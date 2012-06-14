@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal" >
+    
+    <!-- 分类  -->
+	<RelativeLayout
+	    android:layout_width="240dip"
+	    android:layout_height="match_parent"
+	    android:orientation="vertical"
+	    android:background="#654321" >
+	    <RelativeLayout
+	        android:layout_width="fill_parent"
+		    android:layout_height="match_parent"
+		    android:orientation="horizontal">
+	        <Button android:id="@+id/back_btn"
+	            android:text="@string/back"
+	            android:textColor="#FFFFFF"
+	            android:layout_width="100dip"
+		    	android:layout_height="60dip"/>
+	        <Button android:id="@+id/settings_btn"
+	            android:text="@string/settings"
+	            android:textColor="#FFFFFF"
+	            android:layout_width="100dip"
+		    	android:layout_height="60dip"
+		    	android:layout_alignParentRight="true"/>
+	    </RelativeLayout>
+	    <ListView android:id="@+id/categories"
+	         android:layout_width="fill_parent"
+    		 android:layout_height="fill_parent">
+	    </ListView>
+	    <Button android:id="@+id/myOrder"
+	        android:text="@string/myOrder"
+	        android:layout_width="fill_parent"
+    		android:layout_height="70dip"
+    		android:layout_alignParentBottom="true"/>
+    </RelativeLayout>
+    
+    <!-- 菜谱  -->
+    <LinearLayout 
+	    android:layout_width="fill_parent"
+	    android:layout_height="match_parent"
+	    android:orientation="vertical"
+	    android:background="#123456" >
+	    <TextView android:id="@+id/category"
+	    	android:layout_width="fill_parent"
+	    	android:layout_height="60dip"/>
+	    <ListView android:id="@+id/dishes"
+	        android:layout_width="fill_parent"
+	    	android:layout_height="match_parent">
+	    </ListView>
+    </LinearLayout>
+</LinearLayout>

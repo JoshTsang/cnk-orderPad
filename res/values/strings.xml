@@ -3,5 +3,10 @@
 
     <string name="hello">Hello World, Cnk_orderPadActivity!</string>
     <string name="app_name">Cnk_orderPad</string>
+    <string name="menu">菜 谱</string>
+    <string name="ordered">查 单</string>
+    <string name="settings">设 置</string>
+    <string name="back">返回</string>
+    <string name="myOrder">我点的菜</string>
 
 </resources>
