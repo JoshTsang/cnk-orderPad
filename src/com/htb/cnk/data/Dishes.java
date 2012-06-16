@@ -1,0 +1,93 @@
+package com.htb.cnk.data;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Dishes {
+	private List<Dish> dishes = new ArrayList<Dish>();
+	private int mId = -1;
+	
+	public Dishes() {
+		setCategory(0);
+	}
+	
+	public int setCategory(int id) {
+		if (mId == id) {
+			return 0;
+		}
+		mId = id;
+		dishes.clear();
+		fillCategoriesDataById(id);
+		return 0;
+	}
+	
+	public int count() {
+		return dishes.size();
+	}
+	
+	public Dish getDish(int position) {
+		return dishes.get(position);
+	}
+	
+	public int getDishId(int position) {
+		return dishes.get(position).getId();
+	}
+	
+	private void fillCategoriesDataById(int id) {
+		test(id);
+	}
+	
+	private void test(int id) {
+		switch(id) {
+		case 0:
+			dishes.add(new Dish(0,"菜1",1.0,"1"));
+			dishes.add(new Dish(1,"菜2",1.0,"2"));
+			dishes.add(new Dish(2,"菜3",1.0,"3"));
+			dishes.add(new Dish(3,"菜4",1.0,"4"));
+			dishes.add(new Dish(4,"菜5",1.0,"5"));
+			break;
+		case 1:
+			dishes.add(new Dish(5,"菜6",1.0,"6"));
+			dishes.add(new Dish(6,"菜7",1.0,"7"));
+			dishes.add(new Dish(7,"菜8",1.0,"8"));
+			dishes.add(new Dish(8,"菜9",1.0,"9"));
+			dishes.add(new Dish(9,"菜10",1.0,"0"));
+			break;
+		case 2:
+			dishes.add(new Dish(10,"菜11",1.0,"a"));
+			dishes.add(new Dish(11,"菜12",1.0,"a"));
+			dishes.add(new Dish(12,"菜13",1.0,"a"));
+			dishes.add(new Dish(13,"菜14",1.0,"a"));
+			dishes.add(new Dish(14,"菜15",1.0,"a"));
+			break;
+		case 3:
+			dishes.add(new Dish(15,"菜16",1.0,"a"));
+			dishes.add(new Dish(16,"菜17",1.0,"a"));
+			dishes.add(new Dish(17,"菜18",1.0,"a"));
+			dishes.add(new Dish(18,"菜19",1.0,"a"));
+			dishes.add(new Dish(19,"菜20",1.0,"a"));
+			break;
+		case 4:
+			dishes.add(new Dish(20,"菜21",1.0,"a"));
+			dishes.add(new Dish(21,"菜22",1.0,"a"));
+			dishes.add(new Dish(22,"菜23",1.0,"a"));
+			dishes.add(new Dish(23,"菜24",1.0,"a"));
+			dishes.add(new Dish(24,"菜25",1.0,"a"));
+			break;
+		case 5:
+			dishes.add(new Dish(25,"菜26",1.0,"a"));
+			dishes.add(new Dish(26,"菜27",1.0,"a"));
+			dishes.add(new Dish(27,"菜28",1.0,"a"));
+			dishes.add(new Dish(28,"菜29",1.0,"a"));
+			dishes.add(new Dish(29,"菜30",1.0,"a"));
+			break;
+		default:
+			dishes.add(new Dish(30,"菜31",1.0,"a"));
+			dishes.add(new Dish(31,"菜32",1.0,"a"));
+			dishes.add(new Dish(32,"菜33",1.0,"a"));
+			dishes.add(new Dish(33,"菜34",1.0,"a"));
+			dishes.add(new Dish(34,"菜35",1.0,"a"));
+			break;
+		}
+	}
+}

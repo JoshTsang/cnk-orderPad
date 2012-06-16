@@ -8,5 +8,13 @@
     <string name="settings">设 置</string>
     <string name="back">返回</string>
     <string name="myOrder">我点的菜</string>
+    <string name="plusOne">+1</string>
+    <string name="minusOne">-1</string>
+    <string name="tableNum">桌号</string>
+    <string name="dishCount">总共点了</string>
+    <string name="totalPrice">总价</string>
+    <string name="submit">提交菜单</string>
+    <string name="plusFive">+5</string>
+    <string name="minusFive">-5</string>
 
 </resources>

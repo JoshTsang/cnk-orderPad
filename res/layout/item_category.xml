@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView android:id="@+id/categoryItem"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="60dip"
+	android:paddingLeft="15dip"
+	android:textSize="50dip"
+	android:textColor="#652A25"/>
