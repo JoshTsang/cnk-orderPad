@@ -27,7 +27,6 @@ public class MyOrderActivity extends Activity {
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.myorder_activity);
 		findViews();
@@ -50,26 +49,33 @@ public class MyOrderActivity extends Activity {
 		mMyOrderAdapter = new MyOrderAdapter(this, mMyOrder) {
 			@Override
 			public View getView(int position, View convertView, ViewGroup arg2) {
+				TextView dishName;
+				TextView dishPrice;
+				TextView dishQuantity;
+				Button plusBtn;
+				Button minusBtn;
+				Button plus5Btn;
+				Button minus5Btn;
+				
 				if(convertView==null)
 				{
 					convertView=LayoutInflater.from(MyOrderActivity.this).inflate(R.layout.item_ordereddish, null);
 				}
 				OrderedDish dishDetail = mMyOrder.getOrderedDish(position);
 				
-				TextView dishName = (TextView) convertView.findViewById(R.id.dishName);
-				TextView dishPrice = (TextView) convertView.findViewById(R.id.dishPrice);
-				TextView dishQuantity = (TextView) convertView.findViewById(R.id.dishQuantity);
-				Button plusBtn = (Button) convertView.findViewById(R.id.dishPlus);
-				Button minusBtn = (Button) convertView.findViewById(R.id.dishMinus);
-				Button plus5Btn = (Button) convertView.findViewById(R.id.dishPlus5);
-				Button minus5Btn = (Button) convertView.findViewById(R.id.dishMinus5);
+				dishName = (TextView) convertView.findViewById(R.id.dishName);
+				dishPrice = (TextView) convertView.findViewById(R.id.dishPrice);
+				dishQuantity = (TextView) convertView.findViewById(R.id.dishQuantity);
+				plusBtn = (Button) convertView.findViewById(R.id.dishPlus);
+				minusBtn = (Button) convertView.findViewById(R.id.dishMinus);
+				plus5Btn = (Button) convertView.findViewById(R.id.dishPlus5);
+				minus5Btn = (Button) convertView.findViewById(R.id.dishMinus5);
 				
 				dishName.setText(dishDetail.getName());
 				dishPrice.setText(Double.toString(dishDetail.getPrice()) + " 元/份");
 				dishQuantity.setText(Integer.toString(dishDetail.getQuantity()));
 				
 				plusBtn.setTag(position);
-
 				plusBtn.setOnClickListener(new OnClickListener() {
 
 					public void onClick(View v) {
@@ -79,37 +85,7 @@ public class MyOrderActivity extends Activity {
 				});
 				
 				minusBtn.setTag(position);
-
-				minusBtn.setOnClickListener(new OnClickListener() {
-
-					public void onClick(View v) {
-						final int position = Integer.parseInt(v.getTag().toString());
-						if (mMyOrder.getOrderedDish(position).getQuantity() > 1) {
-							updateDishQuantity(position, -1);
-						} else {
-							new AlertDialog.Builder(MyOrderActivity.this)
-							.setTitle("请注意")
-							.setMessage("确认删除" + mMyOrder.getOrderedDish(position).getName())
-							.setPositiveButton("确定",
-									new DialogInterface.OnClickListener() {
-
-										@Override
-										public void onClick(DialogInterface dialog,
-												int which) {
-											updateDishQuantity(position, -1);
-										}
-									})
-							.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
-									
-								}
-							}).show();
-						}
-					}
-				});
+				minusBtn.setOnClickListener(minusClicked);
 				
 				plus5Btn.setTag(position);
 
@@ -123,36 +99,7 @@ public class MyOrderActivity extends Activity {
 				
 				minus5Btn.setTag(position);
 
-				minus5Btn.setOnClickListener(new OnClickListener() {
-
-					public void onClick(View v) {
-						final int position = Integer.parseInt(v.getTag().toString());
-						if (mMyOrder.getOrderedDish(position).getQuantity() > 1) {
-							updateDishQuantity(position, -5);
-						} else {
-							new AlertDialog.Builder(MyOrderActivity.this)
-							.setTitle("请注意")
-							.setMessage("确认删除" + mMyOrder.getOrderedDish(position).getName())
-							.setPositiveButton("确定",
-									new DialogInterface.OnClickListener() {
-
-										@Override
-										public void onClick(DialogInterface dialog,
-												int which) {
-											updateDishQuantity(position, -5);
-										}
-									})
-							.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
-									
-								}
-							}).show();
-						}
-					}
-				});
+				minus5Btn.setOnClickListener(minus5Clicked);
 				return convertView;
 			}
 		};
@@ -179,11 +126,54 @@ public class MyOrderActivity extends Activity {
 		mTotalPriceTxt.setText(Double.toString(mMyOrder.getTotalPrice()) + " 元");
 	}
 
+	private void minusDishQuantity(final int position, final int quantity) {
+		if (mMyOrder.getOrderedDish(position).getQuantity() > quantity) {
+			updateDishQuantity(position, -quantity);
+		} else {
+			new AlertDialog.Builder(MyOrderActivity.this)
+			.setTitle("请注意")
+			.setMessage("确认删除" + mMyOrder.getOrderedDish(position).getName())
+			.setPositiveButton("确定",
+					new DialogInterface.OnClickListener() {
+	
+						@Override
+						public void onClick(DialogInterface dialog,
+								int which) {
+							updateDishQuantity(position, -quantity);
+						}
+					})
+			.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+	
+				@Override
+				public void onClick(DialogInterface dialog,
+						int which) {
+					
+				}
+			}).show();
+		}
+	}
+
 	private OnClickListener backBtnClicked = new OnClickListener() {
 		
 		@Override
 		public void onClick(View v) {
 			MyOrderActivity.this.finish();
+		}
+	};
+	
+	private OnClickListener minusClicked = new OnClickListener() {
+
+		public void onClick(View v) {
+			final int position = Integer.parseInt(v.getTag().toString());
+			minusDishQuantity(position, 1);
+		}
+	};
+	
+	private OnClickListener minus5Clicked = new OnClickListener() {
+
+		public void onClick(View v) {
+			final int position = Integer.parseInt(v.getTag().toString());
+			minusDishQuantity(position, 5);
 		}
 	};
 }

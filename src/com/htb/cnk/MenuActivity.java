@@ -49,11 +49,9 @@ public class MenuActivity extends Activity {
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.menu_activity);
 		findViews();
-		setTestData();
 		setListData();
 		setClickListener();
 	}
@@ -82,66 +80,27 @@ public class MenuActivity extends Activity {
 		mDishLstAdapter = new DishListAdapter(this, mDishes) {
 			@Override
 			public View getView(int position, View convertView, ViewGroup arg2) {
+				ImageButton dishPic;
+				TextView dishName;
+				TextView dishPrice;
+				Button plusBtn;
+				Button minusBtn;
+				
 				if(convertView==null)
 				{
 					convertView=LayoutInflater.from(MenuActivity.this).inflate(R.layout.item_dish, null);
 				}
 				Dish dishDetail = mDishes.getDish(position);
 
-				ImageButton dishPic = (ImageButton) convertView.findViewById(R.id.pic);
-				TextView dishName = (TextView) convertView.findViewById(R.id.dishName);
-				TextView dishPrice = (TextView) convertView.findViewById(R.id.dishPrice);
-				Button plusBtn = (Button) convertView.findViewById(R.id.dishPlus);
-				Button minusBtn = (Button) convertView.findViewById(R.id.dishMinus);
+				dishPic = (ImageButton) convertView.findViewById(R.id.pic);
+				dishName = (TextView) convertView.findViewById(R.id.dishName);
+				dishPrice = (TextView) convertView.findViewById(R.id.dishPrice);
+				plusBtn = (Button) convertView.findViewById(R.id.dishPlus);
+				minusBtn = (Button) convertView.findViewById(R.id.dishMinus);
 				
-				
-				FileInputStream inStream = null;
-				try {
-					Log.d("fileName", "ldpi_" + dishDetail.getPic() + ".jpg");
-					inStream = openFileInput("ldpi_" + dishDetail.getPic() + ".jpg");
-				} catch (FileNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				FileInputStream inStream = getThumbnail(dishDetail.getPic());
 				if (inStream != null) {
-					Bitmap photo = BitmapFactory.decodeStream(inStream);  
-					Drawable drawable = new BitmapDrawable(photo);
-					dishPic.setTag(position);
-					dishPic.setBackgroundDrawable(drawable);
-					dishPic.setOnClickListener(new Button.OnClickListener() {  
-			            public void onClick(View view) {  
-			            	final int position = Integer.parseInt(view.getTag().toString());
-					        final Dialog dialog = new Dialog(MenuActivity.this, R.style.TANCStyle);
-
-					        ImageView dishPicView;  
-					        
-					        dialog.setContentView(R.layout.dish_detail);  
-					        dishPicView = (ImageView) dialog.findViewById(R.id.dishBigPic);
-					        dialog.setCancelable(true);  
-					        
-					        FileInputStream isBigPic = null;
-							try {
-								isBigPic = openFileInput("hdpi_" + mDishes.getDish(position).getPic() + ".jpg");
-							} catch (FileNotFoundException e) {
-								e.printStackTrace();
-							}
-							if (isBigPic != null) {
-								Bitmap photo = BitmapFactory.decodeStream(isBigPic);  
-								Drawable drawable = new BitmapDrawable(photo);
-								dishPicView.setBackgroundDrawable(drawable);
-							} else {
-						        dishPicView.setBackgroundResource(R.drawable.no_pic_bigl);
-							}
-							
-					        Button btnCancel = (Button) dialog.findViewById(R.id.btnCancel);  
-					        btnCancel.setOnClickListener(new Button.OnClickListener() {  
-					            public void onClick(View view) {  
-					                dialog.cancel();  
-					            }  
-					        });  
-					        dialog.show();  
-			            }  
-					});
+					setThumbnail(position, dishPic, inStream);
 				} else {
 					Resources resources = MenuActivity.this.getResources();
 					dishPic.setBackgroundDrawable(resources.getDrawable(R.drawable.no_pic_bigl));
@@ -161,7 +120,6 @@ public class MenuActivity extends Activity {
 				});
 				
 				minusBtn.setTag(position);
-
 				minusBtn.setOnClickListener(new OnClickListener() {
 
 					public void onClick(View v) {
@@ -178,6 +136,37 @@ public class MenuActivity extends Activity {
 		mDishesLst.setAdapter(mDishLstAdapter);
 	}
 	
+	private void setThumbnail(int position, ImageButton dishPic,
+			FileInputStream inStream) {
+		Bitmap photo = BitmapFactory.decodeStream(inStream);  
+		Drawable drawable = new BitmapDrawable(photo);
+		dishPic.setTag(position);
+		dishPic.setBackgroundDrawable(drawable);
+		dishPic.setOnClickListener(thumbnailClicked);
+	}
+
+	private FileInputStream getPic(String name) {
+		FileInputStream isBigPic = null;
+		try {
+			isBigPic = openFileInput("hdpi_" + name + ".jpg");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		return isBigPic;
+	}
+
+	private FileInputStream getThumbnail(String name) {
+		FileInputStream inStream = null;
+		try {
+			Log.d("fileName", "ldpi_" + name + ".jpg");
+			inStream = openFileInput("ldpi_" + name + ".jpg");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return null;
+		}
+		return inStream;
+	}
+
 	private void setClickListener() {
 		mBackBtn.setOnClickListener(backBtnClicked);
 		mSettingsBtn.setOnClickListener(settingBtnClicked);
@@ -185,19 +174,10 @@ public class MenuActivity extends Activity {
 		mCategoriesLst.setOnItemClickListener(CategoryListClicked);
 	}
 	
-	private void setTestData() {
-//		mCategories.add("凉菜");
-//		mCategories.add("热菜");
-//		mCategories.add("汤菜");
-//		mCategories.add("饮料");
-//		mCategories.add("测试1");
-//		mCategories.add("测试2");
-//		mCategories.add("测试3");
-//		mCategories.add("测试4");
-//		mCategories.add("测试5");
-//		mCategories.add("测试6");
+	private void updateOrderedDishCount() {
+		mOrderedDishCount.setText(Integer.toString(mMyOrder.count()));
 	}
-	
+
 	private OnItemClickListener CategoryListClicked = new OnItemClickListener() {
 
 		@Override
@@ -213,7 +193,6 @@ public class MenuActivity extends Activity {
 		
 		@Override
 		public void onClick(View v) {
-			// TODO Auto-generated method stub
 			MenuActivity.this.finish();
 		}
 	};
@@ -239,7 +218,33 @@ public class MenuActivity extends Activity {
 		}
 	};
 	
-	private void updateOrderedDishCount() {
-		mOrderedDishCount.setText(Integer.toString(mMyOrder.count()));
-	}
+	private OnClickListener thumbnailClicked = new Button.OnClickListener() {  
+        public void onClick(View view) {  
+        	final int position = Integer.parseInt(view.getTag().toString());
+	        final Dialog dialog = new Dialog(MenuActivity.this, R.style.TANCStyle);
+
+	        ImageView dishPicView;  
+	        
+	        dialog.setContentView(R.layout.dish_detail);  
+	        dishPicView = (ImageView) dialog.findViewById(R.id.dishBigPic);
+	        dialog.setCancelable(true);  
+	        
+	        FileInputStream isBigPic = getPic(mDishes.getDish(position).getPic());
+			if (isBigPic != null) {
+				Bitmap photo = BitmapFactory.decodeStream(isBigPic);  
+				Drawable drawable = new BitmapDrawable(photo);
+				dishPicView.setBackgroundDrawable(drawable);
+			} else {
+		        dishPicView.setBackgroundResource(R.drawable.no_pic_bigl);
+			}
+			
+	        Button btnCancel = (Button) dialog.findViewById(R.id.btnCancel);  
+	        btnCancel.setOnClickListener(new Button.OnClickListener() {  
+	            public void onClick(View view) {  
+	                dialog.cancel();  
+	            }  
+	        });  
+	        dialog.show();  
+        }  
+	};
 }

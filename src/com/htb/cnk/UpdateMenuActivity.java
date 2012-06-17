@@ -32,7 +32,6 @@ public class UpdateMenuActivity extends Activity {
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.update_menu_activity);
 		mStateTxt = (TextView) findViewById(R.id.state);
@@ -161,7 +160,6 @@ public class UpdateMenuActivity extends Activity {
 	
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
-	  // TODO Auto-generated method stub
 	  
 		if(keyCode == KeyEvent.KEYCODE_BACK){
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);

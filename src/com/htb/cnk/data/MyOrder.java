@@ -29,15 +29,6 @@ public class MyOrder {
 	
 	static private List<OrderedDish> order = new ArrayList<OrderedDish>();
 	
-	public MyOrder() {
-		//test
-//		Dish a = new Dish(0, "菜1", 1.0, "a");
-//		order.add(new OrderedDish(a, 1));
-//		order.add(new OrderedDish(new Dish(1, "菜2", 2.0, "a"), 1));
-//		order.add(new OrderedDish(new Dish(2, "菜123", 3.0, "a"), 1));
-//		order.add(new OrderedDish(new Dish(3, "菜1224", 4.0, "a"), 1));
-//		order.add(new OrderedDish(new Dish(0, "菜15", 15.0, "a"), 1));
-	}
 	public int add(Dish dish, int quantity) {
 		for (OrderedDish item:order) {
 			if (item.dish.getId() == dish.getId()) {
