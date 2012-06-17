@@ -18,8 +18,9 @@
 	            android:text="@string/back"
  	            android:textColor="#F9E8BB"
 	        	android:textSize="35dip"
-	            android:layout_width="100dip"
+	            android:layout_width="120dip"
 		    	android:layout_height="60dip"
+		    	android:gravity="center"
 	        	android:background="#00000000"/>
 	        
 	    </RelativeLayout>
