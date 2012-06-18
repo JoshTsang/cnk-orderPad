@@ -5,6 +5,18 @@
         <item name="android:windowBackground">@drawable/background_transparent</item>
         <!-- 屏幕背景不变暗 -->
         <item name="android:backgroundDimEnabled">false</item>
+        
+        <item name="android:windowNoTitle">true</item> 
+        <!-- 更改对话框标题栏 -->
+        <!-- <item name="android:windowTitleStyle">@style/TitleStyle</item> -->
+    </style>
+    <style name="FULLTANCStyle">
+        <!-- 更换背景图片实现全透明 -->
+        <item name="android:windowBackground">@drawable/background_transparent</item>
+        <!-- 屏幕背景不变暗 -->
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowNoTitle">true</item> 
         <!-- 更改对话框标题栏 -->
         <!-- <item name="android:windowTitleStyle">@style/TitleStyle</item> -->
     </style>

@@ -16,5 +16,6 @@
     <string name="submit">提交菜单</string>
     <string name="plusFive">+5</string>
     <string name="minusFive">-5</string>
+    <string name="loading">正在加载...</string>
 
 </resources>

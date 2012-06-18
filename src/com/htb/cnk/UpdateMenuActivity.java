@@ -1,10 +1,12 @@
 package com.htb.cnk;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -13,15 +15,20 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.view.KeyEvent;
 import android.widget.TextView;
 
+import com.htb.cnk.lib.DBFile;
+import com.htb.constant.Server;
+
 public class UpdateMenuActivity extends Activity {
 	final static int DOWNLOAD_DB_FAILED = -1;
 	final static int WRITE_FILE_FAILED = -2;
 	final static int DOWNLOAD_PIC_FAILED = -3;
+	final static int COPY_DB_FAILED = -4;
 	
 	final static int DOWNLOAD_THUMBNAIL = 1;
 	final static int DOWNLOAD_PIC = 2;
@@ -29,6 +36,7 @@ public class UpdateMenuActivity extends Activity {
 	final static String MY_HOST = "http://192.168.0.100/jpeg/";
 	
 	private TextView mStateTxt;
+	private DBFile mDBFile;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +45,7 @@ public class UpdateMenuActivity extends Activity {
 		mStateTxt = (TextView) findViewById(R.id.state);
 		
 		mStateTxt.setText("正在准备更新...");
-		
+		mDBFile = new DBFile(this);
 		updateMenu();
 	}
 
@@ -46,7 +54,7 @@ public class UpdateMenuActivity extends Activity {
 			public void run() {
 				int ret;
 			
-				ret = downloadDB();
+				ret = downloadDB("db/cnk.db");
 				if (ret < 0) {
 					handler.sendEmptyMessage(ret);
 					return ;
@@ -76,8 +84,42 @@ public class UpdateMenuActivity extends Activity {
 		return true;
 	}
 	
-	private int downloadDB() {
-		return 0;
+	private int downloadDB(String serverDBPath) {
+		URL url;
+		String filePath = Environment
+                .getExternalStorageDirectory().getAbsolutePath()
+                + "/cainaoke/";
+        try {
+            url=new URL(Server.SERVER_DOMIN + "/" + serverDBPath);
+            
+            HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+
+            InputStream istream=connection.getInputStream();
+            String filename="cnk.db";
+            
+            File dir=new File(filePath);
+            if (!dir.exists()) {
+                dir.mkdir();
+            }
+            File file=new File(filePath+filename);
+            file.createNewFile();
+            
+            OutputStream output=new FileOutputStream(file);
+            byte[] buffer=new byte[1024*4];
+            while (istream.read(buffer)!=-1) {
+                output.write(buffer);
+            }
+            output.flush();
+            output.close();
+            istream.close();
+            if (mDBFile.copyDatabase() < 0) {
+            	return COPY_DB_FAILED;
+            }
+            return 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return DOWNLOAD_DB_FAILED;
+        }
 	}
 	
 	private int downloadSmallPic() {
@@ -144,7 +186,7 @@ public class UpdateMenuActivity extends Activity {
 	        return WRITE_FILE_FAILED;
 	    }
 	    return 0;
-	} 
+	}
 	
 	public static byte[] readStream(InputStream inStream) throws Exception{     
         ByteArrayOutputStream outStream = new ByteArrayOutputStream();     

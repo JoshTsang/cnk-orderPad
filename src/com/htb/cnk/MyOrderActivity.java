@@ -6,13 +6,14 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.htb.cnk.adapter.MyOrderAdapter;
+import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.MyOrder.OrderedDish;
 
@@ -43,7 +44,7 @@ public class MyOrderActivity extends Activity {
 	}
 	
 	private void fillData() {
-		mTableNumTxt.setText("100");
+		mTableNumTxt.setText(Info.getTableName());
 		updateTabelInfos();
 		
 		mMyOrderAdapter = new MyOrderAdapter(this, mMyOrder) {

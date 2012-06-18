@@ -1,5 +1,7 @@
 package com.htb.cnk;
 
+import com.htb.cnk.data.Info;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -39,6 +41,7 @@ public class Cnk_orderPadActivity extends Activity {
 		public void onClick(View arg0) {
 			Intent intent = new Intent();
 			intent.setClass(Cnk_orderPadActivity.this, MenuActivity.class);
+			Info.setMode(Info.WORK_MODE_CUSTOMER);
 			startActivity(intent);
 		}
     	
@@ -49,7 +52,8 @@ public class Cnk_orderPadActivity extends Activity {
 		@Override
 		public void onClick(View v) {
 			Intent intent = new Intent();
-			intent.setClass(Cnk_orderPadActivity.this, OrderActivity.class);
+			intent.setClass(Cnk_orderPadActivity.this, MenuActivity.class);
+			Info.setMode(Info.WORK_MODE_WAITER);
 			startActivity(intent);
 		}
    
