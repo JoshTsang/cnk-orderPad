@@ -22,20 +22,17 @@ public class CategoryListAdapter extends BaseAdapter {
 	
 	@Override
 	public int getCount() {
-		// TODO Auto-generated method stub
 		return mCategories.count();
 	}
 
 	@Override
 	public Object getItem(int arg0) {
-		// TODO Auto-generated method stub
 		return mCategories.getName(arg0);
 	}
 
 	@Override
 	public long getItemId(int arg0) {
-		// TODO Auto-generated method stub
-		return mCategories.getId(arg0);
+		return 0;
 	}
 
 	@Override

@@ -21,6 +21,7 @@ public class Cnk_orderPadActivity extends Activity {
         setContentView(R.layout.main);
         findViews();
         setClickListeners();
+        Info.setNewCustomer(true);
     }
     
     private void findViews(){

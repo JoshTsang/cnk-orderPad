@@ -3,46 +3,54 @@ package com.htb.cnk.data;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+
 public class Categories {
 	public class Category {
-		public int mId;
+		public String mTableName;
 		public String mName;
 		
-		public Category(int id, String name) {
-			mId = id;
+		public Category(String tableName, String name) {
+			mTableName = tableName;
 			mName = name;
 		}
 	}
 	
-	List<Category> categories = new ArrayList<Category>();
+	private CnkDbHelper mCnkDbHelper;
+	private SQLiteDatabase mDb;
+	List<Category> mCategories = new ArrayList<Category>();
 	
-	public  Categories(){
+	public Categories(Context context){
+		mCnkDbHelper = new CnkDbHelper(context, CnkDbHelper.DATABASE_NAME, null, 1);
 		getCategoriesData();
 	}
 	
 	public int count() {
-		return categories.size();
+		return mCategories.size();
 	}
 	
 	public String getName(int position) {
-		return categories.get(position).mName;
+		return mCategories.get(position).mName;
 	}
 	
-	public int getId(int position) {
-		return categories.get(position).mId;
+	public String getTableName(int position) {
+		return mCategories.get(position).mTableName;
 	}
 	
 	private void getCategoriesData() {
-		test();
+		mDb = mCnkDbHelper.getReadableDatabase();
+		Cursor categories = mDb.query(CnkDbHelper.TABLE_CATEGORIES, new String[] {CnkDbHelper.CATEGORY_NAME,
+				CnkDbHelper.CATEGORY_TABLE_NAME},
+				null, null, null, null, null);
+		while (categories.moveToNext()) {
+			mCategories.add(new Category(categories.getString(1), categories.getString(0)));
+		} 
+		mDb.close();
 	}
 
 	private void test() {
-		categories.add(new Category(0, "凉菜"));
-		categories.add(new Category(1, "热菜"));
-		categories.add(new Category(2, "汤"));
-		categories.add(new Category(3, "稀饭"));
-		categories.add(new Category(4, "饮料"));
-		categories.add(new Category(5, "特色菜"));
-		categories.add(new Category(6, "私房菜"));
+		
 	}
 }

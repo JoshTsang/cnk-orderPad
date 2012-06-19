@@ -46,7 +46,7 @@ public class MenuActivity extends Activity {
 	private Button mMyOrderBtn;
 	private TextView mDishLstTitle;
 	private TextView mOrderedDishCount;
-	private Categories mCategories = new Categories();
+	private Categories mCategories;
 	private Dishes mDishes;
 	private DishListAdapter mDishLstAdapter;
 	private MyOrder mMyOrder = new MyOrder();
@@ -56,11 +56,11 @@ public class MenuActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.menu_activity);
 		mDishes = new Dishes(this);
+		mCategories = new Categories(this);
 		findViews();
 		setListData();
 		setClickListener();
 		
-		Info.setNewCustomer(true);
 		if (Info.isNewCustomer()) {
 			showGuide();
 		}
@@ -255,9 +255,8 @@ public class MenuActivity extends Activity {
 		mDishLstAdapter.notifyDataSetChanged();
 		new Thread() {
 			public void run() {
-				//TODO overtime
-				mDishes.setCategory(mCategories.getId(position));
-				handler.sendEmptyMessage(0);
+				int ret = mDishes.setCategory(mCategories.getTableName(position));
+				handler.sendEmptyMessage(ret);
 			}
 		}.start();
 	}
@@ -273,7 +272,8 @@ public class MenuActivity extends Activity {
 	        public void onClick(View view) {  
 	            dialog.cancel();  
 	        }  
-	    });  
+	    });
+	    Info.setNewCustomer(false);
 	    dialog.show();  
 	}
 
@@ -282,8 +282,10 @@ public class MenuActivity extends Activity {
 		@Override
 		public void onItemClick(AdapterView<?> arg0, View view, int position,
 				long arg3) {
-			mDishLstTitle.setText(mCategories.getName(position));
-			updateDishes(position);
+			if (!mCategories.getName(position).equals(mDishLstTitle.getText())) {
+				mDishLstTitle.setText(mCategories.getName(position));
+				updateDishes(position);
+			}
 		}
 	};
 	

@@ -9,7 +9,8 @@ import android.database.sqlite.SQLiteDatabase;
 
 public class Dishes {
 	private List<Dish> mDishes = new ArrayList<Dish>();
-	private int mId = -1;
+	private int mSoldOutItemsId[];
+	private String mTableName = "";
 	private CnkDbHelper mCnkDbHelper;
 	private SQLiteDatabase mDb;
 	
@@ -23,13 +24,13 @@ public class Dishes {
 		mDb = mCnkDbHelper.getReadableDatabase();
 	}
 	
-	public int setCategory(int id) {
-		if (mId == id) {
+	public int setCategory(String tableName) {
+		if (mTableName.equals(tableName)) {
 			return 0;
 		}
-		mId = id;
+		mTableName = tableName;
 		mDishes.clear();
-		fillCategoriesDataById(id);
+		fillCategoriesData();
 		return 0;
 	}
 	
@@ -49,23 +50,45 @@ public class Dishes {
 		mDishes.clear();
 	}
 	
-	private void fillCategoriesDataById(int id) {
-		test(id);
-//		Cursor dishes = getDishesFromDataBase(id);
-//		do {
-//			mDishes.add(new Dish(dishes.getInt(ID_COLUMN),
-//								dishes.getString(NAME_COLUMN),
-//								dishes.getDouble(PRICE_COLUMN),
-//								dishes.getString(PIC_COLUMN)));
-//		} while (dishes.moveToNext());
+	private void fillCategoriesData() {
+//		test(id);
+		Cursor dishes = getDishesFromDataBase(mTableName);
+		while (dishes.moveToNext()) {
+			mDishes.add(new Dish(dishes.getInt(ID_COLUMN),
+								dishes.getString(NAME_COLUMN),
+								dishes.getDouble(PRICE_COLUMN),
+								dishes.getString(PIC_COLUMN)));
+		}
+//		removeSoldOutItems(id);
 	}
 	
-	private Cursor getDishesFromDataBase(int id) {
-		return mDb.query(Integer.toString(id), new String[] {CnkDbHelper.DISH_ID,
+	private Cursor getDishesFromDataBase(String tableName) {
+		return mDb.query(tableName, new String[] {CnkDbHelper.DISH_ID,
 															CnkDbHelper.DISH_NAME,
 															CnkDbHelper.DISH_PRICE,
 															CnkDbHelper.DISH_PIC},
 							null, null, null, null, null);
+	}
+	
+	private int removeSoldOutItems(int id) {
+		int ret;
+		ret = getSoldItemsFromSever(id);
+		if (ret < 0) {
+			return ret;
+		}
+		
+		for (int i:mSoldOutItemsId) {
+			for (Dish item:mDishes) {
+				if (item.getId() == i) {
+					mDishes.remove(item);
+				}
+			}
+		}
+		return 0;
+	}
+	
+	private int getSoldItemsFromSever(int id) {
+		return 0;
 	}
 	
 	private void test(int id) {
@@ -121,4 +144,13 @@ public class Dishes {
 			break;
 		}
 	}
+
+	@Override
+	protected void finalize() throws Throwable {
+		// TODO Auto-generated method stub
+		mDb.close();
+		super.finalize();
+	}
+	
+	
 }

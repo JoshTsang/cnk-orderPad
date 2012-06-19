@@ -208,7 +208,7 @@ public class UpdateMenuActivity extends Activity {
 			builder.setTitle("确定退出");
 			builder.setMessage("退出将菜谱无法更新,请等待菜谱更新完毕后,系统自动退出");
 			
-			builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+			builder.setPositiveButton("退出", new DialogInterface.OnClickListener() {
 			    
 			    @Override
 				public void onClick(DialogInterface dialog, int which) {
