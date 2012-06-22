@@ -9,12 +9,14 @@ import android.database.sqlite.SQLiteDatabase;
 
 public class Categories {
 	public class Category {
+		public int mCategoryId;
 		public String mTableName;
 		public String mName;
 		
-		public Category(String tableName, String name) {
+		public Category(String tableName, String name, int id) {
 			mTableName = tableName;
 			mName = name;
+			mCategoryId = id;
 		}
 	}
 	
@@ -39,13 +41,19 @@ public class Categories {
 		return mCategories.get(position).mTableName;
 	}
 	
+	public int getCategoryId(int position) {
+		return mCategories.get(position).mCategoryId;
+	}
+	
 	private void getCategoriesData() {
 		mDb = mCnkDbHelper.getReadableDatabase();
-		Cursor categories = mDb.query(CnkDbHelper.TABLE_CATEGORIES, new String[] {CnkDbHelper.CATEGORY_NAME,
+		Cursor categories = mDb.query(CnkDbHelper.TABLE_CATEGORIES, 
+				new String[] {CnkDbHelper.CATEGORY_ID, CnkDbHelper.CATEGORY_NAME,
 				CnkDbHelper.CATEGORY_TABLE_NAME},
 				null, null, null, null, null);
 		while (categories.moveToNext()) {
-			mCategories.add(new Category(categories.getString(1), categories.getString(0)));
+			mCategories.add(new Category(categories.getString(2),
+					categories.getString(1), categories.getInt(0)));
 		} 
 		mDb.close();
 	}

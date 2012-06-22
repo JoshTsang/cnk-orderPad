@@ -33,7 +33,7 @@ public class UpdateMenuActivity extends Activity {
 	final static int DOWNLOAD_THUMBNAIL = 1;
 	final static int DOWNLOAD_PIC = 2;
 	
-	final static String MY_HOST = "http://192.168.0.100/jpeg/";
+	final static String MY_HOST = Server.SERVER_DOMIN + "/jpeg/";
 	
 	private TextView mStateTxt;
 	private DBFile mDBFile;
@@ -245,7 +245,7 @@ public class UpdateMenuActivity extends Activity {
 							@Override
 							public void onClick(DialogInterface dialog,
 									int which) {
-								
+								finish();
 							}
 						})
 				.show();

@@ -255,7 +255,9 @@ public class MenuActivity extends Activity {
 		mDishLstAdapter.notifyDataSetChanged();
 		new Thread() {
 			public void run() {
-				int ret = mDishes.setCategory(mCategories.getTableName(position));
+				int ret = mDishes.setCategory(
+						mCategories.getCategoryId(position), 
+						mCategories.getTableName(position));
 				handler.sendEmptyMessage(ret);
 			}
 		}.start();

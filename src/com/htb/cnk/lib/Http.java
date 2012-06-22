@@ -28,6 +28,7 @@ import org.apache.http.util.EntityUtils;
 import android.util.Log;
 
 import com.htb.constant.ErrorNum;
+import com.htb.constant.Limit;
 import com.htb.constant.Server;
 
 /**
@@ -36,6 +37,19 @@ import com.htb.constant.Server;
  */
 public class Http {
 	private static int mErrno;
+	
+	public static String get(String page, String param) {
+		String ret;
+		
+		for (int i=0; i<Limit.RETRY; i++) {
+			ret = httpRequestGet(page, param);
+			if (ret != null) {
+				return ret;
+			}
+		}
+		
+		return null;
+	}
 	
 	private static String httpRequestPost(String page, String msg) {
 		HttpParams httpParameters1 = new BasicHttpParams();
@@ -130,15 +144,22 @@ public class Http {
 		return stringBuffer.toString();
 	}
 		
-	private static String httpRequestGet(String page, String msg) {
+	private static String httpRequestGet(String page, String param) {
 		/*声明网址字符串*/
-		String uriAPI = Server.SERVER_DOMIN + "/" + page;
+		String uriAPI = Server.SERVER_DOMIN + "/" + page + "?" + param;
 		/*建立HTTP Get联机*/
 		HttpGet httpRequest = new HttpGet(uriAPI); 
 		
+		HttpParams httpParameters1 = new BasicHttpParams();
+		HttpConnectionParams.setConnectionTimeout(httpParameters1, 20 * 1000);
+		HttpConnectionParams.setSoTimeout(httpParameters1, 20 * 1000);
+		
+		DefaultHttpClient client;
+		client = new DefaultHttpClient(httpParameters1);
+		
 		try 
 		{
-			HttpResponse httpResponse = new DefaultHttpClient().execute(httpRequest); 
+			HttpResponse httpResponse = client.execute(httpRequest); 
 		
 			if(httpResponse.getStatusLine().getStatusCode() == 200) { 
 				return EntityUtils.toString(httpResponse.getEntity());

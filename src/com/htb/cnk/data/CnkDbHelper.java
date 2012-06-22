@@ -10,6 +10,7 @@ public class CnkDbHelper extends SQLiteOpenHelper {
 	
 	public final static String TABLE_CATEGORIES = "table_show";
 	
+	public final static String CATEGORY_ID = "id";
 	public final static String CATEGORY_NAME = "class";
 	public final static String CATEGORY_TABLE_NAME = "tablename";
 	
