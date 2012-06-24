@@ -4,6 +4,9 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -19,6 +22,7 @@ import com.htb.cnk.data.MyOrder.OrderedDish;
 
 public class MyOrderActivity extends Activity {
 	private Button mBackBtn;
+	private Button mSubmitBtn;
 	private TextView mTableNumTxt;
 	private TextView mDishCountTxt;
 	private TextView mTotalPriceTxt;
@@ -37,6 +41,7 @@ public class MyOrderActivity extends Activity {
 
 	private void findViews() {
 		mBackBtn = (Button) findViewById(R.id.back_btn);
+		mSubmitBtn = (Button) findViewById(R.id.submit);
 		mTableNumTxt = (TextView) findViewById(R.id.tableNum);
 		mDishCountTxt = (TextView) findViewById(R.id.dishCount);
 		mTotalPriceTxt = (TextView) findViewById(R.id.totalPrice);
@@ -109,6 +114,7 @@ public class MyOrderActivity extends Activity {
 	
 	private void setClickListener() {
 		mBackBtn.setOnClickListener(backBtnClicked);
+		mSubmitBtn.setOnClickListener(submitBtnClicked);
 	}
 	
 	private void updateDishQuantity(int position, int quantity) {
@@ -175,6 +181,72 @@ public class MyOrderActivity extends Activity {
 		public void onClick(View v) {
 			final int position = Integer.parseInt(v.getTag().toString());
 			minusDishQuantity(position, 5);
+		}
+	};
+	
+	private OnClickListener submitBtnClicked = new OnClickListener() {
+		
+		@Override
+		public void onClick(View v) {
+			if (mMyOrder.count() <= 0) {
+				new AlertDialog.Builder(MyOrderActivity.this)
+				.setTitle("请注意")
+				.setMessage("您还没有点任何东西")
+				.setPositiveButton("确定",
+					new DialogInterface.OnClickListener() {
+	
+						@Override
+						public void onClick(DialogInterface dialog,
+								int which) {
+							
+						}
+				}).show();
+				return ;
+			}
+			//TODO auth
+			new Thread() {
+				public void run() {
+					String ret = mMyOrder.submit();
+					if (ret == null) {
+						handler.sendEmptyMessage(-1);
+					} else {
+						handler.sendEmptyMessage(0);
+						Log.d("Respond", ret);
+					}
+				}
+			}.start();
+		}
+	};
+	
+	private Handler handler = new Handler() {
+		public void handleMessage(Message msg) {
+			if (msg.what < 0) {
+				new AlertDialog.Builder(MyOrderActivity.this)
+				.setTitle("出错了")
+				.setMessage("提交订单失败")
+				.setPositiveButton("确定",
+					new DialogInterface.OnClickListener() {
+	
+						@Override
+						public void onClick(DialogInterface dialog,
+								int which) {
+							
+						}
+				}).show();
+			} else {
+				new AlertDialog.Builder(MyOrderActivity.this)
+				.setTitle("提示")
+				.setMessage("提交已提交")
+				.setPositiveButton("确定",
+					new DialogInterface.OnClickListener() {
+	
+						@Override
+						public void onClick(DialogInterface dialog,
+								int which) {
+							
+						}
+				}).show();
+			}
 		}
 	};
 }

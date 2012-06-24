@@ -54,7 +54,7 @@ public class UpdateMenuActivity extends Activity {
 			public void run() {
 				int ret;
 			
-				ret = downloadDB("db/cnk.db");
+				ret = downloadDB("db/menu.db");
 				if (ret < 0) {
 					handler.sendEmptyMessage(ret);
 					return ;

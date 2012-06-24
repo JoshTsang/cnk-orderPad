@@ -28,6 +28,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.htb.cnk.adapter.CategoryListAdapter;
 import com.htb.cnk.adapter.DishListAdapter;
@@ -353,7 +354,9 @@ public class MenuActivity extends Activity {
 	private Handler handler = new Handler() {
 		public void handleMessage(Message msg) {
 			if (msg.what < 0) {
-			
+				Toast.makeText(MenuActivity.this, "服务器开小差了,系统将显示全部菜单.",
+						Toast.LENGTH_SHORT).show();
+				mDishLstAdapter.notifyDataSetChanged();
 			} else {
 				mDishLstAdapter.notifyDataSetChanged();
 			}	

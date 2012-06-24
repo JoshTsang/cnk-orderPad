@@ -51,6 +51,19 @@ public class Http {
 		return null;
 	}
 	
+	public static String post(String page, String msg) {
+		String ret;
+		
+		for (int i=0; i<Limit.RETRY; i++) {
+			ret = httpRequestPost(page, msg);
+			if (ret != null) {
+				return ret;
+			}
+		}
+		
+		return null;
+	}
+	
 	private static String httpRequestPost(String page, String msg) {
 		HttpParams httpParameters1 = new BasicHttpParams();
 
@@ -97,16 +110,15 @@ public class Http {
 			try {
 				return EntityUtils.toString(httpResponse.getEntity());
 			} catch (ParseException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 				return null;
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 				return null;
 			}
 		} else {
 		    	mErrno = -statusCode;
+		    	Log.d("HTTP ERR", Integer.toString(mErrno));
 				return null;
 		}
 	}
@@ -191,7 +203,7 @@ public class Http {
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
-		params.put("value", param);
+		params.put("json", param);
 
 		List<NameValuePair> ls = new ArrayList<NameValuePair>();
 		Set<String> keys = params.keySet();

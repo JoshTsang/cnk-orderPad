@@ -40,8 +40,8 @@ public class Dishes {
 		mTableName = tableName;
 		mDishes.clear();
 		fillCategoriesData();
-		removeSoldOutItems(mCategoryId);
-		return 0;
+		int ret = removeSoldOutItems(mCategoryId);
+		return ret;
 	}
 	
 	public int count() {
@@ -103,6 +103,11 @@ public class Dishes {
 		String dishStatusPkg = 
 				Http.get(Server.GET_DISH_STATUS,
 						"CID=" + Integer.toString(id));
+		
+		if (dishStatusPkg == null) {
+			//TODO handle network errors
+			return -1;
+		}
 		Log.d("DISHES", dishStatusPkg);
 		int start = dishStatusPkg.indexOf("[");
 		int end = dishStatusPkg.indexOf("]");
