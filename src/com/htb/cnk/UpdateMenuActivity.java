@@ -14,6 +14,8 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -23,14 +25,10 @@ import android.widget.TextView;
 
 import com.htb.cnk.data.CnkDbHelper;
 import com.htb.cnk.lib.DBFile;
+import com.htb.constant.ErrorNum;
 import com.htb.constant.Server;
 
 public class UpdateMenuActivity extends Activity {
-	final static int DOWNLOAD_DB_FAILED = -1;
-	final static int WRITE_FILE_FAILED = -2;
-	final static int DOWNLOAD_PIC_FAILED = -3;
-	final static int COPY_DB_FAILED = -4;
-	
 	final static int DOWNLOAD_THUMBNAIL = 1;
 	final static int DOWNLOAD_PIC = 2;
 	
@@ -38,6 +36,8 @@ public class UpdateMenuActivity extends Activity {
 	
 	private TextView mStateTxt;
 	private DBFile mDBFile;
+	private SharedPreferences mSharedPre = null;
+	private static int mMenuVer;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -75,14 +75,23 @@ public class UpdateMenuActivity extends Activity {
 					return ;
 				}
 				
+				mSharedPre = getSharedPreferences("menuDB",
+						Context.MODE_WORLD_WRITEABLE
+								| Context.MODE_WORLD_READABLE);
+				Editor editor = mSharedPre.edit();
+				editor.putInt("ver", mMenuVer);
+				editor.commit();
 				handler.sendEmptyMessage(0);
 			}
 		}.start();
 		
 	}
 	
-	private boolean isUpdateNeed() {
-		return true;
+	public static boolean isUpdateNeed(int currentMenuVer) {
+		//TODO implement this method
+		int serverMenuVer = 0;
+		mMenuVer = serverMenuVer;
+		return false;
 	}
 	
 	private int downloadDB(String serverDBPath) {
@@ -114,12 +123,12 @@ public class UpdateMenuActivity extends Activity {
             output.close();
             istream.close();
             if (mDBFile.copyDatabase(CnkDbHelper.DB_MENU) < 0) {
-            	return COPY_DB_FAILED;
+            	return ErrorNum.COPY_DB_FAILED;
             }
             return 0;
         } catch (Exception e) {
             e.printStackTrace();
-            return DOWNLOAD_DB_FAILED;
+            return ErrorNum.DOWNLOAD_DB_FAILED;
         }
 	}
 	
@@ -152,12 +161,12 @@ public class UpdateMenuActivity extends Activity {
             if(data!=null){        
                 save(dest, data);
             }else{        
-                return DOWNLOAD_PIC_FAILED;       
+                return ErrorNum.DOWNLOAD_PIC_FAILED;       
             }  
             
         } catch (Exception e) {         
             e.printStackTrace();    
-            return DOWNLOAD_PIC_FAILED;
+            return ErrorNum.DOWNLOAD_PIC_FAILED;
         }    
 		return 0;
 	}
@@ -181,10 +190,10 @@ public class UpdateMenuActivity extends Activity {
 			outStream.write(buffer);
 	        outStream.close();
 	    } catch (FileNotFoundException e) {
-	        return WRITE_FILE_FAILED;
+	        return ErrorNum.WRITE_FILE_FAILED;
 	    }
 	    catch (IOException e){
-	        return WRITE_FILE_FAILED;
+	        return ErrorNum.WRITE_FILE_FAILED;
 	    }
 	    return 0;
 	}

@@ -10,6 +10,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.htb.cnk.lib.Http;
+import com.htb.constant.ErrorNum;
 import com.htb.constant.Server;
 
 public class Dishes {
@@ -33,9 +34,6 @@ public class Dishes {
 	}
 	
 	public int setCategory(int categoryId, String tableName) {
-//		if (mTableName.equals(tableName)) {
-//			return 0;
-//		}
 		mCategoryId = categoryId;
 		mTableName = tableName;
 		mDishes.clear();
@@ -61,7 +59,6 @@ public class Dishes {
 	}
 	
 	private void fillCategoriesData() {
-//		test(id);
 		Cursor dishes = getDishesFromDataBase(mTableName);
 		while (dishes.moveToNext()) {
 			mDishes.add(new Dish(dishes.getInt(ID_COLUMN),
@@ -69,7 +66,6 @@ public class Dishes {
 								dishes.getDouble(PRICE_COLUMN),
 								dishes.getString(PIC_COLUMN)));
 		}
-//		removeSoldOutItems(id);
 	}
 	
 	private Cursor getDishesFromDataBase(String tableName) {
@@ -105,14 +101,13 @@ public class Dishes {
 						"CID=" + Integer.toString(id));
 		
 		if (dishStatusPkg == null) {
-			//TODO handle network errors
-			return -1;
+			return ErrorNum.GET_SOLDOUT_ITEM_FAILED;
 		}
 		Log.d("DISHES", dishStatusPkg);
 		int start = dishStatusPkg.indexOf("[");
 		int end = dishStatusPkg.indexOf("]");
 		if ((start < 0) || (end < 0)) {
-			return -1;
+			return ErrorNum.GET_SOLDOUT_ITEM_FAILED;
 		}
 
 		mSoldOutItemsId.clear();
@@ -131,7 +126,6 @@ public class Dishes {
 
 	@Override
 	protected void finalize() throws Throwable {
-		// TODO Auto-generated method stub
 		mDb.close();
 		super.finalize();
 	}

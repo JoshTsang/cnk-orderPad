@@ -3,8 +3,13 @@ package com.htb.cnk;
 import com.htb.cnk.data.Info;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
@@ -14,6 +19,10 @@ public class Cnk_orderPadActivity extends Activity {
 	private ImageButton mMenuBtn;
 	private ImageButton mOrderBtn;
 	private ImageButton mSettingsBtn;
+	private ProgressDialog mpDialog;
+	
+	private final static int UPDATE_MENU = 0;
+	private final static int LATEST_MENU = 1;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -22,6 +31,7 @@ public class Cnk_orderPadActivity extends Activity {
         findViews();
         setClickListeners();
         Info.setNewCustomer(true);
+        syncWithServer();
     }
     
     private void findViews(){
@@ -34,6 +44,32 @@ public class Cnk_orderPadActivity extends Activity {
     	mMenuBtn.setOnClickListener(menuClicked);
     	mOrderBtn.setOnClickListener(orderClicked);
     	mSettingsBtn.setOnClickListener(settingsClicked);
+    }
+    
+    private int getCurrentMenuVer() {
+		SharedPreferences sharedPre = getSharedPreferences("menuDB", 
+				Context.MODE_WORLD_WRITEABLE | Context.MODE_WORLD_READABLE);
+		return sharedPre.getInt("ver", 0);
+	}
+    
+    private void syncWithServer() {
+    	mpDialog = new ProgressDialog(Cnk_orderPadActivity.this);  
+        mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        mpDialog.setTitle("请稍等");
+        mpDialog.setMessage("正在与服务器同步...");  
+        mpDialog.setIndeterminate(false);
+        mpDialog.setCancelable(false);
+        mpDialog.show();
+        new Thread() {
+			public void run() {
+				int menuVer = getCurrentMenuVer();
+				if (UpdateMenuActivity.isUpdateNeed(menuVer)) {
+					handler.sendEmptyMessage(UPDATE_MENU);
+				} else {
+					handler.sendEmptyMessage(LATEST_MENU);
+				}
+			}
+        }.start();
     }
     
     private OnClickListener menuClicked = new OnClickListener() {
@@ -69,5 +105,16 @@ public class Cnk_orderPadActivity extends Activity {
 			startActivity(intent);
 		}
     	
+    };
+    
+    private Handler handler = new Handler() {
+		public void handleMessage(Message msg) {
+			if (msg.what == UPDATE_MENU) {
+				Intent intent = new Intent();
+				intent.setClass(Cnk_orderPadActivity.this, UpdateMenuActivity.class);
+				startActivity(intent);
+			}
+			mpDialog.cancel();
+		}
     };
 }

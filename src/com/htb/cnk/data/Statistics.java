@@ -17,6 +17,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
 
 import com.htb.cnk.lib.DBFile;
+import com.htb.constant.ErrorNum;
 import com.htb.constant.Server;
 
 public class Statistics {
@@ -42,11 +43,6 @@ public class Statistics {
 	private SQLiteDatabase mDbMenu;
 	private double mTotalAmount = 0;
 	
-	//TODO combine with update menu and move to errnum
-	final static int DOWNLOAD_DB_FAILED = -1;
-	final static int WRITE_FILE_FAILED = -2;
-	final static int DOWNLOAD_PIC_FAILED = -3;
-	final static int COPY_DB_FAILED = -4;
 	
 	public Statistics(Context context) {
 		mContext = context;
@@ -86,12 +82,12 @@ public class Statistics {
             output.close();
             istream.close();
             if (mDBFile.copyDatabase(CnkDbHelper.DB_SALES) < 0) {
-            	return COPY_DB_FAILED;
+            	return ErrorNum.COPY_DB_FAILED;
             }
             return 0;
         } catch (Exception e) {
             e.printStackTrace();
-            return DOWNLOAD_DB_FAILED;
+            return ErrorNum.DOWNLOAD_DB_FAILED;
         }
 	}
 	
@@ -99,6 +95,9 @@ public class Statistics {
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 		String startDT = df.format(start.getTime());
 		String endDT = df.format(end.getTime());
+		final int DID = 0;
+		final int TOTAL_AMOUNT = 1;
+		final int COUNT = 2;
 
 		conectDB();
 		mSalesData.clear();
@@ -109,12 +108,13 @@ public class Statistics {
 				  "timestamp>'"+startDT +"' and timestamp<'" + endDT+"'",
 				  null, "dish_id", null, null, null);
 		while (resultSet.moveToNext()) {
-			SalesRow salesRow = new SalesRow(resultSet.getInt(0), resultSet.getInt(1), resultSet.getInt(2));
+			SalesRow salesRow = new SalesRow(resultSet.getInt(DID),
+					resultSet.getInt(TOTAL_AMOUNT), resultSet.getInt(COUNT));
 			String dishName = getDishName(salesRow.did);
 			salesRow.dName = dishName;
 			mSalesData.add(salesRow);
 			
-			mTotalAmount += resultSet.getInt(1);
+			mTotalAmount += resultSet.getInt(TOTAL_AMOUNT);
 		}
 		return 0;
 	}

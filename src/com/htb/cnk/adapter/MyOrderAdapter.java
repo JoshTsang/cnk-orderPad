@@ -8,23 +8,19 @@ import android.widget.BaseAdapter;
 import com.htb.cnk.data.MyOrder;
 
 public class MyOrderAdapter extends BaseAdapter {
-	private Context mContext;
 	private MyOrder mMyOrder;
 	
 	public MyOrderAdapter(Context context, MyOrder order) {
-		mContext = context;
 		mMyOrder = order;
 	}
 	
 	@Override
 	public int getCount() {
-		// TODO Auto-generated method stub
 		return mMyOrder.count();
 	}
 
 	@Override
 	public Object getItem(int arg0) {
-		// TODO Auto-generated method stub
 		return mMyOrder.getOrderedDish(arg0);
 	}
 
@@ -35,7 +31,6 @@ public class MyOrderAdapter extends BaseAdapter {
 
 	@Override
 	public View getView(int arg0, View arg1, ViewGroup arg2) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 }

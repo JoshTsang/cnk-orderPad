@@ -28,6 +28,7 @@ import android.widget.TimePicker;
 import com.htb.cnk.adapter.StatisticsAdapter;
 import com.htb.cnk.data.Statistics;
 import com.htb.cnk.lib.Http;
+import com.htb.constant.ErrorNum;
 import com.htb.constant.Server;
 
 public class StatisticsActivity extends Activity{
@@ -114,8 +115,7 @@ public class StatisticsActivity extends Activity{
         		
         		String respond = Http.get(Server.LATEST_STATISTICS, "do=get");
         		if (respond == null) {
-        			//TODO define errnum
-        			handler.sendEmptyMessage(-1);
+        			handler.sendEmptyMessage(ErrorNum.GET_LATEST_STATISTICS_FAILED);
         			return ;
         		}
         		int start = respond.indexOf("[") + 1;
@@ -290,7 +290,6 @@ public class StatisticsActivity extends Activity{
 		
 		@Override
 		public void onClick(View v) {
-			// TODO Auto-generated method stub
 			mStatistics.print();
 			if (mQueryMode == QUERY_TODAY) {
 				updateLatestStatistics();

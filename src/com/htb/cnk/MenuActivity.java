@@ -279,7 +279,7 @@ public class MenuActivity extends Activity {
 	    Info.setNewCustomer(false);
 	    dialog.show();  
 	}
-
+	
 	private OnItemClickListener CategoryListClicked = new OnItemClickListener() {
 
 		@Override
@@ -347,7 +347,7 @@ public class MenuActivity extends Activity {
 	                dialog.cancel();  
 	            }  
 	        });  
-	        dialog.show();  
+	        dialog.show();
         }  
 	};
 	

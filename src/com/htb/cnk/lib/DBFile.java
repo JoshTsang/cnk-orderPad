@@ -59,7 +59,6 @@ public class DBFile {
     }
 
     private void fileCopy(File dbFile, File backup) throws IOException {
-        // TODO Auto-generated method stub
         FileChannel inChannel = new FileInputStream(dbFile).getChannel();
         FileChannel outChannel = new FileOutputStream(backup).getChannel();
         try {

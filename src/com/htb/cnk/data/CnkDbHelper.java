@@ -27,18 +27,16 @@ public class CnkDbHelper extends SQLiteOpenHelper {
 	public CnkDbHelper(Context context, String name, CursorFactory factory,
 			int version) {
 		super(context, name, factory, version);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-		// TODO Auto-generated method stub
 		db.execSQL("create table a (id integer primary key autoincrement);");
 	}
 
 	@Override
 	public void onUpgrade(SQLiteDatabase arg0, int arg1, int arg2) {
-		// TODO Auto-generated method stub
+		// TODO Auto-generated method stub--
 		
 	}
 }
