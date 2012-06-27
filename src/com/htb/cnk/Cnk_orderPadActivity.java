@@ -65,7 +65,7 @@ public class Cnk_orderPadActivity extends Activity {
 		@Override
 		public void onClick(View v) {
 			Intent intent = new Intent();
-			intent.setClass(Cnk_orderPadActivity.this, UpdateMenuActivity.class);
+			intent.setClass(Cnk_orderPadActivity.this, StatisticsActivity.class);
 			startActivity(intent);
 		}
     	

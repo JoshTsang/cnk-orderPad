@@ -16,22 +16,24 @@ import com.htb.cnk.data.CnkDbHelper;
 public class DBFile {
 	private Context mContext;
 	private CnkDbHelper mDbHelper;
+	private String mDbName;
 	
-	public DBFile(Context context) {
+	public DBFile(Context context, String name) {
 	    this.mContext = context;
+	    mDbName = name;
 	}
 	
 	public void creatDBifNotExist() {
-		mDbHelper = new CnkDbHelper(mContext, "cnk.db", null, 1);
+		mDbHelper = new CnkDbHelper(mContext, mDbName, null, 1);
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 		//db.query("a", new String[], null, null, null, null, null);
 		db.close();
 	}
 	
-	public int copyDatabase() {
+	public int copyDatabase(String name) {
         // 获得正在使用的数据库路径，我的是 sdcard 目录下的 /dlion/db_dlion.db
 		// 默认路径是 /data/data/(包名)/databases/*.db
-        File dbFile = mContext.getDatabasePath("cnk.db");
+        File dbFile = mContext.getDatabasePath(name);
         File exportDir = new File(Environment
                 .getExternalStorageDirectory().getAbsolutePath()
                 + "/cainaoke/");

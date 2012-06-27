@@ -21,6 +21,7 @@ import android.os.Message;
 import android.view.KeyEvent;
 import android.widget.TextView;
 
+import com.htb.cnk.data.CnkDbHelper;
 import com.htb.cnk.lib.DBFile;
 import com.htb.constant.Server;
 
@@ -45,7 +46,7 @@ public class UpdateMenuActivity extends Activity {
 		mStateTxt = (TextView) findViewById(R.id.state);
 		
 		mStateTxt.setText("正在准备更新...");
-		mDBFile = new DBFile(this);
+		mDBFile = new DBFile(this, CnkDbHelper.DB_MENU);
 		updateMenu();
 	}
 
@@ -112,7 +113,7 @@ public class UpdateMenuActivity extends Activity {
             output.flush();
             output.close();
             istream.close();
-            if (mDBFile.copyDatabase() < 0) {
+            if (mDBFile.copyDatabase(CnkDbHelper.DB_MENU) < 0) {
             	return COPY_DB_FAILED;
             }
             return 0;
