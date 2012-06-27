@@ -126,6 +126,7 @@ public class MyOrder {
 			for (int i=0; i<mOrder.size(); i++) {
 				JSONObject dish = new JSONObject();
 				dish.put("id", mOrder.get(i).dish.getId());
+				dish.put("name", mOrder.get(i).dish.getName());
 				dish.put("price", mOrder.get(i).dish.getPrice());
 				dish.put("quan", mOrder.get(i).quantity);
 				dishes.put(dish);
