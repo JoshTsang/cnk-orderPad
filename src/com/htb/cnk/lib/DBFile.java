@@ -13,6 +13,10 @@ import android.util.Log;
 
 import com.htb.cnk.data.CnkDbHelper;
 
+/**
+ * @author josh
+ *
+ */
 public class DBFile {
 	private Context mContext;
 	private CnkDbHelper mDbHelper;
@@ -26,7 +30,6 @@ public class DBFile {
 	public void creatDBifNotExist() {
 		mDbHelper = new CnkDbHelper(mContext, mDbName, null, 1);
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
-		//db.query("a", new String[], null, null, null, null, null);
 		db.close();
 	}
 	
@@ -52,8 +55,8 @@ public class DBFile {
         } catch (Exception e) {
             // TODO: handle exception
             e.printStackTrace();
-           Log.d("restore", "fail");
-           return -1;
+            Log.d("restore", "fail");
+            return -1;
         }
         
     }

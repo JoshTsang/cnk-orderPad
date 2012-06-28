@@ -28,11 +28,15 @@ import com.htb.cnk.lib.DBFile;
 import com.htb.constant.ErrorNum;
 import com.htb.constant.Server;
 
+/**
+ * @author josh
+ *
+ */
 public class UpdateMenuActivity extends Activity {
 	final static int DOWNLOAD_THUMBNAIL = 1;
 	final static int DOWNLOAD_PIC = 2;
 	
-	final static String MY_HOST = Server.SERVER_DOMIN + "/jpeg/";
+	
 	
 	private TextView mStateTxt;
 	private DBFile mDBFile;
@@ -135,7 +139,7 @@ public class UpdateMenuActivity extends Activity {
 	private int downloadSmallPic() {
 		int ret;
 		for (int i=0; i<10; i++) {
-			ret = downloadPic(MY_HOST+ i + ".jpg", "ldpi_" + i + ".jpg");
+			ret = downloadPic(Server.IMG_PATH+ i + ".jpg", "ldpi_" + i + ".jpg");
 			if (ret < 0) {
 				return ret;
 			}
@@ -146,7 +150,7 @@ public class UpdateMenuActivity extends Activity {
 	private int downloadHugePic() {
 		int ret;
 		for (int i=0; i<10; i++) {
-			ret = downloadPic(MY_HOST+ i + ".jpg", "hdpi_" + i + ".jpg");
+			ret = downloadPic(Server.IMG_PATH+ i + ".jpg", "hdpi_" + i + ".jpg");
 			if (ret < 0) {
 				return ret;
 			}

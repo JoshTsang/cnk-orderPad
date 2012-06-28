@@ -20,6 +20,10 @@ import com.htb.cnk.lib.DBFile;
 import com.htb.constant.ErrorNum;
 import com.htb.constant.Server;
 
+/**
+ * @author josh
+ *
+ */
 public class Statistics {
 	class SalesRow {
 		int did;

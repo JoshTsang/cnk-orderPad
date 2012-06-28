@@ -1,7 +1,6 @@
 package com.htb.cnk.lib;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.ParseException;
@@ -121,39 +119,6 @@ public class Http {
 		    	Log.d("HTTP ERR", Integer.toString(mErrno));
 				return null;
 		}
-	}
-
-	private static String handleHttpResponse(HttpResponse httpResponse) {
-		HttpEntity httpEntity = httpResponse.getEntity();
-		
-		int length = (int) httpEntity.getContentLength();
-		if (length <= 0) {
-			length = 50;
-		}
-		
-		StringBuffer stringBuffer = new StringBuffer(length);
-		try {
-			InputStreamReader inputStreamReader = new InputStreamReader(
-					httpEntity.getContent(), HTTP.UTF_8);
-			char buffer[] = new char[length];
-			int count;
-			while ((count = inputStreamReader.read(buffer, 0, length)) > 0) {
-				stringBuffer.append(buffer, 0, count);
-			}
-			inputStreamReader.close();
-		} catch (UnsupportedEncodingException e) {
-			Log.e("inputseerteerewrdfa==", e.getMessage());
-			mErrno = ErrorNum.UTF8_NOT_SUPPORTED;
-			return null;
-		} catch (IllegalStateException e) {
-			Log.e("inputseerteerewrdfa==", e.getMessage());
-		} catch (IOException e) {
-			Log.e("inputseerteerewrdfa==", e.getMessage());
-			mErrno = ErrorNum.HTTP_NO_CONECTION;
-			return null;
-		}
-		Log.d("respond pkg", stringBuffer.toString());
-		return stringBuffer.toString();
 	}
 		
 	private static String httpRequestGet(String page, String param) {

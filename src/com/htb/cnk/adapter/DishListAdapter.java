@@ -7,6 +7,10 @@ import android.widget.BaseAdapter;
 
 import com.htb.cnk.data.Dishes;
 
+/**
+ * @author josh
+ *
+ */
 public class DishListAdapter extends BaseAdapter {
 	private Dishes mDishes;
 	

@@ -7,6 +7,11 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+
+/**
+ * @author josh
+ *
+ */
 public class Categories {
 	public class Category {
 		public int mCategoryId;

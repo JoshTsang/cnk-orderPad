@@ -13,6 +13,10 @@ import com.htb.cnk.lib.Http;
 import com.htb.constant.ErrorNum;
 import com.htb.constant.Server;
 
+/**
+ * @author josh
+ *
+ */
 public class Dishes {
 	
 	private List<Dish> mDishes = new ArrayList<Dish>();

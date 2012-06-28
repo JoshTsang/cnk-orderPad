@@ -1,5 +1,9 @@
 package com.htb.cnk.data;
 
+/**
+ * @author josh
+ *
+ */
 public class Info {
 	final static public int WORK_MODE_CUSTOMER = 0;
 	final static public int WORK_MODE_WAITER = 1;
@@ -8,12 +12,6 @@ public class Info {
 	static private int mTableId;
 	static private String mTableName;
 	static private boolean mNewCustomer;
-	
-	public Info() {
-		mMode = WORK_MODE_WAITER;
-		mTableId = 101;
-		setTableName("101");
-	}
 	
 	public static int getMode() {
 		return mMode;

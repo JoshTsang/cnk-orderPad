@@ -10,6 +10,10 @@ import android.widget.TextView;
 import com.htb.cnk.R;
 import com.htb.cnk.data.Categories;
 
+/**
+ * @author josh
+ *
+ */
 public class CategoryListAdapter extends BaseAdapter {
 
 	private Context mContext;

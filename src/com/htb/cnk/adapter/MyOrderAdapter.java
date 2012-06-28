@@ -7,6 +7,10 @@ import android.widget.BaseAdapter;
 
 import com.htb.cnk.data.MyOrder;
 
+/**
+ * @author josh
+ *
+ */
 public class MyOrderAdapter extends BaseAdapter {
 	private MyOrder mMyOrder;
 	

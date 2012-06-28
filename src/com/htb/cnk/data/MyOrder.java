@@ -14,7 +14,10 @@ import android.util.Log;
 import com.htb.cnk.lib.Http;
 import com.htb.constant.Server;
 
-
+/**
+ * @author josh
+ *
+ */
 public class MyOrder {
 	public class OrderedDish {
 		Dish dish;

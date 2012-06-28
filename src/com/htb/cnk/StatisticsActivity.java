@@ -31,6 +31,10 @@ import com.htb.cnk.lib.Http;
 import com.htb.constant.ErrorNum;
 import com.htb.constant.Server;
 
+/**
+ * @author josh
+ *
+ */
 public class StatisticsActivity extends Activity{
 	public final static int QUERY_BY_TIME = 0;
 	public final static int QUERY_TODAY = 1;

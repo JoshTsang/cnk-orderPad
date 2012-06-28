@@ -20,6 +20,10 @@ import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.MyOrder.OrderedDish;
 
+/**
+ * @author josh
+ *
+ */
 public class MyOrderActivity extends Activity {
 	private Button mBackBtn;
 	private Button mSubmitBtn;
@@ -52,7 +56,12 @@ public class MyOrderActivity extends Activity {
 		mTableNumTxt.setText(Info.getTableName());
 		updateTabelInfos();
 		
-		mMyOrderAdapter = new MyOrderAdapter(this, mMyOrder) {
+		mMyOrderAdapter = getMyOrderAdapterInstance();
+		mMyOrderLst.setAdapter(mMyOrderAdapter);
+	}
+
+	private MyOrderAdapter getMyOrderAdapterInstance() {
+		return new MyOrderAdapter(this, mMyOrder) {
 			@Override
 			public View getView(int position, View convertView, ViewGroup arg2) {
 				TextView dishName;
@@ -109,7 +118,6 @@ public class MyOrderActivity extends Activity {
 				return convertView;
 			}
 		};
-		mMyOrderLst.setAdapter(mMyOrderAdapter);
 	}
 	
 	private void setClickListener() {

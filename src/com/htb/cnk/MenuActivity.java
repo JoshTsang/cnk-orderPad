@@ -38,6 +38,10 @@ import com.htb.cnk.data.Dishes;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder;
 
+/**
+ * @author josh
+ *
+ */
 public class MenuActivity extends Activity {
 
 	private ListView mCategoriesLst;
@@ -356,10 +360,9 @@ public class MenuActivity extends Activity {
 			if (msg.what < 0) {
 				Toast.makeText(MenuActivity.this, "服务器开小差了,系统将显示全部菜单.",
 						Toast.LENGTH_SHORT).show();
-				mDishLstAdapter.notifyDataSetChanged();
-			} else {
-				mDishLstAdapter.notifyDataSetChanged();
-			}	
+			} 
+			
+			mDishLstAdapter.notifyDataSetChanged();
 		}
 	};
 }

@@ -7,6 +7,10 @@ import android.widget.BaseAdapter;
 
 import com.htb.cnk.data.Statistics;
 
+/**
+ * @author josh
+ *
+ */
 public class StatisticsAdapter extends BaseAdapter {
 	private Statistics mStatistics;
 	

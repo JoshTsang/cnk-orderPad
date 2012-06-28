@@ -1,14 +1,19 @@
 package com.htb.constant;
 
 public class Server {
-	final static public String SERVER_DOMIN = "http://192.168.1.1";
+	public final static String SERVER_DOMIN = "http://192.168.1.1";
 	
 	/* php */
-	final static public String GET_DISH_STATUS = "orderPad/getDishStatus.php";
-	final static public String SUBMIT_ORDER = "orderPad/submitOrder.php";
-	final static public String LATEST_STATISTICS = "orderPad1/latestStatistics.php";
+	public final static String PHP_DIR = "orderPad/";
+	public final static String GET_DISH_STATUS = PHP_DIR + "getDishStatus.php";
+	public final static String SUBMIT_ORDER = PHP_DIR + "submitOrder.php";
+	public final static String LATEST_STATISTICS = PHP_DIR + "latestStatistics.php";
 	
 	/* Database */
-	final static public String DB_MENU = "db/menu.db";
-	final static public String DB_SALES = "db/sales.db";
+	public final static String DB_DIR = "db/";
+	public final static String DB_MENU = DB_DIR + "menu.db";
+	public final static String DB_SALES = DB_DIR + "sales.db";
+	
+	/* other */
+	public final static String IMG_PATH = Server.SERVER_DOMIN + "/jpeg/";
 }

@@ -5,6 +5,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 
+/**
+ * @author josh
+ *
+ */
 public class CnkDbHelper extends SQLiteOpenHelper {
 	public final static String DATABASE_NAME = "cnk.db";
 	public final static String DB_MENU = "cnk.db";

@@ -1,5 +1,9 @@
 package com.htb.cnk.data;
 
+/**
+ * @author josh
+ *
+ */
 public class Dish {
 	private int mId;
 	private String mName;
