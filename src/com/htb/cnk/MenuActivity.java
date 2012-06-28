@@ -66,7 +66,7 @@ public class MenuActivity extends Activity {
 		setListData();
 		setClickListener();
 		
-		if (Info.isNewCustomer()) {
+		if (Info.isNewCustomer() && Info.getMode() == Info.WORK_MODE_CUSTOMER) {
 			showGuide();
 		}
 	}

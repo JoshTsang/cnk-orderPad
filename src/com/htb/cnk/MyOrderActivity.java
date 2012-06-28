@@ -18,6 +18,7 @@ import android.widget.TextView;
 import com.htb.cnk.adapter.MyOrderAdapter;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder;
+import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.data.MyOrder.OrderedDish;
 
 /**
@@ -33,7 +34,8 @@ public class MyOrderActivity extends Activity {
 	private ListView mMyOrderLst;
 	private MyOrder mMyOrder = new MyOrder();
 	private MyOrderAdapter mMyOrderAdapter;
-	
+	private TableSetting mSettings = new TableSetting();
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -206,7 +208,7 @@ public class MyOrderActivity extends Activity {
 						@Override
 						public void onClick(DialogInterface dialog,
 								int which) {
-							
+
 						}
 				}).show();
 				return ;
@@ -215,6 +217,8 @@ public class MyOrderActivity extends Activity {
 			new Thread() {
 				public void run() {
 					String ret = mMyOrder.submit();
+					mSettings.setstatus(Info.getTableId(), 1);
+					mSettings.UpdatusStatus(Info.getTableId(), 1);
 					if (ret == null) {
 						handler.sendEmptyMessage(-1);
 					} else {

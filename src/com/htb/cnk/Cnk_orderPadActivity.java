@@ -95,8 +95,7 @@ public class Cnk_orderPadActivity extends Activity {
 		@Override
 		public void onClick(View v) {
 			Intent intent = new Intent();
-			intent.setClass(Cnk_orderPadActivity.this, MenuActivity.class);
-			Info.setMode(Info.WORK_MODE_WAITER);
+			intent.setClass(Cnk_orderPadActivity.this, QueryOrderActivity.class);
 			startActivity(intent);
 		}
    
@@ -109,7 +108,7 @@ public class Cnk_orderPadActivity extends Activity {
 			// 点击确定转向登录对话框
 			LayoutInflater factory = LayoutInflater.from(Cnk_orderPadActivity.this);
 			// 得到自定义对话框
-			final View DialogView = factory.inflate(R.layout.dialog, null);
+			final View DialogView = factory.inflate(R.layout.setting_dialog, null);
 			// 创建对话框
 			AlertDialog dlg = new AlertDialog.Builder(Cnk_orderPadActivity.this)
 					.setTitle("登录框").setView(DialogView)// 设置自定义对话框样式
