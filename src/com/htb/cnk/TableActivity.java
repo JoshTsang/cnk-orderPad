@@ -12,10 +12,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Button;
 import android.widget.GridView;
 import android.widget.SimpleAdapter;
 
@@ -25,7 +27,13 @@ import com.htb.cnk.data.TableSetting;
 
 public class TableActivity extends Activity {
 
+	private Button mBackBtn;
+	private Button mUpdateBtn;
+	private Button mStatisticsBtn;
+	private Button mManageBtn;
+	
 	private TableSetting mSettings = new TableSetting();
+	
 	protected List<Map<String, String>> mTableSettings = new ArrayList<Map<String, String>>();
 	protected int tableButton[];
 	private MyOrder myOrder = new MyOrder();
@@ -38,6 +46,16 @@ public class TableActivity extends Activity {
 
 		setContentView(R.layout.table_activity);
 		GridView gridview = (GridView) findViewById(R.id.gridview);
+		mBackBtn = (Button) findViewById(R.id.back);
+		mUpdateBtn = (Button) findViewById(R.id.updateMenu);
+		mStatisticsBtn = (Button) findViewById(R.id.statistics);
+		mManageBtn = (Button) findViewById(R.id.management);
+		
+		mBackBtn.setOnClickListener(backClicked);
+		mUpdateBtn.setOnClickListener(updateClicked);
+		mStatisticsBtn.setOnClickListener(statisticsClicked);
+		mManageBtn.setOnClickListener(manageClicked);
+		
 		ArrayList<HashMap<String, String>> lstImageItem = new ArrayList<HashMap<String, String>>();
 		mTableSettings.clear();
 		tableButton = new int[mSettings.size()];
@@ -130,4 +148,41 @@ public class TableActivity extends Activity {
 		}
 	}
 
+	private OnClickListener backClicked = new OnClickListener() {
+		
+		@Override
+		public void onClick(View v) {
+			finish();
+		}
+	};
+	
+	private OnClickListener updateClicked = new OnClickListener() {
+		
+		@Override
+		public void onClick(View v) {
+			Intent intent = new Intent();
+			intent.setClass(TableActivity.this, UpdateMenuActivity.class);
+			TableActivity.this.startActivity(intent);
+		}
+	};
+	
+	private OnClickListener statisticsClicked = new OnClickListener() {
+		
+		@Override
+		public void onClick(View v) {
+			//TODO check permission
+			Intent intent = new Intent();
+			intent.setClass(TableActivity.this, StatisticsActivity.class);
+			TableActivity.this.startActivity(intent);
+		}
+	};
+	
+	private OnClickListener manageClicked = new OnClickListener() {
+		
+		@Override
+		public void onClick(View v) {
+			// TODO Auto-generated method stub
+			
+		}
+	};
 }

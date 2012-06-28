@@ -1,13 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?> 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" 
-     xmlns:app="http://schemas.android.com/apk/res/com.google.android.gx5weather" 
      android:orientation="vertical"
      android:layout_width="fill_parent" 
      android:layout_height="fill_parent" 
      android:layout_weight="1.0" 
-   	 android:background="@drawable/table_bg"
+   	 android:background="#F8E9C1"
      > 
- 
+<LinearLayout android:id="@+id/titlebar"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/statistics_titlebar"
+    android:orientation="horizontal" >
+	    <Button android:id="@+id/back"
+	        android:layout_width="265dip"
+	    	android:layout_height="65dip"
+	    	android:textColor="#F9E8BB"
+	    	android:textSize="35dip"
+	    	android:text="@string/back"
+	    	android:background="#00000000"/>
+	    <Button android:id="@+id/updateMenu"
+	        android:layout_width="265dip"
+	    	android:layout_height="67dip"
+	    	android:textColor="#F9E8BB"
+	    	android:textSize="35dip"
+	    	android:text="@string/updateMenu"
+	    	android:background="#00000000"/>
+	    <Button android:id="@+id/statistics"
+	        android:layout_width="265dip"
+	    	android:layout_height="67dip"
+	    	android:textColor="#F9E8BB"
+	    	android:textSize="35dip"
+	    	android:text="@string/statistics"
+	    	android:background="#00000000"/>
+	    <Button android:id="@+id/management"
+	        android:layout_width="265dip"
+	    	android:layout_height="67dip"
+	    	android:textColor="#F9E8BB"
+	    	android:textSize="35dip"
+	    	android:text="@string/mangement"
+	    	android:background="#00000000"/>
+    </LinearLayout>
 <GridView xmlns:android="http://schemas.android.com/apk/res/android"    
     android:id="@+id/gridview"  
     android:layout_width="wrap_content"    
@@ -17,6 +49,7 @@
     android:horizontalSpacing="10dip"  
     android:columnWidth="90dip"  
     android:stretchMode="columnWidth"  
+    android:layout_marginTop="20dip"
     android:gravity="center"
     android:listSelector="@drawable/grid_selector_background"
 >

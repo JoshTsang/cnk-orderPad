@@ -172,4 +172,16 @@ public class Statistics {
 		}
 		return null;
 	}
+
+	@Override
+	protected void finalize() throws Throwable {
+		// TODO Auto-generated method stub
+		mDbMenu.close();
+		if (mCnkDbSales != null) {
+			mDbSales.close();
+		}
+		super.finalize();
+	}
+	
+	
 }
