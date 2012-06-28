@@ -9,6 +9,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.htb.cnk.lib.Http;
@@ -39,9 +42,25 @@ public class MyOrder {
 		public double getPrice() {
 			return dish.getPrice();
 		}
+		
+		public int getId(){
+			return dish.getId();
+		}
 	}
 	
-	static private List<OrderedDish> mOrder = new ArrayList<OrderedDish>();
+	private CnkDbHelper mCnkDbHelper ;
+	private SQLiteDatabase mDb;
+	private static List<OrderedDish> mOrder = new ArrayList<OrderedDish>();
+	
+	public MyOrder(Context context) {
+		mCnkDbHelper = new CnkDbHelper(context, CnkDbHelper.DATABASE_NAME,
+				null, 1);
+		mDb = mCnkDbHelper.getReadableDatabase();
+	}
+	
+	public MyOrder(){
+		
+	}
 	
 	public int add(Dish dish, int quantity) {
 		for (OrderedDish item:mOrder) {
@@ -74,6 +93,7 @@ public class MyOrder {
 		
 		return 0;
 	}
+	
 	
 	public int minus(int position, int quantity) {
 		if (mOrder.get(position).quantity > quantity) {
@@ -148,4 +168,64 @@ public class MyOrder {
 		}
 		return response;
 	}
+	
+	public int get(int tableId) {
+		String response = Http.get(Server.GET_MYORDER, "TID=" + tableId);
+		try {
+			Log.d("debugTest_1", response);
+			JSONArray tableList = new JSONArray(response);
+			int length = tableList.length();
+			Log.d("debugTest_response", response);
+			MyOrder setting = new MyOrder();
+			setting.clear();
+			for (int i = 0; i < length; i++) {// ±éÀúJSONArray
+				Log.d("debugTest_i", Integer.toString(i));
+				JSONObject item = tableList.getJSONObject(i);
+				int quantity = item.getInt("quantity");
+				int dishId = item.getInt("dish_id");
+				double dishPrice = item.getInt("price");
+				String name = getDishName(dishId);
+				Log.d("debugTest_name", name);
+				Dish mDish = new Dish(dishId, name, dishPrice, null);
+				setting.add(mDish, quantity);
+			}
+			return 0;
+
+		} catch (Exception e) {
+
+			// TODO: handle exception
+		}
+
+		return -1;
+	}
+
+	public String getDishName(int index) {	
+		String name = getDishNameFromDB(index);
+		if (name == null) {
+			return "²ËÃû´íÎó";
+		}
+		return name;
+	}
+	
+	private String getDishNameFromDB(int id) {
+		Cursor cur = mDb.query(CnkDbHelper.DISH_TABLE_NAME, new String[] {CnkDbHelper.DISH_NAME},
+				  	CnkDbHelper.DISH_ID + "=" + id, null, null, null, null);
+		
+		if (cur.moveToNext()) {
+			return cur.getString(0);
+		}
+		return null;
+	}
+	
+	public int del(int dishId) {
+		Log.d("DID", ""+dishId);
+		int id = mOrder.get(dishId).getId();
+		String response = Http.get(Server.DEL_ORDER, "DID=" + id);
+		if (response == null) {
+			// TODO handle network errors
+			return 0;
+		}
+		return -1;
+	}
+	
 }

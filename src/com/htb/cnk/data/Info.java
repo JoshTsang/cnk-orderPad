@@ -22,7 +22,7 @@ public class Info {
 	public static int getTableId() {
 		return mTableId;
 	}
-	public static void setTablekId(int tableId) {
+	public static void setTableId(int tableId) {
 		Info.mTableId = tableId;
 	}
 

@@ -31,5 +31,8 @@
     <string name="salesCount">销量</string>
     <string name="salesAmount">销售额</string>
     <string name="percentage">销售百分比</string>
-
+    <string name="cleanAll">全部删除</string>
+    <string name="continueOrder">继续点菜</string>
+    <string name="clean">删除</string>
+    <string name="del_warning">亲：还没有点菜！请开台嘛！</string>
 </resources>

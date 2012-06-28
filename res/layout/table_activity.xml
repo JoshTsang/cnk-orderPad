@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" 
+     xmlns:app="http://schemas.android.com/apk/res/com.google.android.gx5weather" 
+     android:orientation="vertical"
+     android:layout_width="fill_parent" 
+     android:layout_height="fill_parent" 
+     android:layout_weight="1.0" 
+   	 android:background="@drawable/table_bg"
+     > 
+ 
+<GridView xmlns:android="http://schemas.android.com/apk/res/android"    
+    android:id="@+id/gridview"  
+    android:layout_width="wrap_content"    
+    android:layout_height="wrap_content"  
+    android:numColumns="6"  
+    android:verticalSpacing="30dip"  
+    android:horizontalSpacing="10dip"  
+    android:columnWidth="90dip"  
+    android:stretchMode="columnWidth"  
+    android:gravity="center"
+    android:listSelector="@drawable/grid_selector_background"
+>
+</GridView>
+ 
+</LinearLayout>

@@ -8,6 +8,9 @@ public class Server {
 	public final static String GET_DISH_STATUS = PHP_DIR + "getDishStatus.php";
 	public final static String SUBMIT_ORDER = PHP_DIR + "submitOrder.php";
 	public final static String LATEST_STATISTICS = PHP_DIR + "latestStatistics.php";
+	public final static String GET_MYORDER = PHP_DIR + "getToDelOrder.php";
+	public final static String DEL_ORDER = PHP_DIR + "DelOrder.php";
+	public final static String GET_TABLE_STATUS = PHP_DIR + "getTableStatus.php";
 	
 	/* Database */
 	public final static String DB_DIR = "db/";

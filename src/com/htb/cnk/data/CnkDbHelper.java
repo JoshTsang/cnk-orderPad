@@ -26,6 +26,11 @@ public class CnkDbHelper extends SQLiteOpenHelper {
 	public final static String DISH_PRICE = "price";
 	public final static String DISH_PIC = "pictureBUrl";
 	
+	public final static String TABLE_INFO = "table_info";
+	public final static String TABLE_ID = "table_id";
+	public final static String TABLE_NAME = "table_name";
+	public final static String TABLE_STATUS = "status";
+	
 	public final static String SALES_DATA = "sales_data";
 	
 	public CnkDbHelper(Context context, String name, CursorFactory factory,

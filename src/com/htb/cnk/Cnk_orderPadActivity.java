@@ -1,18 +1,22 @@
 package com.htb.cnk;
 
-import com.htb.cnk.data.Info;
-
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
+
+import com.htb.cnk.data.Info;
+import com.htb.cnk.data.TableSetting;
 
 public class Cnk_orderPadActivity extends Activity {
     /** Called when the activity is first created. */
@@ -20,6 +24,8 @@ public class Cnk_orderPadActivity extends Activity {
 	private ImageButton mOrderBtn;
 	private ImageButton mSettingsBtn;
 	private ProgressDialog mpDialog;
+	private ProgressDialog settingDialog;
+	private TableSetting mSettings = new TableSetting();
 	
 	private final static int UPDATE_MENU = 0;
 	private final static int LATEST_MENU = 1;
@@ -64,9 +70,9 @@ public class Cnk_orderPadActivity extends Activity {
 			public void run() {
 				int menuVer = getCurrentMenuVer();
 				if (UpdateMenuActivity.isUpdateNeed(menuVer)) {
-					handler.sendEmptyMessage(UPDATE_MENU);
+					handlerSync.sendEmptyMessage(UPDATE_MENU);
 				} else {
-					handler.sendEmptyMessage(LATEST_MENU);
+					handlerSync.sendEmptyMessage(LATEST_MENU);
 				}
 			}
         }.start();
@@ -100,14 +106,62 @@ public class Cnk_orderPadActivity extends Activity {
 
 		@Override
 		public void onClick(View v) {
-			Intent intent = new Intent();
-			intent.setClass(Cnk_orderPadActivity.this, StatisticsActivity.class);
-			startActivity(intent);
+			// 点击确定转向登录对话框
+			LayoutInflater factory = LayoutInflater.from(Cnk_orderPadActivity.this);
+			// 得到自定义对话框
+			final View DialogView = factory.inflate(R.layout.dialog, null);
+			// 创建对话框
+			AlertDialog dlg = new AlertDialog.Builder(Cnk_orderPadActivity.this)
+					.setTitle("登录框").setView(DialogView)// 设置自定义对话框样式
+					.setPositiveButton("确定", new DialogInterface.OnClickListener() {// 设置监听事件
+
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+									// 输入完成后点击“确定”开始登录
+									settingDialog = ProgressDialog.show(
+											Cnk_orderPadActivity.this, "请稍等...",
+											"正在登录...", true);
+									new Thread() {
+										public void run() {
+											try {
+												Message msg = new Message();						
+												int ret = 1;
+												mSettings.clear();
+												ret = mSettings.getJson();
+												if (ret < 0) {
+													handler.sendEmptyMessage(ret);
+													return ;
+												}
+												msg.what = ret;
+												handler.sendMessage(msg);
+												
+											} catch (Exception e) {
+												e.printStackTrace();
+											} finally {
+												// 登录结束，取消settingDialog对话框
+												settingDialog.dismiss();
+											}
+										}
+									}.start();
+								}
+							}).setNegativeButton("取消",// 设置取消按钮
+							new DialogInterface.OnClickListener() {
+
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+									// 点击取消后退出程序
+									
+
+								}
+							}).create();// 创建对话框
+			dlg.show();// 显示对话框
 		}
     	
     };
     
-    private Handler handler = new Handler() {
+    private Handler handlerSync = new Handler() {
 		public void handleMessage(Message msg) {
 			if (msg.what == UPDATE_MENU) {
 				Intent intent = new Intent();
@@ -117,4 +171,17 @@ public class Cnk_orderPadActivity extends Activity {
 			mpDialog.cancel();
 		}
     };
+	private Handler handler = new Handler() {
+
+		public void handleMessage(Message msg) {
+			if (msg.what < 0) {
+				
+			} else {
+				Intent intent = new Intent();
+	    		intent.setClass(Cnk_orderPadActivity.this, TableActivity.class);
+	    		Cnk_orderPadActivity.this.startActivity(intent);
+			}
+		}
+
+	};
 }

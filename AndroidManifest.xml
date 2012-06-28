@@ -49,14 +49,27 @@
         <activity
             android:name=".UpdateMenuActivity"
             android:label="@string/app_name"
-            android:theme="@android:style/Theme.NoTitleBar"  
-			android:screenOrientation="landscape" >
+            android:screenOrientation="landscape"
+            android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
+
         <activity
             android:name=".StatisticsActivity"
             android:label="@string/app_name"
             android:theme="@android:style/Theme.NoTitleBar"  
 			android:screenOrientation="landscape" >
+        </activity>
+	<activity
+            android:name=".TableActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="landscape"
+            android:theme="@android:style/Theme.NoTitleBar" >
+        </activity>
+        <activity
+            android:name=".DelOrderActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="landscape"
+            android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
     </application>
 
