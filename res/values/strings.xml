@@ -34,8 +34,10 @@
     <string name="cleanAll">全部删除</string>
     <string name="continueOrder">继续点菜</string>
     <string name="clean">删除</string>
-    <string name="del_warning">亲：还没有点菜！请开台嘛！</string>
+    <string name="delWarning">亲：还没有点菜！请点菜嘛！</string>
     <string name="updateMenu">更新菜谱</string>
     <string name="statistics">统计</string>
     <string name="mangement">管理</string>
+    <string name="queryId">选择桌号</string>
+
 </resources>

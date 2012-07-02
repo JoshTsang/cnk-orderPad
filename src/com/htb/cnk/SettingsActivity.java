@@ -23,7 +23,7 @@ public class SettingsActivity extends Activity {
 		// 点击确定转向登录对话框
 		LayoutInflater factory = LayoutInflater.from(SettingsActivity.this);
 		// 得到自定义对话框
-		final View DialogView = factory.inflate(R.layout.dialog, null);
+		final View DialogView = factory.inflate(R.layout.setting_dialog, null);
 		// 创建对话框
 		AlertDialog dlg = new AlertDialog.Builder(SettingsActivity.this)
 				.setTitle("登录框").setView(DialogView)// 设置自定义对话框样式

@@ -2,6 +2,7 @@ package com.htb.cnk;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,33 +22,33 @@ import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.MyOrder.OrderedDish;
 
-public class DelOrderActivity extends Activity {
+public class QueryOrderActivity extends Activity {
 	private Button mBackBtn;
-	private Button mDelBtn;
-	//private Button mContinueBtn;
+	private Button mSettingBtn;
 	private TextView mTableNumTxt;
 	private TextView mDishCountTxt;
 	private TextView mTotalPriceTxt;
 	private ListView mMyOrderLst;
 	private MyOrder mMyOrder;
 	private MyOrderAdapter mMyOrderAdapter;
-
+//	private static int talbeId;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.del_activity);
+		setContentView(R.layout.query_activity);
 		findViews();
-		updateTabelInfos();
+	//	updateTabelInfos();
 		setClickListener();
 	}
 
 	private void findViews() {
 		mBackBtn = (Button) findViewById(R.id.back_btn);
-		mDelBtn = (Button) findViewById(R.id.cleanAll_btn);
+		mSettingBtn = (Button)findViewById(R.id.queryId);
 		mTableNumTxt = (TextView) findViewById(R.id.tableNum);
 		mDishCountTxt = (TextView) findViewById(R.id.dishCount);
 		mTotalPriceTxt = (TextView) findViewById(R.id.totalPrice);
 		mMyOrderLst = (ListView) findViewById(R.id.myOrderList);
+		
 
 	}
 
@@ -63,12 +65,12 @@ public class DelOrderActivity extends Activity {
 				TextView dishName;
 				TextView dishPrice;
 				TextView dishQuantity;
-				Button minusBtn;
+				
 				
 
 				if (convertView == null) {
-					convertView = LayoutInflater.from(DelOrderActivity.this)
-							.inflate(R.layout.item_delorder, null);
+					convertView = LayoutInflater.from(QueryOrderActivity.this)
+							.inflate(R.layout.item_queryorder, null);
 				}
 				OrderedDish dishDetail = mMyOrder.getOrderedDish(position);
 
@@ -76,16 +78,12 @@ public class DelOrderActivity extends Activity {
 				dishPrice = (TextView) convertView.findViewById(R.id.dishPrice);
 				dishQuantity = (TextView) convertView
 						.findViewById(R.id.dishQuantity);
-				minusBtn = (Button) convertView.findViewById(R.id.dishMinus);
-				
+			
 				dishName.setText(dishDetail.getName());
 				dishPrice.setText(Double.toString(dishDetail.getPrice())
 						+ " 元/份");
 				dishQuantity
 						.setText(Integer.toString(dishDetail.getQuantity()));
-
-				minusBtn.setTag(position);
-				minusBtn.setOnClickListener(minusClicked);
 
 				return convertView;
 			}
@@ -97,37 +95,13 @@ public class DelOrderActivity extends Activity {
 
 	private void setClickListener() {
 		mBackBtn.setOnClickListener(backBtnClicked);
-		mDelBtn.setOnClickListener(cleanBtnClicked);
-	
-	}
+		
+		mSettingBtn.setOnClickListener(settingsClicked);
 
-	private void updateDishQuantity(int position, int quantity) {
-		final int dId = position;
-		new Thread() {
-			public void run() {
-				try {
-					Message msg = new Message();						
-					int ret = 1;
-					ret = mMyOrder.del(dId);
-					if (ret < 0) {
-						myHandler.sendEmptyMessage(ret);
-						return ;
-					}
-					msg.what = ret;
-					myHandler.sendMessage(msg);
-					
-				} catch (Exception e) {
-					e.printStackTrace();
-				} 
-			}
-		}.start();
-		mMyOrder.minus(position, -quantity);
-		fillData();
-		mMyOrderAdapter.notifyDataSetChanged();
 	}
 
 	private void updateTabelInfos() {
-		mMyOrder = new MyOrder(DelOrderActivity.this);
+		mMyOrder = new MyOrder(QueryOrderActivity.this);
 		mMyOrder.clear();
 		new Thread(new delThread()).start();
 	}
@@ -159,65 +133,57 @@ public class DelOrderActivity extends Activity {
 		}
 
 	}
-	
-
-	
-
-	private void minusDishQuantity(final int position, final int quantity) {
-		
-			new AlertDialog.Builder(DelOrderActivity.this)
-					.setTitle("请注意")
-					.setMessage(
-							"确认删除"
-									+ mMyOrder.getOrderedDish(position)
-											.getName())
-					.setPositiveButton("确定",
-							new DialogInterface.OnClickListener() {
-
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
-									updateDishQuantity(position, -quantity);
-								}
-							})
-					.setNegativeButton("取消",
-							new DialogInterface.OnClickListener() {
-
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
-
-								}
-							}).show();
-		
-	}
 
 	private OnClickListener backBtnClicked = new OnClickListener() {
 
 		@Override
 		public void onClick(View v) {
-			DelOrderActivity.this.finish();
+			QueryOrderActivity.this.finish();
 		}
 	};
+	 private OnClickListener settingsClicked = new OnClickListener() {
 
-	private OnClickListener cleanBtnClicked = new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				// 点击确定转向登录对话框
+				LayoutInflater factory = LayoutInflater.from(QueryOrderActivity.this);
+				// 得到自定义对话框
+				final View DialogView = factory.inflate(R.layout.query_dialog, null);
+		
+				// 创建对话框
+				AlertDialog dlg = new AlertDialog.Builder(QueryOrderActivity.this)
+						.setTitle("选择桌号").setView(DialogView)// 设置自定义对话框样式
+						.setPositiveButton("确定", new DialogInterface.OnClickListener() {// 设置监听事件
 
-		@Override
-		public void onClick(View v) {
-			mMyOrder.clear();
-			mMyOrderAdapter.notifyDataSetChanged();
-			fillData();
-		}
-	};
+									@Override
+									public void onClick(DialogInterface dialog,
+											int which) {
+										 if(which == Dialog.BUTTON_POSITIVE){  
+										EditText mTableId = (EditText)DialogView.findViewById(R.id.queryTableId);
+										final String talbeId = mTableId.getText().toString();
+										Info.setTableId((Integer.parseInt(talbeId))-1);
+										Info.setTableName(talbeId);
+//										Toast.makeText(QueryOrderActivity.this, Integer
+//												.toString(Info.getTableId()), Toast.LENGTH_LONG).show(); 
+										updateTabelInfos();
+										 }
+										
+									}
+								}
+									).setNegativeButton("取消",// 设置取消按钮
+								new DialogInterface.OnClickListener() {
 
-	
+									@Override
+									public void onClick(DialogInterface dialog,
+											int which) {
+										// 点击取消后退出程序
+										
 
-	private OnClickListener minusClicked = new OnClickListener() {
-
-		public void onClick(View v) {
-			final int position = Integer.parseInt(v.getTag().toString());
-			minusDishQuantity(position, 1);
-		}
-	};
+									}
+								}).create();// 创建对话框
+				dlg.show();// 显示对话框
+			}
+	    	
+	    };
 
 }

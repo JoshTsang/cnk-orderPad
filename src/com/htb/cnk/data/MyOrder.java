@@ -169,7 +169,7 @@ public class MyOrder {
 		return response;
 	}
 	
-	public int get(int tableId) {
+	public int getTableFromDB(int tableId) {
 		String response = Http.get(Server.GET_MYORDER, "TID=" + tableId);
 		try {
 			Log.d("debugTest_1", response);
@@ -178,7 +178,7 @@ public class MyOrder {
 			Log.d("debugTest_response", response);
 			MyOrder setting = new MyOrder();
 			setting.clear();
-			for (int i = 0; i < length; i++) {// ±éÀúJSONArray
+			for (int i = 0; i < length; i++) {// ï¿½ï¿½ï¿½ï¿½JSONArray
 				Log.d("debugTest_i", Integer.toString(i));
 				JSONObject item = tableList.getJSONObject(i);
 				int quantity = item.getInt("quantity");
@@ -202,7 +202,7 @@ public class MyOrder {
 	public String getDishName(int index) {	
 		String name = getDishNameFromDB(index);
 		if (name == null) {
-			return "²ËÃû´íÎó";
+			return "èœåä¸ºç©º";
 		}
 		return name;
 	}
@@ -223,9 +223,9 @@ public class MyOrder {
 		String response = Http.get(Server.DEL_ORDER, "DID=" + id);
 		if (response == null) {
 			// TODO handle network errors
-			return 0;
+			return -1;
 		}
-		return -1;
+		return 0;
 	}
 	
 }
