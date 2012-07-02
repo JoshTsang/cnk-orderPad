@@ -11,12 +11,18 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
+import android.util.Log;
 
 import com.htb.cnk.lib.DBFile;
+import com.htb.cnk.lib.Http;
 import com.htb.constant.ErrorNum;
 import com.htb.constant.Server;
 
@@ -40,7 +46,7 @@ public class Statistics {
 	
 	private Context mContext;
 
-	private static List<SalesRow> mSalesData = new ArrayList<SalesRow>(); 
+	private List<SalesRow> mSalesData = new ArrayList<SalesRow>(); 
 	private CnkDbHelper mCnkDbMenu;
 	private CnkDbHelper mCnkDbSales;
 	private SQLiteDatabase mDbSales;
@@ -123,7 +129,45 @@ public class Statistics {
 		return 0;
 	}
 	
-	public int print() {
+	public int print(Calendar start, Calendar end) {
+		JSONObject salesData = new JSONObject();
+		
+		if (mSalesData.size() <= 0) {
+			return -1;
+		}
+		
+		try {
+			SimpleDateFormat timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+			salesData.put("total", mTotalAmount);
+			salesData.put("timeStart", timestamp.format(start.getTime()));
+			salesData.put("timeEnd", timestamp.format(end.getTime()));
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		JSONArray rows = new JSONArray();
+		try {
+			for (int i=0; i<mSalesData.size(); i++) {
+				JSONObject row = new JSONObject();
+				row.put("name", getName(i));
+				row.put("count", mSalesData.get(i).quantity);
+				row.put("amount", mSalesData.get(i).salesAmount);
+				row.put("percentage", mSalesData.get(i).salesAmount/mTotalAmount);
+				rows.put(row);
+			}
+			salesData.put("rows", rows);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+ 
+		Log.d("JSON",salesData.toString());
+		String response = Http.post(Server.STATISTICS_PRINT, salesData.toString());
+		if (response == null) {
+			Log.d("Respond", "die/ok");
+		} else {
+			Log.d("Respond",response);
+		}
 		return 0;
 	}
 	
@@ -147,14 +191,6 @@ public class Statistics {
 		return mSalesData.size();
 	}
 	
-	private void conectDB() {
-		if (mCnkDbSales == null) {
-			mCnkDbSales = new CnkDbHelper(mContext, CnkDbHelper.DB_SALES,
-					null, 1);
-			mDbSales = mCnkDbSales.getReadableDatabase();
-		}
-	}
-	
 	public String getDishName(int did) {
 		String name = getDishNameFromDB(did);
 		if (name == null) {
@@ -163,6 +199,23 @@ public class Statistics {
 		return name;
 	}
 	
+	@Override
+	protected void finalize() throws Throwable {
+		mDbMenu.close();
+		if (mCnkDbSales != null) {
+			mDbSales.close();
+		}
+		super.finalize();
+	}
+
+	private void conectDB() {
+		if (mCnkDbSales == null) {
+			mCnkDbSales = new CnkDbHelper(mContext, CnkDbHelper.DB_SALES,
+					null, 1);
+			mDbSales = mCnkDbSales.getReadableDatabase();
+		}
+	}
+
 	private String getDishNameFromDB(int id) {
 		Cursor cur = mDbMenu.query(CnkDbHelper.DISH_TABLE_NAME, new String[] {CnkDbHelper.DISH_NAME},
 				  	CnkDbHelper.DISH_ID + "=" + id, null, null, null, null);
@@ -172,16 +225,5 @@ public class Statistics {
 		}
 		return null;
 	}
-
-	@Override
-	protected void finalize() throws Throwable {
-		// TODO Auto-generated method stub
-		mDbMenu.close();
-		if (mCnkDbSales != null) {
-			mDbSales.close();
-		}
-		super.finalize();
-	}
-	
 	
 }
