@@ -18,7 +18,6 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.htb.cnk.data.Info;
-import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.data.UserData;
 
 public class Cnk_orderPadActivity extends Activity {
@@ -111,7 +110,7 @@ public class Cnk_orderPadActivity extends Activity {
 			// 得到自定义对话框
 			final View DialogView = factory.inflate(R.layout.setting_dialog, null);
 			// 创建对话框
-			AlertDialog dlg = new AlertDialog.Builder(Cnk_orderPadActivity.this)
+			 AlertDialog dlg = new AlertDialog.Builder(Cnk_orderPadActivity.this)
 					.setTitle("登录框").setView(DialogView)// 设置自定义对话框样式
 					.setPositiveButton("确定", new DialogInterface.OnClickListener() {// 设置监听事件
 
@@ -122,8 +121,13 @@ public class Cnk_orderPadActivity extends Activity {
 									final String userName = mUserName.getText().toString();
 									EditText mUserPwd = (EditText)DialogView.findViewById(R.id.edit_password);
 									final String userPwd = mUserPwd.getText().toString();
-									UserData.setUserName(userName);
-									UserData.setUserPwd(userPwd);
+									UserData.clean();
+									if("".equals(userName) || "".equals(userPwd)){
+										dialog.cancel();
+									}else{
+										UserData.setUserName(userName);
+										UserData.setUserPwd(userPwd);
+									}
 									Toast.makeText(getApplicationContext(),
 											userName+userPwd,
 											Toast.LENGTH_SHORT).show();
@@ -138,14 +142,12 @@ public class Cnk_orderPadActivity extends Activity {
 									// 点击取消后退出程序
 								}
 							}).create();// 创建对话框
-
 			if(Info.getMode() == Info.WORK_MODE_CUSTOMER){
 				dlg.show();// 显示对话框
-			}else{
+			}else if(Info.getMode() == Info.WORK_MODE_WAITER){
 				Intent intent = new Intent();
 	    		intent.setClass(Cnk_orderPadActivity.this, TableActivity.class);
 	    		Cnk_orderPadActivity.this.startActivity(intent);
-
 			}
 		}
     	
@@ -172,9 +174,9 @@ public class Cnk_orderPadActivity extends Activity {
 		public void handleMessage(Message msg) {
 			if (msg.what < 0) {
 				Toast.makeText(getApplicationContext(),
-						getResources().getString(R.string.delWarning),
+						getResources().getString(R.string.userWarning),
 						Toast.LENGTH_SHORT).show();
-			} else {
+			} else if (msg.what == 1){
 				Intent intent = new Intent();
 	    		intent.setClass(Cnk_orderPadActivity.this, TableActivity.class);
 	    		Cnk_orderPadActivity.this.startActivity(intent);

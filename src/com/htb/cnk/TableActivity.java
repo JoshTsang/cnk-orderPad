@@ -17,16 +17,18 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Button;
 import android.widget.GridView;
+import android.widget.ImageButton;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.TableSetting;
-import com.htb.cnk.data.UserData;
 
 public class TableActivity extends Activity {
 
@@ -34,6 +36,10 @@ public class TableActivity extends Activity {
 	protected List<Map<String, String>> mTableSettings = new ArrayList<Map<String, String>>();
 	protected int tableButton[];
 	private MyOrder myOrder = new MyOrder();
+	private Button mBackBtn;
+	private Button mUpdateBtn;
+	private Button mStatisticsBtn;
+	private Button mManageBtn;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -43,11 +49,27 @@ public class TableActivity extends Activity {
 		this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setContentView(R.layout.table_activity);
+		findViews();
+		setClickListeners();
 		new Thread(new tableThread()).start();
 
 	}
-	
-  class tableThread implements Runnable {
+
+	private void findViews() {
+		mBackBtn = (Button) findViewById(R.id.back);
+		mUpdateBtn = (Button) findViewById(R.id.updateMenu);
+		mStatisticsBtn = (Button) findViewById(R.id.statistics);
+		mManageBtn = (Button) findViewById(R.id.management);
+	}
+
+	private void setClickListeners() {
+		mBackBtn.setOnClickListener(backClicked);
+		mUpdateBtn.setOnClickListener(updateClicked);
+		mStatisticsBtn.setOnClickListener(statisticsClicked);
+		mManageBtn.setOnClickListener(manageClicked);
+	}
+
+	class tableThread implements Runnable {
 		public void run() {
 			try {
 				Message msg = new Message();
@@ -55,18 +77,17 @@ public class TableActivity extends Activity {
 				int ret = mSettings.getJson();
 				if (ret < 0) {
 					userHandle.sendEmptyMessage(ret);
-					return ;
+					return;
 				}
 				msg.what = ret;
 				userHandle.sendMessage(msg);
-				
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
 	}
-  
-  private Handler userHandle = new Handler() {
+
+	private Handler userHandle = new Handler() {
 		public void handleMessage(Message msg) {
 			if (msg.what < 0) {
 				Toast.makeText(getApplicationContext(),
@@ -79,20 +100,21 @@ public class TableActivity extends Activity {
 				tableButton = new int[mSettings.size()];
 				for (int i = 0; i < mSettings.size(); i++) {
 					HashMap<String, String> map = new HashMap<String, String>();
-					map.put("ItemText", "第" + mSettings.getId(i)  + "桌");
+					map.put("ItemText", "第" + mSettings.getId(i) + "桌");
 					tableButton[i] = mSettings.getstatus(i);
 					lstImageItem.add(map);
 				}
 
-				SimpleAdapter saImageItems = new SimpleAdapter(TableActivity.this, lstImageItem,
-						R.layout.table_item, new String[] { "ItemText" },
+				SimpleAdapter saImageItems = new SimpleAdapter(
+						TableActivity.this, lstImageItem, R.layout.table_item,
+						new String[] { "ItemText" },
 						new int[] { R.id.ItemText });
 				gridview.setAdapter(saImageItems);
 				gridview.setOnItemClickListener(new ItemClickListener());
 			}
 		}
-    };
-    
+	};
+
 	class ItemClickListener implements OnItemClickListener {
 
 		@SuppressWarnings("unchecked")
@@ -105,7 +127,7 @@ public class TableActivity extends Activity {
 			HashMap<String, Object> item = (HashMap<String, Object>) arg0
 					.getItemAtPosition(arg2);
 			final int TableId = arg2;
-			Info.setTableName(Integer.toString(TableId+ 1) );
+			Info.setTableName(Integer.toString(TableId + 1));
 			Info.setTableId(TableId + 1);
 			final ChoiceOnClickListener choiceListener = new ChoiceOnClickListener();
 			Dialog addDialog = new AlertDialog.Builder(TableActivity.this)
@@ -161,10 +183,13 @@ public class TableActivity extends Activity {
 										new Thread() {
 											public void run() {
 												try {
-													 mSettings.UpdatusStatus(
-															mSettings.getId(TableId),
+													mSettings.UpdatusStatus(
+															mSettings
+																	.getId(TableId),
 															0);
-													 mSettings.CleanTalble(mSettings.getId(TableId));
+													mSettings
+															.CleanTalble(mSettings
+																	.getId(TableId));
 
 												} catch (Exception e) {
 													e.printStackTrace();
@@ -173,7 +198,7 @@ public class TableActivity extends Activity {
 										}.start();
 										intent.setClass(TableActivity.this,
 												TableActivity.class);
-										
+
 										break;
 									case 1:
 										intent.setClass(TableActivity.this,
@@ -214,5 +239,42 @@ public class TableActivity extends Activity {
 			return which;
 		}
 	}
-
+	
+	private OnClickListener backClicked = new OnClickListener() {
+		
+		@Override
+		public void onClick(View v) {
+			TableActivity.this.finish();
+		}
+	};
+	
+	private OnClickListener updateClicked = new OnClickListener() {
+		
+		@Override
+		public void onClick(View v) {
+			Intent intent = new Intent();
+			intent.setClass(TableActivity.this, UpdateMenuActivity.class);
+			TableActivity.this.startActivity(intent);
+		}
+	};
+	
+	private OnClickListener statisticsClicked = new OnClickListener() {
+		
+		@Override
+		public void onClick(View v) {
+			//TODO check permission
+			Intent intent = new Intent();
+			intent.setClass(TableActivity.this, StatisticsActivity.class);
+			TableActivity.this.startActivity(intent);
+		}
+	};
+	
+	private OnClickListener manageClicked = new OnClickListener() {
+		
+		@Override
+		public void onClick(View v) {
+			// TODO Auto-generated method stub
+			
+		}
+	};
 }

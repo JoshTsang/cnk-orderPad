@@ -39,5 +39,5 @@
     <string name="statistics">统计</string>
     <string name="mangement">管理</string>
     <string name="queryId">选择桌号</string>
-
+	<string name="userWarning">用户名密码不正确</string>
 </resources>

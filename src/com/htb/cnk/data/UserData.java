@@ -9,6 +9,11 @@ public class UserData {
 	static protected String mName;
 	static protected String mPwd;
 	
+	public static void clean(){
+	  	mName = null;
+	  	mPwd = null;
+	}
+	
 	public static String getUserName() {
 		return mName;
 	}
@@ -34,7 +39,7 @@ public class UserData {
 		}
 		Log.d("pwd", "pwd1:"+userPwd+"pwd2:"+UserData.mPwd);
 		if(UserData.mPwd.equals(userPwd)){
-			return 0;
+			return 1;
 		}else{
 			return -1;
 		}
