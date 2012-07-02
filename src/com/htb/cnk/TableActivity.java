@@ -8,10 +8,10 @@ import java.util.Map;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
@@ -21,6 +21,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 import android.widget.SimpleAdapter;
+import android.widget.Toast;
 
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder;
@@ -32,7 +33,6 @@ public class TableActivity extends Activity {
 	protected List<Map<String, String>> mTableSettings = new ArrayList<Map<String, String>>();
 	protected int tableButton[];
 	private MyOrder myOrder = new MyOrder();
-	private ProgressDialog settingDialog;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -41,49 +41,57 @@ public class TableActivity extends Activity {
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
 		setContentView(R.layout.table_activity);
-		
-		settingDialog = ProgressDialog.show(
-				TableActivity.this, "请稍等...",
-				"正在登录...", true);
-		new Thread() {
-			public void run() {
-				try {
-					mSettings.clear();
-					mSettings.getJson();
-				} catch (Exception e) {
-					e.printStackTrace();
-				} finally {
-					// 登录结束，取消settingDialog对话框
-					settingDialog.dismiss();
-				}
-			}
-		}.start();
-		
-		GridView gridview = (GridView) findViewById(R.id.gridview);
-		ArrayList<HashMap<String, String>> lstImageItem = new ArrayList<HashMap<String, String>>();
-		mTableSettings.clear();
-		tableButton = new int[mSettings.size()];
-		for (int i = 0; i < mSettings.size(); i++) {
-			HashMap<String, String> map = new HashMap<String, String>();
-			map.put("ItemText", "第" + (i + 1) + "桌");
-			tableButton[i] = mSettings.getstatus(i);
-			lstImageItem.add(map);
-		}
-
-		SimpleAdapter saImageItems = new SimpleAdapter(this, lstImageItem,
-				R.layout.table_item, new String[] { "ItemText" },
-				new int[] { R.id.ItemText });
-		// ImageButton v = (ImageButton)findViewById(R.id.TableItemImage);
-		// v.setBackgroundColor(Color.BLACK);
-
-		gridview.setAdapter(saImageItems);
-
-		gridview.setOnItemClickListener(new ItemClickListener());
+		new Thread(new tableThread()).start();
 
 	}
+	
+  class tableThread implements Runnable {
+		public void run() {
+			try {
+				Message msg = new Message();
+				mSettings.clear();
+				int ret = mSettings.getJson();
+				if (ret < 0) {
+					userHandle.sendEmptyMessage(ret);
+					return ;
+				}
+				msg.what = ret;
+				userHandle.sendMessage(msg);
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+  
+  private Handler userHandle = new Handler() {
+		public void handleMessage(Message msg) {
+			if (msg.what < 0) {
+				Toast.makeText(getApplicationContext(),
+						getResources().getString(R.string.delWarning),
+						Toast.LENGTH_SHORT).show();
+			} else {
+				GridView gridview = (GridView) findViewById(R.id.gridview);
+				ArrayList<HashMap<String, String>> lstImageItem = new ArrayList<HashMap<String, String>>();
+				mTableSettings.clear();
+				tableButton = new int[mSettings.size()];
+				for (int i = 0; i < mSettings.size(); i++) {
+					HashMap<String, String> map = new HashMap<String, String>();
+					map.put("ItemText", "第" + mSettings.getId(i)  + "桌");
+					tableButton[i] = mSettings.getstatus(i);
+					lstImageItem.add(map);
+				}
 
+				SimpleAdapter saImageItems = new SimpleAdapter(TableActivity.this, lstImageItem,
+						R.layout.table_item, new String[] { "ItemText" },
+						new int[] { R.id.ItemText });
+				gridview.setAdapter(saImageItems);
+				gridview.setOnItemClickListener(new ItemClickListener());
+			}
+		}
+    };
+    
 	class ItemClickListener implements OnItemClickListener {
 
 		@SuppressWarnings("unchecked")
@@ -96,8 +104,8 @@ public class TableActivity extends Activity {
 			HashMap<String, Object> item = (HashMap<String, Object>) arg0
 					.getItemAtPosition(arg2);
 			final int TableId = arg2;
-			Info.setTableName(Integer.toString(TableId + 1));
-			Info.setTableId(TableId);
+			Info.setTableName(Integer.toString(TableId+ 1) );
+			Info.setTableId(TableId + 1);
 			final ChoiceOnClickListener choiceListener = new ChoiceOnClickListener();
 			Dialog addDialog = new AlertDialog.Builder(TableActivity.this)
 					.setTitle("选择功能")
@@ -116,7 +124,6 @@ public class TableActivity extends Activity {
 									switch (choiceWhich) {
 									case 0:
 										myOrder.clear();
-							//			mSettings.setstatus(TableId, 1);
 										intent.setClass(TableActivity.this,
 												MenuActivity.class);
 										Info.setMode(Info.WORK_MODE_CUSTOMER);
@@ -128,6 +135,7 @@ public class TableActivity extends Activity {
 										break;
 									}
 									TableActivity.this.startActivity(intent);
+									TableActivity.this.finish();
 								}
 							}).setNegativeButton("取消", null).create();
 
@@ -177,6 +185,7 @@ public class TableActivity extends Activity {
 										break;
 									}
 									TableActivity.this.startActivity(intent);
+									TableActivity.this.finish();
 								}
 							}).setNegativeButton("取消", null).create();
 

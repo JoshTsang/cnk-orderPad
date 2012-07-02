@@ -71,10 +71,8 @@ public class TableSetting {
 			TableSettingItem asItem;
 			TableSetting setting = new TableSetting();
 			for (int i = 0; i < length; i++) {// 遍历JSONArray
-				Log.d("debugTest", Integer.toString(i));
 				JSONObject item = tableList.getJSONObject(i);
 				int id = item.getInt("id");
-				Log.d("debugTest", "id" + id);
 				String name = item.getString("name");
 				int status = item.getInt("status");
 				asItem = new TableSettingItem(status, name, id);

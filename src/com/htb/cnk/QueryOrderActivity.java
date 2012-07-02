@@ -31,43 +31,36 @@ public class QueryOrderActivity extends Activity {
 	private ListView mMyOrderLst;
 	private MyOrder mMyOrder;
 	private MyOrderAdapter mMyOrderAdapter;
-//	private static int talbeId;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.query_activity);
 		findViews();
-	//	updateTabelInfos();
 		setClickListener();
 	}
 
 	private void findViews() {
 		mBackBtn = (Button) findViewById(R.id.back_btn);
-		mSettingBtn = (Button)findViewById(R.id.queryId);
+		mSettingBtn = (Button) findViewById(R.id.queryId);
 		mTableNumTxt = (TextView) findViewById(R.id.tableNum);
 		mDishCountTxt = (TextView) findViewById(R.id.dishCount);
 		mTotalPriceTxt = (TextView) findViewById(R.id.totalPrice);
 		mMyOrderLst = (ListView) findViewById(R.id.myOrderList);
-		
 
 	}
 
 	private void fillData() {
 		mTableNumTxt.setText(Info.getTableName());
-		mDishCountTxt.setText(Integer.toString(mMyOrder.count())
-				+ " 道菜");
+		mDishCountTxt.setText(Integer.toString(mMyOrder.count()) + " 道菜");
 		mTotalPriceTxt
-				.setText(Double.toString(mMyOrder.getTotalPrice())
-						+ " 元");
+				.setText(Double.toString(mMyOrder.getTotalPrice()) + " 元");
 		mMyOrderAdapter = new MyOrderAdapter(this, mMyOrder) {
 			@Override
 			public View getView(int position, View convertView, ViewGroup arg2) {
 				TextView dishName;
 				TextView dishPrice;
 				TextView dishQuantity;
-				
-				
-
 				if (convertView == null) {
 					convertView = LayoutInflater.from(QueryOrderActivity.this)
 							.inflate(R.layout.item_queryorder, null);
@@ -78,7 +71,7 @@ public class QueryOrderActivity extends Activity {
 				dishPrice = (TextView) convertView.findViewById(R.id.dishPrice);
 				dishQuantity = (TextView) convertView
 						.findViewById(R.id.dishQuantity);
-			
+
 				dishName.setText(dishDetail.getName());
 				dishPrice.setText(Double.toString(dishDetail.getPrice())
 						+ " 元/份");
@@ -95,7 +88,7 @@ public class QueryOrderActivity extends Activity {
 
 	private void setClickListener() {
 		mBackBtn.setOnClickListener(backBtnClicked);
-		
+
 		mSettingBtn.setOnClickListener(settingsClicked);
 
 	}
@@ -112,7 +105,8 @@ public class QueryOrderActivity extends Activity {
 				Toast.makeText(getApplicationContext(),
 						getResources().getString(R.string.delWarning),
 						Toast.LENGTH_SHORT).show();
-			} else {	
+				fillData();
+			} else {
 				fillData();
 				mMyOrderAdapter.notifyDataSetChanged();
 			}
@@ -141,49 +135,52 @@ public class QueryOrderActivity extends Activity {
 			QueryOrderActivity.this.finish();
 		}
 	};
-	 private OnClickListener settingsClicked = new OnClickListener() {
+	private OnClickListener settingsClicked = new OnClickListener() {
 
-			@Override
-			public void onClick(View v) {
-				// 点击确定转向登录对话框
-				LayoutInflater factory = LayoutInflater.from(QueryOrderActivity.this);
-				// 得到自定义对话框
-				final View DialogView = factory.inflate(R.layout.query_dialog, null);
-		
-				// 创建对话框
-				AlertDialog dlg = new AlertDialog.Builder(QueryOrderActivity.this)
-						.setTitle("选择桌号").setView(DialogView)// 设置自定义对话框样式
-						.setPositiveButton("确定", new DialogInterface.OnClickListener() {// 设置监听事件
+		@Override
+		public void onClick(View v) {
+			// 点击确定转向登录对话框
+			LayoutInflater factory = LayoutInflater
+					.from(QueryOrderActivity.this);
+			// 得到自定义对话框
+			final View DialogView = factory
+					.inflate(R.layout.query_dialog, null);
 
-									@Override
-									public void onClick(DialogInterface dialog,
-											int which) {
-										 if(which == Dialog.BUTTON_POSITIVE){  
-										EditText mTableId = (EditText)DialogView.findViewById(R.id.queryTableId);
-										final String talbeId = mTableId.getText().toString();
-										Info.setTableId((Integer.parseInt(talbeId))-1);
+			// 创建对话框
+			AlertDialog dlg = new AlertDialog.Builder(QueryOrderActivity.this)
+					.setTitle("选择桌号")
+					.setView(DialogView)
+					// 设置自定义对话框样式
+					.setPositiveButton("确定",
+							new DialogInterface.OnClickListener() {// 设置监听事件
+
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+									if (which == Dialog.BUTTON_POSITIVE) {
+										EditText mTableId = (EditText) DialogView
+												.findViewById(R.id.queryTableId);
+										final String talbeId = mTableId
+												.getText().toString();
+										Info.setTableId((Integer
+												.parseInt(talbeId)));
 										Info.setTableName(talbeId);
-//										Toast.makeText(QueryOrderActivity.this, Integer
-//												.toString(Info.getTableId()), Toast.LENGTH_LONG).show(); 
 										updateTabelInfos();
-										 }
-										
 									}
+
 								}
-									).setNegativeButton("取消",// 设置取消按钮
-								new DialogInterface.OnClickListener() {
+							}).setNegativeButton("取消",// 设置取消按钮
+							new DialogInterface.OnClickListener() {
 
-									@Override
-									public void onClick(DialogInterface dialog,
-											int which) {
-										// 点击取消后退出程序
-										
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+									// 点击取消后退出程序
+								}
+							}).create();// 创建对话框
+			dlg.show();// 显示对话框
+		}
 
-									}
-								}).create();// 创建对话框
-				dlg.show();// 显示对话框
-			}
-	    	
-	    };
+	};
 
 }
