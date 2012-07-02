@@ -15,12 +15,10 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Button;
 import android.widget.GridView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
@@ -28,16 +26,11 @@ import android.widget.Toast;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.TableSetting;
+import com.htb.cnk.data.UserData;
 
 public class TableActivity extends Activity {
 
-	private Button mBackBtn;
-	private Button mUpdateBtn;
-	private Button mStatisticsBtn;
-	private Button mManageBtn;
-	
 	private TableSetting mSettings = new TableSetting();
-	
 	protected List<Map<String, String>> mTableSettings = new ArrayList<Map<String, String>>();
 	protected int tableButton[];
 	private MyOrder myOrder = new MyOrder();
@@ -70,8 +63,7 @@ public class TableActivity extends Activity {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		}.start();
-		
+		}
 	}
   
   private Handler userHandle = new Handler() {
@@ -173,8 +165,6 @@ public class TableActivity extends Activity {
 															mSettings.getId(TableId),
 															0);
 													 mSettings.CleanTalble(mSettings.getId(TableId));
-												//	 mSettings.getJson();
-
 
 												} catch (Exception e) {
 													e.printStackTrace();
@@ -183,6 +173,7 @@ public class TableActivity extends Activity {
 										}.start();
 										intent.setClass(TableActivity.this,
 												TableActivity.class);
+										
 										break;
 									case 1:
 										intent.setClass(TableActivity.this,
@@ -204,6 +195,7 @@ public class TableActivity extends Activity {
 			} else {
 				clearDialog.show();
 			}
+
 		}
 	}
 
@@ -223,41 +215,4 @@ public class TableActivity extends Activity {
 		}
 	}
 
-	private OnClickListener backClicked = new OnClickListener() {
-		
-		@Override
-		public void onClick(View v) {
-			TableActivity.this.finish();
-		}
-	};
-	
-	private OnClickListener updateClicked = new OnClickListener() {
-		
-		@Override
-		public void onClick(View v) {
-			Intent intent = new Intent();
-			intent.setClass(TableActivity.this, UpdateMenuActivity.class);
-			TableActivity.this.startActivity(intent);
-		}
-	};
-	
-	private OnClickListener statisticsClicked = new OnClickListener() {
-		
-		@Override
-		public void onClick(View v) {
-			//TODO check permission
-			Intent intent = new Intent();
-			intent.setClass(TableActivity.this, StatisticsActivity.class);
-			TableActivity.this.startActivity(intent);
-		}
-	};
-	
-	private OnClickListener manageClicked = new OnClickListener() {
-		
-		@Override
-		public void onClick(View v) {
-			// TODO Auto-generated method stub
-			
-		}
-	};
 }

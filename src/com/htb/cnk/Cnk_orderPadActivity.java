@@ -141,7 +141,7 @@ public class Cnk_orderPadActivity extends Activity {
 			if(Info.getMode() == Info.WORK_MODE_WAITER){
 				Message msg = new Message();
 				msg.what = 1;
-				handler.sendMessage(msg);
+				userHandle.sendMessage(msg);
 			}else{
 				dlg.show();// 显示对话框
 
