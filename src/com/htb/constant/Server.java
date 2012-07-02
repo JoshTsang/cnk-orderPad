@@ -13,6 +13,7 @@ public class Server {
 	public final static String GET_TABLE_STATUS = PHP_DIR + "getTableStatus.php";
 	public final static String UPDATE_TABLE_STATUS = PHP_DIR + "updateTableStatus.php";
 	public final static String CLEAN_TABLE= PHP_DIR + "cleanTable.php";
+	public final static String GET_PWD = PHP_DIR + "getPwd.php";
 	/* Database */
 	public final static String DB_DIR = "db/";
 	public final static String DB_MENU = DB_DIR + "menu.db";
