@@ -105,6 +105,7 @@ public class Cnk_orderPadActivity extends Activity {
 
 		@Override
 		public void onClick(View v) {
+			
 			// 点击确定转向登录对话框
 			LayoutInflater factory = LayoutInflater.from(Cnk_orderPadActivity.this);
 			// 得到自定义对话框
@@ -155,7 +156,13 @@ public class Cnk_orderPadActivity extends Activity {
 
 								}
 							}).create();// 创建对话框
-			dlg.show();// 显示对话框
+			if(Info.getMode() == Info.WORK_MODE_WAITER){
+				Message msg = new Message();
+				msg.what = 1;
+				handler.sendMessage(msg);
+			}else{
+				dlg.show();// 显示对话框
+			}
 		}
     	
     };

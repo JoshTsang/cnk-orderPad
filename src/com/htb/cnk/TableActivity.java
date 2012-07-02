@@ -146,6 +146,7 @@ public class TableActivity extends Activity {
 										break;
 									}
 									TableActivity.this.startActivity(intent);
+									TableActivity.this.finish();
 								}
 							}).setNegativeButton("取消", null).create();
 
@@ -174,6 +175,8 @@ public class TableActivity extends Activity {
 															mSettings.getId(TableId),
 															0);
 													 mSettings.CleanTalble(mSettings.getId(TableId));
+												//	 mSettings.getJson();
+
 
 												} catch (Exception e) {
 													e.printStackTrace();
@@ -182,7 +185,6 @@ public class TableActivity extends Activity {
 										}.start();
 										intent.setClass(TableActivity.this,
 												TableActivity.class);
-										
 										break;
 									case 1:
 										intent.setClass(TableActivity.this,
@@ -195,6 +197,7 @@ public class TableActivity extends Activity {
 										break;
 									}
 									TableActivity.this.startActivity(intent);
+									TableActivity.this.finish();
 								}
 							}).setNegativeButton("取消", null).create();
 
@@ -203,7 +206,6 @@ public class TableActivity extends Activity {
 			} else {
 				clearDialog.show();
 			}
-
 		}
 	}
 
@@ -227,7 +229,7 @@ public class TableActivity extends Activity {
 		
 		@Override
 		public void onClick(View v) {
-			finish();
+			TableActivity.this.finish();
 		}
 	};
 	
