@@ -138,12 +138,13 @@ public class Cnk_orderPadActivity extends Activity {
 									// 点击取消后退出程序
 								}
 							}).create();// 创建对话框
-			if(Info.getMode() == Info.WORK_MODE_WAITER){
-				Message msg = new Message();
-				msg.what = 1;
-				userHandle.sendMessage(msg);
-			}else{
+
+			if(Info.getMode() == Info.WORK_MODE_CUSTOMER){
 				dlg.show();// 显示对话框
+			}else{
+				Intent intent = new Intent();
+	    		intent.setClass(Cnk_orderPadActivity.this, TableActivity.class);
+	    		Cnk_orderPadActivity.this.startActivity(intent);
 
 			}
 		}
