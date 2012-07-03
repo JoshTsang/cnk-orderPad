@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
     <string name="hello">Hello World, Cnk_orderPadActivity!</string>
@@ -40,4 +40,5 @@
     <string name="mangement">管理</string>
     <string name="queryId">选择桌号</string>
 	<string name="userWarning">用户名密码不正确</string>
+	<string name="tableNotSet">还未设定桌号</string>
 </resources>

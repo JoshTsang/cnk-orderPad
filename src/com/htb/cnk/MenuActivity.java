@@ -76,6 +76,12 @@ public class MenuActivity extends Activity {
 		}
 	}
 
+	@Override
+	protected void onResume() {
+		super.onResume();
+		updateOrderedDishCount();
+	}
+
 	private void findViews() {
 		mBackBtn = (Button) findViewById(R.id.back_btn);
 		mSettingsBtn = (Button) findViewById(R.id.settings_btn);

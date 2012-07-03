@@ -36,6 +36,7 @@ public class Cnk_orderPadActivity extends Activity {
         findViews();
         setClickListeners();
         Info.setNewCustomer(true);
+        Info.setTableId(-1);
         syncWithServer();
     }
     
@@ -81,10 +82,16 @@ public class Cnk_orderPadActivity extends Activity {
 
 		@Override
 		public void onClick(View arg0) {
-			Intent intent = new Intent();
-			intent.setClass(Cnk_orderPadActivity.this, MenuActivity.class);
-			Info.setMode(Info.WORK_MODE_CUSTOMER);
-			startActivity(intent);
+			if (Info.getTableId() < 0) {
+				Toast.makeText(getApplicationContext(),
+						getResources().getString(R.string.tableNotSet),
+						Toast.LENGTH_SHORT).show();
+			} else {
+				Intent intent = new Intent();
+				intent.setClass(Cnk_orderPadActivity.this, MenuActivity.class);
+				Info.setMode(Info.WORK_MODE_CUSTOMER);
+				startActivity(intent);
+			}
 		}
     	
     };

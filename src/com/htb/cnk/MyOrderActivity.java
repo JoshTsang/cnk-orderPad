@@ -255,7 +255,8 @@ public class MyOrderActivity extends Activity {
 						@Override
 						public void onClick(DialogInterface dialog,
 								int which) {
-							
+							mMyOrder.clear();
+							mMyOrderAdapter.notifyDataSetChanged();
 						}
 				}).show();
 			}

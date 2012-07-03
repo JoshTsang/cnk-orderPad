@@ -24,6 +24,7 @@ import android.widget.DatePicker;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.htb.cnk.adapter.StatisticsAdapter;
 import com.htb.cnk.data.Statistics;
@@ -294,7 +295,18 @@ public class StatisticsActivity extends Activity{
 		
 		@Override
 		public void onClick(View v) {
-			mStatistics.print();
+			if (mStatistics.count() <= 0) {
+				Toast.makeText(getApplicationContext(),
+						"没有可打印信息", Toast.LENGTH_LONG).show();
+				return;
+			}
+			new Thread() {
+				public void run() {
+					int ret = mStatistics.print(mStart, mEnd);
+					handlerPrint.sendEmptyMessage(ret);
+				}
+			}.start();
+			
 			if (mQueryMode == QUERY_TODAY) {
 				updateLatestStatistics();
 			}
@@ -405,6 +417,28 @@ public class StatisticsActivity extends Activity{
 							public void onClick(DialogInterface dialog,
 									int which) {
 								finish();
+							}
+						})
+				.show();
+			} else {
+				mpDialog.cancel();
+			}
+		}
+    };
+    
+    private Handler handlerPrint = new Handler() {
+		public void handleMessage(Message msg) {
+			if (msg.what < 0) {
+				mpDialog.cancel();
+				new AlertDialog.Builder(StatisticsActivity.this)
+				.setTitle("错误")
+				.setMessage("打印出现错误,请检查打印机" + msg.what)
+				.setPositiveButton("确定",
+						new DialogInterface.OnClickListener() {
+	
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
 							}
 						})
 				.show();
