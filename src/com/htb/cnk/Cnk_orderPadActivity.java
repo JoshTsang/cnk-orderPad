@@ -135,9 +135,6 @@ public class Cnk_orderPadActivity extends Activity {
 										UserData.setUserName(userName);
 										UserData.setUserPwd(userPwd);
 									}
-									Toast.makeText(getApplicationContext(),
-											userName+userPwd,
-											Toast.LENGTH_SHORT).show();
 									new Thread(new userThread()).start();
 								}
 							}).setNegativeButton("取消",// 设置取消按钮

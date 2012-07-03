@@ -335,11 +335,12 @@ public class MenuActivity extends Activity {
 									final String userName = mUserName.getText().toString();
 									EditText mUserPwd = (EditText)DialogView.findViewById(R.id.edit_password);
 									final String userPwd = mUserPwd.getText().toString();
-									UserData.setUserName(userName);
-									UserData.setUserPwd(userPwd);
-									Toast.makeText(getApplicationContext(),
-											userName+userPwd,
-											Toast.LENGTH_SHORT).show();
+									if("".equals(userName) || "".equals(userPwd)){
+										dialog.cancel();
+									}else{
+										UserData.setUserName(userName);
+										UserData.setUserPwd(userPwd);
+									}
 									new Thread(new userThread()).start();
 								}
 							}).setNegativeButton("取消",// 设置取消按钮

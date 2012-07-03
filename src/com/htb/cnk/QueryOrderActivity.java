@@ -162,10 +162,14 @@ public class QueryOrderActivity extends Activity {
 												.findViewById(R.id.queryTableId);
 										final String talbeId = mTableId
 												.getText().toString();
-										Info.setTableId((Integer
-												.parseInt(talbeId)));
-										Info.setTableName(talbeId);
-										updateTabelInfos();
+										if ("".equals(talbeId)) {
+											dialog.cancel();
+										} else {
+											Info.setTableId((Integer
+													.parseInt(talbeId)));
+											Info.setTableName(talbeId);
+											updateTabelInfos();
+										}
 									}
 
 								}
