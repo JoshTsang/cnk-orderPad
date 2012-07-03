@@ -53,7 +53,7 @@
 	    	android:layout_marginLeft="10dip"
 	    	android:layout_marginRight="5dip"
 	    	android:textSize="35dip"
-	    	android:textColor="#F9E8BB"
+	    	android:textColor="#FFFFFF"
 	    	android:text="@string/startTime"/>
 	    <Button android:id="@+id/setStartDate"
 	        android:layout_width="210dip"
@@ -76,8 +76,8 @@
 	        android:layout_width="wrap_content"
 	    	android:layout_height="wrap_content"
 	    	android:textSize="35dip"
-	    	android:textColor="#F9E8BB"
-	    	android:layout_marginLeft="10dip"
+	    	android:textColor="#FFFFFF"
+	    	android:layout_marginLeft="15dip"
 	    	android:layout_marginRight="5dip"
 	    	android:text="@string/endTime"/>
 	    <Button android:id="@+id/setEndDate"

@@ -317,12 +317,14 @@ public class StatisticsActivity extends Activity{
 		
 		@Override
 		public void onClick(View v) {
-			new DatePickerDialog(StatisticsActivity.this ,
+			DatePickerDialog date = new DatePickerDialog(StatisticsActivity.this ,
 								 startDateListener,
 								 mStart.get(Calendar.YEAR),
 								 mStart.get(Calendar.MONTH),
 								 mStart.get(Calendar.DAY_OF_MONTH)
-								).show();
+								);
+			date.setCancelable(false);
+			date.show();
 		}
 	};
 	
@@ -330,10 +332,12 @@ public class StatisticsActivity extends Activity{
 		
 		@Override
 		public void onClick(View v) {
-			new TimePickerDialog(StatisticsActivity.this,
+			TimePickerDialog time = new TimePickerDialog(StatisticsActivity.this,
 					startTimeListener,
 					mStart.get(Calendar.HOUR_OF_DAY),
-					mStart.get(Calendar.MINUTE),true).show();
+					mStart.get(Calendar.MINUTE),true);
+			time.setCancelable(false);
+			time.show();
 		}
 	};
 	
@@ -341,12 +345,14 @@ public class StatisticsActivity extends Activity{
 		
 		@Override
 		public void onClick(View v) {
-			new DatePickerDialog(StatisticsActivity.this ,
+			DatePickerDialog date = new DatePickerDialog(StatisticsActivity.this ,
 					 endDateListener,
 					 mEnd.get(Calendar.YEAR),
 					 mEnd.get(Calendar.MONTH),
 					 mEnd.get(Calendar.DAY_OF_MONTH)
-					).show();
+					);
+			date.setCancelable(false);
+			date.show();
 		}
 	};
 	
@@ -354,10 +360,12 @@ public class StatisticsActivity extends Activity{
 		
 		@Override
 		public void onClick(View v) {
-			new TimePickerDialog(StatisticsActivity.this,
+			TimePickerDialog time = new TimePickerDialog(StatisticsActivity.this,
 					endTimeListener,
 					mEnd.get(Calendar.HOUR_OF_DAY),
-					mEnd.get(Calendar.MINUTE),true).show();
+					mEnd.get(Calendar.MINUTE),true);
+			time.setCancelable(false);
+			time.show();
 		}
 	};
 	
