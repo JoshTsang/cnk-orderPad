@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.Contacts.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -234,6 +235,7 @@ public class MyOrderActivity extends Activity {
 		public void handleMessage(Message msg) {
 			if (msg.what < 0) {
 				new AlertDialog.Builder(MyOrderActivity.this)
+				.setCancelable(false)
 				.setTitle("出错了")
 				.setMessage("提交订单失败")
 				.setPositiveButton("确定",
@@ -244,11 +246,13 @@ public class MyOrderActivity extends Activity {
 								int which) {
 							
 						}
-				}).show();
+				})
+				.show();
 			} else {
 				new AlertDialog.Builder(MyOrderActivity.this)
+				.setCancelable(false)
 				.setTitle("提示")
-				.setMessage("提交已提交")
+				.setMessage("订单已提交")
 				.setPositiveButton("确定",
 					new DialogInterface.OnClickListener() {
 	

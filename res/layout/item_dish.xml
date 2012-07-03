@@ -44,8 +44,8 @@
     		android:layout_height="wrap_content"
     		android:includeFontPadding="false"
     		android:textSize="48dip"
-    		android:singleLine="true"
     		android:textColor="#4D2412"/>
+    		<!-- android:singleLine="true" -->
     	<TextView android:id="@+id/dishPrice" 
 	    	android:layout_width="wrap_content"
     		android:layout_height="45dip"
