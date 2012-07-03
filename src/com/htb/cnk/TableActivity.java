@@ -22,7 +22,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.GridView;
-import android.widget.ImageButton;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
@@ -143,10 +142,10 @@ public class TableActivity extends Activity {
 										int which) {
 									// TODO Auto-generated method stub
 									int choiceWhich = choiceListener.getWhich();
+									myOrder.clear();
 									Intent intent = new Intent();
 									switch (choiceWhich) {
 									case 0:
-										myOrder.clear();
 										intent.setClass(TableActivity.this,
 												MenuActivity.class);
 										Info.setMode(Info.WORK_MODE_CUSTOMER);
@@ -176,7 +175,6 @@ public class TableActivity extends Activity {
 									// TODO Auto-generated method stub
 									int choiceWhich = choiceListener.getWhich();
 									Intent intent = new Intent();
-									Info.setTableId(TableId);
 									switch (choiceWhich) {
 									case 0:
 										myOrder.clear();
@@ -198,13 +196,13 @@ public class TableActivity extends Activity {
 										}.start();
 										intent.setClass(TableActivity.this,
 												TableActivity.class);
-
 										break;
 									case 1:
 										intent.setClass(TableActivity.this,
 												DelOrderActivity.class);
 										break;
 									case 2:
+										myOrder.clear();
 										intent.setClass(TableActivity.this,
 												MenuActivity.class);
 										Info.setMode(Info.WORK_MODE_WAITER);

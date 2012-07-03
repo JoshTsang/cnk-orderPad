@@ -23,7 +23,6 @@ import com.htb.cnk.data.MyOrder.OrderedDish;
 public class DelOrderActivity extends Activity {
 	private Button mBackBtn;
 	private Button mDelBtn;
-	//private Button mContinueBtn;
 	private TextView mTableNumTxt;
 	private TextView mDishCountTxt;
 	private TextView mTotalPriceTxt;
