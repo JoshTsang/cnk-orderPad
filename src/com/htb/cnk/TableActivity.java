@@ -320,6 +320,7 @@ public class TableActivity extends Activity {
 									final String userName = mUserName.getText().toString();
 									EditText mUserPwd = (EditText)DialogView.findViewById(R.id.edit_password);
 									final String userPwd = mUserPwd.getText().toString();
+									UserData.clean();
 									if("".equals(userName) || "".equals(userPwd)){
 										dialog.cancel();
 									}else{
