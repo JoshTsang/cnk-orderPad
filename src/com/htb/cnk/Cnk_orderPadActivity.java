@@ -14,7 +14,6 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.htb.cnk.data.Info;
-import com.htb.cnk.data.UserData;
 
 public class Cnk_orderPadActivity extends Activity {
     /** Called when the activity is first created. */
@@ -89,17 +88,6 @@ public class Cnk_orderPadActivity extends Activity {
     	
     };
     
-//    private OnClickListener orderClicked = new OnClickListener() {
-//
-//		@Override
-//		public void onClick(View v) {
-//			Intent intent = new Intent();
-//			intent.setClass(Cnk_orderPadActivity.this, QueryOrderActivity.class);
-//			startActivity(intent);
-//		}
-//   
-//    };
-    
     private OnClickListener settingsClicked = new OnClickListener() {
 
 		@Override
@@ -109,37 +97,6 @@ public class Cnk_orderPadActivity extends Activity {
 	    		Cnk_orderPadActivity.this.startActivity(intent);
 		}
     	
-    };
-    
-    class userThread implements Runnable {
-		public void run() {
-			try {
-				Message msg = new Message();						
-				int ret = UserData.ComparePwd();
-				if(ret < 0){
-					userHandle.sendEmptyMessage(ret);
-					return;
-				}
-				msg.what = ret;
-				userHandle.sendMessage(msg);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-	}
-    
-    private Handler userHandle = new Handler() {
-		public void handleMessage(Message msg) {
-			if (msg.what < 0) {
-				Toast.makeText(getApplicationContext(),
-						getResources().getString(R.string.userWarning),
-						Toast.LENGTH_SHORT).show();
-			} else if (msg.what == 1){
-				Intent intent = new Intent();
-	    		intent.setClass(Cnk_orderPadActivity.this, TableActivity.class);
-	    		Cnk_orderPadActivity.this.startActivity(intent);
-			}
-		}
     };
     
     private Handler handlerSync = new Handler() {

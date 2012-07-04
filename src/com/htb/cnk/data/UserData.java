@@ -31,14 +31,19 @@ public class UserData {
 	}
 
 	
-	public static int ComparePwd(){
+	public static int Compare(){
 		String userPwd = Http.get(Server.GET_PWD, "UNAME="+ UserData.mName);
 		Log.d("pwd", "pwd1:"+userPwd+"pwd2:"+UserData.mPwd);
 		if(userPwd == null){
 			return -1;
 		}
-		Log.d("pwd", "pwd1:"+userPwd+"pwd2:"+UserData.mPwd);
-		if(UserData.mPwd.equals(userPwd)){
+		
+		String userPerminssion = Http.get(Server.GET_PERMINSSION, "UNAME="+ UserData.mName);
+		if (userPerminssion == null){
+			return -1;
+		}
+		Log.d("pwd", "userPerminssion:"+userPerminssion);
+		if(UserData.mPwd.equals(userPwd) && "0".equals(userPerminssion)){
 			return 1;
 		}else{
 			return -1;

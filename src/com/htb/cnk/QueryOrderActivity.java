@@ -1,9 +1,6 @@
 package com.htb.cnk;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -12,7 +9,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,7 +20,7 @@ import com.htb.cnk.data.MyOrder.OrderedDish;
 
 public class QueryOrderActivity extends Activity {
 	private Button mBackBtn;
-	private Button mSettingBtn;
+//	private Button mSettingBtn;
 	private TextView mTableNumTxt;
 	private TextView mDishCountTxt;
 	private TextView mTotalPriceTxt;
@@ -38,11 +34,12 @@ public class QueryOrderActivity extends Activity {
 		setContentView(R.layout.query_activity);
 		findViews();
 		setClickListener();
+		updateTabelInfos();
 	}
 
 	private void findViews() {
 		mBackBtn = (Button) findViewById(R.id.back_btn);
-		mSettingBtn = (Button) findViewById(R.id.queryId);
+//		mSettingBtn = (Button) findViewById(R.id.queryId);
 		mTableNumTxt = (TextView) findViewById(R.id.tableNum);
 		mDishCountTxt = (TextView) findViewById(R.id.dishCount);
 		mTotalPriceTxt = (TextView) findViewById(R.id.totalPrice);
@@ -86,7 +83,7 @@ public class QueryOrderActivity extends Activity {
 
 	private void setClickListener() {
 		mBackBtn.setOnClickListener(backBtnClicked);
-		mSettingBtn.setOnClickListener(settingsClicked);
+	//	mSettingBtn.setOnClickListener(settingsClicked);
 	}
 
 	private void updateTabelInfos() {
@@ -131,54 +128,54 @@ public class QueryOrderActivity extends Activity {
 			QueryOrderActivity.this.finish();
 		}
 	};
-	private OnClickListener settingsClicked = new OnClickListener() {
-
-		@Override
-		public void onClick(View v) {
-			// 点击确定转向登录对话框
-			LayoutInflater factory = LayoutInflater
-					.from(QueryOrderActivity.this);
-			// 得到自定义对话框
-			final View DialogView = factory
-					.inflate(R.layout.query_dialog, null);
-			// 创建对话框
-			AlertDialog dlg = new AlertDialog.Builder(QueryOrderActivity.this)
-					.setTitle("选择桌号")
-					.setView(DialogView)
-					// 设置自定义对话框样式
-					.setPositiveButton("确定",
-							new DialogInterface.OnClickListener() {// 设置监听事件
-
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
-									if (which == Dialog.BUTTON_POSITIVE) {
-										EditText mTableId = (EditText) DialogView
-												.findViewById(R.id.queryTableId);
-										final String talbeId = mTableId
-												.getText().toString();
-										if ("".equals(talbeId)) {
-											dialog.cancel();
-										} else {
-											Info.setTableId((Integer
-													.parseInt(talbeId)));
-											Info.setTableName(talbeId);
-											updateTabelInfos();
-										}
-									}
-								}
-							}).setNegativeButton("取消",// 设置取消按钮
-							new DialogInterface.OnClickListener() {
-
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
-									// 点击取消后退出程序
-								}
-							}).create();// 创建对话框
-			dlg.show();// 显示对话框
-		}
-
-	};
+//	private OnClickListener settingsClicked = new OnClickListener() {
+//
+//		@Override
+//		public void onClick(View v) {
+//			// 点击确定转向登录对话框
+//			LayoutInflater factory = LayoutInflater
+//					.from(QueryOrderActivity.this);
+//			// 得到自定义对话框
+//			final View DialogView = factory
+//					.inflate(R.layout.query_dialog, null);
+//			// 创建对话框
+//			AlertDialog dlg = new AlertDialog.Builder(QueryOrderActivity.this)
+//					.setTitle("选择桌号")
+//					.setView(DialogView)
+//					// 设置自定义对话框样式
+//					.setPositiveButton("确定",
+//							new DialogInterface.OnClickListener() {// 设置监听事件
+//
+//								@Override
+//								public void onClick(DialogInterface dialog,
+//										int which) {
+//									if (which == Dialog.BUTTON_POSITIVE) {
+//										EditText mTableId = (EditText) DialogView
+//												.findViewById(R.id.queryTableId);
+//										final String talbeId = mTableId
+//												.getText().toString();
+//										if ("".equals(talbeId)) {
+//											dialog.cancel();
+//										} else {
+//											Info.setTableId((Integer
+//													.parseInt(talbeId)));
+//											Info.setTableName(talbeId);
+//											updateTabelInfos();
+//										}
+//									}
+//								}
+//							}).setNegativeButton("取消",// 设置取消按钮
+//							new DialogInterface.OnClickListener() {
+//
+//								@Override
+//								public void onClick(DialogInterface dialog,
+//										int which) {
+//									// 点击取消后退出程序
+//								}
+//							}).create();// 创建对话框
+//			dlg.show();// 显示对话框
+//		}
+//
+//	};
 
 }
