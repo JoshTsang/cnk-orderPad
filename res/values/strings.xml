@@ -41,4 +41,5 @@
 	<string name="userWarning">用户名密码不正确</string>
 	<string name="tableNotSet">还未设定桌号</string>
 	<string name="tableWarning">请查看数据库桌号设定好没有</string>
+	<string name="queryOrder">已点的菜</string>
 </resources>

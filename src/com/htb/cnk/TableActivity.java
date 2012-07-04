@@ -16,9 +16,9 @@ import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
@@ -206,10 +206,6 @@ public class TableActivity extends Activity {
 													}
 												}
 											}.start();
-											intent.setClass(TableActivity.this,
-													TableActivity.class);
-											TableActivity.this.startActivity(intent);
-											TableActivity.this.finish();
 											break;
 										case 1:
 											intent.setClass(TableActivity.this,
@@ -219,7 +215,7 @@ public class TableActivity extends Activity {
 										case 2:
 											myOrder.clear();
 											intent.setClass(TableActivity.this,
-													TableActivity.class);
+													MenuActivity.class);
 											Info.setMode(Info.WORK_MODE_WAITER);
 											TableActivity.this.startActivity(intent);
 											break;
@@ -341,13 +337,8 @@ public class TableActivity extends Activity {
 									// 点击取消后退出程序
 								}
 							}).create();// 创建对话框
-			if(Info.getMode() == Info.WORK_MODE_CUSTOMER){
 				dlg.show();// 显示对话框
-			}else{
-				Intent intent = new Intent();
-	    		intent.setClass(TableActivity.this, StatisticsActivity.class);
-	    		TableActivity.this.startActivity(intent);
-			}
+			
 		}
     	
 	};
@@ -356,7 +347,7 @@ public class TableActivity extends Activity {
 			public void run() {
 				try {
 					Message msg = new Message();						
-					int ret = UserData.ComparePwd();
+					int ret = UserData.Compare();
 					if(ret < 0){
 						userHandle.sendEmptyMessage(ret);
 						return;
@@ -372,7 +363,9 @@ public class TableActivity extends Activity {
 	  private Handler userHandle = new Handler() {
 			public void handleMessage(Message msg) {
 				if (msg.what < 0) {
-				
+					Toast.makeText(getApplicationContext(),
+							getResources().getString(R.string.userWarning),
+							Toast.LENGTH_SHORT).show();
 				} else {
 					Intent intent = new Intent();
 		    		intent.setClass(TableActivity.this, StatisticsActivity.class);
