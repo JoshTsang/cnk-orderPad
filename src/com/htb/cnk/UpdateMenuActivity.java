@@ -26,7 +26,6 @@ import android.view.KeyEvent;
 import android.widget.TextView;
 
 import com.htb.cnk.data.CnkDbHelper;
-import com.htb.cnk.data.Dish;
 import com.htb.cnk.lib.DBFile;
 import com.htb.cnk.lib.Http;
 import com.htb.constant.ErrorNum;
@@ -106,8 +105,8 @@ public class UpdateMenuActivity extends Activity {
 		if (serverRespond == null || "".equals(serverRespond)) {
 			mMenuVer = 1;
 		} else {
-			int start = serverRespond.indexOf("[");
-			int end = serverRespond.indexOf("]") - 1;
+			int start = serverRespond.indexOf("[") + 1;
+			int end = serverRespond.indexOf("]");
 			if (start < 0 || end < 0) {
 				mMenuVer = 1;
 			} else {
@@ -278,6 +277,7 @@ public class UpdateMenuActivity extends Activity {
 	   
 	private Handler handler = new Handler() {
 		public void handleMessage(Message msg) {
+			mDb.close();
 			if (msg.what < 0) {
 				new AlertDialog.Builder(UpdateMenuActivity.this)
 				.setTitle("错误")

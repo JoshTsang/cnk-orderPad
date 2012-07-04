@@ -48,7 +48,7 @@ public class Cnk_orderPadActivity extends Activity {
     private int getCurrentMenuVer() {
 		SharedPreferences sharedPre = getSharedPreferences("menuDB", 
 				Context.MODE_WORLD_WRITEABLE | Context.MODE_WORLD_READABLE);
-		return sharedPre.getInt("ver", 0);
+		return sharedPre.getInt("ver", -1);
 	}
     
     private void syncWithServer() {
