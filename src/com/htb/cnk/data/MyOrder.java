@@ -162,7 +162,7 @@ public class MyOrder {
 		Log.d("JSON",order.toString());
 		String response = Http.post(Server.SUBMIT_ORDER, order.toString());
 		if (response == null) {
-			Log.d("Respond", "die/ok");
+			Log.d("Respond", "ok");
 		} else {
 			Log.d("Respond",response);
 		}

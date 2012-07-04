@@ -2,6 +2,7 @@ package com.htb.cnk;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
@@ -35,6 +36,7 @@ public class MyOrderActivity extends Activity {
 	private ListView mMyOrderLst;
 	private MyOrder mMyOrder = new MyOrder();
 	private MyOrderAdapter mMyOrderAdapter;
+	private ProgressDialog mpDialog;
 	private TableSetting mSettings = new TableSetting();
 
 	@Override
@@ -215,6 +217,13 @@ public class MyOrderActivity extends Activity {
 				return ;
 			}
 			//TODO auth
+			mpDialog = new ProgressDialog(MyOrderActivity.this);  
+	        mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+	        mpDialog.setTitle("请稍等");
+	        mpDialog.setMessage("正在提交订单...");  
+	        mpDialog.setIndeterminate(false);
+	        mpDialog.setCancelable(false);
+	        mpDialog.show();
 			new Thread() {
 				public void run() {
 					String ret = mMyOrder.submit();
@@ -223,7 +232,11 @@ public class MyOrderActivity extends Activity {
 					if (ret == null) {
 						handler.sendEmptyMessage(-1);
 					} else {
-						handler.sendEmptyMessage(0);
+						if ("".equals(ret)) {
+							handler.sendEmptyMessage(0);
+						} else {
+							handler.sendEmptyMessage(-1);
+						}
 						Log.d("Respond", ret);
 					}
 				}
@@ -233,6 +246,7 @@ public class MyOrderActivity extends Activity {
 	
 	private Handler handler = new Handler() {
 		public void handleMessage(Message msg) {
+			mpDialog.cancel();
 			if (msg.what < 0) {
 				new AlertDialog.Builder(MyOrderActivity.this)
 				.setCancelable(false)
