@@ -172,16 +172,20 @@ public class UpdateMenuActivity extends Activity {
 	
 	private int downloadHugePic() {
 		int ret;
-		Cursor dishes = mDb.query(CnkDbHelper.DISH_TABLE_NAME, new String[] {
-				  CnkDbHelper.DISH_PIC},
-				  null, null, null, null, null);
-		while (dishes.moveToNext()) {
-			String picName = dishes.getString(0);
-			
-			ret = downloadPic(Server.IMG_PATH+ picName, "hdpi_" + picName);
-			if (ret < 0) {
-				return ret;
+		try {
+			Cursor dishes = mDb.query(CnkDbHelper.DISH_TABLE_NAME, new String[] {
+					  CnkDbHelper.DISH_PIC},
+					  null, null, null, null, null);
+			while (dishes.moveToNext()) {
+				String picName = dishes.getString(0);
+				
+				ret = downloadPic(Server.IMG_PATH+ picName, "hdpi_" + picName);
+				if (ret < 0) {
+					return ret;
+				}
 			}
+		} catch (Exception e) {
+			return -1;
 		}
 		return 0;
 	}

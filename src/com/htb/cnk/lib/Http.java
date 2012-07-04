@@ -66,8 +66,8 @@ public class Http {
 		HttpParams httpParameters1 = new BasicHttpParams();
 
 		// 超时设置
-		HttpConnectionParams.setConnectionTimeout(httpParameters1, 20 * 1000);
-		HttpConnectionParams.setSoTimeout(httpParameters1, 20 * 1000);
+		HttpConnectionParams.setConnectionTimeout(httpParameters1, 5 * 1000);
+		HttpConnectionParams.setSoTimeout(httpParameters1, 5 * 1000);
 
 		List<NameValuePair> ls = constructHttpPkg(msg);
 
@@ -128,8 +128,8 @@ public class Http {
 		HttpGet httpRequest = new HttpGet(uriAPI); 
 		
 		HttpParams httpParameters1 = new BasicHttpParams();
-		HttpConnectionParams.setConnectionTimeout(httpParameters1, 20 * 1000);
-		HttpConnectionParams.setSoTimeout(httpParameters1, 20 * 1000);
+		HttpConnectionParams.setConnectionTimeout(httpParameters1, 5 * 1000);
+		HttpConnectionParams.setSoTimeout(httpParameters1, 5 * 1000);
 		
 		DefaultHttpClient client;
 		client = new DefaultHttpClient(httpParameters1);
