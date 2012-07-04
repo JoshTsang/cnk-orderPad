@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -21,6 +22,7 @@ import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
@@ -28,12 +30,12 @@ import android.widget.Toast;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.TableSetting;
+import com.htb.cnk.data.UserData;
 
 public class TableActivity extends Activity {
 
 	private TableSetting mSettings = new TableSetting();
 	protected List<Map<String, String>> mTableSettings = new ArrayList<Map<String, String>>();
-	protected int tableButton[];
 	private MyOrder myOrder = new MyOrder();
 	private Button mBackBtn;
 	private Button mUpdateBtn;
@@ -73,34 +75,32 @@ public class TableActivity extends Activity {
 			try {
 				Message msg = new Message();
 				mSettings.clear();
-				int ret = mSettings.getJson();
+				int ret = mSettings.getTableStatus();
 				if (ret < 0) {
-					userHandle.sendEmptyMessage(ret);
+					tableHandle.sendEmptyMessage(ret);
 					return;
 				}
 				msg.what = ret;
-				userHandle.sendMessage(msg);
+				tableHandle.sendMessage(msg);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
 	}
 
-	private Handler userHandle = new Handler() {
+	private Handler tableHandle = new Handler() {
 		public void handleMessage(Message msg) {
 			if (msg.what < 0) {
 				Toast.makeText(getApplicationContext(),
-						getResources().getString(R.string.delWarning),
+						getResources().getString(R.string.tableWarning),
 						Toast.LENGTH_SHORT).show();
 			} else {
 				GridView gridview = (GridView) findViewById(R.id.gridview);
 				ArrayList<HashMap<String, String>> lstImageItem = new ArrayList<HashMap<String, String>>();
 				mTableSettings.clear();
-				tableButton = new int[mSettings.size()];
 				for (int i = 0; i < mSettings.size(); i++) {
 					HashMap<String, String> map = new HashMap<String, String>();
 					map.put("ItemText", "第" + mSettings.getId(i) + "桌");
-					tableButton[i] = mSettings.getstatus(i);
 					lstImageItem.add(map);
 				}
 
@@ -113,7 +113,136 @@ public class TableActivity extends Activity {
 			}
 		}
 	};
+	
+	class refreshThread implements Runnable {
+		public void run() {
+			try {
+				Message msg = new Message();
+				mSettings.clear();
+				int ret = mSettings.getTableStatus();
+				if (ret < 0) {
+					refreshHandle.sendEmptyMessage(ret);
+					return;
+				}
+				msg.what = ret;
+				refreshHandle.sendMessage(msg);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	private Handler refreshHandle = new Handler() {
+		public void handleMessage(Message msg) {
+			if (msg.what < 0) {
+				Toast.makeText(getApplicationContext(),
+						getResources().getString(R.string.tableWarning),
+						Toast.LENGTH_SHORT).show();
+			} else {
+				final ChoiceOnClickListener choiceListener = new ChoiceOnClickListener();
+				Dialog addDialog = new AlertDialog.Builder(TableActivity.this)
+						.setTitle("选择功能")
+						// 设置标题
+						.setSingleChoiceItems(new String[] { "开台（客户模式）", "开台（服务员模式）" }, 0,
+								choiceListener)
+						.setPositiveButton("确定",
+								new DialogInterface.OnClickListener() {
 
+									@Override
+									public void onClick(DialogInterface dialog,
+											int which) {
+										// TODO Auto-generated method stub
+										int choiceWhich = choiceListener.getWhich();
+										myOrder.clear();
+										Intent intent = new Intent();
+										switch (choiceWhich) {
+										case 0:
+											intent.setClass(TableActivity.this,
+													MenuActivity.class);
+											Info.setMode(Info.WORK_MODE_CUSTOMER);
+											TableActivity.this.startActivity(intent);
+											TableActivity.this.finish();
+											break;
+										case 1:
+											intent.setClass(TableActivity.this,
+													MenuActivity.class);
+											Info.setMode(Info.WORK_MODE_WAITER);
+											TableActivity.this.startActivity(intent);
+											break;
+										}
+									}
+								}).setNegativeButton("取消", null).create();
+
+				Dialog cleanDialog = new AlertDialog.Builder(TableActivity.this)
+						.setTitle("选择功能")
+						// 设置标题
+						.setSingleChoiceItems(new String[] { "清台", "删除菜", "添加菜","查看菜" },
+								0, choiceListener)
+						.setPositiveButton("确定",
+								new DialogInterface.OnClickListener() {
+
+									@Override
+									public void onClick(DialogInterface dialog,
+											int which) {
+										// TODO Auto-generated method stub
+										int choiceWhich = choiceListener.getWhich();
+										Intent intent = new Intent();
+										switch (choiceWhich) {
+										case 0:
+											myOrder.clear();
+											new Thread() {
+												public void run() {
+													try {
+														mSettings.UpdatusStatus(
+																mSettings
+																		.getId(Info.getTableId() - 1),
+																0);
+														mSettings
+																.CleanTalble(mSettings
+																		.getId(Info.getTableId() - 1));
+
+													} catch (Exception e) {
+														e.printStackTrace();
+													}
+												}
+											}.start();
+											intent.setClass(TableActivity.this,
+													TableActivity.class);
+											TableActivity.this.startActivity(intent);
+											TableActivity.this.finish();
+											break;
+										case 1:
+											intent.setClass(TableActivity.this,
+													DelOrderActivity.class);
+											TableActivity.this.startActivity(intent);
+											break;
+										case 2:
+											myOrder.clear();
+											intent.setClass(TableActivity.this,
+													TableActivity.class);
+											Info.setMode(Info.WORK_MODE_WAITER);
+											TableActivity.this.startActivity(intent);
+											break;
+										case 3:
+											intent.setClass(TableActivity.this,
+													QueryOrderActivity.class);
+											TableActivity.this.startActivity(intent);
+										}
+										
+									}
+								}).setNegativeButton("取消", null).create();
+
+				if (mSettings.getstatus((Info.getTableId() - 1)) == 0) {
+					addDialog.show();
+				} else {
+					cleanDialog.show();
+				}
+
+
+			}
+		}
+	};
+	
 	class ItemClickListener implements OnItemClickListener {
 
 		@SuppressWarnings("unchecked")
@@ -123,108 +252,17 @@ public class TableActivity extends Activity {
 				int arg2,// The position of the view in the adapter
 				long arg3// The row id of the item that was clicked
 		) {
+			new Thread(new refreshThread()).start();
 			HashMap<String, Object> item = (HashMap<String, Object>) arg0
 					.getItemAtPosition(arg2);
 			final int TableId = arg2;
 			Info.setTableName(Integer.toString(TableId + 1));
 			Info.setTableId(TableId + 1);
-			final ChoiceOnClickListener choiceListener = new ChoiceOnClickListener();
-			Dialog addDialog = new AlertDialog.Builder(TableActivity.this)
-					.setTitle("选择功能")
-					// 设置标题
-					.setSingleChoiceItems(new String[] { "开台", "快速点菜" }, 0,
-							choiceListener)
-					.setPositiveButton("确定",
-							new DialogInterface.OnClickListener() {
-
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
-									// TODO Auto-generated method stub
-									int choiceWhich = choiceListener.getWhich();
-									myOrder.clear();
-									Intent intent = new Intent();
-									switch (choiceWhich) {
-									case 0:
-										intent.setClass(TableActivity.this,
-												MenuActivity.class);
-										Info.setMode(Info.WORK_MODE_CUSTOMER);
-										break;
-									case 1:
-										intent.setClass(TableActivity.this,
-												MenuActivity.class);
-										Info.setMode(Info.WORK_MODE_WAITER);
-										break;
-									}
-									TableActivity.this.startActivity(intent);
-									TableActivity.this.finish();
-								}
-							}).setNegativeButton("取消", null).create();
-
-			Dialog clearDialog = new AlertDialog.Builder(TableActivity.this)
-					.setTitle("选择功能")
-					// 设置标题
-					.setSingleChoiceItems(new String[] { "清台", "删除菜", "快速点菜" },
-							0, choiceListener)
-					.setPositiveButton("确定",
-							new DialogInterface.OnClickListener() {
-
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
-									// TODO Auto-generated method stub
-									int choiceWhich = choiceListener.getWhich();
-									Intent intent = new Intent();
-									switch (choiceWhich) {
-									case 0:
-										myOrder.clear();
-										new Thread() {
-											public void run() {
-												try {
-													mSettings.UpdatusStatus(
-															mSettings
-																	.getId(TableId),
-															0);
-													mSettings
-															.CleanTalble(mSettings
-																	.getId(TableId));
-
-												} catch (Exception e) {
-													e.printStackTrace();
-												}
-											}
-										}.start();
-										intent.setClass(TableActivity.this,
-												TableActivity.class);
-										break;
-									case 1:
-										intent.setClass(TableActivity.this,
-												DelOrderActivity.class);
-										break;
-									case 2:
-										myOrder.clear();
-										intent.setClass(TableActivity.this,
-												MenuActivity.class);
-										Info.setMode(Info.WORK_MODE_WAITER);
-										break;
-									}
-									TableActivity.this.startActivity(intent);
-									TableActivity.this.finish();
-								}
-							}).setNegativeButton("取消", null).create();
-
-			if (mSettings.getstatus(arg2) == 0) {
-				addDialog.show();
-			} else {
-				clearDialog.show();
-			}
-
 		}
 	}
 
 	private class ChoiceOnClickListener implements
 			DialogInterface.OnClickListener {
-
 		private int which = 0;
 
 		@Override
@@ -256,17 +294,6 @@ public class TableActivity extends Activity {
 		}
 	};
 	
-	private OnClickListener statisticsClicked = new OnClickListener() {
-		
-		@Override
-		public void onClick(View v) {
-			//TODO check permission
-			Intent intent = new Intent();
-			intent.setClass(TableActivity.this, StatisticsActivity.class);
-			TableActivity.this.startActivity(intent);
-		}
-	};
-	
 	private OnClickListener manageClicked = new OnClickListener() {
 		
 		@Override
@@ -275,4 +302,82 @@ public class TableActivity extends Activity {
 			
 		}
 	};
+	
+	private OnClickListener statisticsClicked = new OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			
+			// 点击确定转向登录对话框
+			LayoutInflater factory = LayoutInflater.from(TableActivity.this);
+			// 得到自定义对话框
+			final View DialogView = factory.inflate(R.layout.setting_dialog, null);
+			// 创建对话框
+			AlertDialog dlg = new AlertDialog.Builder(TableActivity.this)
+					.setTitle("登录框").setView(DialogView)// 设置自定义对话框样式
+					.setPositiveButton("确定", new DialogInterface.OnClickListener() {// 设置监听事件
+
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+									EditText mUserName = (EditText)DialogView.findViewById(R.id.edit_username);
+									final String userName = mUserName.getText().toString();
+									EditText mUserPwd = (EditText)DialogView.findViewById(R.id.edit_password);
+									final String userPwd = mUserPwd.getText().toString();
+									if("".equals(userName) || "".equals(userPwd)){
+										dialog.cancel();
+									}else{
+										UserData.setUserName(userName);
+										UserData.setUserPwd(userPwd);
+									}
+									new Thread(new userThread()).start();
+								}
+							}).setNegativeButton("取消",// 设置取消按钮
+							new DialogInterface.OnClickListener() {
+
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+									// 点击取消后退出程序
+								}
+							}).create();// 创建对话框
+			if(Info.getMode() == Info.WORK_MODE_CUSTOMER){
+				dlg.show();// 显示对话框
+			}else{
+				Intent intent = new Intent();
+	    		intent.setClass(TableActivity.this, StatisticsActivity.class);
+	    		TableActivity.this.startActivity(intent);
+			}
+		}
+    	
+	};
+	
+	 class userThread implements Runnable {
+			public void run() {
+				try {
+					Message msg = new Message();						
+					int ret = UserData.ComparePwd();
+					if(ret < 0){
+						userHandle.sendEmptyMessage(ret);
+						return;
+					}
+					msg.what = ret;
+					userHandle.sendMessage(msg);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	 
+	  private Handler userHandle = new Handler() {
+			public void handleMessage(Message msg) {
+				if (msg.what < 0) {
+				
+				} else {
+					Intent intent = new Intent();
+		    		intent.setClass(TableActivity.this, StatisticsActivity.class);
+		    		TableActivity.this.startActivity(intent);
+				}
+			}
+	    };
+	    
 }

@@ -81,25 +81,21 @@ public class QueryOrderActivity extends Activity {
 				return convertView;
 			}
 		};
-
 		mMyOrderLst.setAdapter(mMyOrderAdapter);
-
 	}
 
 	private void setClickListener() {
 		mBackBtn.setOnClickListener(backBtnClicked);
-
 		mSettingBtn.setOnClickListener(settingsClicked);
-
 	}
 
 	private void updateTabelInfos() {
 		mMyOrder = new MyOrder(QueryOrderActivity.this);
 		mMyOrder.clear();
-		new Thread(new delThread()).start();
+		new Thread(new queryThread()).start();
 	}
 
-	Handler myHandler = new Handler() {
+	Handler queryHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			if (msg.what < 0) {
 				Toast.makeText(getApplicationContext(),
@@ -113,13 +109,13 @@ public class QueryOrderActivity extends Activity {
 		}
 	};
 
-	class delThread implements Runnable {
+	class queryThread implements Runnable {
 		public void run() {
 			Message msg = new Message();
 			try {
 				int ret = mMyOrder.getTableFromDB(Info.getTableId());
 				msg.what = ret;
-				myHandler.sendMessage(msg);
+				queryHandler.sendMessage(msg);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -145,7 +141,6 @@ public class QueryOrderActivity extends Activity {
 			// 得到自定义对话框
 			final View DialogView = factory
 					.inflate(R.layout.query_dialog, null);
-
 			// 创建对话框
 			AlertDialog dlg = new AlertDialog.Builder(QueryOrderActivity.this)
 					.setTitle("选择桌号")
@@ -171,7 +166,6 @@ public class QueryOrderActivity extends Activity {
 											updateTabelInfos();
 										}
 									}
-
 								}
 							}).setNegativeButton("取消",// 设置取消按钮
 							new DialogInterface.OnClickListener() {

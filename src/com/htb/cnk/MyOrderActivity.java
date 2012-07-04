@@ -217,11 +217,11 @@ public class MyOrderActivity extends Activity {
 			new Thread() {
 				public void run() {
 					String ret = mMyOrder.submit();
-					mSettings.setstatus(Info.getTableId(), 1);
-					mSettings.UpdatusStatus(Info.getTableId(), 1);
 					if (ret == null) {
 						handler.sendEmptyMessage(-1);
 					} else {
+						mSettings.setstatus(Info.getTableId(), 1);
+						mSettings.UpdatusStatus(Info.getTableId(), 1);
 						handler.sendEmptyMessage(0);
 						Log.d("Respond", ret);
 					}
@@ -248,7 +248,7 @@ public class MyOrderActivity extends Activity {
 			} else {
 				new AlertDialog.Builder(MyOrderActivity.this)
 				.setTitle("提示")
-				.setMessage("提交已提交")
+				.setMessage("顶单已提交")
 				.setPositiveButton("确定",
 					new DialogInterface.OnClickListener() {
 	
