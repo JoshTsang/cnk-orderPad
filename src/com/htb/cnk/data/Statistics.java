@@ -112,19 +112,23 @@ public class Statistics {
 		conectDB();
 		mSalesData.clear();
 		mTotalAmount = 0;
-		Cursor resultSet = mDbSales.query(CnkDbHelper.SALES_DATA, new String[] {"dish_id",
-				  "sum(price*quantity)",
-				  "sum(quantity)"},
-				  "timestamp>'"+startDT +"' and timestamp<'" + endDT+"'",
-				  null, "dish_id", null, null, null);
-		while (resultSet.moveToNext()) {
-			SalesRow salesRow = new SalesRow(resultSet.getInt(DID),
-					resultSet.getInt(TOTAL_AMOUNT), resultSet.getInt(COUNT));
-			String dishName = getDishName(salesRow.did);
-			salesRow.dName = dishName;
-			mSalesData.add(salesRow);
-			
-			mTotalAmount += resultSet.getInt(TOTAL_AMOUNT);
+		try {
+			Cursor resultSet = mDbSales.query(CnkDbHelper.SALES_DATA, new String[] {"dish_id",
+					  "sum(price*quantity)",
+					  "sum(quantity)"},
+					  "timestamp>'"+startDT +"' and timestamp<'" + endDT+"'",
+					  null, "dish_id", null, null, null);
+			while (resultSet.moveToNext()) {
+				SalesRow salesRow = new SalesRow(resultSet.getInt(DID),
+						resultSet.getInt(TOTAL_AMOUNT), resultSet.getInt(COUNT));
+				String dishName = getDishName(salesRow.did);
+				salesRow.dName = dishName;
+				mSalesData.add(salesRow);
+				
+				mTotalAmount += resultSet.getInt(TOTAL_AMOUNT);
+			}
+		} catch (Exception e) {
+			return -1;
 		}
 		return 0;
 	}

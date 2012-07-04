@@ -199,7 +199,7 @@ public class StatisticsActivity extends Activity{
 					@Override
 					public void onClick(DialogInterface dialog,
 							int which) {
-						
+						downloadDB();
 					}
 				})
 		.show();
@@ -258,6 +258,21 @@ public class StatisticsActivity extends Activity{
 			StatisticsActivity.this.finish();
 		}
 	};
+	private void dbErrAlert() {
+		new AlertDialog.Builder(StatisticsActivity.this)
+		.setTitle("错误")
+		.setMessage("销售数据出错,需从新下载!")
+		.setPositiveButton("确定",
+				new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog,
+							int which) {
+						
+					}
+				})
+		.show();
+	}
 	
 	private OnClickListener queryTodayClicked = new OnClickListener() {
 		
@@ -284,7 +299,11 @@ public class StatisticsActivity extends Activity{
 		@Override
 		public void onClick(View v) {
 			if(isDateTimeSet()) {
-				mStatistics.perpareResult(mStart, mEnd);
+				int ret = mStatistics.perpareResult(mStart, mEnd);
+				if (ret < 0) {
+					dbErrAlert();
+					return ;
+				}
 				updateData();
 				mQueryMode = QUERY_BY_TIME;
 			}			
