@@ -227,5 +227,13 @@ public class MyOrder {
 		}
 		return 0;
 	}
+
+	@Override
+	protected void finalize() throws Throwable {
+		if (mDb != null) {
+			mDb.close();
+		}
+		super.finalize();
+	}
 	
 }

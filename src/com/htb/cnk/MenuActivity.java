@@ -317,7 +317,7 @@ public class MenuActivity extends Activity {
 				Intent intent = new Intent();
 	    		intent.setClass(MenuActivity.this, TableActivity.class);
 	    		MenuActivity.this.startActivity(intent);
-			
+	    		finish();
 		}
     	
 	};

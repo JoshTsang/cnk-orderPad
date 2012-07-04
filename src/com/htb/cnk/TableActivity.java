@@ -8,6 +8,7 @@ import java.util.Map;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -41,6 +42,7 @@ public class TableActivity extends Activity {
 	private Button mUpdateBtn;
 	private Button mStatisticsBtn;
 	private Button mManageBtn;
+	private ProgressDialog mpDialog;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -134,6 +136,7 @@ public class TableActivity extends Activity {
 	
 	private Handler refreshHandle = new Handler() {
 		public void handleMessage(Message msg) {
+			mpDialog.cancel();
 			if (msg.what < 0) {
 				Toast.makeText(getApplicationContext(),
 						getResources().getString(R.string.tableWarning),
@@ -241,16 +244,22 @@ public class TableActivity extends Activity {
 	
 	class ItemClickListener implements OnItemClickListener {
 
-		@SuppressWarnings("unchecked")
 		public void onItemClick(AdapterView<?> arg0,// The AdapterView where the
 													// click happened
 				View arg1,// The view within the AdapterView that was clicked
 				int arg2,// The position of the view in the adapter
 				long arg3// The row id of the item that was clicked
 		) {
+			mpDialog = new ProgressDialog(TableActivity.this);  
+	        mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+	        mpDialog.setTitle("请稍等");
+	        mpDialog.setMessage("正在获取状态...");  
+	        mpDialog.setIndeterminate(false);
+	        mpDialog.setCancelable(false);
+	        mpDialog.show();
 			new Thread(new refreshThread()).start();
-			HashMap<String, Object> item = (HashMap<String, Object>) arg0
-					.getItemAtPosition(arg2);
+//			HashMap<String, Object> item = (HashMap<String, Object>) arg0
+//					.getItemAtPosition(arg2);
 			final int TableId = arg2;
 			Info.setTableName(Integer.toString(TableId + 1));
 			Info.setTableId(TableId + 1);

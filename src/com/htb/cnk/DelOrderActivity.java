@@ -126,6 +126,7 @@ public class DelOrderActivity extends Activity {
 	}
 
 	private void updateTabelInfos() {
+		mMyOrder = new MyOrder(DelOrderActivity.this);
 		mMyOrder.clear();
 		new Thread(new delThread()).start();
 	}
@@ -142,7 +143,7 @@ public class DelOrderActivity extends Activity {
 			}
 		}
 	};
-
+ 
 	class delThread implements Runnable {
 		public void run() {
 			Message msg = new Message();
