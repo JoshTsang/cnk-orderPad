@@ -16,6 +16,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -24,7 +26,9 @@ import android.view.KeyEvent;
 import android.widget.TextView;
 
 import com.htb.cnk.data.CnkDbHelper;
+import com.htb.cnk.data.Dish;
 import com.htb.cnk.lib.DBFile;
+import com.htb.cnk.lib.Http;
 import com.htb.constant.ErrorNum;
 import com.htb.constant.Server;
 
@@ -42,10 +46,16 @@ public class UpdateMenuActivity extends Activity {
 	private DBFile mDBFile;
 	private SharedPreferences mSharedPre = null;
 	private static int mMenuVer;
+	private CnkDbHelper mCnkDbHelper;
+	private SQLiteDatabase mDb;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		mCnkDbHelper = new CnkDbHelper(UpdateMenuActivity.this,
+				CnkDbHelper.DATABASE_NAME,
+				null, 1);
+		mDb = mCnkDbHelper.getReadableDatabase();
 		setContentView(R.layout.update_menu_activity);
 		mStateTxt = (TextView) findViewById(R.id.state);
 		
@@ -65,12 +75,12 @@ public class UpdateMenuActivity extends Activity {
 					return ;
 				}
 				
-				handler.sendEmptyMessage(DOWNLOAD_THUMBNAIL);
-				ret = downloadSmallPic();
-				if (ret < 0) {
-					handler.sendEmptyMessage(ret);
-					return ;
-				}
+//				handler.sendEmptyMessage(DOWNLOAD_THUMBNAIL);
+//				ret = downloadSmallPic();
+//				if (ret < 0) {
+//					handler.sendEmptyMessage(ret);
+//					return ;
+//				}
 				
 				handler.sendEmptyMessage(DOWNLOAD_PIC);
 				ret = downloadHugePic();
@@ -92,10 +102,24 @@ public class UpdateMenuActivity extends Activity {
 	}
 	
 	public static boolean isUpdateNeed(int currentMenuVer) {
-		//TODO implement this method
-		int serverMenuVer = 0;
-		mMenuVer = serverMenuVer;
-		return false;
+		String serverRespond = Http.get(Server.MENU_VERSION, "");
+		if (serverRespond == null || "".equals(serverRespond)) {
+			mMenuVer = 1;
+		} else {
+			int start = serverRespond.indexOf("[");
+			int end = serverRespond.indexOf("]") - 1;
+			if (start < 0 || end < 0) {
+				mMenuVer = 1;
+			} else {
+				String ver = serverRespond.substring(start, end);
+				mMenuVer = Integer.parseInt(ver);
+			}
+		}
+		if (mMenuVer == currentMenuVer) {
+			return false;
+		} else {
+			return true;
+		}
 	}
 	
 	private int downloadDB(String serverDBPath) {
@@ -149,12 +173,17 @@ public class UpdateMenuActivity extends Activity {
 	
 	private int downloadHugePic() {
 		int ret;
-		for (int i=0; i<10; i++) {
-			ret = downloadPic(Server.IMG_PATH+ i + ".jpg", "hdpi_" + i + ".jpg");
+		Cursor dishes = mDb.query(CnkDbHelper.DISH_TABLE_NAME, new String[] {
+				  CnkDbHelper.DISH_PIC},
+				  null, null, null, null, null);
+		while (dishes.moveToNext()) {
+			String picName = dishes.getString(0);
+			
+			ret = downloadPic(Server.IMG_PATH+ picName, "hdpi_" + picName);
 			if (ret < 0) {
 				return ret;
 			}
-		}    
+		}
 		return 0;
 	}
 	

@@ -15,6 +15,8 @@ public class Server {
 	public final static String CLEAN_TABLE= PHP_DIR + "cleanTable.php";
 	public final static String GET_PWD = PHP_DIR + "getPwd.php";
 	public final static String STATISTICS_PRINT = PHP_DIR + "statistics.php";
+	public final static String MENU_VERSION = PHP_DIR + "version.php";
+	
 	/* Database */
 	public final static String DB_DIR = "db/";
 	public final static String DB_MENU = DB_DIR + "menu.db";

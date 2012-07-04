@@ -231,7 +231,7 @@ public class MenuActivity extends Activity {
 	private FileInputStream getPic(String name) {
 		FileInputStream isBigPic = null;
 		try {
-			isBigPic = openFileInput("hdpi_" + name + ".jpg");
+			isBigPic = openFileInput("hdpi_" + name);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -241,8 +241,9 @@ public class MenuActivity extends Activity {
 	private FileInputStream getThumbnail(String name) {
 		FileInputStream inStream = null;
 		try {
-			Log.d("fileName", "ldpi_" + name + ".jpg");
-			inStream = openFileInput("ldpi_" + name + ".jpg");
+			//TODO usehdpi cause no ldpi pic available
+			Log.d("fileName", "hdpi_" + name);
+			inStream = openFileInput("hdpi_" + name);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			return null;
