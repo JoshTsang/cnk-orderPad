@@ -63,7 +63,7 @@ public class TableSetting {
 		mTableSettings.get(index).setstatus(n);
 	}
 
-	public int getJson() {
+	public int getTableStatus() {
 		String tableStatusPkg = Http.get(Server.GET_TABLE_STATUS, "");
 		try {
 			JSONArray tableList = new JSONArray(tableStatusPkg);

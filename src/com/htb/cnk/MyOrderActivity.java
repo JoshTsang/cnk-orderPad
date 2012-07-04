@@ -227,16 +227,16 @@ public class MyOrderActivity extends Activity {
 			new Thread() {
 				public void run() {
 					String ret = mMyOrder.submit();
-					mSettings.setstatus(Info.getTableId(), 1);
-					mSettings.UpdatusStatus(Info.getTableId(), 1);
 					if (ret == null) {
 						handler.sendEmptyMessage(-1);
 					} else {
 						if ("".equals(ret)) {
 							handler.sendEmptyMessage(0);
+							mSettings.setstatus(Info.getTableId(), 1);
+							mSettings.UpdatusStatus(Info.getTableId(), 1);
 						} else {
 							handler.sendEmptyMessage(-1);
-						}
+						}						
 						Log.d("Respond", ret);
 					}
 				}

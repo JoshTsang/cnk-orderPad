@@ -5,9 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -26,14 +24,12 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.htb.cnk.MenuActivity.userThread;
 import com.htb.cnk.adapter.CategoryListAdapter;
 import com.htb.cnk.adapter.DishListAdapter;
 import com.htb.cnk.data.Categories;
@@ -41,7 +37,6 @@ import com.htb.cnk.data.Dish;
 import com.htb.cnk.data.Dishes;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder;
-import com.htb.cnk.data.UserData;
 
 /**
  * @author josh
@@ -318,47 +313,10 @@ public class MenuActivity extends Activity {
 	private OnClickListener settingBtnClicked = new OnClickListener() {
 		@Override
 		public void onClick(View v) {
-			
-			// 点击确定转向登录对话框
-			LayoutInflater factory = LayoutInflater.from(MenuActivity.this);
-			// 得到自定义对话框
-			final View DialogView = factory.inflate(R.layout.setting_dialog, null);
-			// 创建对话框
-			AlertDialog dlg = new AlertDialog.Builder(MenuActivity.this)
-					.setTitle("登录框").setView(DialogView)// 设置自定义对话框样式
-					.setPositiveButton("确定", new DialogInterface.OnClickListener() {// 设置监听事件
-
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
-									EditText mUserName = (EditText)DialogView.findViewById(R.id.edit_username);
-									final String userName = mUserName.getText().toString();
-									EditText mUserPwd = (EditText)DialogView.findViewById(R.id.edit_password);
-									final String userPwd = mUserPwd.getText().toString();
-									if("".equals(userName) || "".equals(userPwd)){
-										dialog.cancel();
-									}else{
-										UserData.setUserName(userName);
-										UserData.setUserPwd(userPwd);
-									}
-									new Thread(new userThread()).start();
-								}
-							}).setNegativeButton("取消",// 设置取消按钮
-							new DialogInterface.OnClickListener() {
-
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
-									// 点击取消后退出程序
-								}
-							}).create();// 创建对话框
-			if(Info.getMode() == Info.WORK_MODE_CUSTOMER){
-				dlg.show();// 显示对话框
-			}else{
 				Intent intent = new Intent();
 	    		intent.setClass(MenuActivity.this, TableActivity.class);
 	    		MenuActivity.this.startActivity(intent);
-			}
+			
 		}
     	
 	};
@@ -372,37 +330,6 @@ public class MenuActivity extends Activity {
 			startActivity(intent);
 		}
 	};
-	
-	 class userThread implements Runnable {
-			public void run() {
-				try {
-					Message msg = new Message();						
-					int ret = UserData.ComparePwd();
-					if(ret < 0){
-						userHandle.sendEmptyMessage(ret);
-						return;
-					}
-					msg.what = ret;
-					userHandle.sendMessage(msg);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}
-	 
-	  private Handler userHandle = new Handler() {
-			public void handleMessage(Message msg) {
-				if (msg.what < 0) {
-					Toast.makeText(getApplicationContext(),
-							getResources().getString(R.string.delWarning),
-							Toast.LENGTH_SHORT).show();
-				} else {
-					Intent intent = new Intent();
-		    		intent.setClass(MenuActivity.this, TableActivity.class);
-		    		MenuActivity.this.startActivity(intent);
-				}
-			}
-	    };
 	    
 	private OnClickListener thumbnailClicked = new Button.OnClickListener() {  
         public void onClick(View view) {  

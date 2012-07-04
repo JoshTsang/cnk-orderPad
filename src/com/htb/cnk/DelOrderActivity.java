@@ -109,11 +109,11 @@ public class DelOrderActivity extends Activity {
 					int ret = 1;
 					ret = mMyOrder.del(dId);
 					if (ret < 0) {
-						myHandler.sendEmptyMessage(ret);
+						delHandler.sendEmptyMessage(ret);
 						return ;
 					}
 					msg.what = ret;
-					myHandler.sendMessage(msg);
+					delHandler.sendMessage(msg);
 					
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -131,7 +131,7 @@ public class DelOrderActivity extends Activity {
 		new Thread(new delThread()).start();
 	}
 
-	Handler myHandler = new Handler() {
+	Handler delHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			if (msg.what < 0) {
 				Toast.makeText(getApplicationContext(),
@@ -150,7 +150,7 @@ public class DelOrderActivity extends Activity {
 			try {
 				int ret = mMyOrder.getTableFromDB(Info.getTableId());
 				msg.what = ret;
-				myHandler.sendMessage(msg);
+				delHandler.sendMessage(msg);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

@@ -1,11 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="hello">Hello World, Cnk_orderPadActivity!</string>
     <string name="app_name">Cnk_orderPad</string>
     <string name="menu">菜 谱</string>
     <string name="ordered">查 单</string>
-    <string name="settings">设 置</string>
+    <string name="settings">服务</string>
     <string name="back">返回</string>
     <string name="myOrder">我点的菜</string>
     <string name="plusOne">+1</string>
@@ -41,4 +40,5 @@
     <string name="queryId">选择桌号</string>
 	<string name="userWarning">用户名密码不正确</string>
 	<string name="tableNotSet">还未设定桌号</string>
+	<string name="tableWarning">请查看数据库桌号设定好没有</string>
 </resources>
