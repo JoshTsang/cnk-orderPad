@@ -11,6 +11,7 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -304,7 +305,12 @@ public class TableActivity extends Activity {
 		
 		@Override
 		public void onClick(View v) {
-			// TODO Auto-generated method stub
+			Intent intent= new Intent();        
+            intent.setAction("android.intent.action.VIEW");    
+            Uri content_url = Uri.parse(getResources().getString(R.string.manageUri));   
+            intent.setData(content_url);           
+            intent.setClassName("com.android.browser","com.android.browser.BrowserActivity");   
+            startActivity(intent);
 			
 		}
 	};
