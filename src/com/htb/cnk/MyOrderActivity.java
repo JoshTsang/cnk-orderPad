@@ -232,7 +232,7 @@ public class MyOrderActivity extends Activity {
 					} else {
 						if ("".equals(ret)) {
 							handler.sendEmptyMessage(0);
-							mSettings.setstatus(Info.getTableId(), 1);
+						//	mSettings.setstatus(Info.getTableId(), 1);
 							mSettings.UpdatusStatus(Info.getTableId(), 1);
 						} else {
 							handler.sendEmptyMessage(-1);

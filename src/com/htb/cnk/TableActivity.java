@@ -44,7 +44,7 @@ public class TableActivity extends Activity {
 	private Button mStatisticsBtn;
 	private Button mManageBtn;
 	private ProgressDialog mpDialog;
-
+	private int tableId;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -143,6 +143,9 @@ public class TableActivity extends Activity {
 						getResources().getString(R.string.tableWarning),
 						Toast.LENGTH_SHORT).show();
 			} else {
+			//	Log.d("status", "status:"+ mSettings.getstatus(tableId)+"Id:"+tableId);
+				Info.setTableName(Integer.toString(mSettings.getId(tableId)));
+				Info.setTableId(mSettings.getId(tableId));
 				final ChoiceOnClickListener choiceListener = new ChoiceOnClickListener();
 				Dialog addDialog = new AlertDialog.Builder(TableActivity.this)
 						.setTitle("选择功能")
@@ -199,11 +202,11 @@ public class TableActivity extends Activity {
 													try {
 														mSettings.UpdatusStatus(
 																mSettings
-																		.getId(Info.getTableId() - 1),
+																		.getId(tableId),
 																0);
 														mSettings
 																.CleanTalble(mSettings
-																		.getId(Info.getTableId() - 1));
+																		.getId(tableId));
 
 													} catch (Exception e) {
 														e.printStackTrace();
@@ -232,7 +235,7 @@ public class TableActivity extends Activity {
 									}
 								}).setNegativeButton("取消", null).create();
 
-				if (mSettings.getstatus((Info.getTableId() - 1)) == 0) {
+				if (mSettings.getstatus(tableId) == 0) {
 					addDialog.show();
 				} else {
 					cleanDialog.show();
@@ -261,9 +264,8 @@ public class TableActivity extends Activity {
 			new Thread(new refreshThread()).start();
 //			HashMap<String, Object> item = (HashMap<String, Object>) arg0
 //					.getItemAtPosition(arg2);
-			final int TableId = arg2;
-			Info.setTableName(Integer.toString(TableId + 1));
-			Info.setTableId(TableId + 1);
+			tableId = arg2;
+			
 
 		}
 	}
@@ -309,7 +311,7 @@ public class TableActivity extends Activity {
             intent.setAction("android.intent.action.VIEW");    
             Uri content_url = Uri.parse(getResources().getString(R.string.manageUri));   
             intent.setData(content_url);           
-            intent.setClassName("com.android.browser","com.android.browser.BrowserActivity");   
+   //         intent.setClassName("com.android.browser","com.android.browser.BrowserActivity");   
             startActivity(intent);
 			
 		}
