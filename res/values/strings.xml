@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello">Hello World, Cnk_orderPadActivity!</string>
-    <string name="app_name">Cnk_orderPad</string>
+    <string name="app_name">菜脑壳点菜系统</string>
     <string name="menu">菜 谱</string>
     <string name="ordered">查 单</string>
     <string name="settings">服务</string>
