@@ -3,6 +3,8 @@ package com.htb.cnk.data;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.htb.constant.ErrorNum;
+
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -50,20 +52,25 @@ public class Categories {
 		return mCategories.get(position).mCategoryId;
 	}
 	
-	private void getCategoriesData() {
+	private int getCategoriesData() {
 		mDb = mCnkDbHelper.getReadableDatabase();
 		final int CATEGORY_ID = 0;
 		final int CATEGORY_NAME = 1;
 		final int CATEGORY_TABLE_NAME = 2;
-		Cursor categories = mDb.query(CnkDbHelper.TABLE_CATEGORIES, 
-				new String[] {CnkDbHelper.CATEGORY_ID, CnkDbHelper.CATEGORY_NAME,
-				CnkDbHelper.CATEGORY_TABLE_NAME},
-				null, null, null, null, null);
-		while (categories.moveToNext()) {
-			mCategories.add(new Category(categories.getString(CATEGORY_TABLE_NAME),
-					categories.getString(CATEGORY_NAME),
-					categories.getInt(CATEGORY_ID)));
-		} 
+		try {
+			Cursor categories = mDb.query(CnkDbHelper.TABLE_CATEGORIES, 
+					new String[] {CnkDbHelper.CATEGORY_ID, CnkDbHelper.CATEGORY_NAME,
+					CnkDbHelper.CATEGORY_TABLE_NAME},
+					null, null, null, null, null);
+			while (categories.moveToNext()) {
+				mCategories.add(new Category(categories.getString(CATEGORY_TABLE_NAME),
+						categories.getString(CATEGORY_NAME),
+						categories.getInt(CATEGORY_ID)));
+			} 
+		} catch (Exception e) {
+			return ErrorNum.DB_BROKEN;
+		}
 		mDb.close();
+		return 0;
 	}
 }

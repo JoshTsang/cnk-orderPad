@@ -91,6 +91,10 @@ public class MenuActivity extends Activity {
 	}
 	
 	private void setListData() {
+		if (mCategories.count() <= 0) {
+			errorAccurDlg("菜谱数据损坏,请更新菜谱!");
+			return;
+		}
 		setCategories();
 		setDishes();
 		updateOrderedDishCount();
@@ -111,7 +115,9 @@ public class MenuActivity extends Activity {
 				}
 			}
 		};
-		
+		if (mCategories.count() <= 0) {
+			return;
+		}
 		mDishLstTitle.setText(mCategories.getName(0));
 		mDishesLst.setAdapter(mDishLstAdapter);
 		View emptyView = getLayoutInflater().inflate(R.layout.empty_list, null);
@@ -385,12 +391,12 @@ public class MenuActivity extends Activity {
 		public void handleMessage(Message msg) {
 			if (msg.what < 0) {
 				switch (msg.what) {
-				case ErrorNum.DB_BROKEN:
-					errorAccurDlg("菜谱数据损坏,请更新菜谱!");
-					break;
-				default:
-					Toast.makeText(MenuActivity.this, "服务器开小差了,系统将显示全部菜单.",
-							Toast.LENGTH_SHORT).show();
+					case ErrorNum.DB_BROKEN:
+						errorAccurDlg("菜谱数据损坏,请更新菜谱!");
+						break;
+					default:
+						Toast.makeText(MenuActivity.this, "服务器开小差了,系统将显示全部菜单.",
+								Toast.LENGTH_SHORT).show();
 				}
 				
 			} 

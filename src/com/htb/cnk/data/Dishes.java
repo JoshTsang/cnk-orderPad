@@ -33,7 +33,7 @@ public class Dishes {
 	final static int PIC_COLUMN = 3;
 	
 	public Dishes(Context context) {
-		
+		mContext = context;
 	}
 	
 	public int setCategory(int categoryId, String tableName) {
@@ -67,10 +67,11 @@ public class Dishes {
 	private int fillCategoriesData() {
 		if (mCnkDbHelper == null) {
 			try {
-				mCnkDbHelper = new CnkDbHelper(mContext, CnkDbHelper.DATABASE_NAME,
+				mCnkDbHelper = new CnkDbHelper(mContext, CnkDbHelper.DB_MENU,
 						null, 1);
 				mDb = mCnkDbHelper.getReadableDatabase();
 			} catch (Exception e) {
+				e.printStackTrace();
 				return ErrorNum.DB_BROKEN;
 			}
 		}
@@ -84,6 +85,7 @@ public class Dishes {
 			}
 			return 0;
 		} catch (Exception e) {
+			e.printStackTrace();
 			return ErrorNum.DB_BROKEN;
 		}
 	}
@@ -146,7 +148,9 @@ public class Dishes {
 
 	@Override
 	protected void finalize() throws Throwable {
-		mDb.close();
+		if (mDb != null) {
+			mDb.close();
+		} 
 		super.finalize();
 	}
 	

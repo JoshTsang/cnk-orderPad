@@ -208,6 +208,7 @@ public class UpdateMenuActivity extends Activity {
 		} catch (Exception e) {
 			File file = UpdateMenuActivity.this.getDatabasePath(CnkDbHelper.DB_MENU);
             file.delete();
+            e.printStackTrace();
 			return ErrorNum.DB_BROKEN;
 		}
 		return 0;
@@ -322,13 +323,17 @@ public class UpdateMenuActivity extends Activity {
 		public void handleMessage(Message msg) {
 			mDb.close();
 			if (msg.what < 0) {
-				if (retry < 5) {
-					retry++;
-					Log.d("update menu failed", "retry:" + retry);
-					updateMenu();
-				} else{
-					errDlg(msg.what);
+				if (msg.what == ErrorNum.DB_BROKEN) {
+					if (retry < 5) {
+						retry++;
+						Log.d("update menu failed", "retry:" + retry);
+						updateMenu();
+						return;
+					}
 				}
+				
+				errDlg(msg.what);
+				
 			} else {
 				switch(msg.what) {
 					case DOWNLOAD_THUMBNAIL:
