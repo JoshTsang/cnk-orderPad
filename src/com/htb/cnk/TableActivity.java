@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -33,8 +32,9 @@ import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.data.UserData;
+import com.htb.cnk.lib.BaseActivity;
 
-public class TableActivity extends Activity {
+public class TableActivity extends BaseActivity {
 
 	private TableSetting mSettings = new TableSetting();
 	protected List<Map<String, String>> mTableSettings = new ArrayList<Map<String, String>>();

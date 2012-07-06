@@ -2,6 +2,12 @@ package com.htb.constant;
 
 public class Server {
 	public final static String SERVER_DOMIN = "http://192.168.1.1";
+	public final static String SERVER_IP = "192.168.1.1";
+	public final static String SERVER_MENU_DB = "menu.db";
+	
+	public final static String FTP_USERNAME = "root";
+	public final static String FTP_PWD = "123456";
+	public final static String FTP_DB_DIR = "db";
 	
 	/* php */
 	public final static String PHP_DIR = "orderPad/";

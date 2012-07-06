@@ -1,13 +1,11 @@
 package com.htb.cnk;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.provider.Contacts.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,14 +18,15 @@ import android.widget.TextView;
 import com.htb.cnk.adapter.MyOrderAdapter;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder;
-import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.data.MyOrder.OrderedDish;
+import com.htb.cnk.data.TableSetting;
+import com.htb.cnk.lib.BaseActivity;
 
 /**
  * @author josh
  *
  */
-public class MyOrderActivity extends Activity {
+public class MyOrderActivity extends BaseActivity {
 	private Button mBackBtn;
 	private Button mSubmitBtn;
 	private TextView mTableNumTxt;

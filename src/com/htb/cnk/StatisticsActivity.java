@@ -6,7 +6,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
@@ -28,6 +27,7 @@ import android.widget.Toast;
 
 import com.htb.cnk.adapter.StatisticsAdapter;
 import com.htb.cnk.data.Statistics;
+import com.htb.cnk.lib.BaseActivity;
 import com.htb.cnk.lib.Http;
 import com.htb.constant.ErrorNum;
 import com.htb.constant.Server;
@@ -36,7 +36,7 @@ import com.htb.constant.Server;
  * @author josh
  *
  */
-public class StatisticsActivity extends Activity{
+public class StatisticsActivity extends BaseActivity{
 	public final static int QUERY_BY_TIME = 0;
 	public final static int QUERY_TODAY = 1;
 	private Button mBackBtn;

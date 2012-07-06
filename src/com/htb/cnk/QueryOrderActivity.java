@@ -1,6 +1,5 @@
 package com.htb.cnk;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -17,8 +16,9 @@ import com.htb.cnk.adapter.MyOrderAdapter;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.MyOrder.OrderedDish;
+import com.htb.cnk.lib.BaseActivity;
 
-public class QueryOrderActivity extends Activity {
+public class QueryOrderActivity extends BaseActivity {
 	private Button mBackBtn;
 //	private Button mSettingBtn;
 	private TextView mTableNumTxt;

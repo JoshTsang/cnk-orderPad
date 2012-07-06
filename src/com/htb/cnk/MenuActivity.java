@@ -4,7 +4,6 @@ package com.htb.cnk;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -39,13 +38,14 @@ import com.htb.cnk.data.Dish;
 import com.htb.cnk.data.Dishes;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder;
+import com.htb.cnk.lib.BaseActivity;
 import com.htb.constant.ErrorNum;
 
 /**
  * @author josh
  *
  */
-public class MenuActivity extends Activity {
+public class MenuActivity extends BaseActivity {
 
 	private ListView mCategoriesLst;
 	private ListView mDishesLst;

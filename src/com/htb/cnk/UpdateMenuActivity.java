@@ -1,16 +1,22 @@
 package com.htb.cnk;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
+import java.net.SocketException;
 import java.net.URL;
+import java.net.UnknownHostException;
 
-import android.app.Activity;
+import org.apache.commons.net.ftp.FTP;
+import org.apache.commons.net.ftp.FTPClient;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -27,6 +33,7 @@ import android.view.KeyEvent;
 import android.widget.TextView;
 
 import com.htb.cnk.data.CnkDbHelper;
+import com.htb.cnk.lib.BaseActivity;
 import com.htb.cnk.lib.DBFile;
 import com.htb.cnk.lib.Http;
 import com.htb.constant.ErrorNum;
@@ -36,7 +43,7 @@ import com.htb.constant.Server;
  * @author josh
  *
  */
-public class UpdateMenuActivity extends Activity {
+public class UpdateMenuActivity extends BaseActivity {
 	final static int DOWNLOAD_THUMBNAIL = 1;
 	final static int DOWNLOAD_PIC = 2;
 	
@@ -58,6 +65,7 @@ public class UpdateMenuActivity extends Activity {
 					CnkDbHelper.DATABASE_NAME,
 					null, 1);
 			mDb = mCnkDbHelper.getReadableDatabase();
+			mDb.close();
 		} catch (Exception e) {
 			File file = UpdateMenuActivity.this.getDatabasePath(CnkDbHelper.DB_MENU);
             file.delete();
@@ -79,7 +87,7 @@ public class UpdateMenuActivity extends Activity {
 			public void run() {
 				int ret;
 			
-				ret = downloadDB(Server.DB_MENU);
+				ret = downloadDB(Server.SERVER_MENU_DB);
 				if (ret < 0) {
 					try {
 						Thread.sleep(3000);
@@ -142,34 +150,45 @@ public class UpdateMenuActivity extends Activity {
 		}
 	}
 	
-	private int downloadDB(String serverDBPath) {
-		URL url;
+	private int downloadDB(String serverDBName) {
 		String filePath = Environment
                 .getExternalStorageDirectory().getAbsolutePath()
                 + "/cainaoke/";
         try {
-            url=new URL(Server.SERVER_DOMIN + "/" + serverDBPath);
-            
-            HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+        	FTPClient ftpClient = new FTPClient();
 
-            InputStream istream=connection.getInputStream();
-            String filename="cnk.db";
-            
-            File dir=new File(filePath);
-            if (!dir.exists()) {
-                dir.mkdir();
-            }
-            File file=new File(filePath+filename);
-            file.createNewFile();
-            
-            OutputStream output=new FileOutputStream(file);
-            byte[] buffer=new byte[1024*4];
-            while (istream.read(buffer)!=-1) {
-                output.write(buffer);
-            }
-            output.flush();
-            output.close();
-            istream.close();
+        	try {
+        	    ftpClient.connect(InetAddress.getByName(Server.SERVER_IP));
+        	    ftpClient.login(Server.FTP_USERNAME, Server.FTP_PWD);
+        	    ftpClient.changeWorkingDirectory(Server.FTP_DB_DIR);
+
+        	    if (ftpClient.getReplyString().contains("250")) {
+        	        ftpClient.setFileType(org.apache.commons.net.ftp.FTP.BINARY_FILE_TYPE);
+        	        BufferedInputStream buffIn = null;
+        	        ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+        	        buffIn = new BufferedInputStream(new FileInputStream(filePath+"cnk.db"));
+        	        ftpClient.enterLocalPassiveMode();
+        	        ftpClient.storeFile(serverDBName, buffIn);
+        	        buffIn.close();
+        	        ftpClient.logout();
+        	        ftpClient.disconnect();
+        	    } else {
+        	    	Log.d("ftp reply", ftpClient.getReplyString());
+        	    	return ErrorNum.DOWNLOAD_DB_FAILED;
+        	    }
+        	} catch (SocketException e) {
+        	    //Log.e(SorensonApplication.TAG, e.getStackTrace().toString());
+        		e.printStackTrace();
+        		return ErrorNum.DOWNLOAD_DB_FAILED;
+        	} catch (UnknownHostException e) {
+        	    //Log.e(SorensonApplication.TAG, e.getStackTrace().toString());
+        		e.printStackTrace();
+        		return ErrorNum.DOWNLOAD_DB_FAILED;
+        	} catch (IOException e) {
+        	    //Log.e(SorensonApplication.TAG, e.getStackTrace().toString());
+        		e.printStackTrace();
+        		return ErrorNum.DOWNLOAD_DB_FAILED;
+        	}
             if (mDBFile.copyDatabase(CnkDbHelper.DB_MENU) < 0) {
             	return ErrorNum.COPY_DB_FAILED;
             }
@@ -194,6 +213,10 @@ public class UpdateMenuActivity extends Activity {
 	private int downloadHugePic() {
 		int ret;
 		try {
+			mCnkDbHelper = new CnkDbHelper(UpdateMenuActivity.this,
+					CnkDbHelper.DATABASE_NAME,
+					null, 1);
+			mDb = mCnkDbHelper.getReadableDatabase();
 			Cursor dishes = mDb.query(CnkDbHelper.DISH_TABLE_NAME, new String[] {
 					  CnkDbHelper.DISH_PIC},
 					  null, null, null, null, null);
@@ -205,6 +228,8 @@ public class UpdateMenuActivity extends Activity {
 					return ret;
 				}
 			}
+			
+			mDb.close();
 		} catch (Exception e) {
 			File file = UpdateMenuActivity.this.getDatabasePath(CnkDbHelper.DB_MENU);
             file.delete();

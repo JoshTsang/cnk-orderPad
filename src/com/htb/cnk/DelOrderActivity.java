@@ -1,6 +1,5 @@
 package com.htb.cnk;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -19,8 +18,9 @@ import com.htb.cnk.adapter.MyOrderAdapter;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.MyOrder.OrderedDish;
+import com.htb.cnk.lib.BaseActivity;
 
-public class DelOrderActivity extends Activity {
+public class DelOrderActivity extends BaseActivity {
 	private Button mBackBtn;
 	private Button mDelBtn;
 	private TextView mTableNumTxt;
