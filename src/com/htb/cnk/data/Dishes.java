@@ -25,6 +25,7 @@ public class Dishes {
 	private String mTableName = "";
 	private CnkDbHelper mCnkDbHelper;
 	private SQLiteDatabase mDb;
+	private Context mContext;
 	
 	final static int ID_COLUMN = 0;
 	final static int NAME_COLUMN = 1;
@@ -32,9 +33,7 @@ public class Dishes {
 	final static int PIC_COLUMN = 3;
 	
 	public Dishes(Context context) {
-		mCnkDbHelper = new CnkDbHelper(context, CnkDbHelper.DATABASE_NAME,
-				null, 1);
-		mDb = mCnkDbHelper.getReadableDatabase();
+		
 	}
 	
 	public int setCategory(int categoryId, String tableName) {
@@ -66,6 +65,15 @@ public class Dishes {
 	}
 	
 	private int fillCategoriesData() {
+		if (mCnkDbHelper == null) {
+			try {
+				mCnkDbHelper = new CnkDbHelper(mContext, CnkDbHelper.DATABASE_NAME,
+						null, 1);
+				mDb = mCnkDbHelper.getReadableDatabase();
+			} catch (Exception e) {
+				return ErrorNum.DB_BROKEN;
+			}
+		}
 		try {
 			Cursor dishes = getDishesFromDataBase(mTableName);
 			while (dishes.moveToNext()) {

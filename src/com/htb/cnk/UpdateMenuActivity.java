@@ -22,6 +22,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.TextView;
 
@@ -47,6 +48,7 @@ public class UpdateMenuActivity extends Activity {
 	private static int mMenuVer;
 	private CnkDbHelper mCnkDbHelper;
 	private SQLiteDatabase mDb;
+	private int retry = 0;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -59,8 +61,10 @@ public class UpdateMenuActivity extends Activity {
 		} catch (Exception e) {
 			File file = UpdateMenuActivity.this.getDatabasePath(CnkDbHelper.DB_MENU);
             file.delete();
-            errDlg(ErrorNum.DB_BROKEN);
-            return ;
+            mCnkDbHelper = new CnkDbHelper(UpdateMenuActivity.this,
+					CnkDbHelper.DATABASE_NAME,
+					null, 1);
+			mDb = mCnkDbHelper.getReadableDatabase();
 		}
 		setContentView(R.layout.update_menu_activity);
 		mStateTxt = (TextView) findViewById(R.id.state);
@@ -77,6 +81,11 @@ public class UpdateMenuActivity extends Activity {
 			
 				ret = downloadDB(Server.DB_MENU);
 				if (ret < 0) {
+					try {
+						Thread.sleep(3000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
 					handler.sendEmptyMessage(ret);
 					return ;
 				}
@@ -91,6 +100,11 @@ public class UpdateMenuActivity extends Activity {
 				handler.sendEmptyMessage(DOWNLOAD_PIC);
 				ret = downloadHugePic();
 				if (ret < 0) {
+					try {
+						Thread.sleep(3000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
 					handler.sendEmptyMessage(ret);
 					return ;
 				}
@@ -308,7 +322,13 @@ public class UpdateMenuActivity extends Activity {
 		public void handleMessage(Message msg) {
 			mDb.close();
 			if (msg.what < 0) {
-				errDlg(msg.what);
+				if (retry < 5) {
+					retry++;
+					Log.d("update menu failed", "retry:" + retry);
+					updateMenu();
+				} else{
+					errDlg(msg.what);
+				}
 			} else {
 				switch(msg.what) {
 					case DOWNLOAD_THUMBNAIL:
