@@ -300,7 +300,8 @@ public class TableActivity extends BaseActivity {
 			Intent intent = new Intent();
 			intent.setClass(TableActivity.this, UpdateMenuActivity.class);
 			TableActivity.this.startActivity(intent);
-			finish();
+			TableActivity.this.finish();
+
 		}
 	};
 	
