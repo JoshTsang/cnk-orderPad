@@ -5,7 +5,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -37,6 +39,7 @@ import com.htb.cnk.data.Dish;
 import com.htb.cnk.data.Dishes;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder;
+import com.htb.constant.ErrorNum;
 
 /**
  * @author josh
@@ -291,6 +294,22 @@ public class MenuActivity extends Activity {
 	    dialog.show();  
 	}
 	
+	private void errorAccurDlg(String msg) {
+		new AlertDialog.Builder(MenuActivity.this)
+		.setTitle("错误")
+		.setMessage(msg)
+		.setPositiveButton("确定",
+				new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog,
+							int which) {
+						finish();
+					}
+				})
+		.show();
+	}
+	
 	private OnItemClickListener CategoryListClicked = new OnItemClickListener() {
 
 		@Override
@@ -365,11 +384,19 @@ public class MenuActivity extends Activity {
 	private Handler handler = new Handler() {
 		public void handleMessage(Message msg) {
 			if (msg.what < 0) {
-				Toast.makeText(MenuActivity.this, "服务器开小差了,系统将显示全部菜单.",
-						Toast.LENGTH_SHORT).show();
+				switch (msg.what) {
+				case ErrorNum.DB_BROKEN:
+					errorAccurDlg("菜谱数据损坏,请更新菜谱!");
+					break;
+				default:
+					Toast.makeText(MenuActivity.this, "服务器开小差了,系统将显示全部菜单.",
+							Toast.LENGTH_SHORT).show();
+				}
+				
 			} 
 			
 			mDishLstAdapter.notifyDataSetChanged();
 		}
 	};
+	
 }

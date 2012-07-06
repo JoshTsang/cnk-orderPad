@@ -51,10 +51,17 @@ public class UpdateMenuActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		mCnkDbHelper = new CnkDbHelper(UpdateMenuActivity.this,
-				CnkDbHelper.DATABASE_NAME,
-				null, 1);
-		mDb = mCnkDbHelper.getReadableDatabase();
+		try {
+			mCnkDbHelper = new CnkDbHelper(UpdateMenuActivity.this,
+					CnkDbHelper.DATABASE_NAME,
+					null, 1);
+			mDb = mCnkDbHelper.getReadableDatabase();
+		} catch (Exception e) {
+			File file = UpdateMenuActivity.this.getDatabasePath(CnkDbHelper.DB_MENU);
+            file.delete();
+            errDlg(ErrorNum.DB_BROKEN);
+            return ;
+		}
 		setContentView(R.layout.update_menu_activity);
 		mStateTxt = (TextView) findViewById(R.id.state);
 		
@@ -185,7 +192,9 @@ public class UpdateMenuActivity extends Activity {
 				}
 			}
 		} catch (Exception e) {
-			return -1;
+			File file = UpdateMenuActivity.this.getDatabasePath(CnkDbHelper.DB_MENU);
+            file.delete();
+			return ErrorNum.DB_BROKEN;
 		}
 		return 0;
 	}
@@ -205,6 +214,22 @@ public class UpdateMenuActivity extends Activity {
             return ErrorNum.DOWNLOAD_PIC_FAILED;
         }    
 		return 0;
+	}
+	
+	private void errDlg(int errnum) {
+		new AlertDialog.Builder(UpdateMenuActivity.this)
+		.setTitle("错误")
+		.setMessage("更新菜谱失败,请重试.错误码:" + errnum)
+		.setPositiveButton("确定",
+				new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog,
+							int which) {
+						finish();
+					}
+				})
+		.show();
 	}
 	
 	public byte[] getImage(String path) throws Exception{     
@@ -283,19 +308,7 @@ public class UpdateMenuActivity extends Activity {
 		public void handleMessage(Message msg) {
 			mDb.close();
 			if (msg.what < 0) {
-				new AlertDialog.Builder(UpdateMenuActivity.this)
-				.setTitle("错误")
-				.setMessage("更新菜谱失败,错误码:" + msg.what)
-				.setPositiveButton("确定",
-						new DialogInterface.OnClickListener() {
-	
-							@Override
-							public void onClick(DialogInterface dialog,
-									int which) {
-								finish();
-							}
-						})
-				.show();
+				errDlg(msg.what);
 			} else {
 				switch(msg.what) {
 					case DOWNLOAD_THUMBNAIL:

@@ -16,6 +16,7 @@ public class ErrorNum {
 	public final static int GET_LATEST_STATISTICS_FAILED = -10;
 	public final static int GET_SOLDOUT_ITEM_FAILED = -11;
 	
+	/* Http errors */
 	public final static int HTTP_TIMEOUT = -400;
 	public final static int HTTP_PAGE_NOT_FOUND = -404;
 	public final static int HTTP_INTERNAL_ERR = -500;
@@ -23,5 +24,7 @@ public class ErrorNum {
 	public final static int UTF8_NOT_SUPPORTED = -402;
 	public final static int FETCH_DATA_FAILED = -403;
 	
-
+	/* database errors */
+	public final static int DB_BROKEN = -101;
+	
 }

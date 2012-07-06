@@ -41,8 +41,11 @@ public class Dishes {
 		mCategoryId = categoryId;
 		mTableName = tableName;
 		mDishes.clear();
-		fillCategoriesData();
-		int ret = removeSoldOutItems(mCategoryId);
+		int ret = fillCategoriesData();
+		if (ret < 0) {
+			return ret;
+		}
+		ret = removeSoldOutItems(mCategoryId);
 		return ret;
 	}
 	
@@ -62,13 +65,18 @@ public class Dishes {
 		mDishes.clear();
 	}
 	
-	private void fillCategoriesData() {
-		Cursor dishes = getDishesFromDataBase(mTableName);
-		while (dishes.moveToNext()) {
-			mDishes.add(new Dish(dishes.getInt(ID_COLUMN),
-								dishes.getString(NAME_COLUMN),
-								dishes.getDouble(PRICE_COLUMN),
-								dishes.getString(PIC_COLUMN)));
+	private int fillCategoriesData() {
+		try {
+			Cursor dishes = getDishesFromDataBase(mTableName);
+			while (dishes.moveToNext()) {
+				mDishes.add(new Dish(dishes.getInt(ID_COLUMN),
+									dishes.getString(NAME_COLUMN),
+									dishes.getDouble(PRICE_COLUMN),
+									dishes.getString(PIC_COLUMN)));
+			}
+			return 0;
+		} catch (Exception e) {
+			return ErrorNum.DB_BROKEN;
 		}
 	}
 	
