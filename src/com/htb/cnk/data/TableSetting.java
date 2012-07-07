@@ -72,6 +72,9 @@ public class TableSetting {
 
 	public int getTableStatus() {
 		String tableStatusPkg = Http.get(Server.GET_TABLE_STATUS, "");
+		if(tableStatusPkg == null){
+			return -1;
+		}
 		try {
 			JSONArray tableList = new JSONArray(tableStatusPkg);
 			int length = tableList.length();
@@ -87,7 +90,6 @@ public class TableSetting {
 			}
 
 		} catch (Exception e) {
-
 			// TODO: handle exception
 		}
 
