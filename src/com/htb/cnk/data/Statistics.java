@@ -1,6 +1,7 @@
 package com.htb.cnk.data;
 
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
@@ -67,6 +68,10 @@ public class Statistics {
 		String filePath = Environment
                 .getExternalStorageDirectory().getAbsolutePath()
                 + "/cainaoke/";
+		File file = mContext.getDatabasePath(CnkDbHelper.DB_SALES);
+        file.delete();
+        File fileDownload = new File(filePath + Server.DB_SALES);
+        fileDownload.delete();
 		DBFile mDBFile = new DBFile(mContext, CnkDbHelper.DB_SALES);;
         try {
         	FTPClient ftpClient = new FTPClient();
@@ -80,7 +85,7 @@ public class Statistics {
         	        ftpClient.setFileType(org.apache.commons.net.ftp.FTP.BINARY_FILE_TYPE);
         	        BufferedOutputStream buffIn = null;
         	        ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
-        	        buffIn = new BufferedOutputStream(new FileOutputStream(filePath+"cnk.db"));
+        	        buffIn = new BufferedOutputStream(new FileOutputStream(filePath+Server.SERVER_DB_SALES));
         	        ftpClient.enterLocalPassiveMode();
         	        boolean ret = ftpClient.retrieveFile(serverDBName, buffIn);
         	        buffIn.close();
@@ -117,9 +122,10 @@ public class Statistics {
 	}
 	
 	public int perpareResult(Calendar start, Calendar end) {
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-		String startDT = df.format(start.getTime());
-		String endDT = df.format(end.getTime());
+		SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat time = new SimpleDateFormat("HH:mm");
+		String startDT = date.format(start.getTime()) + " " + time.format(start.getTime());
+		String endDT = date.format(end.getTime()) + " " + time.format(end.getTime());
 		final int DID = 0;
 		final int TOTAL_AMOUNT = 1;
 		final int COUNT = 2;
@@ -128,10 +134,11 @@ public class Statistics {
 		mSalesData.clear();
 		mTotalAmount = 0;
 		try {
+			Log.d("statictics timestamp", "start:" + startDT + " end:" + endDT);
 			Cursor resultSet = mDbSales.query(CnkDbHelper.SALES_DATA, new String[] {"dish_id",
 					  "sum(price*quantity)",
 					  "sum(quantity)"},
-					  "timestamp>'"+startDT +"' and timestamp<'" + endDT+"'",
+					  "DATETIME(timestamp)>='"+startDT +"' and DATETIME(timestamp)<='" + endDT+"'",
 					  null, "dish_id", null, null, null);
 			while (resultSet.moveToNext()) {
 				SalesRow salesRow = new SalesRow(resultSet.getInt(DID),

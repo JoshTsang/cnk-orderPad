@@ -177,6 +177,7 @@ public class MyOrder {
 
 		try {
 			order.put("tableId", Info.getTableId());
+			order.put("tableName", Info.getTableName());
 			order.put("timestamp", time);
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
@@ -269,6 +270,7 @@ public class MyOrder {
 		}
 		try {
 			order.put("tableId", Info.getTableId());
+			order.put("tableName", Info.getTableName());
 			order.put("timestamp", time);
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block

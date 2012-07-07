@@ -50,12 +50,12 @@ public class DBFile {
         File backup = new File(exportDir, dbFile.getName());
         try {
             fileCopy(backup, dbFile);
-            Log.d("restore", "success");
+            Log.d("copy db to db dir", "success");
             return 0;
         } catch (Exception e) {
             // TODO: handle exception
             e.printStackTrace();
-            Log.d("restore", "fail");
+            Log.d("copy db to db dir", "fail");
             return -1;
         }
         
