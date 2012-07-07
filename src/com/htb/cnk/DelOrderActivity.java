@@ -114,6 +114,7 @@ public class DelOrderActivity extends BaseActivity {
 						delHandler.sendEmptyMessage(ret);
 						return;
 					}
+					Log.d("dId", "did+" + dId);
 					mMyOrder.removeItem(dId);
 					msg.what = ret;
 					delHandler.sendMessage(msg);
@@ -123,8 +124,8 @@ public class DelOrderActivity extends BaseActivity {
 			}
 		}.start();
 	//	mMyOrder.removeItem(dId);
-		fillData();
-		mMyOrderAdapter.notifyDataSetChanged();
+//		fillData();
+//		mMyOrderAdapter.notifyDataSetChanged();
 	}
 
 	private void updateTabelInfos() {
@@ -151,6 +152,10 @@ public class DelOrderActivity extends BaseActivity {
 			Message msg = new Message();
 			try {
 				int ret = mMyOrder.getTableFromDB(Info.getTableId());
+				if (ret < 0) {
+					delHandler.sendEmptyMessage(ret);
+					return;
+				}
 				msg.what = ret;
 				delHandler.sendMessage(msg);
 			} catch (Exception e) {

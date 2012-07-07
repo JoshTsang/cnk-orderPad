@@ -103,7 +103,7 @@ public class TableActivity extends BaseActivity {
 				mTableSettings.clear();
 				for (int i = 0; i < mSettings.size(); i++) {
 					HashMap<String, String> map = new HashMap<String, String>();
-					map.put("ItemText", "第" + mSettings.getId(i) + "桌");
+					map.put("ItemText", "第" + mSettings.getName(i) + "桌");
 					lstImageItem.add(map);
 				}
 

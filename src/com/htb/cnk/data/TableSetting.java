@@ -34,7 +34,10 @@ public class TableSetting {
 		public int getId() {
 			return mId;
 		}
-
+		
+		public String getName(){
+			return mName;
+		}
 	}
 
 	static List<TableSettingItem> mTableSettings = new ArrayList<TableSettingItem>();
@@ -59,6 +62,10 @@ public class TableSetting {
 		return mTableSettings.get(index).getId();
 	}
 
+	public String getName(int index){
+		return mTableSettings.get(index).getName();
+	}
+	
 	public void setstatus(int index, int n) {
 		mTableSettings.get(index).setstatus(n);
 	}
