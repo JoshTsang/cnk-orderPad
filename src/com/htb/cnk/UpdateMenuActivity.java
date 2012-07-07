@@ -1,10 +1,8 @@
 package com.htb.cnk;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -47,8 +45,6 @@ import com.htb.constant.Server;
 public class UpdateMenuActivity extends BaseActivity {
 	final static int DOWNLOAD_THUMBNAIL = 1;
 	final static int DOWNLOAD_PIC = 2;
-	
-	
 	
 	private TextView mStateTxt;
 	private DBFile mDBFile;
@@ -264,6 +260,7 @@ public class UpdateMenuActivity extends BaseActivity {
 	private void errDlg(int errnum) {
 		new AlertDialog.Builder(UpdateMenuActivity.this)
 		.setTitle("错误")
+		.setCancelable(false)
 		.setMessage("更新菜谱失败,请重试.错误码:" + errnum)
 		.setPositiveButton("确定",
 				new DialogInterface.OnClickListener() {
@@ -322,6 +319,7 @@ public class UpdateMenuActivity extends BaseActivity {
 		if(keyCode == KeyEvent.KEYCODE_BACK){
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setTitle("确定退出");
+			builder.setCancelable(false);
 			builder.setMessage("退出将菜谱无法更新,请等待菜谱更新完毕后,系统自动退出");
 			
 			builder.setPositiveButton("退出", new DialogInterface.OnClickListener() {
@@ -375,6 +373,7 @@ public class UpdateMenuActivity extends BaseActivity {
 					default:
 						new AlertDialog.Builder(UpdateMenuActivity.this)
 						.setMessage("菜谱已更新")
+						.setCancelable(false)
 						.setPositiveButton("确定",
 								new DialogInterface.OnClickListener() {
 

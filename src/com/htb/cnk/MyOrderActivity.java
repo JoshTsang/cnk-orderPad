@@ -141,7 +141,7 @@ public class MyOrderActivity extends BaseActivity {
 	}
 
 	private void updateTabelInfos() {
-		mDishCountTxt.setText(Integer.toString(mMyOrder.count()) + " 道菜");
+		mDishCountTxt.setText(Integer.toString(mMyOrder.totalQuantity()) + " 道菜");
 		mTotalPriceTxt.setText(Double.toString(mMyOrder.getTotalPrice()) + " 元");
 	}
 

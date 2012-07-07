@@ -49,7 +49,7 @@ public class QueryOrderActivity extends BaseActivity {
 
 	private void fillData() {
 		mTableNumTxt.setText(Info.getTableName());
-		mDishCountTxt.setText(Integer.toString(mMyOrder.count()) + " 道菜");
+		mDishCountTxt.setText(Integer.toString(mMyOrder.totalQuantity()) + " 道菜");
 		mTotalPriceTxt
 				.setText(Double.toString(mMyOrder.getTotalPrice()) + " 元");
 		mMyOrderAdapter = new MyOrderAdapter(this, mMyOrder) {

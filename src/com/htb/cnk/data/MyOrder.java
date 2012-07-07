@@ -133,6 +133,15 @@ public class MyOrder {
 		return mOrder.size();
 	}
 
+	public int totalQuantity() {
+		int count = 0;
+		
+		for (OrderedDish item : mOrder) {
+			count += item.quantity;
+		}
+		return count;
+	}
+	
 	public double getTotalPrice() {
 		double totalPrice = 0;
 

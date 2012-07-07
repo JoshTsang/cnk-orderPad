@@ -268,7 +268,7 @@ public class MenuActivity extends BaseActivity {
 	}
 	
 	private void updateOrderedDishCount() {
-		mOrderedDishCount.setText(Integer.toString(mMyOrder.count()));
+		mOrderedDishCount.setText(Integer.toString(mMyOrder.totalQuantity()));
 	}
 
 	private void updateDishes(final int position) {
