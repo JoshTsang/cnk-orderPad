@@ -144,7 +144,7 @@ public class TableActivity extends BaseActivity {
 						Toast.LENGTH_SHORT).show();
 			} else {
 			//	Log.d("status", "status:"+ mSettings.getstatus(tableId)+"Id:"+tableId);
-				Info.setTableName(Integer.toString(mSettings.getId(tableId)));
+				Info.setTableName(mSettings.getName(tableId));
 				Info.setTableId(mSettings.getId(tableId));
 				final ChoiceOnClickListener choiceListener = new ChoiceOnClickListener();
 				Dialog addDialog = new AlertDialog.Builder(TableActivity.this)
