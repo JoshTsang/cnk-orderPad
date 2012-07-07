@@ -1,6 +1,7 @@
 package com.htb.cnk;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -87,7 +88,7 @@ public class UpdateMenuActivity extends BaseActivity {
 			public void run() {
 				int ret;
 			
-				ret = downloadDB(Server.SERVER_MENU_DB);
+				ret = downloadDB(Server.SERVER_DB_MENU);
 				if (ret < 0) {
 					try {
 						Thread.sleep(3000);
@@ -164,14 +165,18 @@ public class UpdateMenuActivity extends BaseActivity {
 
         	    if (ftpClient.getReplyString().contains("250")) {
         	        ftpClient.setFileType(org.apache.commons.net.ftp.FTP.BINARY_FILE_TYPE);
-        	        BufferedInputStream buffIn = null;
+        	        BufferedOutputStream buffIn = null;
         	        ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
-        	        buffIn = new BufferedInputStream(new FileInputStream(filePath+"cnk.db"));
+        	        buffIn = new BufferedOutputStream(new FileOutputStream(filePath+"cnk.db"));
         	        ftpClient.enterLocalPassiveMode();
-        	        ftpClient.storeFile(serverDBName, buffIn);
+        	        boolean ret = ftpClient.retrieveFile(serverDBName, buffIn);
         	        buffIn.close();
         	        ftpClient.logout();
         	        ftpClient.disconnect();
+        	        if (!ret) {
+        	        	return ErrorNum.DOWNLOAD_DB_FAILED;
+        	        }
+        	        
         	    } else {
         	    	Log.d("ftp reply", ftpClient.getReplyString());
         	    	return ErrorNum.DOWNLOAD_DB_FAILED;

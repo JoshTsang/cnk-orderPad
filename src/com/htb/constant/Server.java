@@ -3,7 +3,8 @@ package com.htb.constant;
 public class Server {
 	public final static String SERVER_DOMIN = "http://192.168.1.1";
 	public final static String SERVER_IP = "192.168.1.1";
-	public final static String SERVER_MENU_DB = "menu.db";
+	public final static String SERVER_DB_MENU = "menu.db";
+	public final static String SERVER_DB_SALES = "sales.db";
 	
 	public final static String FTP_USERNAME = "root";
 	public final static String FTP_PWD = "123456";

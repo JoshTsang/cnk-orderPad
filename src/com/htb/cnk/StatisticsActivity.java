@@ -112,7 +112,7 @@ public class StatisticsActivity extends BaseActivity{
         mpDialog.show();
         new Thread() {
         	public void run() {
-        		int ret = mStatistics.downloadDB(Server.DB_SALES);
+        		int ret = mStatistics.downloadDB(Server.SERVER_DB_SALES);
         		if (ret < 0) {
         			handler.sendEmptyMessage(ret);
         			return ;

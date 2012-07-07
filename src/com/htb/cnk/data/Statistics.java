@@ -1,7 +1,7 @@
 package com.htb.cnk.data;
 
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.SocketException;
@@ -78,14 +78,17 @@ public class Statistics {
 
         	    if (ftpClient.getReplyString().contains("250")) {
         	        ftpClient.setFileType(org.apache.commons.net.ftp.FTP.BINARY_FILE_TYPE);
-        	        BufferedInputStream buffIn = null;
+        	        BufferedOutputStream buffIn = null;
         	        ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
-        	        buffIn = new BufferedInputStream(new FileInputStream(filePath+"cnk.db"));
+        	        buffIn = new BufferedOutputStream(new FileOutputStream(filePath+"cnk.db"));
         	        ftpClient.enterLocalPassiveMode();
-        	        ftpClient.storeFile(serverDBName, buffIn);
+        	        boolean ret = ftpClient.retrieveFile(serverDBName, buffIn);
         	        buffIn.close();
         	        ftpClient.logout();
         	        ftpClient.disconnect();
+        	        if (!ret) {
+        	        	return ErrorNum.DOWNLOAD_DB_FAILED;
+        	        }
         	    } else {
         	    	Log.d("ftp reply", ftpClient.getReplyString());
         	    	return ErrorNum.DOWNLOAD_DB_FAILED;
