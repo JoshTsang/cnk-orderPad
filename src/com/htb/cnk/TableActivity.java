@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -48,10 +49,18 @@ public class TableActivity extends BaseActivity {
 	private Button mManageBtn;
 	private GridView gridview ;
 	private ProgressDialog mpDialog;
+//	private AlertDialog.Builder mAlertDialog = new AlertDialog.Builder(TableActivity.this);
 	private int tableId;
 	private SimpleAdapter saImageItems;
 	@Override
 		protected void onResume() {
+			mpDialog = new ProgressDialog(TableActivity.this);
+			mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+			mpDialog.setTitle("请稍等");
+			mpDialog.setMessage("正在获取状态...");
+			mpDialog.setIndeterminate(false);
+			mpDialog.setCancelable(false);
+			mpDialog.show();
 			new Thread(new tableThread()).start();
 			super.onResume();
 		}
@@ -66,13 +75,7 @@ public class TableActivity extends BaseActivity {
 		setContentView(R.layout.table_activity);
 		findViews();
 		setClickListeners();
-		mpDialog = new ProgressDialog(TableActivity.this);
-		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-		mpDialog.setTitle("请稍等");
-		mpDialog.setMessage("正在获取状态...");
-		mpDialog.setIndeterminate(false);
-		mpDialog.setCancelable(false);
-		mpDialog.show();
+
 	//	new Thread(new tableThread()).start();
 
 	}
@@ -113,10 +116,21 @@ public class TableActivity extends BaseActivity {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
 			if (msg.what < 0) {
-				Toast.makeText(getApplicationContext(),
-						getResources().getString(R.string.tableWarning),
-						Toast.LENGTH_SHORT).show();
+				final AlertDialog.Builder mAlertDialog = new AlertDialog.Builder(TableActivity.this);
+				mAlertDialog.setTitle("错误");//设置对话框标题
+				mAlertDialog.setMessage("网络连接失败，请检查网络后重试");//设置对话框内容
+				mAlertDialog.setPositiveButton("确认", new DialogInterface.OnClickListener() {
+				 
+							@Override
+							public void onClick(DialogInterface dialog, int i) {
+								dialog.cancel();
+								mpDialog.show();
+								new Thread(new tableThread()).start();
+							}
+						});
+				mAlertDialog.show();
 			} else {
+				
 				gridview = (GridView) findViewById(R.id.gridview);
 				ArrayList<HashMap<String, String>> lstImageItem = new ArrayList<HashMap<String, String>>();
 				lstImageItem.clear();
