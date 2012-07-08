@@ -19,6 +19,7 @@ import com.htb.cnk.data.MyOrder.OrderedDish;
 import com.htb.cnk.lib.BaseActivity;
 
 public class QueryOrderActivity extends BaseActivity {
+
 	private Button mBackBtn;
 //	private Button mSettingBtn;
 	private TextView mTableNumTxt;
@@ -102,6 +103,7 @@ public class QueryOrderActivity extends BaseActivity {
 			} else {
 				fillData();
 				mMyOrderAdapter.notifyDataSetChanged();
+				
 			}
 		}
 	};
@@ -128,6 +130,12 @@ public class QueryOrderActivity extends BaseActivity {
 			QueryOrderActivity.this.finish();
 		}
 	};
+	
+	@Override
+	public void finish() {
+		mMyOrder.clear();
+		super.finish();
+	}
 //	private OnClickListener settingsClicked = new OnClickListener() {
 //
 //		@Override
