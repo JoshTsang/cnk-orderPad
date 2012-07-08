@@ -231,6 +231,7 @@ public class TableActivity extends BaseActivity {
 											intent.setClass(TableActivity.this,
 													MenuActivity.class);
 											Info.setMode(Info.WORK_MODE_CUSTOMER);
+											Info.setNewCustomer(true);
 											TableActivity.this
 													.startActivity(intent);
 											TableActivity.this.finish();

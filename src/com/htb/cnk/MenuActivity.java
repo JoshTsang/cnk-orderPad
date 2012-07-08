@@ -195,7 +195,7 @@ public class MenuActivity extends BaseActivity {
 		TextView dishName;
 		TextView dishPrice;
 		Button plusBtn;
-		Button plus5Btn;
+		Button minusBtn;
 		
 		if(convertView==null)
 		{
@@ -207,8 +207,8 @@ public class MenuActivity extends BaseActivity {
 		dishPrice = (TextView) convertView.findViewById(R.id.dishPrice);
 		plusBtn = (Button) convertView.findViewById(R.id.dishPlus);
 		orderedCount = (TextView) convertView.findViewById(R.id.orderedCount);
-		//minusBtn = (Button) convertView.findViewById(R.id.dishMinus);
-		plus5Btn = (Button) convertView.findViewById(R.id.dishPlus5);
+		minusBtn = (Button) convertView.findViewById(R.id.dishMinus);
+		//plus5Btn = (Button) convertView.findViewById(R.id.dishPlus5);
 		//minus5Btn = (Button) convertView.findViewById(R.id.dishMinus5);
 		
 		int orderCount = mMyOrder.getOrderedCount(dishDetail.getId());
@@ -234,12 +234,12 @@ public class MenuActivity extends BaseActivity {
 		
 		//minusBtn.setVisibility(View.INVISIBLE);
 		
-		plus5Btn.setTag(position);
-		plus5Btn.setOnClickListener(new OnClickListener() {
-
+		minusBtn.setTag(position);
+		minusBtn.setOnClickListener(new OnClickListener() {
+	
 			public void onClick(View v) {
 				final int position = Integer.parseInt(v.getTag().toString());
-				mMyOrder.add(mDishes.getDish(position), 5);
+				mMyOrder.minus(mDishes.getDish(position), 1);
 				updateOrderedDishCount();
 				mDishLstAdapter.notifyDataSetChanged();
 			}
