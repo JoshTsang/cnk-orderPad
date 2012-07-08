@@ -88,12 +88,12 @@ public class TableSetting {
 				asItem = new TableSettingItem(status, name, id);
 				setting.add(asItem);
 			}
-
+			return 0;
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
 
-		return 0;
+		return -1;
 	}
 
 	public int UpdatusStatus(int tableId, int status) {
