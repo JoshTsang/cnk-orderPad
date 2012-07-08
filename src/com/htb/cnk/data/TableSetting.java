@@ -1,12 +1,17 @@
 package com.htb.cnk.data;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 
+
+import android.util.Log;
 
 import com.htb.cnk.lib.Http;
 import com.htb.constant.Server;
@@ -116,8 +121,19 @@ public class TableSetting {
 	}
 	
 	public int CleanTalble(int tableId){
-		String tableStatusPkg = Http.get(Server.CLEAN_TABLE, "TID="
-				+ tableId);
+		JSONObject order = new JSONObject();
+		Date date = new Date();
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String time = df.format(date);
+		try {
+			order.put("timestamp", time);
+			order.put("TID", tableId);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Log.d("JSON", order.toString());
+		String tableStatusPkg = Http.post(Server.CLEAN_TABLE,order.toString() );
 		if (tableStatusPkg == null) {
 			return -1;
 		}
