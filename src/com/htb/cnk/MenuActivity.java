@@ -78,6 +78,7 @@ public class MenuActivity extends BaseActivity {
 	protected void onResume() {
 		super.onResume();
 		updateOrderedDishCount();
+		mDishLstAdapter.notifyDataSetChanged();
 	}
 
 	private void findViews() {
@@ -130,6 +131,7 @@ public class MenuActivity extends BaseActivity {
 	
 	private View getMenuView(int position, View convertView) {
 		ImageButton dishPic;
+		TextView orderedCount;
 		TextView dishName;
 		TextView dishPrice;
 		Button plusBtn;
@@ -144,6 +146,7 @@ public class MenuActivity extends BaseActivity {
 		dishPic = (ImageButton) convertView.findViewById(R.id.pic);
 		dishName = (TextView) convertView.findViewById(R.id.dishName);
 		dishPrice = (TextView) convertView.findViewById(R.id.dishPrice);
+		orderedCount = (TextView) convertView.findViewById(R.id.orderedCount);
 		plusBtn = (Button) convertView.findViewById(R.id.dishPlus);
 		minusBtn = (Button) convertView.findViewById(R.id.dishMinus);
 		
@@ -157,7 +160,12 @@ public class MenuActivity extends BaseActivity {
 	    
 		dishName.setText(dishDetail.getName());
 		dishPrice.setText(Double.toString(dishDetail.getPrice()) + " 元/份");
-		
+		int orderCount = mMyOrder.getOrderedCount(dishDetail.getId());
+		if (orderCount > 0) {
+			orderedCount.setText(Integer.toString(orderCount));
+		} else {
+			orderedCount.setText(" ");
+		}
 		plusBtn.setTag(position);
 		plusBtn.setOnClickListener(new OnClickListener() {
 	
@@ -165,6 +173,7 @@ public class MenuActivity extends BaseActivity {
 				final int position = Integer.parseInt(v.getTag().toString());
 				mMyOrder.add(mDishes.getDish(position), 1);
 				updateOrderedDishCount();
+				mDishLstAdapter.notifyDataSetChanged();
 			}
 		});
 		
@@ -175,12 +184,14 @@ public class MenuActivity extends BaseActivity {
 				final int position = Integer.parseInt(v.getTag().toString());
 				mMyOrder.minus(mDishes.getDish(position), 1);
 				updateOrderedDishCount();
+				mDishLstAdapter.notifyDataSetChanged();
 			}
 		});
 		return convertView;
 	}
 	
 	private View getFastOrderMenu(int position, View convertView) {
+		TextView orderedCount;
 		TextView dishName;
 		TextView dishPrice;
 		Button plusBtn;
@@ -195,9 +206,17 @@ public class MenuActivity extends BaseActivity {
 		dishName = (TextView) convertView.findViewById(R.id.dishName);
 		dishPrice = (TextView) convertView.findViewById(R.id.dishPrice);
 		plusBtn = (Button) convertView.findViewById(R.id.dishPlus);
+		orderedCount = (TextView) convertView.findViewById(R.id.orderedCount);
 		//minusBtn = (Button) convertView.findViewById(R.id.dishMinus);
 		plus5Btn = (Button) convertView.findViewById(R.id.dishPlus5);
 		//minus5Btn = (Button) convertView.findViewById(R.id.dishMinus5);
+		
+		int orderCount = mMyOrder.getOrderedCount(dishDetail.getId());
+		if (orderCount > 0) {
+			orderedCount.setText(Integer.toString(orderCount));
+		} else {
+			orderedCount.setText(" ");
+		}
 		
 		dishName.setText(dishDetail.getName());
 		dishPrice.setText(Double.toString(dishDetail.getPrice()) + " 元/份");
@@ -209,6 +228,7 @@ public class MenuActivity extends BaseActivity {
 				final int position = Integer.parseInt(v.getTag().toString());
 				mMyOrder.add(mDishes.getDish(position), 1);
 				updateOrderedDishCount();
+				mDishLstAdapter.notifyDataSetChanged();
 			}
 		});
 		
@@ -221,6 +241,7 @@ public class MenuActivity extends BaseActivity {
 				final int position = Integer.parseInt(v.getTag().toString());
 				mMyOrder.add(mDishes.getDish(position), 5);
 				updateOrderedDishCount();
+				mDishLstAdapter.notifyDataSetChanged();
 			}
 		});
 		

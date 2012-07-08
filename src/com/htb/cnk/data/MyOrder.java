@@ -165,6 +165,16 @@ public class MyOrder {
 		mOrder.clear();
 	}
 
+	public int getOrderedCount(int did) {
+		for (OrderedDish dish:mOrder) {
+			if (dish.getId() == did) {
+				Log.d("ordered dish", "name:" + dish.getName() + "did:" + dish.getId());
+				return dish.quantity;
+			}
+		}
+		return 0;
+	}
+	
 	public String submit() {
 		JSONObject order = new JSONObject();
 		Date date = new Date();
