@@ -49,7 +49,6 @@ public class TableActivity extends BaseActivity {
 	private Button mManageBtn;
 	private GridView gridview ;
 	private ProgressDialog mpDialog;
-//	private AlertDialog.Builder mAlertDialog = new AlertDialog.Builder(TableActivity.this);
 	private int tableId;
 	private SimpleAdapter saImageItems;
 	@Override
@@ -320,7 +319,7 @@ public class TableActivity extends BaseActivity {
 				} else {
 					cleanDialog.show();
 				}
-
+				saImageItems.notifyDataSetChanged();
 			}
 		}
 	};
