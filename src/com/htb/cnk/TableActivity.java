@@ -119,7 +119,8 @@ public class TableActivity extends BaseActivity {
 				final AlertDialog.Builder mAlertDialog = new AlertDialog.Builder(TableActivity.this);
 				mAlertDialog.setTitle("错误");//设置对话框标题
 				mAlertDialog.setMessage("网络连接失败，请检查网络后重试");//设置对话框内容
-				mAlertDialog.setPositiveButton("确认", new DialogInterface.OnClickListener() {
+				mAlertDialog.setCancelable(false);
+				mAlertDialog.setPositiveButton("重试", new DialogInterface.OnClickListener() {
 				 
 							@Override
 							public void onClick(DialogInterface dialog, int i) {
@@ -128,6 +129,14 @@ public class TableActivity extends BaseActivity {
 								new Thread(new tableThread()).start();
 							}
 						});
+				mAlertDialog.setNegativeButton("退出", new DialogInterface.OnClickListener() {
+					 
+					@Override
+					public void onClick(DialogInterface dialog, int i) {
+						dialog.cancel();
+						finish();
+					}
+				});
 				mAlertDialog.show();
 			} else {
 				
