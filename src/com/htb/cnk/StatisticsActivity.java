@@ -390,7 +390,7 @@ public class StatisticsActivity extends BaseActivity {
 		public void onDateSet(DatePicker arg0, int year, int month, int day) {
 			mStartSet.set(year, month, day);
 			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-			mStartDateBtn.setText(df.format(mStart.getTime()));
+			mStartDateBtn.setText(df.format(mStartSet.getTime()));
 		}
 	};
 
@@ -400,7 +400,7 @@ public class StatisticsActivity extends BaseActivity {
 		public void onDateSet(DatePicker arg0, int year, int month, int day) {
 			mEndSet.set(year, month, day);
 			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-			mEndDateBtn.setText(df.format(mEnd.getTime()));
+			mEndDateBtn.setText(df.format(mEndSet.getTime()));
 		}
 	};
 
@@ -409,7 +409,7 @@ public class StatisticsActivity extends BaseActivity {
 			mStartSet.set(Calendar.HOUR_OF_DAY, hourOfDay);
 			mStartSet.set(Calendar.MINUTE, minute);
 			SimpleDateFormat df = new SimpleDateFormat("HH:mm");
-			mStartTimeBtn.setText(df.format(mStart.getTime()));
+			mStartTimeBtn.setText(df.format(mStartSet.getTime()));
 		}
 	};
 
@@ -418,7 +418,7 @@ public class StatisticsActivity extends BaseActivity {
 			mEndSet.set(Calendar.HOUR_OF_DAY, hourOfDay);
 			mEndSet.set(Calendar.MINUTE, minute);
 			SimpleDateFormat df = new SimpleDateFormat("HH:mm");
-			mEndTimeBtn.setText(df.format(mEnd.getTime()));
+			mEndTimeBtn.setText(df.format(mEndSet.getTime()));
 		}
 	};
 

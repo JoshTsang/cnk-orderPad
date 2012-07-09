@@ -6,11 +6,13 @@ import java.util.List;
 import java.util.Map;
 
 import android.app.AlertDialog;
-import android.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -405,6 +407,12 @@ public class TableActivity extends BaseActivity {
 			// 得到自定义对话框
 			final View DialogView = factory.inflate(R.layout.setting_dialog,
 					null);
+			SharedPreferences sharedPre = getSharedPreferences("userInfo", 
+					Context.MODE_WORLD_WRITEABLE | Context.MODE_WORLD_READABLE);
+			String userName = sharedPre.getString("name", "");
+			EditText userNameET = (EditText) DialogView
+					.findViewById(R.id.edit_username);
+			userNameET.setText(userName);
 			// 创建对话框
 			AlertDialog dlg = new AlertDialog.Builder(TableActivity.this)
 					.setTitle("登录框")
@@ -429,6 +437,13 @@ public class TableActivity extends BaseActivity {
 											|| "".equals(userPwd)) {
 										dialog.cancel();
 									} else {
+										SharedPreferences sharedPre  = getSharedPreferences("userInfo",
+												Context.MODE_WORLD_WRITEABLE
+														| Context.MODE_WORLD_READABLE);
+										Editor editor = sharedPre.edit();
+										editor.putString("name", userName);
+										editor.commit();
+										
 										UserData.setUserName(userName);
 										UserData.setUserPwd(userPwd);
 									}
