@@ -114,6 +114,12 @@ public class StatisticsActivity extends BaseActivity {
 		mpDialog.show();
 		new Thread() {
 			public void run() {
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				int ret = mStatistics.downloadDB(Server.SERVER_DB_SALES);
 				if (ret < 0) {
 					handler.sendEmptyMessage(ret);
@@ -288,7 +294,12 @@ public class StatisticsActivity extends BaseActivity {
 				e.printStackTrace();
 			}
 			mEnd.setTimeInMillis(System.currentTimeMillis());
-			mStatistics.perpareResult(mStart, mEnd);
+			
+			int ret = mStatistics.perpareResult(mStart, mEnd);
+			if (ret < 0) {
+				dbErrAlert();
+				return;
+			}
 			updateData(mStart, mEnd);
 			mQueryMode = QUERY_TODAY;
 		}

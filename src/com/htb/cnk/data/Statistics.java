@@ -10,6 +10,7 @@ import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.net.ftp.FTP;
@@ -125,7 +126,9 @@ public class Statistics {
 		SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
 		SimpleDateFormat time = new SimpleDateFormat("HH:mm");
 		String startDT = date.format(start.getTime()) + " " + time.format(start.getTime());
-		String endDT = date.format(end.getTime()) + " " + time.format(end.getTime());
+		Date endDate = end.getTime();
+		endDate.setMinutes(endDate.getMinutes() + 1);
+		String endDT = date.format(end.getTime()) + " " + time.format(endDate);
 		final int DID = 0;
 		final int TOTAL_AMOUNT = 1;
 		final int COUNT = 2;

@@ -89,9 +89,7 @@ public class MenuActivity extends BaseActivity {
 		mDishesLst = (ListView) findViewById(R.id.dishes);
 		mDishLstTitle = (TextView) findViewById(R.id.category);
 		mOrderedDishCount = (TextView) findViewById(R.id.orderedCount);
-		if (Info.getMode() == Info.WORK_MODE_CUSTOMER) {
-			mSettingsBtn.setVisibility(View.INVISIBLE);
-		}
+		mSettingsBtn.setVisibility(View.INVISIBLE);
 	}
 	
 	private void setListData() {
