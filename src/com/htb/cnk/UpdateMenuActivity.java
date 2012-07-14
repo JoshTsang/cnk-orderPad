@@ -53,6 +53,7 @@ public class UpdateMenuActivity extends BaseActivity {
 	private CnkDbHelper mCnkDbHelper;
 	private SQLiteDatabase mDb;
 	private int retry = 0;
+	private Thread updateMenu;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -80,7 +81,7 @@ public class UpdateMenuActivity extends BaseActivity {
 	}
 
 	private void updateMenu() {
-		new Thread() {
+		updateMenu = new Thread() {
 			public void run() {
 				int ret;
 			
@@ -122,7 +123,9 @@ public class UpdateMenuActivity extends BaseActivity {
 				editor.commit();
 				handler.sendEmptyMessage(0);
 			}
-		}.start();
+		};
+		
+		updateMenu.start();
 		
 	}
 	
@@ -153,7 +156,13 @@ public class UpdateMenuActivity extends BaseActivity {
                 + "/cainaoke/";
         try {
         	FTPClient ftpClient = new FTPClient();
-
+        	File dir=new File(filePath);
+            if (!dir.exists()) {
+                dir.mkdir();
+            }
+            File file=new File(filePath+"cnk.db");
+            file.createNewFile();
+            
         	try {
         	    ftpClient.connect(InetAddress.getByName(Server.SERVER_IP));
         	    ftpClient.login(Server.FTP_USERNAME, Server.FTP_PWD);
@@ -223,10 +232,11 @@ public class UpdateMenuActivity extends BaseActivity {
 					  null, null, null, null, null);
 			while (dishes.moveToNext()) {
 				String picName = dishes.getString(0);
-				
-				ret = downloadPic(Server.IMG_PATH+ picName, "hdpi_" + picName);
-				if (ret < 0) {
-					return ret;
+				if (picName != null && !"".equals(picName) && !"null".equals(picName)) {
+					ret = downloadPic(Server.IMG_PATH+ picName, "hdpi_" + picName);
+					if (ret < 0) {
+						return ret;
+					}
 				}
 			}
 			
@@ -322,15 +332,7 @@ public class UpdateMenuActivity extends BaseActivity {
 			builder.setCancelable(false);
 			builder.setMessage("退出将菜谱无法更新,请等待菜谱更新完毕后,系统自动退出");
 			
-			builder.setPositiveButton("退出", new DialogInterface.OnClickListener() {
-			    
-			    @Override
-				public void onClick(DialogInterface dialog, int which) {
-			    	finish();
-			    }
-			});
-			
-			builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+			builder.setNegativeButton("确定", new DialogInterface.OnClickListener() {
 			
 				@Override
 				public void onClick(DialogInterface dialog, int which) {

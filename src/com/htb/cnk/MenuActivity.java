@@ -78,7 +78,9 @@ public class MenuActivity extends BaseActivity {
 	protected void onResume() {
 		super.onResume();
 		updateOrderedDishCount();
-		mDishLstAdapter.notifyDataSetChanged();
+		if (mDishLstAdapter != null) {
+			mDishLstAdapter.notifyDataSetChanged();
+		}
 	}
 
 	private void findViews() {
