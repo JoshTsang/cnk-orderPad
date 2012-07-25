@@ -210,7 +210,7 @@ public class DelOrderActivity extends BaseActivity {
 						int ret = 1;
 						int result = 1;
 						result = mMyOrder.delDish(-1);
-						ret = mSettings.CleanTalble(Info.getTableId());
+						ret = mSettings.cleanTalble(Info.getTableId());
 						if (ret < 0 || result < 0) {
 							cleanAllHandler.sendEmptyMessage(ret);
 							return;

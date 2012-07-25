@@ -233,7 +233,7 @@ public class MyOrderActivity extends BaseActivity {
 							handler.sendEmptyMessage(0);
 						//	mSettings.setstatus(Info.getTableId(), 1);
 							Log.d("tableid", "id:"+Info.getTableId());
-							mSettings.UpdatusStatus(Info.getTableId(), 1);
+							mSettings.updatusStatus(Info.getTableId(), 1);
 						} else {
 							handler.sendEmptyMessage(-1);
 						}						

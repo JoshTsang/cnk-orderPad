@@ -17,7 +17,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -49,23 +48,24 @@ public class TableActivity extends BaseActivity {
 	private Button mUpdateBtn;
 	private Button mStatisticsBtn;
 	private Button mManageBtn;
-	private GridView gridview ;
+	private GridView gridview;
 	private ProgressDialog mpDialog;
 	private int tableId;
 	private SimpleAdapter saImageItems;
+
 	@Override
-		protected void onResume() {
-			mpDialog = new ProgressDialog(TableActivity.this);
-			mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-			mpDialog.setTitle("请稍等");
-			mpDialog.setMessage("正在获取状态...");
-			mpDialog.setIndeterminate(false);
-			mpDialog.setCancelable(false);
-			mpDialog.show();
-			new Thread(new tableThread()).start();
-			super.onResume();
-		}
-	
+	protected void onResume() {
+		mpDialog = new ProgressDialog(TableActivity.this);
+		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+		mpDialog.setTitle("请稍等");
+		mpDialog.setMessage("正在获取状态...");
+		mpDialog.setIndeterminate(false);
+		mpDialog.setCancelable(false);
+		mpDialog.show();
+		new Thread(new tableThread()).start();
+		super.onResume();
+	}
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -76,8 +76,6 @@ public class TableActivity extends BaseActivity {
 		setContentView(R.layout.table_activity);
 		findViews();
 		setClickListeners();
-
-	//	new Thread(new tableThread()).start();
 
 	}
 
@@ -113,73 +111,6 @@ public class TableActivity extends BaseActivity {
 		}
 	}
 
-	private Handler tableHandle = new Handler() {
-		public void handleMessage(Message msg) {
-			mpDialog.cancel();
-			if (msg.what < 0) {
-				final AlertDialog.Builder mAlertDialog = new AlertDialog.Builder(TableActivity.this);
-				mAlertDialog.setTitle("错误");//设置对话框标题
-				mAlertDialog.setMessage("网络连接失败，请检查网络后重试");//设置对话框内容
-				mAlertDialog.setCancelable(false);
-				mAlertDialog.setPositiveButton("重试", new DialogInterface.OnClickListener() {
-				 
-							@Override
-							public void onClick(DialogInterface dialog, int i) {
-								dialog.cancel();
-								mpDialog.show();
-								new Thread(new tableThread()).start();
-							}
-						});
-				mAlertDialog.setNegativeButton("退出", new DialogInterface.OnClickListener() {
-					 
-					@Override
-					public void onClick(DialogInterface dialog, int i) {
-						dialog.cancel();
-						finish();
-					}
-				});
-				mAlertDialog.show();
-			} else {
-				
-				gridview = (GridView) findViewById(R.id.gridview);
-				ArrayList<HashMap<String, String>> lstImageItem = new ArrayList<HashMap<String, String>>();
-				lstImageItem.clear();
-				mTableSettings.clear();
-				for (int i = 0; i < mSettings.size(); i++) {
-					HashMap<String, String> map = new HashMap<String, String>();
-					map.put("ItemText", "第" + mSettings.getName(i) + "桌");
-					lstImageItem.add(map);
-				}
-				saImageItems = new SimpleAdapter(
-						TableActivity.this, lstImageItem, R.layout.table_item,
-						new String[] { "ItemText" },
-						new int[] { R.id.ItemText }) {
-
-					@Override
-					public View getView(int position, View convertView,
-							ViewGroup parent) {
-						convertView = TableActivity.this.getLayoutInflater().inflate(
-								R.layout.grid_item, null);
-						ImageView Image = (ImageView)convertView.findViewById(R.id.ItemImage);
-						TextView text = (TextView)convertView.findViewById(R.id.ItemText);
-						text.setText("第" + mSettings.getName(position) + "桌");
-						if (mSettings.getstatus(position) == 1) {
-							Image.setImageResource(R.drawable.table_blue);
-
-						} else if (mSettings.getstatus(position) == 0) {
-							Image.setImageResource(R.drawable.table_red);
-						}
-						return convertView;
-					}
-
-				};
-				gridview.setAdapter(saImageItems);
-				saImageItems.notifyDataSetChanged();
-				gridview.setOnItemClickListener(new ItemClickListener());
-			}
-		}
-	};
-
 	class refreshThread implements Runnable {
 		public void run() {
 			try {
@@ -197,135 +128,6 @@ public class TableActivity extends BaseActivity {
 			}
 		}
 	}
-
-	private Handler refreshHandle = new Handler() {
-		public void handleMessage(Message msg) {
-			mpDialog.cancel();
-			if (msg.what < 0) {
-				Toast.makeText(getApplicationContext(),
-						getResources().getString(R.string.tableWarning),
-						Toast.LENGTH_SHORT).show();
-			} else {
-				// Log.d("status", "status:"+
-				// mSettings.getstatus(tableId)+"Id:"+tableId);
-				Info.setTableName(mSettings.getName(tableId));
-				Info.setTableId(mSettings.getId(tableId));
-				final ChoiceOnClickListener choiceListener = new ChoiceOnClickListener();
-				Dialog addDialog = new AlertDialog.Builder(TableActivity.this)
-						.setTitle("选择功能")
-						// 设置标题
-						.setSingleChoiceItems(
-								new String[] { "开台（客户模式）", "开台（服务员模式）" }, 0,
-								choiceListener)
-						.setPositiveButton("确定",
-								new DialogInterface.OnClickListener() {
-
-									@Override
-									public void onClick(DialogInterface dialog,
-											int which) {
-										// TODO Auto-generated method stub
-										int choiceWhich = choiceListener
-												.getWhich();
-										myOrder.clear();
-										Intent intent = new Intent();
-										switch (choiceWhich) {
-										case 0:
-											intent.setClass(TableActivity.this,
-													MenuActivity.class);
-											Info.setMode(Info.WORK_MODE_CUSTOMER);
-											Info.setNewCustomer(true);
-											TableActivity.this
-													.startActivity(intent);
-											TableActivity.this.finish();
-											break;
-										case 1:
-											intent.setClass(TableActivity.this,
-													MenuActivity.class);
-											Info.setMode(Info.WORK_MODE_WAITER);
-											TableActivity.this
-													.startActivity(intent);
-											break;
-										}
-									}
-								}).setNegativeButton("取消", null).create();
-
-				Dialog cleanDialog = new AlertDialog.Builder(TableActivity.this)
-						.setTitle("选择功能")
-						// 设置标题
-						.setSingleChoiceItems(
-								new String[] { "清台", "删除菜", "添加菜", "查看菜" }, 0,
-								choiceListener)
-						.setPositiveButton("确定",
-								new DialogInterface.OnClickListener() {
-
-									@Override
-									public void onClick(DialogInterface dialog,
-											int which) {
-										// TODO Auto-generated method stub
-										int choiceWhich = choiceListener
-												.getWhich();
-										Intent intent = new Intent();
-										switch (choiceWhich) {
-										case 0:
-											myOrder.clear();
-											new Thread() {
-												public void run() {
-													try {
-														Message msg = new Message();
-														mSettings.UpdatusStatus(
-																mSettings
-																		.getId(tableId),
-																0);
-														mSettings
-																.CleanTalble(mSettings
-																		.getId(tableId));
-														mSettings.clear();
-														int ret = mSettings.getTableStatus();
-														if (ret < 0) {
-															tableHandle.sendEmptyMessage(ret);
-															return;
-														}
-														msg.what = ret;
-														tableHandle.sendMessage(msg);
-													} catch (Exception e) {
-														e.printStackTrace();
-													}
-												}
-											}.start();
-											break;
-										case 1:
-											intent.setClass(TableActivity.this,
-													DelOrderActivity.class);
-											TableActivity.this
-													.startActivity(intent);
-											break;
-										case 2:
-											myOrder.clear();
-											intent.setClass(TableActivity.this,
-													MenuActivity.class);
-											Info.setMode(Info.WORK_MODE_WAITER);
-											TableActivity.this
-													.startActivity(intent);
-											break;
-										case 3:
-											intent.setClass(TableActivity.this,
-													QueryOrderActivity.class);
-											TableActivity.this
-													.startActivity(intent);
-										}
-
-									}
-								}).setNegativeButton("取消", null).create();
-
-				if (mSettings.getstatus(tableId) == 0) {
-					addDialog.show();
-				} else {
-					cleanDialog.show();
-				}
-				saImageItems.notifyDataSetChanged();
-			}
-		}
-	};
 
 	class ItemClickListener implements OnItemClickListener {
 
@@ -348,19 +150,254 @@ public class TableActivity extends BaseActivity {
 		}
 	}
 
-	private class ChoiceOnClickListener implements
-			DialogInterface.OnClickListener {
-		private int which = 0;
-
-		@Override
-		public void onClick(DialogInterface dialogInterface, int which) {
-			Log.d("a", "a" + which);
-			this.which = which;
+	class userThread implements Runnable {
+		public void run() {
+			try {
+				Message msg = new Message();
+				int ret = UserData.Compare();
+				if (ret < 0) {
+					userHandle.sendEmptyMessage(ret);
+					return;
+				}
+				msg.what = ret;
+				userHandle.sendMessage(msg);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
+	}
 
-		public int getWhich() {
-			return which;
+	private AlertDialog.Builder networkArlertDialog() {
+		final AlertDialog.Builder mAlertDialog = new AlertDialog.Builder(
+				TableActivity.this);
+		mAlertDialog.setTitle("错误");// 设置对话框标题
+		mAlertDialog.setMessage("网络连接失败，请检查网络后重试");// 设置对话框内容
+		mAlertDialog.setCancelable(false);
+		mAlertDialog.setPositiveButton("重试",
+				new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int i) {
+						dialog.cancel();
+						mpDialog.show();
+						new Thread(new tableThread()).start();
+					}
+				});
+		mAlertDialog.setNegativeButton("退出",
+				new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int i) {
+						dialog.cancel();
+						finish();
+					}
+				});
+		return mAlertDialog;
+	}
+
+	private AlertDialog.Builder cleanTableAlertDialog() {
+		final AlertDialog.Builder mAlertDialog = new AlertDialog.Builder(
+				TableActivity.this);
+		mAlertDialog.setMessage("请确认是否清台");// 设置对话框内容
+		mAlertDialog.setCancelable(false);
+		mAlertDialog.setPositiveButton("清台",
+				new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int i) {
+						dialog.cancel();
+						cleanTableThread();
+					}
+				});
+		mAlertDialog.setNegativeButton("取消",
+				new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int i) {
+						dialog.cancel();
+					}
+				});
+		return mAlertDialog;
+	}
+
+	private AlertDialog.Builder addDialog() {
+		final CharSequence[] additems = { "开台（客户模式）", "开台（服务员模式）" };
+
+		AlertDialog.Builder addDialog = new AlertDialog.Builder(
+				TableActivity.this);
+		addDialog.setTitle("选择功能") // 标题
+				.setIcon(R.drawable.ic_launcher) // icon
+				.setCancelable(false) // 不响应back按钮
+				.setItems(additems, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						Intent intent = new Intent();
+						switch (which) {
+						case 0:
+							intent.setClass(TableActivity.this,
+									MenuActivity.class);
+							Info.setMode(Info.WORK_MODE_CUSTOMER);
+							Info.setNewCustomer(true);
+							TableActivity.this.startActivity(intent);
+							TableActivity.this.finish();
+							break;
+						case 1:
+							intent.setClass(TableActivity.this,
+									MenuActivity.class);
+							Info.setMode(Info.WORK_MODE_WAITER);
+							TableActivity.this.startActivity(intent);
+							break;
+						}
+					}
+				}).create();
+		return addDialog;
+	}
+
+	private Dialog cleanDialog() {
+		final CharSequence[] cleanitems = { "清台", "删除菜", "添加菜", "查看菜" };
+		Dialog cleanDialog = new AlertDialog.Builder(TableActivity.this)
+				.setTitle("选择功能")
+				// 设置标题
+				.setItems(cleanitems, new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						Intent intent = new Intent();
+						switch (which) {
+						case 0:
+							myOrder.clear();
+							final AlertDialog.Builder mAlertDialog = cleanTableAlertDialog();
+							mAlertDialog.show();
+							break;
+						case 1:
+							intent.setClass(TableActivity.this,
+									DelOrderActivity.class);
+							TableActivity.this.startActivity(intent);
+							break;
+						case 2:
+							myOrder.clear();
+							intent.setClass(TableActivity.this,
+									MenuActivity.class);
+							Info.setMode(Info.WORK_MODE_WAITER);
+							TableActivity.this.startActivity(intent);
+							break;
+						case 3:
+							intent.setClass(TableActivity.this,
+									QueryOrderActivity.class);
+							TableActivity.this.startActivity(intent);
+						}
+
+					}
+				}).create();
+		return cleanDialog;
+	}
+
+	private Handler tableHandle = new Handler() {
+		public void handleMessage(Message msg) {
+			mpDialog.cancel();
+			if (msg.what < 0) {
+				final AlertDialog.Builder mAlertDialog = networkArlertDialog();
+				mAlertDialog.show();
+			} else {
+
+				gridview = (GridView) findViewById(R.id.gridview);
+				ArrayList<HashMap<String, String>> lstImageItem = new ArrayList<HashMap<String, String>>();
+				lstImageItem.clear();
+				mTableSettings.clear();
+				for (int i = 0; i < mSettings.size(); i++) {
+					HashMap<String, String> map = new HashMap<String, String>();
+					map.put("ItemText", "第" + mSettings.getName(i) + "桌");
+					lstImageItem.add(map);
+				}
+				saImageItems = new SimpleAdapter(TableActivity.this,
+						lstImageItem, R.layout.table_item,
+						new String[] { "ItemText" },
+						new int[] { R.id.ItemText }) {
+
+					@Override
+					public View getView(int position, View convertView,
+							ViewGroup parent) {
+						convertView = TableActivity.this.getLayoutInflater()
+								.inflate(R.layout.grid_item, null);
+						ImageView Image = (ImageView) convertView
+								.findViewById(R.id.ItemImage);
+						TextView text = (TextView) convertView
+								.findViewById(R.id.ItemText);
+						text.setText("第" + mSettings.getName(position) + "桌");
+						if (mSettings.getStatus(position) == 1) {
+							Image.setImageResource(R.drawable.table_blue);
+
+						} else if (mSettings.getStatus(position) == 0) {
+							Image.setImageResource(R.drawable.table_red);
+						}
+						return convertView;
+					}
+
+				};
+				gridview.setAdapter(saImageItems);
+				saImageItems.notifyDataSetChanged();
+				gridview.setOnItemClickListener(new ItemClickListener());
+			}
 		}
+	};
+	private Handler userHandle = new Handler() {
+
+		public void handleMessage(Message msg) {
+			if (msg.what < 0) {
+				Toast.makeText(getApplicationContext(),
+						getResources().getString(R.string.userWarning),
+						Toast.LENGTH_SHORT).show();
+			} else {
+				Intent intent = new Intent();
+				intent.setClass(TableActivity.this, StatisticsActivity.class);
+				TableActivity.this.startActivity(intent);
+			}
+		}
+	};
+	private Handler refreshHandle = new Handler() {
+		public void handleMessage(Message msg) {
+			mpDialog.cancel();
+			if (msg.what < 0) {
+				Toast.makeText(getApplicationContext(),
+						getResources().getString(R.string.tableWarning),
+						Toast.LENGTH_SHORT).show();
+			} else {
+				Info.setTableName(mSettings.getName(tableId));
+				Info.setTableId(mSettings.getId(tableId));
+
+				AlertDialog.Builder addDialog = addDialog();
+				Dialog cleanDialog = cleanDialog();
+
+				if (mSettings.getStatus(tableId) == 0) {
+					addDialog.show();
+				} else {
+					cleanDialog.show();
+				}
+				saImageItems.notifyDataSetChanged();
+			}
+		}
+	};
+
+	private void cleanTableThread() {
+		new Thread() {
+			public void run() {
+				try {
+					Message msg = new Message();
+					mSettings.updatusStatus(mSettings.getId(tableId), 0);
+					mSettings.cleanTalble(mSettings.getId(tableId));
+					mSettings.clear();
+					int ret = mSettings.getTableStatus();
+					if (ret < 0) {
+						tableHandle.sendEmptyMessage(ret);
+						return;
+					}
+					msg.what = ret;
+					tableHandle.sendMessage(msg);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}.start();
 	}
 
 	private OnClickListener backClicked = new OnClickListener() {
@@ -370,7 +407,6 @@ public class TableActivity extends BaseActivity {
 			TableActivity.this.finish();
 		}
 	};
-
 	private OnClickListener updateClicked = new OnClickListener() {
 
 		@Override
@@ -382,7 +418,7 @@ public class TableActivity extends BaseActivity {
 
 		}
 	};
-
+	
 	private OnClickListener manageClicked = new OnClickListener() {
 
 		@Override
@@ -397,7 +433,7 @@ public class TableActivity extends BaseActivity {
 
 		}
 	};
-
+	
 	private OnClickListener statisticsClicked = new OnClickListener() {
 		@Override
 		public void onClick(View v) {
@@ -407,7 +443,7 @@ public class TableActivity extends BaseActivity {
 			// 得到自定义对话框
 			final View DialogView = factory.inflate(R.layout.setting_dialog,
 					null);
-			SharedPreferences sharedPre = getSharedPreferences("userInfo", 
+			SharedPreferences sharedPre = getSharedPreferences("userInfo",
 					Context.MODE_WORLD_WRITEABLE | Context.MODE_WORLD_READABLE);
 			String userName = sharedPre.getString("name", "");
 			EditText userNameET = (EditText) DialogView
@@ -437,13 +473,14 @@ public class TableActivity extends BaseActivity {
 											|| "".equals(userPwd)) {
 										dialog.cancel();
 									} else {
-										SharedPreferences sharedPre  = getSharedPreferences("userInfo",
+										SharedPreferences sharedPre = getSharedPreferences(
+												"userInfo",
 												Context.MODE_WORLD_WRITEABLE
 														| Context.MODE_WORLD_READABLE);
 										Editor editor = sharedPre.edit();
 										editor.putString("name", userName);
 										editor.commit();
-										
+
 										UserData.setUserName(userName);
 										UserData.setUserPwd(userPwd);
 									}
@@ -455,7 +492,6 @@ public class TableActivity extends BaseActivity {
 								@Override
 								public void onClick(DialogInterface dialog,
 										int which) {
-									// 点击取消后退出程序
 								}
 							}).create();// 创建对话框
 			dlg.show();// 显示对话框
@@ -464,37 +500,5 @@ public class TableActivity extends BaseActivity {
 
 	};
 
-	class userThread implements Runnable {
-		public void run() {
-			try {
-				Message msg = new Message();
-				int ret = UserData.Compare();
-				if (ret < 0) {
-					userHandle.sendEmptyMessage(ret);
-					return;
-				}
-				msg.what = ret;
-				userHandle.sendMessage(msg);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-
-	private Handler userHandle = new Handler() {
-		
-		public void handleMessage(Message msg) {
-			if (msg.what < 0) {
-				Toast.makeText(getApplicationContext(),
-						getResources().getString(R.string.userWarning),
-						Toast.LENGTH_SHORT).show();
-			} else {
-				Intent intent = new Intent();
-				intent.setClass(TableActivity.this, StatisticsActivity.class);
-				TableActivity.this.startActivity(intent);
-			}
-		}
-	};
 
 }
