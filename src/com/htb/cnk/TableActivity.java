@@ -227,7 +227,7 @@ public class TableActivity extends BaseActivity {
 				TableActivity.this);
 		addDialog.setTitle("选择功能") // 标题
 				.setIcon(R.drawable.ic_launcher) // icon
-				.setCancelable(false) // 不响应back按钮
+			//	.setCancelable(true) // 不响应back按钮
 				.setItems(additems, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
@@ -252,6 +252,45 @@ public class TableActivity extends BaseActivity {
 				}).create();
 		return addDialog;
 	}
+	
+	private AlertDialog.Builder addPhoneDialog() {
+		final CharSequence[] additems = {"手机已点的菜"};
+
+		AlertDialog.Builder addPhoneDialog = new AlertDialog.Builder(
+				TableActivity.this);
+		addPhoneDialog.setTitle("选择功能") // 标题
+				.setIcon(R.drawable.ic_launcher) // icon
+			//	.setCancelable(true) // 不响应back按钮
+				.setItems(additems, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						Intent intent = new Intent();
+						switch (which) {
+//						case 0:
+//							intent.setClass(TableActivity.this,
+//									MenuActivity.class);
+//							Info.setMode(Info.WORK_MODE_CUSTOMER);
+//							Info.setNewCustomer(true);
+//							TableActivity.this.startActivity(intent);
+//							TableActivity.this.finish();
+//							break;
+//						case 1:
+//							intent.setClass(TableActivity.this,
+//									MenuActivity.class);
+//							Info.setMode(Info.WORK_MODE_WAITER);
+//							TableActivity.this.startActivity(intent);
+//							break;
+						case 0:
+							intent.setClass(TableActivity.this,
+									PhoneActivity.class);
+							TableActivity.this.startActivity(intent);
+							break;
+						}
+					}
+				}).create();
+		return addPhoneDialog;
+	}
+	
 
 	private Dialog cleanDialog() {
 		final CharSequence[] cleanitems = { "清台", "删除菜", "添加菜", "查看菜" };
@@ -329,6 +368,8 @@ public class TableActivity extends BaseActivity {
 
 						} else if (mSettings.getStatus(position) == 0) {
 							Image.setImageResource(R.drawable.table_red);
+						} else if(mSettings.getStatus(position) == 2){
+							Image.setImageResource(R.drawable.table_yellow);
 						}
 						return convertView;
 					}
@@ -366,12 +407,17 @@ public class TableActivity extends BaseActivity {
 				Info.setTableId(mSettings.getId(tableId));
 
 				AlertDialog.Builder addDialog = addDialog();
+				AlertDialog.Builder addPhoneDilog = addPhoneDialog();
 				Dialog cleanDialog = cleanDialog();
+				
 
 				if (mSettings.getStatus(tableId) == 0) {
 					addDialog.show();
-				} else {
+				//	addPhoneDilog.show();
+				} else if(mSettings.getStatus(tableId) == 1){
 					cleanDialog.show();
+				} else {
+					addPhoneDilog.show();
 				}
 				saImageItems.notifyDataSetChanged();
 			}

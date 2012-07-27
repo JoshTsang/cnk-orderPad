@@ -14,7 +14,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.htb.cnk.PhoneActivity.queryThread;
 import com.htb.cnk.adapter.MyOrderAdapter;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder;
@@ -26,7 +28,7 @@ import com.htb.cnk.lib.BaseActivity;
  * @author josh
  *
  */
-public class MyOrderActivity extends BaseActivity {
+public class PhoneActivity extends BaseActivity {
 	private Button mBackBtn;
 	private Button mSubmitBtn;
 	private TextView mTableNumTxt;
@@ -45,6 +47,7 @@ public class MyOrderActivity extends BaseActivity {
 		findViews();
 		fillData();
 		setClickListener();
+		updateTabelInfos();
 	}
 
 	private void findViews() {
@@ -58,13 +61,14 @@ public class MyOrderActivity extends BaseActivity {
 	
 	private void fillData() {
 		mTableNumTxt.setText(Info.getTableName());
-		updateTabelInfos();
+//		updateTabelInfos();
 		
 		mMyOrderAdapter = getMyOrderAdapterInstance();
 		mMyOrderLst.setAdapter(mMyOrderAdapter);
 	}
 
 	private MyOrderAdapter getMyOrderAdapterInstance() {
+		
 		return new MyOrderAdapter(this, mMyOrder) {
 			@Override
 			public View getView(int position, View convertView, ViewGroup arg2) {
@@ -78,7 +82,7 @@ public class MyOrderActivity extends BaseActivity {
 				
 				if(convertView==null)
 				{
-					convertView=LayoutInflater.from(MyOrderActivity.this).inflate(R.layout.item_ordereddish, null);
+					convertView=LayoutInflater.from(PhoneActivity.this).inflate(R.layout.item_ordereddish, null);
 				}
 				OrderedDish dishDetail = mMyOrder.getOrderedDish(position);
 				
@@ -129,6 +133,43 @@ public class MyOrderActivity extends BaseActivity {
 		mSubmitBtn.setOnClickListener(submitBtnClicked);
 	}
 	
+
+
+	Handler queryHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			if (msg.what < 0) {
+				Toast.makeText(getApplicationContext(),
+						getResources().getString(R.string.delWarning),
+						Toast.LENGTH_SHORT).show();
+				
+				fillData();
+				mDishCountTxt.setText(Integer.toString(mMyOrder.totalQuantity()) + " 道菜");
+				mTotalPriceTxt.setText(Double.toString(mMyOrder.getTotalPrice()) + " 元");
+			} else {
+				fillData();
+				mDishCountTxt.setText(Integer.toString(mMyOrder.totalQuantity()) + " 道菜");
+				mTotalPriceTxt.setText(Double.toString(mMyOrder.getTotalPrice()) + " 元");
+				mMyOrderAdapter.notifyDataSetChanged();
+				
+			}
+		}
+	};
+
+	class queryThread implements Runnable {
+		public void run() {
+			Message msg = new Message();
+			try {
+				int ret = mMyOrder.getTablePhoneFromDB(Info.getTableId());
+				msg.what = ret;
+				queryHandler.sendMessage(msg);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+		}
+
+	}
+	
 	private void updateDishQuantity(int position, int quantity) {
 		if (quantity < 0) {
 			mMyOrder.minus(position, -quantity);
@@ -137,19 +178,23 @@ public class MyOrderActivity extends BaseActivity {
 		}
 
 		mMyOrderAdapter.notifyDataSetChanged();
-		updateTabelInfos();
+		mDishCountTxt.setText(Integer.toString(mMyOrder.totalQuantity()) + " 道菜");
+		mTotalPriceTxt.setText(Double.toString(mMyOrder.getTotalPrice()) + " 元");
 	}
 
 	private void updateTabelInfos() {
-		mDishCountTxt.setText(Integer.toString(mMyOrder.totalQuantity()) + " 道菜");
-		mTotalPriceTxt.setText(Double.toString(mMyOrder.getTotalPrice()) + " 元");
+		mMyOrder = new MyOrder(PhoneActivity.this);
+		mMyOrder.clear();
+		new Thread(new queryThread()).start();
+//		mDishCountTxt.setText(Integer.toString(mMyOrder.totalQuantity()) + " 道菜");
+//		mTotalPriceTxt.setText(Double.toString(mMyOrder.getTotalPrice()) + " 元");
 	}
 
 	private void minusDishQuantity(final int position, final int quantity) {
 		if (mMyOrder.getOrderedDish(position).getQuantity() > quantity) {
 			updateDishQuantity(position, -quantity);
 		} else {
-			new AlertDialog.Builder(MyOrderActivity.this)
+			new AlertDialog.Builder(PhoneActivity.this)
 			.setTitle("请注意")
 			.setMessage("确认删除" + mMyOrder.getOrderedDish(position).getName())
 			.setPositiveButton("确定",
@@ -176,7 +221,7 @@ public class MyOrderActivity extends BaseActivity {
 		
 		@Override
 		public void onClick(View v) {
-			MyOrderActivity.this.finish();
+			PhoneActivity.this.finish();
 		}
 	};
 	
@@ -201,7 +246,7 @@ public class MyOrderActivity extends BaseActivity {
 		@Override
 		public void onClick(View v) {
 			if (mMyOrder.count() <= 0) {
-				new AlertDialog.Builder(MyOrderActivity.this)
+				new AlertDialog.Builder(PhoneActivity.this)
 				.setTitle("请注意")
 				.setMessage("您还没有点任何东西")
 				.setPositiveButton("确定",
@@ -216,12 +261,12 @@ public class MyOrderActivity extends BaseActivity {
 				return ;
 			}
 			//TODO auth
-			mpDialog = new ProgressDialog(MyOrderActivity.this);  
+			mpDialog = new ProgressDialog(PhoneActivity.this);  
 	        mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 	        mpDialog.setTitle("请稍等");
 	        mpDialog.setMessage("正在提交订单...");  
 	        mpDialog.setIndeterminate(false);
-	        mpDialog.setCancelable(false);
+	        mpDialog.setCancelable(false); 
 	        mpDialog.show();
 			new Thread() {
 				public void run() {
@@ -234,6 +279,7 @@ public class MyOrderActivity extends BaseActivity {
 						//	mSettings.setstatus(Info.getTableId(), 1);
 							Log.d("tableid", "id:"+Info.getTableId());
 							mSettings.updatusStatus(Info.getTableId(), 1);
+							mMyOrder.delPhoneTable(Info.getTableId());
 						} else {
 							handler.sendEmptyMessage(-1);
 						}						
@@ -248,7 +294,7 @@ public class MyOrderActivity extends BaseActivity {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
 			if (msg.what < 0) {
-				new AlertDialog.Builder(MyOrderActivity.this)
+				new AlertDialog.Builder(PhoneActivity.this)
 				.setCancelable(false)
 				.setTitle("出错了")
 				.setMessage("提交订单失败")
@@ -263,7 +309,7 @@ public class MyOrderActivity extends BaseActivity {
 				})
 				.show();
 			} else {
-				new AlertDialog.Builder(MyOrderActivity.this)
+				new AlertDialog.Builder(PhoneActivity.this)
 				.setCancelable(false)
 				.setTitle("提示")
 				.setMessage("订单已提交")
