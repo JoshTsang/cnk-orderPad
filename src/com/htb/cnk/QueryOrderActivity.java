@@ -32,7 +32,7 @@ public class QueryOrderActivity extends BaseActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.query_activity);
+		setContentView(R.layout.myorder_activity);
 		findViews();
 		setClickListener();
 		updateTabelInfos();
@@ -45,7 +45,10 @@ public class QueryOrderActivity extends BaseActivity {
 		mDishCountTxt = (TextView) findViewById(R.id.dishCount);
 		mTotalPriceTxt = (TextView) findViewById(R.id.totalPrice);
 		mMyOrderLst = (ListView) findViewById(R.id.myOrderList);
-
+		Button submit = (Button) findViewById(R.id.submit);
+		submit.setVisibility(View.GONE);
+		Button leftBtn = (Button) findViewById(R.id.left_btn);
+		leftBtn.setVisibility(View.GONE);
 	}
 
 	private void fillData() {

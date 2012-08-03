@@ -54,6 +54,8 @@ public class MyOrderActivity extends BaseActivity {
 		mDishCountTxt = (TextView) findViewById(R.id.dishCount);
 		mTotalPriceTxt = (TextView) findViewById(R.id.totalPrice);
 		mMyOrderLst = (ListView) findViewById(R.id.myOrderList);
+		Button leftBtn = (Button) findViewById(R.id.left_btn);
+		leftBtn.setVisibility(View.GONE);
 	}
 	
 	private void fillData() {

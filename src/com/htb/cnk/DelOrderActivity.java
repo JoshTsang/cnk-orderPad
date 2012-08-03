@@ -37,7 +37,7 @@ public class DelOrderActivity extends BaseActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.del_activity);
+		setContentView(R.layout.myorder_activity);
 		findViews();
 		updateTabelInfos();
 		setClickListener();
@@ -45,12 +45,14 @@ public class DelOrderActivity extends BaseActivity {
 
 	private void findViews() {
 		mBackBtn = (Button) findViewById(R.id.back_btn);
-		mDelBtn = (Button) findViewById(R.id.cleanAll_btn);
+		mDelBtn = (Button) findViewById(R.id.left_btn);
 		mTableNumTxt = (TextView) findViewById(R.id.tableNum);
 		mDishCountTxt = (TextView) findViewById(R.id.dishCount);
 		mTotalPriceTxt = (TextView) findViewById(R.id.totalPrice);
 		mMyOrderLst = (ListView) findViewById(R.id.myOrderList);
-
+		Button submit = (Button) findViewById(R.id.submit);
+		submit.setVisibility(View.GONE);
+		mDelBtn.setText("全部删除");
 	}
 
 	private void fillData() {
