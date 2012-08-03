@@ -73,9 +73,6 @@ public class MyOrder {
 
 	}
 
-	// public int getOrderId(int){
-	// return
-	// }
 	public int add(Dish dish, int quantity) {
 		for (OrderedDish item : mOrder) {
 			if (item.dish.getId() == dish.getId()) {
@@ -222,23 +219,46 @@ public class MyOrder {
 	public int getTableFromDB(int tableId) {
 		String response = Http.get(Server.GET_MYORDER, "TID=" + tableId);
 		try {
-			Log.d("debugTest_1", response);
 			JSONArray tableList = new JSONArray(response);
 			int length = tableList.length();
-			Log.d("debugTest_response", response);
 			MyOrder setting = new MyOrder();
 			setting.clear();
-			for (int i = 0; i < length; i++) {// ����JSONArray
-				Log.d("debugTest_i", Integer.toString(i));
+			for (int i = 0; i < length; i++) {
 				JSONObject item = tableList.getJSONObject(i);
 				int quantity = item.getInt("quantity");
 				int dishId = item.getInt("dish_id");
 				double dishPrice = item.getInt("price");
-				int id = item.getInt("id");
+				Log.d("tableFromDB", "quantity"+quantity+"dishId"+dishId+"dishPrice"+dishPrice);
 				String name = getDishName(dishId);
-				Log.d("debugTest_name", name);
 				Dish mDish = new Dish(dishId, name, dishPrice, null);
-				setting.addItem(mDish, quantity, id);
+				setting.addItem(mDish, quantity, tableId);
+			}
+			return 0;
+
+		} catch (Exception e) {
+
+			// TODO: handle exception
+		}
+
+		return -1;
+	}
+	
+	public int getTablePhoneFromDB(int tableId) {
+		String response = Http.get(Server.GET_GETPHONEORDER, "TID=" + tableId);
+		try {
+			JSONArray tableList = new JSONArray(response);
+			int length = tableList.length();
+			MyOrder setting = new MyOrder();
+			setting.clear();
+			for (int i = 0; i < length; i++) {
+				JSONObject item = tableList.getJSONObject(i);
+				int quantity = item.getInt("quantity");
+				int dishId = item.getInt("dish_id");
+				Cursor cur = getDishNameAndPriceFromDB(dishId);
+				String name = cur.getString(0);
+				double dishPrice = cur.getDouble(1);
+				Dish mDish = new Dish(dishId, name, dishPrice, null);
+				setting.addItem(mDish, quantity, tableId);
 			}
 			return 0;
 
@@ -267,6 +287,26 @@ public class MyOrder {
 			return cur.getString(0);
 		}
 		return null;
+	}
+	
+	private Cursor getDishNameAndPriceFromDB(int id) {
+		Cursor cur = mDb.query(CnkDbHelper.DISH_TABLE_NAME,
+				new String[] { CnkDbHelper.DISH_NAME ,CnkDbHelper.DISH_PRICE}, CnkDbHelper.DISH_ID
+						+ "=" + id, null, null, null, null);
+		
+		if (cur.moveToNext()) {
+			return cur;
+		}
+		return null;
+	}
+	
+	public int delPhoneTable(int tableId){
+			String tableStatusPkg = Http.get(Server.DELETE_PHONEORDER, "TID="
+					+ tableId );
+			if (tableStatusPkg == null) {
+				return -1;
+			}
+			return 0;
 	}
 
 	public int delDish(int dishId) {

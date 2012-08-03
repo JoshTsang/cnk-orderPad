@@ -24,6 +24,8 @@ public class Server {
 	public final static String STATISTICS_PRINT = PHP_DIR + "statistics.php";
 	public final static String MENU_VERSION = PHP_DIR + "version.php";
 	public final static String GET_PERMINSSION = PHP_DIR + "getPerminssion.php";
+	public final static String GET_GETPHONEORDER = PHP_DIR +"getPhoneOrder.php";
+	public final static String DELETE_PHONEORDER = PHP_DIR +"deletePhoneOrder.php";
 	/* Database */
 	public final static String DB_DIR = "db/";
 	public final static String DB_MENU = DB_DIR + "menu.db";

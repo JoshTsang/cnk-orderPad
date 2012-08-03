@@ -4,7 +4,8 @@
     android:layout_height="match_parent"
     android:orientation="horizontal" >
     
-   <RelativeLayout
+    <!-- 统计信息  -->
+	<RelativeLayout
 	    android:layout_width="240dip"
 	    android:layout_height="match_parent"
 	    android:orientation="vertical"
@@ -16,33 +17,30 @@
 	        <Button android:id="@+id/back_btn"
 	            android:text="@string/back"
  	            android:textColor="#F9E8BB"
-	        	android:textSize="25dip"
+	        	android:textSize="35dip"
 	            android:layout_width="120dip"
 		    	android:layout_height="60dip"
 		    	android:gravity="center"
 	        	android:background="#00000000"/>
-	        <Button android:id="@+id/cleanAll_btn"
-	            android:text="@string/cleanAll"
- 	            android:textColor="#F9E8BB"
-	        	android:textSize="25dip"
-	        	android:gravity="center"
-	            android:layout_width="120dip"
-		    	android:layout_height="60dip"
-		    	android:background="#00000000"
-		    	android:layout_alignParentRight="true"/>
 	        
 	    </RelativeLayout>
-	    
-	    
-	     <LinearLayout
+	    <Button android:id="@+id/submit"
+	        android:layout_width="fill_parent"
+    		android:layout_height="60dip"
+	        android:text="@string/submit"
+	        android:textColor="#F9E8BB"
+	        android:textSize="35dip"
+	        android:background="#00000000"
+    		android:layout_alignParentBottom="true"/>
+	    <LinearLayout
 	         android:layout_width="fill_parent"
     		 android:layout_height="fill_parent"
     		 android:orientation="vertical"
     		 android:layout_marginTop="5dip"
     		 android:layout_marginBottom="5dip"
-    		 android:layout_below="@id/titleBar">
-	    
-	     <!-- 桌号 -->
+    		 android:layout_below="@id/titleBar"
+    		 android:layout_above="@id/myOrder">
+	        <!-- 桌号 -->
 	        <TextView android:layout_width="wrap_content"
 	    		android:layout_height="wrap_content"
 	    		android:layout_marginTop="10dip"
@@ -74,10 +72,10 @@
 	            android:layout_width="wrap_content"
 	    		android:layout_height="wrap_content"
 	    		android:textSize="40dip"/>
-	        </LinearLayout>
+	    </LinearLayout>
     </RelativeLayout>
     
-    <!-- 菜谱  -->
+    <!-- 我点的菜  -->
     <LinearLayout 
 	    android:layout_width="fill_parent"
 	    android:layout_height="match_parent"
@@ -89,11 +87,11 @@
 	    	android:gravity="center"
 	    	android:textSize="40dip"
 	    	android:textColor="#652A25"
-	    	android:text="@string/myOrder"/>
+	    	android:text="@string/phoneOrder"/>
 	    <ListView android:id="@+id/myOrderList"
 	        android:layout_width="fill_parent"
 	    	android:layout_height="match_parent"
-	    	android:layout_marginLeft="12dip"
+	    	android:layout_marginLeft="10dip"
 	    	android:divider="#DECFBB"
 	    	android:dividerHeight="1dip">
 	    </ListView>

@@ -28,11 +28,11 @@ public class TableSetting {
 			mId = id;
 		}
 
-		public void setstatus(int status) {
+		public void setStatus(int status) {
 			mStatus = status;
 		}
 
-		public int getstatus() {
+		public int getStatus() {
 			return mStatus;
 		}
 
@@ -59,8 +59,8 @@ public class TableSetting {
 		return mTableSettings.size();
 	}
 
-	public int getstatus(int index) {
-		return mTableSettings.get(index).getstatus();
+	public int getStatus(int index) {
+		return mTableSettings.get(index).getStatus();
 	}
 
 	public int getId(int index) {
@@ -71,8 +71,8 @@ public class TableSetting {
 		return mTableSettings.get(index).getName();
 	}
 	
-	public void setstatus(int index, int n) {
-		mTableSettings.get(index).setstatus(n);
+	public void setStatus(int index, int n) {
+		mTableSettings.get(index).setStatus(n);
 	}
 
 	public int getTableStatus() {
@@ -101,7 +101,7 @@ public class TableSetting {
 		return -1;
 	}
 
-	public int UpdatusStatus(int tableId, int status) {
+	public int updatusStatus(int tableId, int status) {
 		String tableStatusPkg = Http.get(Server.UPDATE_TABLE_STATUS, "TID="
 				+ tableId + "&TST=" + status);
 		if (tableStatusPkg == null) {
@@ -120,7 +120,7 @@ public class TableSetting {
 		return 0;
 	}
 	
-	public int CleanTalble(int tableId){
+	public int cleanTalble(int tableId){
 		JSONObject order = new JSONObject();
 		Date date = new Date();
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
