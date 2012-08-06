@@ -132,13 +132,21 @@ public class MyOrder {
 
 	public int totalQuantity() {
 		int count = 0;
-		
+
 		for (OrderedDish item : mOrder) {
 			count += item.quantity;
 		}
 		return count;
 	}
-	
+
+	public int getDishId(int position) {
+		Log.d("position", "position:" + position + " size:" + mOrder.size());
+		if (position < mOrder.size()) {
+			return mOrder.get(position).dish.getId();
+		}
+		return -1;
+	}
+
 	public double getTotalPrice() {
 		double totalPrice = 0;
 
@@ -163,15 +171,16 @@ public class MyOrder {
 	}
 
 	public int getOrderedCount(int did) {
-		for (OrderedDish dish:mOrder) {
+		for (OrderedDish dish : mOrder) {
 			if (dish.getId() == did) {
-				Log.d("ordered dish", "name:" + dish.getName() + "did:" + dish.getId());
+				Log.d("ordered dish",
+						"name:" + dish.getName() + "did:" + dish.getId());
 				return dish.quantity;
 			}
 		}
 		return 0;
 	}
-	
+
 	public String submit() {
 		JSONObject order = new JSONObject();
 		Date date = new Date();
@@ -187,7 +196,6 @@ public class MyOrder {
 			order.put("tableName", Info.getTableName());
 			order.put("timestamp", time);
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -228,7 +236,8 @@ public class MyOrder {
 				int quantity = item.getInt("quantity");
 				int dishId = item.getInt("dish_id");
 				double dishPrice = item.getInt("price");
-				Log.d("tableFromDB", "quantity"+quantity+"dishId"+dishId+"dishPrice"+dishPrice);
+				Log.d("tableFromDB", "quantity" + quantity + "dishId" + dishId
+						+ "dishPrice" + dishPrice);
 				String name = getDishName(dishId);
 				Dish mDish = new Dish(dishId, name, dishPrice, null);
 				setting.addItem(mDish, quantity, tableId);
@@ -242,7 +251,7 @@ public class MyOrder {
 
 		return -1;
 	}
-	
+
 	public int getTablePhoneFromDB(int tableId) {
 		String response = Http.get(Server.GET_GETPHONEORDER, "TID=" + tableId);
 		try {
@@ -288,25 +297,40 @@ public class MyOrder {
 		}
 		return null;
 	}
-	
+
 	private Cursor getDishNameAndPriceFromDB(int id) {
-		Cursor cur = mDb.query(CnkDbHelper.DISH_TABLE_NAME,
-				new String[] { CnkDbHelper.DISH_NAME ,CnkDbHelper.DISH_PRICE}, CnkDbHelper.DISH_ID
-						+ "=" + id, null, null, null, null);
-		
+		Cursor cur = mDb.query(CnkDbHelper.DISH_TABLE_NAME, new String[] {
+				CnkDbHelper.DISH_NAME, CnkDbHelper.DISH_PRICE },
+				CnkDbHelper.DISH_ID + "=" + id, null, null, null, null);
+
 		if (cur.moveToNext()) {
 			return cur;
 		}
 		return null;
 	}
-	
-	public int delPhoneTable(int tableId){
-			String tableStatusPkg = Http.get(Server.DELETE_PHONEORDER, "TID="
-					+ tableId );
-			if (tableStatusPkg == null) {
-				return -1;
-			}
-			return 0;
+
+	public int delPhoneTable(int tableId, int dishId) {
+		String tableStatusPkg;
+		if (dishId == 0) {
+			tableStatusPkg = Http.get(Server.DELETE_PHONEORDER, "TID="
+					+ tableId);
+		} else {
+			tableStatusPkg = Http.get(Server.DELETE_PHONEORDER, "TID="
+					+ tableId + "&DID=" + dishId);
+		}
+		if (tableStatusPkg == null) {
+			return -1;
+		}
+		return 0;
+	}
+
+	public int updatePhoneOrder(int tableId, int quantity, int dishId) {
+		String phoneOrderPkg = Http.get(Server.UPDATE_PHONE_ORDER, "DID="
+				+ dishId + "&DNUM=" + quantity + "&TID=" + tableId);
+		if (phoneOrderPkg == null) {
+			return -1;
+		}
+		return 0;
 	}
 
 	public int delDish(int dishId) {
@@ -329,7 +353,7 @@ public class MyOrder {
 
 		JSONArray dishes = new JSONArray();
 		try {
-			
+
 			if (dishId == -1) {
 				for (int i = 0; i < mOrder.size(); i++) {
 					JSONObject dish = new JSONObject();
@@ -340,7 +364,7 @@ public class MyOrder {
 					dish.put("id", mOrder.get(i).getDishId());
 					dishes.put(dish);
 				}
-			}else{
+			} else {
 				JSONObject dish = new JSONObject();
 				dish.put("dishId", mOrder.get(dishId).dish.getId());
 				dish.put("name", mOrder.get(dishId).dish.getName());

@@ -26,6 +26,10 @@ public class Server {
 	public final static String GET_PERMINSSION = PHP_DIR + "getPerminssion.php";
 	public final static String GET_GETPHONEORDER = PHP_DIR +"getPhoneOrder.php";
 	public final static String DELETE_PHONEORDER = PHP_DIR +"deletePhoneOrder.php";
+	public final static String GET_NOTIFICATION = PHP_DIR +"getNotification.php";
+	public final static String GET_NOTIFICATIONTYPES = PHP_DIR +"getNotificationTypes.php";
+	public final static String CLEANNOTIFICATION = PHP_DIR + "cleanNotification.php";
+	public final static String UPDATE_PHONE_ORDER = PHP_DIR + "updatePhoneOrder.php";
 	/* Database */
 	public final static String DB_DIR = "db/";
 	public final static String DB_MENU = DB_DIR + "menu.db";

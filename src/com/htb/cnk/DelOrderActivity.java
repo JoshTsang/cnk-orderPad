@@ -64,7 +64,7 @@ public class DelOrderActivity extends BaseActivity {
 				TextView dishName;
 				TextView dishPrice;
 				// TextView dishQuantity;
-				Button minusBtn;
+				Button delBtn;
 
 				if (convertView == null) {
 					convertView = LayoutInflater.from(DelOrderActivity.this)
@@ -76,7 +76,7 @@ public class DelOrderActivity extends BaseActivity {
 				dishPrice = (TextView) convertView.findViewById(R.id.dishPrice);
 				// dishQuantity = (TextView) convertView
 				// .findViewById(R.id.dishQuantity);
-				minusBtn = (Button) convertView.findViewById(R.id.dishMinus);
+				delBtn = (Button) convertView.findViewById(R.id.dishMinus);
 
 				dishName.setText(dishDetail.getName());
 				dishPrice.setText(Double.toString(dishDetail.getPrice())
@@ -84,8 +84,8 @@ public class DelOrderActivity extends BaseActivity {
 				// dishQuantity
 				// .setText(Integer.toString(dishDetail.getQuantity()));
 
-				minusBtn.setTag(position);
-				minusBtn.setOnClickListener(minusClicked);
+				delBtn.setTag(position);
+				delBtn.setOnClickListener(delClicked);
 
 				return convertView;
 			}
@@ -101,9 +101,9 @@ public class DelOrderActivity extends BaseActivity {
 
 	}
 
-	private void updateDishQuantity(int position, int quantity) {
+	private void delDishQuantity(int position) {
 		dId = position;
-		Log.d("dId", "did+" + mMyOrder.getOrderedDish(dId).getDishId());
+//		Log.d("dId", "did+" + mMyOrder.getOrderedDish(dId).getDishId());
 		new Thread() {
 			public void run() {
 				try {
@@ -123,9 +123,7 @@ public class DelOrderActivity extends BaseActivity {
 				}
 			}
 		}.start();
-	//	mMyOrder.removeItem(dId);
-//		fillData();
-//		mMyOrderAdapter.notifyDataSetChanged();
+
 	}
 
 	private void updateTabelInfos() {
@@ -166,7 +164,7 @@ public class DelOrderActivity extends BaseActivity {
 
 	}
 
-	private void minusDishQuantity(final int position, final int quantity) {
+	private void delDish(final int position) {
 
 		new AlertDialog.Builder(DelOrderActivity.this)
 				.setTitle("请注意")
@@ -176,7 +174,7 @@ public class DelOrderActivity extends BaseActivity {
 
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						updateDishQuantity(position, -quantity);
+						delDishQuantity(position);
 
 					}
 				})
@@ -246,11 +244,11 @@ public class DelOrderActivity extends BaseActivity {
 		}
 	};
 
-	private OnClickListener minusClicked = new OnClickListener() {
+	private OnClickListener delClicked = new OnClickListener() {
 
 		public void onClick(View v) {
 			final int position = Integer.parseInt(v.getTag().toString());
-			minusDishQuantity(position, 1);
+			delDish(position);
 		}
 	};
 
