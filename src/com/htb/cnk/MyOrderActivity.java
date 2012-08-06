@@ -21,19 +21,13 @@ import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.MyOrder.OrderedDish;
 import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.lib.BaseActivity;
+import com.htb.cnk.lib.OrderBaseActivity;
 
 /**
  * @author josh
  *
  */
-public class MyOrderActivity extends BaseActivity {
-	private Button mBackBtn;
-	private Button mSubmitBtn;
-	private TextView mTableNumTxt;
-	private TextView mDishCountTxt;
-	private TextView mTotalPriceTxt;
-	private ListView mMyOrderLst;
-	private MyOrder mMyOrder = new MyOrder();
+public class MyOrderActivity extends OrderBaseActivity {
 	private MyOrderAdapter mMyOrderAdapter;
 	private ProgressDialog mpDialog;
 	private TableSetting mSettings = new TableSetting();
@@ -41,27 +35,16 @@ public class MyOrderActivity extends BaseActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.myorder_activity);
-		findViews();
-		fillData();
-		setClickListener();
+		setOrderViews();
+		fillOrderData();
+		setOrderClickListener();
 	}
 
-	private void findViews() {
-		mBackBtn = (Button) findViewById(R.id.back_btn);
-		mSubmitBtn = (Button) findViewById(R.id.submit);
-		mTableNumTxt = (TextView) findViewById(R.id.tableNum);
-		mDishCountTxt = (TextView) findViewById(R.id.dishCount);
-		mTotalPriceTxt = (TextView) findViewById(R.id.totalPrice);
-		mMyOrderLst = (ListView) findViewById(R.id.myOrderList);
-		Button leftBtn = (Button) findViewById(R.id.left_btn);
-		leftBtn.setVisibility(View.GONE);
+	private void setOrderViews() {
+		mLeftBtn.setVisibility(View.GONE);
 	}
-	
-	private void fillData() {
-		mTableNumTxt.setText(Info.getTableName());
-		updateTabelInfos();
-		
+
+	private void fillOrderData() {
 		mMyOrderAdapter = getMyOrderAdapterInstance();
 		mMyOrderLst.setAdapter(mMyOrderAdapter);
 	}
@@ -77,13 +60,13 @@ public class MyOrderActivity extends BaseActivity {
 				Button minusBtn;
 				Button plus5Btn;
 				Button minus5Btn;
-				
+
 				if(convertView==null)
 				{
 					convertView=LayoutInflater.from(MyOrderActivity.this).inflate(R.layout.item_ordereddish, null);
 				}
 				OrderedDish dishDetail = mMyOrder.getOrderedDish(position);
-				
+
 				dishName = (TextView) convertView.findViewById(R.id.dishName);
 				dishPrice = (TextView) convertView.findViewById(R.id.dishPrice);
 				dishQuantity = (TextView) convertView.findViewById(R.id.dishQuantity);
@@ -91,11 +74,11 @@ public class MyOrderActivity extends BaseActivity {
 				minusBtn = (Button) convertView.findViewById(R.id.dishMinus);
 				plus5Btn = (Button) convertView.findViewById(R.id.dishPlus5);
 				minus5Btn = (Button) convertView.findViewById(R.id.dishMinus5);
-				
+
 				dishName.setText(dishDetail.getName());
 				dishPrice.setText(Double.toString(dishDetail.getPrice()) + " 元/份");
 				dishQuantity.setText(Integer.toString(dishDetail.getQuantity()));
-				
+
 				plusBtn.setTag(position);
 				plusBtn.setOnClickListener(new OnClickListener() {
 
@@ -104,10 +87,10 @@ public class MyOrderActivity extends BaseActivity {
 						updateDishQuantity(position, 1);
 					}
 				});
-				
+
 				minusBtn.setTag(position);
 				minusBtn.setOnClickListener(minusClicked);
-				
+
 				plus5Btn.setTag(position);
 
 				plus5Btn.setOnClickListener(new OnClickListener() {
@@ -117,7 +100,7 @@ public class MyOrderActivity extends BaseActivity {
 						updateDishQuantity(position, 5);
 					}
 				});
-				
+
 				minus5Btn.setTag(position);
 
 				minus5Btn.setOnClickListener(minus5Clicked);
@@ -125,12 +108,11 @@ public class MyOrderActivity extends BaseActivity {
 			}
 		};
 	}
-	
-	private void setClickListener() {
-		mBackBtn.setOnClickListener(backBtnClicked);
+
+	private void setOrderClickListener() {
 		mSubmitBtn.setOnClickListener(submitBtnClicked);
 	}
-	
+
 	private void updateDishQuantity(int position, int quantity) {
 		if (quantity < 0) {
 			mMyOrder.minus(position, -quantity);
@@ -142,11 +124,6 @@ public class MyOrderActivity extends BaseActivity {
 		updateTabelInfos();
 	}
 
-	private void updateTabelInfos() {
-		mDishCountTxt.setText(Integer.toString(mMyOrder.totalQuantity()) + " 道菜");
-		mTotalPriceTxt.setText(Double.toString(mMyOrder.getTotalPrice()) + " 元");
-	}
-
 	private void minusDishQuantity(final int position, final int quantity) {
 		if (mMyOrder.getOrderedDish(position).getQuantity() > quantity) {
 			updateDishQuantity(position, -quantity);
@@ -156,7 +133,7 @@ public class MyOrderActivity extends BaseActivity {
 			.setMessage("确认删除" + mMyOrder.getOrderedDish(position).getName())
 			.setPositiveButton("确定",
 					new DialogInterface.OnClickListener() {
-	
+
 						@Override
 						public void onClick(DialogInterface dialog,
 								int which) {
@@ -164,24 +141,16 @@ public class MyOrderActivity extends BaseActivity {
 						}
 					})
 			.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-	
+
 				@Override
 				public void onClick(DialogInterface dialog,
 						int which) {
-					
+
 				}
 			}).show();
 		}
 	}
 
-	private OnClickListener backBtnClicked = new OnClickListener() {
-		
-		@Override
-		public void onClick(View v) {
-			MyOrderActivity.this.finish();
-		}
-	};
-	
 	private OnClickListener minusClicked = new OnClickListener() {
 
 		public void onClick(View v) {
@@ -189,7 +158,7 @@ public class MyOrderActivity extends BaseActivity {
 			minusDishQuantity(position, 1);
 		}
 	};
-	
+
 	private OnClickListener minus5Clicked = new OnClickListener() {
 
 		public void onClick(View v) {
@@ -197,9 +166,9 @@ public class MyOrderActivity extends BaseActivity {
 			minusDishQuantity(position, 5);
 		}
 	};
-	
+
 	private OnClickListener submitBtnClicked = new OnClickListener() {
-		
+
 		@Override
 		public void onClick(View v) {
 			if (mMyOrder.count() <= 0) {
@@ -208,7 +177,7 @@ public class MyOrderActivity extends BaseActivity {
 				.setMessage("您还没有点任何东西")
 				.setPositiveButton("确定",
 					new DialogInterface.OnClickListener() {
-	
+
 						@Override
 						public void onClick(DialogInterface dialog,
 								int which) {
@@ -245,7 +214,7 @@ public class MyOrderActivity extends BaseActivity {
 			}.start();
 		}
 	};
-	
+
 	private Handler handler = new Handler() {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
@@ -256,11 +225,11 @@ public class MyOrderActivity extends BaseActivity {
 				.setMessage("提交订单失败")
 				.setPositiveButton("确定",
 					new DialogInterface.OnClickListener() {
-	
+
 						@Override
 						public void onClick(DialogInterface dialog,
 								int which) {
-							
+
 						}
 				})
 				.show();
@@ -271,7 +240,7 @@ public class MyOrderActivity extends BaseActivity {
 				.setMessage("订单已提交")
 				.setPositiveButton("确定",
 					new DialogInterface.OnClickListener() {
-	
+
 						@Override
 						public void onClick(DialogInterface dialog,
 								int which) {
@@ -282,5 +251,5 @@ public class MyOrderActivity extends BaseActivity {
 			}
 		}
 	};
-	
+
 }

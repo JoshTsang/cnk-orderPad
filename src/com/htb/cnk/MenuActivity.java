@@ -57,7 +57,7 @@ public class MenuActivity extends BaseActivity {
 	private Categories mCategories;
 	private Dishes mDishes;
 	private DishListAdapter mDishLstAdapter;
-	private MyOrder mMyOrder = new MyOrder();
+	private MyOrder mMyOrder = new MyOrder(MenuActivity.this);
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

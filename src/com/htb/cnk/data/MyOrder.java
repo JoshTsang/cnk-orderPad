@@ -69,10 +69,6 @@ public class MyOrder {
 		mDb = mCnkDbHelper.getReadableDatabase();
 	}
 
-	public MyOrder() {
-
-	}
-
 	public int add(Dish dish, int quantity) {
 		for (OrderedDish item : mOrder) {
 			if (item.dish.getId() == dish.getId()) {
@@ -218,11 +214,11 @@ public class MyOrder {
 
 	public int getTableFromDB(int tableId) {
 		String response = Http.get(Server.GET_MYORDER, "TID=" + tableId);
+		Log.d("resp", response);
 		try {
 			JSONArray tableList = new JSONArray(response);
 			int length = tableList.length();
-			MyOrder setting = new MyOrder();
-			setting.clear();
+			clear();
 			for (int i = 0; i < length; i++) {
 				JSONObject item = tableList.getJSONObject(i);
 				int quantity = item.getInt("quantity");
@@ -231,12 +227,11 @@ public class MyOrder {
 				Log.d("tableFromDB", "quantity"+quantity+"dishId"+dishId+"dishPrice"+dishPrice);
 				String name = getDishName(dishId);
 				Dish mDish = new Dish(dishId, name, dishPrice, null);
-				setting.addItem(mDish, quantity, tableId);
+				addItem(mDish, quantity, tableId);
 			}
 			return 0;
-
 		} catch (Exception e) {
-
+			e.printStackTrace();
 			// TODO: handle exception
 		}
 
@@ -248,8 +243,7 @@ public class MyOrder {
 		try {
 			JSONArray tableList = new JSONArray(response);
 			int length = tableList.length();
-			MyOrder setting = new MyOrder();
-			setting.clear();
+			clear();
 			for (int i = 0; i < length; i++) {
 				JSONObject item = tableList.getJSONObject(i);
 				int quantity = item.getInt("quantity");
@@ -258,7 +252,7 @@ public class MyOrder {
 				String name = cur.getString(0);
 				double dishPrice = cur.getDouble(1);
 				Dish mDish = new Dish(dishId, name, dishPrice, null);
-				setting.addItem(mDish, quantity, tableId);
+				addItem(mDish, quantity, tableId);
 			}
 			return 0;
 
