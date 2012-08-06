@@ -20,6 +20,7 @@ import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.data.MyOrder.OrderedDish;
 import com.htb.cnk.lib.OrderBaseActivity;
 
+
 public class DelOrderActivity extends OrderBaseActivity {
 	private MyOrderAdapter mMyOrderAdapter;
 	private TableSetting mSettings = new TableSetting();
@@ -49,7 +50,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 				TextView dishName;
 				TextView dishPrice;
 				// TextView dishQuantity;
-				Button minusBtn;
+				Button delBtn;
 
 				if (convertView == null) {
 					convertView = LayoutInflater.from(DelOrderActivity.this)
@@ -61,7 +62,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 				dishPrice = (TextView) convertView.findViewById(R.id.dishPrice);
 				// dishQuantity = (TextView) convertView
 				// .findViewById(R.id.dishQuantity);
-				minusBtn = (Button) convertView.findViewById(R.id.dishMinus);
+				delBtn = (Button) convertView.findViewById(R.id.dishMinus);
 
 				dishName.setText(dishDetail.getName());
 				dishPrice.setText(Double.toString(dishDetail.getPrice())
@@ -69,8 +70,9 @@ public class DelOrderActivity extends OrderBaseActivity {
 				// dishQuantity
 				// .setText(Integer.toString(dishDetail.getQuantity()));
 
-				minusBtn.setTag(position);
-				minusBtn.setOnClickListener(delClicked);
+
+				delBtn.setTag(position);
+				delBtn.setOnClickListener(delClicked);
 
 				return convertView;
 			}
@@ -83,6 +85,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 	private void setDelClickListener() {
 		mLeftBtn.setOnClickListener(cleanBtnClicked);
 	}
+
 
 	private void delDish(int position) {
 		final int dId = position;
@@ -106,6 +109,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 				}
 			}
 		}.start();
+
 	}
 
 	Handler delHandler = new Handler() {
@@ -142,6 +146,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 
 	private void delDishAlert(final int position) {
 
+
 		new AlertDialog.Builder(DelOrderActivity.this)
 				.setTitle("请注意")
 				.setMessage(
@@ -150,7 +155,9 @@ public class DelOrderActivity extends OrderBaseActivity {
 
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
+
 						delDish(position);
+
 					}
 				})
 				.setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -216,6 +223,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 		public void onClick(View v) {
 			final int position = Integer.parseInt(v.getTag().toString());
 			delDishAlert(position);
+
 		}
 	};
 

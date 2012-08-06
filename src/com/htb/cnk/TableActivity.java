@@ -17,10 +17,10 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
@@ -28,12 +28,13 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
-import android.widget.ImageView;
 import android.widget.SimpleAdapter;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.htb.cnk.data.Info;
+import com.htb.cnk.data.MyOrder;
+import com.htb.cnk.data.NotificationTypes;
+import com.htb.cnk.data.Notifications;
 import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.data.UserData;
 import com.htb.cnk.lib.BaseActivity;
@@ -48,25 +49,33 @@ public class TableActivity extends BaseActivity {
 	private Button mManageBtn;
 	private GridView gridview;
 	private ProgressDialog mpDialog;
-	private int tableId;
 	private SimpleAdapter saImageItems;
+	private Handler handler = new Handler();
+	private ArrayList<HashMap<String, Object>> lstImageItem = new ArrayList<HashMap<String, Object>>();
+	private Notifications mNotificaion = new Notifications();
+	private NotificationTypes mNotificationType = new NotificationTypes();
+	private MyOrder mMyOrder = new MyOrder();
+	@Override
+	protected void onDestroy() {
+		handler.removeCallbacks(runnable); // 停止刷新
+		super.onDestroy();
+	}
+
+	@Override
+	protected void onStop() {
+		handler.removeCallbacks(runnable); // 停止刷新
+		super.onStop();
+	}
 
 	@Override
 	protected void onResume() {
-		mpDialog = new ProgressDialog(TableActivity.this);
-		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-		mpDialog.setTitle("请稍等");
-		mpDialog.setMessage("正在获取状态...");
-		mpDialog.setIndeterminate(false);
-		mpDialog.setCancelable(false);
 		mpDialog.show();
-		new Thread(new tableThread()).start();
+		handler.postDelayed(runnable, 1000 * 1);
 		super.onResume();
 	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
@@ -74,6 +83,12 @@ public class TableActivity extends BaseActivity {
 		setContentView(R.layout.table_activity);
 		findViews();
 		setClickListeners();
+		mpDialog = new ProgressDialog(TableActivity.this);
+		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+		mpDialog.setTitle("请稍等");
+		mpDialog.setMessage("正在获取状态...");
+		mpDialog.setIndeterminate(false);
+		mpDialog.setCancelable(false);
 
 	}
 
@@ -96,7 +111,11 @@ public class TableActivity extends BaseActivity {
 			try {
 				Message msg = new Message();
 				mSettings.clear();
+				mNotificaion.clear();
+				mNotificaion.getNotifiycations();
+				mNotificationType.getNotifiycationsType();
 				int ret = mSettings.getTableStatus();
+				mpDialog.cancel();
 				if (ret < 0) {
 					tableHandle.sendEmptyMessage(ret);
 					return;
@@ -109,18 +128,18 @@ public class TableActivity extends BaseActivity {
 		}
 	}
 
-	class refreshThread implements Runnable {
+	class cleanNotification implements Runnable {
 		public void run() {
 			try {
 				Message msg = new Message();
-				mSettings.clear();
-				int ret = mSettings.getTableStatus();
+				handler.removeCallbacks(runnable); // 停止刷新
+				int ret = mNotificaion.cleanNotifications(Info.getTableId());
 				if (ret < 0) {
-					refreshHandle.sendEmptyMessage(ret);
+					notificationHandle.sendEmptyMessage(ret);
 					return;
 				}
 				msg.what = ret;
-				refreshHandle.sendMessage(msg);
+				notificationHandle.sendMessage(msg);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -135,15 +154,31 @@ public class TableActivity extends BaseActivity {
 				int arg2,// The position of the view in the adapter
 				long arg3// The row id of the item that was clicked
 		) {
-			mpDialog = new ProgressDialog(TableActivity.this);
-			mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-			mpDialog.setTitle("请稍等");
-			mpDialog.setMessage("正在获取状态...");
-			mpDialog.setIndeterminate(false);
-			mpDialog.setCancelable(false);
-			mpDialog.show();
-			new Thread(new refreshThread()).start();
-			tableId = arg2;
+
+			Info.setTableName(mSettings.getName(arg2));
+			Info.setTableId(mSettings.getId(arg2));
+			int id = mSettings.getStatus(arg2);
+			switch (id) {
+			case 1:
+				Dialog cleanDialog = cleanDialog();
+				cleanDialog.show();
+				break;
+			case 2:
+				AlertDialog.Builder addPhoneDilog = addPhoneDialog();
+				addPhoneDilog.show();
+				break;
+			case 100:
+			case 101:
+			case 102:
+				AlertDialog.Builder notificationDialog = notificationDialog();
+				notificationDialog.show();
+				break;
+			default:
+				AlertDialog.Builder addDialog = addDialog();
+				addDialog.show();
+				break;
+			}
+			saImageItems.notifyDataSetChanged();
 
 		}
 	}
@@ -165,7 +200,7 @@ public class TableActivity extends BaseActivity {
 		}
 	}
 
-	private AlertDialog.Builder networkArlertDialog() {
+	private AlertDialog.Builder networkDialog() {
 		final AlertDialog.Builder mAlertDialog = new AlertDialog.Builder(
 				TableActivity.this);
 		mAlertDialog.setTitle("错误");// 设置对话框标题
@@ -193,7 +228,7 @@ public class TableActivity extends BaseActivity {
 		return mAlertDialog;
 	}
 
-	private AlertDialog.Builder cleanTableAlertDialog() {
+	private AlertDialog.Builder cleanTableDialog() {
 		final AlertDialog.Builder mAlertDialog = new AlertDialog.Builder(
 				TableActivity.this);
 		mAlertDialog.setMessage("请确认是否清台");// 设置对话框内容
@@ -225,7 +260,7 @@ public class TableActivity extends BaseActivity {
 				TableActivity.this);
 		addDialog.setTitle("选择功能") // 标题
 				.setIcon(R.drawable.ic_launcher) // icon
-			//	.setCancelable(true) // 不响应back按钮
+				// .setCancelable(true) // 不响应back按钮
 				.setItems(additems, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
@@ -250,45 +285,58 @@ public class TableActivity extends BaseActivity {
 				}).create();
 		return addDialog;
 	}
-	
+
 	private AlertDialog.Builder addPhoneDialog() {
-		final CharSequence[] additems = {"手机已点的菜"};
+		final CharSequence[] additems = { "手机已点的菜", "清台" };
 
 		AlertDialog.Builder addPhoneDialog = new AlertDialog.Builder(
 				TableActivity.this);
 		addPhoneDialog.setTitle("选择功能") // 标题
 				.setIcon(R.drawable.ic_launcher) // icon
-			//	.setCancelable(true) // 不响应back按钮
+				// .setCancelable(true) // 不响应back按钮
 				.setItems(additems, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						Intent intent = new Intent();
 						switch (which) {
-//						case 0:
-//							intent.setClass(TableActivity.this,
-//									MenuActivity.class);
-//							Info.setMode(Info.WORK_MODE_CUSTOMER);
-//							Info.setNewCustomer(true);
-//							TableActivity.this.startActivity(intent);
-//							TableActivity.this.finish();
-//							break;
-//						case 1:
-//							intent.setClass(TableActivity.this,
-//									MenuActivity.class);
-//							Info.setMode(Info.WORK_MODE_WAITER);
-//							TableActivity.this.startActivity(intent);
-//							break;
 						case 0:
 							intent.setClass(TableActivity.this,
 									PhoneActivity.class);
 							TableActivity.this.startActivity(intent);
+							break;
+						case 1:
+							final AlertDialog.Builder mAlertDialog = cleanTableDialog();
+							mAlertDialog.show();
+							break;
+						default:
 							break;
 						}
 					}
 				}).create();
 		return addPhoneDialog;
 	}
-	
+
+	private AlertDialog.Builder notificationDialog() {
+		List<String> add = mNotificaion
+				.getNotifiycationsType(Info.getTableId());
+		String[] additems = (String[]) add.toArray(new String[add.size()]);
+		AlertDialog.Builder addPhoneDialog = new AlertDialog.Builder(
+				TableActivity.this);
+		addPhoneDialog.setTitle("客户呼叫需求").setIcon(R.drawable.ic_launcher)
+				.setItems(additems, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+					}
+				})
+				.setNegativeButton("确定", new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						new Thread(new cleanNotification()).start();
+					}
+				}).create();
+		return addPhoneDialog;
+	}
 
 	private Dialog cleanDialog() {
 		final CharSequence[] cleanitems = { "清台", "删除菜", "添加菜", "查看菜" };
@@ -302,7 +350,7 @@ public class TableActivity extends BaseActivity {
 						Intent intent = new Intent();
 						switch (which) {
 						case 0:
-							final AlertDialog.Builder mAlertDialog = cleanTableAlertDialog();
+							final AlertDialog.Builder mAlertDialog = cleanTableDialog();
 							mAlertDialog.show();
 							break;
 						case 1:
@@ -310,6 +358,7 @@ public class TableActivity extends BaseActivity {
 							TableActivity.this.startActivity(intent);
 							break;
 						case 2:
+
 							intent.setClass(TableActivity.this,
 									MenuActivity.class);
 							Info.setMode(Info.WORK_MODE_WAITER);
@@ -329,54 +378,111 @@ public class TableActivity extends BaseActivity {
 
 	private Handler tableHandle = new Handler() {
 		public void handleMessage(Message msg) {
-			mpDialog.cancel();
 			if (msg.what < 0) {
-				final AlertDialog.Builder mAlertDialog = networkArlertDialog();
+				final AlertDialog.Builder mAlertDialog = networkDialog();
 				mAlertDialog.show();
 			} else {
-
 				gridview = (GridView) findViewById(R.id.gridview);
-				ArrayList<HashMap<String, String>> lstImageItem = new ArrayList<HashMap<String, String>>();
-				lstImageItem.clear();
 				mTableSettings.clear();
-				for (int i = 0; i < mSettings.size(); i++) {
-					HashMap<String, String> map = new HashMap<String, String>();
-					map.put("ItemText", "第" + mSettings.getName(i) + "桌");
-					lstImageItem.add(map);
-				}
-				saImageItems = new SimpleAdapter(TableActivity.this,
-						lstImageItem, R.layout.table_item,
-						new String[] { "ItemText" },
-						new int[] { R.id.ItemText }) {
+				Log.d("Notification", "NotificationNum:" + mNotificaion.size());
+				if (lstImageItem.size() > 0) {
+					for (int i = 0, n = 0; i < mSettings.size(); i++) {
+						int status = mSettings.getStatus(i);
+						if (status < 100
+								&& mNotificaion.getId(n) == mSettings.getId(i)) {
 
-					@Override
-					public View getView(int position, View convertView,
-							ViewGroup parent) {
-						convertView = TableActivity.this.getLayoutInflater()
-								.inflate(R.layout.grid_item, null);
-						ImageView Image = (ImageView) convertView
-								.findViewById(R.id.ItemImage);
-						TextView text = (TextView) convertView
-								.findViewById(R.id.ItemText);
-						text.setText("第" + mSettings.getName(position) + "桌");
-						if (mSettings.getStatus(position) == 1) {
-							Image.setImageResource(R.drawable.table_blue);
-
-						} else if (mSettings.getStatus(position) == 0) {
-							Image.setImageResource(R.drawable.table_red);
-						} else if(mSettings.getStatus(position) == 2){
-							Image.setImageResource(R.drawable.table_yellow);
+							status = status + 100;
+							n++;
+							Log.d("mNotificaionID", "mNotificaionID"
+									+ mNotificaion.getId(n)
+									+ " mSettings.getId:" + mSettings.getId(i));
+							Log.d("statusImage", "statusImage" + status
+									+ " num:" + i);
 						}
-						return convertView;
-					}
 
-				};
-				gridview.setAdapter(saImageItems);
+						switch (status) {
+						case 1:
+							lstImageItem.get(i).put("imageItem",
+									R.drawable.table_blue);
+							break;
+						case 2:
+							lstImageItem.get(i).put("imageItem",
+									R.drawable.table_yellow);
+							break;
+						case 100:
+							lstImageItem.get(i).put("imageItem",
+									R.drawable.table_rednotification);
+							mSettings.setStatus(i, 100);
+							break;
+						case 101:
+							lstImageItem.get(i).put("imageItem",
+									R.drawable.table_bluenotification);
+							mSettings.setStatus(i, 101);
+							break;
+						case 102:
+							lstImageItem.get(i).put("imageItem",
+									R.drawable.table_yellownotification);
+							mSettings.setStatus(i, 102);
+							break;
+						default:
+							lstImageItem.get(i).put("imageItem",
+									R.drawable.table_red);
+							break;
+						}
+					}
+				} else {
+					for (int i = 0, n = 0; i < mSettings.size(); i++) {
+						int status = mSettings.getStatus(i);
+						if (status < 100
+								&& mNotificaion.getId(n) == mSettings.getId(i)) {
+							status = status + 100;
+							n++;
+						}
+
+						HashMap<String, Object> map = new HashMap<String, Object>();
+						map.put("ItemText", "第" + mSettings.getName(i) + "桌");
+						switch (status) {
+						case 1:
+							map.put("imageItem", R.drawable.table_blue);
+							break;
+						case 2:
+							map.put("imageItem", R.drawable.table_yellow);
+							break;
+						case 100:
+							map.put("imageItem",
+									R.drawable.table_rednotification);
+							mSettings.setStatus(i, 100);
+							break;
+						case 101:
+							map.put("imageItem",
+									R.drawable.table_bluenotification);
+							mSettings.setStatus(i, 101);
+							break;
+						case 102:
+							map.put("imageItem",
+									R.drawable.table_yellownotification);
+							mSettings.setStatus(i, 102);
+							break;
+						default:
+							map.put("imageItem", R.drawable.table_red);
+							break;
+
+						}
+						lstImageItem.add(map);
+					}
+					saImageItems = new SimpleAdapter(TableActivity.this,
+							lstImageItem, R.layout.grid_item, new String[] {
+									"imageItem", "ItemText" }, new int[] {
+									R.id.ItemImage, R.id.ItemText }) {
+					};
+					gridview.setAdapter(saImageItems);
+				}
 				saImageItems.notifyDataSetChanged();
 				gridview.setOnItemClickListener(new ItemClickListener());
 			}
 		}
 	};
+
 	private Handler userHandle = new Handler() {
 
 		public void handleMessage(Message msg) {
@@ -391,31 +497,17 @@ public class TableActivity extends BaseActivity {
 			}
 		}
 	};
-	private Handler refreshHandle = new Handler() {
+
+	private Handler notificationHandle = new Handler() {
 		public void handleMessage(Message msg) {
-			mpDialog.cancel();
 			if (msg.what < 0) {
-				Toast.makeText(getApplicationContext(),
-						getResources().getString(R.string.tableWarning),
-						Toast.LENGTH_SHORT).show();
+				Toast.makeText(getApplicationContext(), "b", Toast.LENGTH_SHORT)
+						.show();
 			} else {
-				Info.setTableName(mSettings.getName(tableId));
-				Info.setTableId(mSettings.getId(tableId));
-
-				AlertDialog.Builder addDialog = addDialog();
-				AlertDialog.Builder addPhoneDilog = addPhoneDialog();
-				Dialog cleanDialog = cleanDialog();
-				
-
-				if (mSettings.getStatus(tableId) == 0) {
-					addDialog.show();
-				//	addPhoneDilog.show();
-				} else if(mSettings.getStatus(tableId) == 1){
-					cleanDialog.show();
-				} else {
-					addPhoneDilog.show();
-				}
-				saImageItems.notifyDataSetChanged();
+				Toast.makeText(getApplicationContext(),
+						getResources().getString(R.string.claenNotificaion),
+						Toast.LENGTH_SHORT).show();
+				handler.postDelayed(runnable, 100 * 1);
 			}
 		}
 	};
@@ -425,9 +517,11 @@ public class TableActivity extends BaseActivity {
 			public void run() {
 				try {
 					Message msg = new Message();
-					mSettings.updatusStatus(mSettings.getId(tableId), 0);
-					mSettings.cleanTalble(mSettings.getId(tableId));
+					mSettings.updatusStatus(Info.getTableId(), 0);
+					mMyOrder.delPhoneTable(Info.getTableId(), 0);
+					mSettings.cleanTalble(Info.getTableId());
 					mSettings.clear();
+					mNotificaion.getNotifiycations();
 					int ret = mSettings.getTableStatus();
 					if (ret < 0) {
 						tableHandle.sendEmptyMessage(ret);
@@ -461,7 +555,7 @@ public class TableActivity extends BaseActivity {
 
 		}
 	};
-	
+
 	private OnClickListener manageClicked = new OnClickListener() {
 
 		@Override
@@ -476,7 +570,7 @@ public class TableActivity extends BaseActivity {
 
 		}
 	};
-	
+
 	private OnClickListener statisticsClicked = new OnClickListener() {
 		@Override
 		public void onClick(View v) {
@@ -543,5 +637,15 @@ public class TableActivity extends BaseActivity {
 
 	};
 
+	private Runnable runnable = new Runnable() {
+		public void run() {
+			this.update();
+		}
 
+		void update() {
+			// 刷新msg的内容
+			new Thread(new tableThread()).start();
+			handler.postDelayed(this, 1000 * 10);// 间隔20秒
+		}
+	};
 }
