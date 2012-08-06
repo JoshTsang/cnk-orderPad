@@ -35,7 +35,7 @@ public class PhoneActivity extends BaseActivity {
 	private TextView mDishCountTxt;
 	private TextView mTotalPriceTxt;
 	private ListView mMyOrderLst;
-	private MyOrder mMyOrder = new MyOrder();
+	private MyOrder mMyOrder = new MyOrder(PhoneActivity.this);
 	private MyOrderAdapter mMyOrderAdapter;
 	private ProgressDialog mpDialog;
 	private TableSetting mSettings = new TableSetting();

@@ -11,51 +11,34 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.htb.cnk.adapter.MyOrderAdapter;
 import com.htb.cnk.data.Info;
-import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.data.MyOrder.OrderedDish;
-import com.htb.cnk.lib.BaseActivity;
+import com.htb.cnk.lib.OrderBaseActivity;
 
-public class DelOrderActivity extends BaseActivity {
-	private Button mBackBtn;
-	private Button mDelBtn;
-	private TextView mTableNumTxt;
-	private TextView mDishCountTxt;
-	private TextView mTotalPriceTxt;
-	private ListView mMyOrderLst;
-	private MyOrder mMyOrder;
+public class DelOrderActivity extends OrderBaseActivity {
 	private MyOrderAdapter mMyOrderAdapter;
-	private int dId;
 	private TableSetting mSettings = new TableSetting();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.myorder_activity);
-		findViews();
-		updateTabelInfos();
-		setClickListener();
+		mMyOrder.clear();
+		setDelViews();
+		setDelClickListener();
+		new Thread(new delThread()).start();
 	}
 
-	private void findViews() {
-		mBackBtn = (Button) findViewById(R.id.back_btn);
-		mDelBtn = (Button) findViewById(R.id.left_btn);
-		mTableNumTxt = (TextView) findViewById(R.id.tableNum);
-		mDishCountTxt = (TextView) findViewById(R.id.dishCount);
-		mTotalPriceTxt = (TextView) findViewById(R.id.totalPrice);
-		mMyOrderLst = (ListView) findViewById(R.id.myOrderList);
-		Button submit = (Button) findViewById(R.id.submit);
-		submit.setVisibility(View.GONE);
-		mDelBtn.setText("全部删除");
+	private void setDelViews() {
+		mSubmitBtn.setVisibility(View.GONE);
+		mLeftBtn.setText("全部删除");
 	}
 
-	private void fillData() {
+	private void fillDelData() {
 		mTableNumTxt.setText(Info.getTableName());
 		mDishCountTxt.setText(Integer.toString(mMyOrder.totalQuantity()) + " 道菜");
 		mTotalPriceTxt
@@ -87,7 +70,7 @@ public class DelOrderActivity extends BaseActivity {
 				// .setText(Integer.toString(dishDetail.getQuantity()));
 
 				minusBtn.setTag(position);
-				minusBtn.setOnClickListener(minusClicked);
+				minusBtn.setOnClickListener(delClicked);
 
 				return convertView;
 			}
@@ -97,14 +80,12 @@ public class DelOrderActivity extends BaseActivity {
 
 	}
 
-	private void setClickListener() {
-		mBackBtn.setOnClickListener(backBtnClicked);
-		mDelBtn.setOnClickListener(cleanBtnClicked);
-
+	private void setDelClickListener() {
+		mLeftBtn.setOnClickListener(cleanBtnClicked);
 	}
 
-	private void updateDishQuantity(int position, int quantity) {
-		dId = position;
+	private void delDish(int position) {
+		final int dId = position;
 		Log.d("dId", "did+" + mMyOrder.getOrderedDish(dId).getDishId());
 		new Thread() {
 			public void run() {
@@ -125,15 +106,6 @@ public class DelOrderActivity extends BaseActivity {
 				}
 			}
 		}.start();
-	//	mMyOrder.removeItem(dId);
-//		fillData();
-//		mMyOrderAdapter.notifyDataSetChanged();
-	}
-
-	private void updateTabelInfos() {
-		mMyOrder = new MyOrder(DelOrderActivity.this);
-		mMyOrder.clear();
-		new Thread(new delThread()).start();
 	}
 
 	Handler delHandler = new Handler() {
@@ -143,7 +115,7 @@ public class DelOrderActivity extends BaseActivity {
 						getResources().getString(R.string.delWarning),
 						Toast.LENGTH_SHORT).show();
 			} else {
-				fillData();
+				fillDelData();
 				mMyOrderAdapter.notifyDataSetChanged();
 			}
 		}
@@ -168,7 +140,7 @@ public class DelOrderActivity extends BaseActivity {
 
 	}
 
-	private void minusDishQuantity(final int position, final int quantity) {
+	private void delDishAlert(final int position) {
 
 		new AlertDialog.Builder(DelOrderActivity.this)
 				.setTitle("请注意")
@@ -178,8 +150,7 @@ public class DelOrderActivity extends BaseActivity {
 
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						updateDishQuantity(position, -quantity);
-
+						delDish(position);
 					}
 				})
 				.setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -191,14 +162,6 @@ public class DelOrderActivity extends BaseActivity {
 				}).show();
 
 	}
-
-	private OnClickListener backBtnClicked = new OnClickListener() {
-
-		@Override
-		public void onClick(View v) {
-			DelOrderActivity.this.finish();
-		}
-	};
 
 	private OnClickListener cleanBtnClicked = new OnClickListener() {
 
@@ -227,7 +190,7 @@ public class DelOrderActivity extends BaseActivity {
 			}.start();
 
 			
-			fillData();
+			fillDelData();
 			mMyOrderAdapter.notifyDataSetChanged();
 
 		}
@@ -242,17 +205,17 @@ public class DelOrderActivity extends BaseActivity {
 			} else {
 				mMyOrder.clear();
 				mMyOrderAdapter.notifyDataSetChanged();
-				fillData();
+				fillDelData();
 
 			}
 		}
 	};
 
-	private OnClickListener minusClicked = new OnClickListener() {
+	private OnClickListener delClicked = new OnClickListener() {
 
 		public void onClick(View v) {
 			final int position = Integer.parseInt(v.getTag().toString());
-			minusDishQuantity(position, 1);
+			delDishAlert(position);
 		}
 	};
 

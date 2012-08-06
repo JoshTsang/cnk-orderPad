@@ -34,7 +34,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.htb.cnk.data.Info;
-import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.data.UserData;
 import com.htb.cnk.lib.BaseActivity;
@@ -43,7 +42,6 @@ public class TableActivity extends BaseActivity {
 
 	private TableSetting mSettings = new TableSetting();
 	protected List<Map<String, String>> mTableSettings = new ArrayList<Map<String, String>>();
-	private MyOrder myOrder = new MyOrder();
 	private Button mBackBtn;
 	private Button mUpdateBtn;
 	private Button mStatisticsBtn;
@@ -304,26 +302,24 @@ public class TableActivity extends BaseActivity {
 						Intent intent = new Intent();
 						switch (which) {
 						case 0:
-							myOrder.clear();
 							final AlertDialog.Builder mAlertDialog = cleanTableAlertDialog();
 							mAlertDialog.show();
 							break;
 						case 1:
-							intent.setClass(TableActivity.this,
-									DelOrderActivity.class);
+							intent.setClass(TableActivity.this, DelOrderActivity.class);
 							TableActivity.this.startActivity(intent);
 							break;
 						case 2:
-							myOrder.clear();
 							intent.setClass(TableActivity.this,
 									MenuActivity.class);
 							Info.setMode(Info.WORK_MODE_WAITER);
 							TableActivity.this.startActivity(intent);
 							break;
 						case 3:
-							intent.setClass(TableActivity.this,
-									QueryOrderActivity.class);
+							intent.setClass(TableActivity.this, QueryOrderActivity.class);
 							TableActivity.this.startActivity(intent);
+							break;
+						default:break;
 						}
 
 					}
@@ -453,6 +449,7 @@ public class TableActivity extends BaseActivity {
 			TableActivity.this.finish();
 		}
 	};
+	
 	private OnClickListener updateClicked = new OnClickListener() {
 
 		@Override
