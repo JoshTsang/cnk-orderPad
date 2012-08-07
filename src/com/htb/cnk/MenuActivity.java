@@ -57,12 +57,13 @@ public class MenuActivity extends BaseActivity {
 	private Categories mCategories;
 	private Dishes mDishes;
 	private DishListAdapter mDishLstAdapter;
-	private MyOrder mMyOrder = new MyOrder(MenuActivity.this);
+	private MyOrder mMyOrder;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.menu_activity);
+		mMyOrder = new MyOrder(MenuActivity.this);
 		mDishes = new Dishes(this);
 		mCategories = new Categories(this);
 		findViews();
