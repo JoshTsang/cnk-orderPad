@@ -244,7 +244,6 @@ public class MyOrder {
 			return 0;
 		} catch (Exception e) {
 			e.printStackTrace();
-			// TODO: handle exception
 		}
 
 		return -1;
@@ -269,8 +268,7 @@ public class MyOrder {
 			return 0;
 
 		} catch (Exception e) {
-
-			// TODO: handle exception
+			e.printStackTrace();
 		}
 
 		return -1;

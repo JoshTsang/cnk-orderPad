@@ -3,6 +3,7 @@ package com.htb.cnk;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -29,12 +30,13 @@ import com.htb.cnk.lib.BaseActivity;
  */
 public class PhoneActivity extends BaseActivity {
 	private Button mBackBtn;
+	private Button mLeftBtn;
 	private Button mSubmitBtn;
 	private TextView mTableNumTxt;
 	private TextView mDishCountTxt;
 	private TextView mTotalPriceTxt;
 	private ListView mMyOrderLst;
-	private MyOrder mMyOrder = new MyOrder(PhoneActivity.this);
+	private MyOrder mMyOrder = new MyOrder();
 	private MyOrderAdapter mMyOrderAdapter;
 	private ProgressDialog mpDialog;
 	private TableSetting mSettings = new TableSetting();
@@ -51,6 +53,7 @@ public class PhoneActivity extends BaseActivity {
 
 	private void findViews() {
 		mBackBtn = (Button) findViewById(R.id.back_btn);
+		mLeftBtn = (Button) findViewById(R.id.left_btn);
 		mSubmitBtn = (Button) findViewById(R.id.submit);
 		mTableNumTxt = (TextView) findViewById(R.id.tableNum);
 		mDishCountTxt = (TextView) findViewById(R.id.dishCount);
@@ -59,6 +62,7 @@ public class PhoneActivity extends BaseActivity {
 	}
 
 	private void fillData() {
+		mLeftBtn.setText(R.string.phoneAdd);
 		mTableNumTxt.setText(Info.getTableName());
 		mMyOrderAdapter = getMyOrderAdapterInstance();
 		mMyOrderLst.setAdapter(mMyOrderAdapter);
@@ -133,6 +137,7 @@ public class PhoneActivity extends BaseActivity {
 	private void setClickListener() {
 		mBackBtn.setOnClickListener(backBtnClicked);
 		mSubmitBtn.setOnClickListener(submitBtnClicked);
+		mLeftBtn.setOnClickListener(leftBtnClicked);
 	}
 
 	Handler queryHandler = new Handler() {
@@ -270,6 +275,7 @@ public class PhoneActivity extends BaseActivity {
 
 		@Override
 		public void onClick(View v) {
+			mMyOrder.clear();
 			PhoneActivity.this.finish();
 		}
 	};
@@ -336,7 +342,18 @@ public class PhoneActivity extends BaseActivity {
 			}.start();
 		}
 	};
+	
+	private OnClickListener leftBtnClicked = new OnClickListener() {
 
+		@Override
+		public void onClick(View v) {
+			Intent intent = new Intent();
+			intent.setClass(PhoneActivity.this, MenuActivity.class);
+			Info.setMode(Info.WORK_MODE_CUSTOMER);
+			startActivity(intent);
+		}
+	};
+	
 	private Handler handler = new Handler() {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();

@@ -24,7 +24,7 @@
 	        	android:background="#00000000"/>
 	        <Button android:id="@+id/left_btn"
  	            android:textColor="#F9E8BB"
-	        	android:textSize="25dip"
+	        	android:textSize="30dip"
 	            android:layout_width="120dip"
 		    	android:layout_height="60dip"
 		    	android:gravity="center"
