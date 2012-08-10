@@ -32,9 +32,10 @@ import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 import com.htb.cnk.data.Info;
-import com.htb.cnk.data.MyOrder;
+import com.htb.cnk.data.PadOrder;
 import com.htb.cnk.data.NotificationTypes;
 import com.htb.cnk.data.Notifications;
+import com.htb.cnk.data.PhoneOrder;
 import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.data.UserData;
 import com.htb.cnk.lib.BaseActivity;
@@ -54,16 +55,21 @@ public class TableActivity extends BaseActivity {
 	private ArrayList<HashMap<String, Object>> lstImageItem = new ArrayList<HashMap<String, Object>>();
 	private Notifications mNotificaion = new Notifications();
 	private NotificationTypes mNotificationType = new NotificationTypes();
-	private MyOrder mMyOrder = new MyOrder();
+	private PadOrder mMyOrder;
+	private PhoneOrder mPhoneOrder;
+
+
 	@Override
 	protected void onDestroy() {
 		handler.removeCallbacks(runnable); // 停止刷新
+		handler.removeCallbacksAndMessages(runnable); // 停止刷新
 		super.onDestroy();
 	}
 
 	@Override
 	protected void onStop() {
 		handler.removeCallbacks(runnable); // 停止刷新
+		handler.removeCallbacksAndMessages(runnable); // 停止刷新
 		super.onStop();
 	}
 
@@ -81,6 +87,8 @@ public class TableActivity extends BaseActivity {
 		this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setContentView(R.layout.table_activity);
+		mMyOrder = new PadOrder(TableActivity.this);
+		mPhoneOrder = new  PhoneOrder(TableActivity.this);
 		findViews();
 		setClickListeners();
 		mpDialog = new ProgressDialog(TableActivity.this);
@@ -264,6 +272,7 @@ public class TableActivity extends BaseActivity {
 				.setItems(additems, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
+						mMyOrder.clear();
 						Intent intent = new Intent();
 						switch (which) {
 						case 0:
@@ -287,7 +296,7 @@ public class TableActivity extends BaseActivity {
 	}
 
 	private AlertDialog.Builder addPhoneDialog() {
-		final CharSequence[] additems = { "手机已点的菜", "清台" };
+		final CharSequence[] additems = { "手机已点的菜", "取消手机已点菜" };
 
 		AlertDialog.Builder addPhoneDialog = new AlertDialog.Builder(
 				TableActivity.this);
@@ -354,21 +363,23 @@ public class TableActivity extends BaseActivity {
 							mAlertDialog.show();
 							break;
 						case 1:
-							intent.setClass(TableActivity.this, DelOrderActivity.class);
+							intent.setClass(TableActivity.this,
+									DelOrderActivity.class);
 							TableActivity.this.startActivity(intent);
 							break;
 						case 2:
-
 							intent.setClass(TableActivity.this,
 									MenuActivity.class);
 							Info.setMode(Info.WORK_MODE_WAITER);
 							TableActivity.this.startActivity(intent);
 							break;
 						case 3:
-							intent.setClass(TableActivity.this, QueryOrderActivity.class);
+							intent.setClass(TableActivity.this,
+									QueryOrderActivity.class);
 							TableActivity.this.startActivity(intent);
 							break;
-						default:break;
+						default:
+							break;
 						}
 
 					}
@@ -518,7 +529,7 @@ public class TableActivity extends BaseActivity {
 				try {
 					Message msg = new Message();
 					mSettings.updatusStatus(Info.getTableId(), 0);
-					mMyOrder.delPhoneTable(Info.getTableId(), 0);
+					mPhoneOrder.delPhoneTable(Info.getTableId(), 0);
 					mSettings.cleanTalble(Info.getTableId());
 					mSettings.clear();
 					mNotificaion.getNotifiycations();
@@ -543,7 +554,7 @@ public class TableActivity extends BaseActivity {
 			TableActivity.this.finish();
 		}
 	};
-	
+
 	private OnClickListener updateClicked = new OnClickListener() {
 
 		@Override
@@ -644,8 +655,9 @@ public class TableActivity extends BaseActivity {
 
 		void update() {
 			// 刷新msg的内容
+		//	Log.d("runnalbe", "update");
 			new Thread(new tableThread()).start();
-			handler.postDelayed(this, 1000 * 10);// 间隔20秒
+			handler.postDelayed(this, 1000 * 15);// 间隔15秒
 		}
 	};
 }

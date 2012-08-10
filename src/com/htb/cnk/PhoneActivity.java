@@ -18,9 +18,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.htb.cnk.adapter.MyOrderAdapter;
+import com.htb.cnk.adapter.PadOrderAdapter;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder;
-import com.htb.cnk.data.MyOrder.OrderedDish;
+import com.htb.cnk.data.PadOrder;
+import com.htb.cnk.data.PadOrder.OrderedDish;
+import com.htb.cnk.data.PhoneOrder;
 import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.lib.BaseActivity;
 
@@ -29,6 +32,7 @@ import com.htb.cnk.lib.BaseActivity;
  * 
  */
 public class PhoneActivity extends BaseActivity {
+
 	private Button mBackBtn;
 	private Button mLeftBtn;
 	private Button mSubmitBtn;
@@ -36,19 +40,37 @@ public class PhoneActivity extends BaseActivity {
 	private TextView mDishCountTxt;
 	private TextView mTotalPriceTxt;
 	private ListView mMyOrderLst;
-	private MyOrder mMyOrder = new MyOrder();
+	private MyOrder mMyOrder;
+	private PhoneOrder mPhoneOrder;
 	private MyOrderAdapter mMyOrderAdapter;
 	private ProgressDialog mpDialog;
 	private TableSetting mSettings = new TableSetting();
 
 	@Override
+	protected void onResume() {
+		Log.d("onResume", "onResume");
+		updateTabelInfos();
+		
+		super.onResume();
+	}
+
+	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.myorder_activity);
+		mMyOrder = new MyOrder(PhoneActivity.this);
+		mPhoneOrder =new PhoneOrder(PhoneActivity.this);
+		mpDialog = new ProgressDialog(
+				PhoneActivity.this);
+		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+		mpDialog.setTitle("请稍等");
+		mpDialog.setMessage("正在删除菜单...");
+		mpDialog.setIndeterminate(false);
+		mpDialog.setCancelable(false);
 		findViews();
-		fillData();
 		setClickListener();
-		updateTabelInfos();
+		fillData();
+		
 	}
 
 	private void findViews() {
@@ -61,7 +83,7 @@ public class PhoneActivity extends BaseActivity {
 		mMyOrderLst = (ListView) findViewById(R.id.myOrderList);
 	}
 
-	private void fillData() {
+	private void fillData(){
 		mLeftBtn.setText(R.string.phoneAdd);
 		mTableNumTxt.setText(Info.getTableName());
 		mMyOrderAdapter = getMyOrderAdapterInstance();
@@ -86,7 +108,7 @@ public class PhoneActivity extends BaseActivity {
 							.inflate(R.layout.item_ordereddish, null);
 				}
 				OrderedDish dishDetail = mMyOrder.getOrderedDish(position);
-
+				Log.d("OrderedDish", (dishDetail.getName()+" aaa "+ dishDetail.getPrice()));
 				dishName = (TextView) convertView.findViewById(R.id.dishName);
 				dishPrice = (TextView) convertView.findViewById(R.id.dishPrice);
 				dishQuantity = (TextView) convertView
@@ -142,29 +164,21 @@ public class PhoneActivity extends BaseActivity {
 
 	Handler queryHandler = new Handler() {
 		public void handleMessage(Message msg) {
+		
 			if (msg.what < 0) {
 				Toast.makeText(getApplicationContext(),
 						getResources().getString(R.string.delWarning),
 						Toast.LENGTH_SHORT).show();
-
-				fillData();
-				mDishCountTxt
-						.setText(Integer.toString(mMyOrder.totalQuantity())
-								+ " 道菜");
-				mTotalPriceTxt
-						.setText(Double.toString(mMyOrder.getTotalPrice())
-								+ " 元");
 			} else {
-				fillData();
-				mDishCountTxt
-						.setText(Integer.toString(mMyOrder.totalQuantity())
-								+ " 道菜");
-				mTotalPriceTxt
-						.setText(Double.toString(mMyOrder.getTotalPrice())
-								+ " 元");
+				mMyOrder.addOrder();
+				mpDialog.cancel();
 				mMyOrderAdapter.notifyDataSetChanged();
-
+				Log.d("phone", (mMyOrderAdapter.getCount()+" a"));
 			}
+			mDishCountTxt.setText(Integer.toString(mMyOrder.totalQuantity())
+					+ " 道菜");
+			mTotalPriceTxt.setText(Double.toString(mMyOrder.getTotalPrice())
+					+ " 元");
 		}
 	};
 
@@ -172,8 +186,12 @@ public class PhoneActivity extends BaseActivity {
 		public void run() {
 			Message msg = new Message();
 			try {
-				int ret = mMyOrder.getTablePhoneFromDB(Info.getTableId());
+				int ret = mPhoneOrder.getTablePhoneFromDB(Info.getTableId());
 				msg.what = ret;
+				if (ret < 0) {
+					queryHandler.sendEmptyMessage(ret);
+					return;
+				}
 				queryHandler.sendMessage(msg);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -188,6 +206,7 @@ public class PhoneActivity extends BaseActivity {
 			mMyOrder.minus(position, -quantity);
 		} else {
 			mMyOrder.add(position, quantity);
+			updatePhoneOrder(position);
 		}
 
 		mMyOrderAdapter.notifyDataSetChanged();
@@ -198,9 +217,8 @@ public class PhoneActivity extends BaseActivity {
 	}
 
 	private void updateTabelInfos() {
-		mMyOrder = new MyOrder(PhoneActivity.this);
-		mMyOrder.clear();
-		new Thread(new queryThread()).start();
+			mpDialog.show();
+			new Thread(new queryThread()).start();
 	}
 
 	private void minusDishQuantity(final int position, final int quantity) {
@@ -220,19 +238,11 @@ public class PhoneActivity extends BaseActivity {
 								@Override
 								public void onClick(DialogInterface dialog,
 										int which) {
-									
 									delPhoneTableThread(position);
-									mpDialog = new ProgressDialog(PhoneActivity.this);
-									mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-									mpDialog.setTitle("请稍等");
-									mpDialog.setMessage("正在删除菜单...");
-									mpDialog.setIndeterminate(false);
-									mpDialog.setCancelable(false);
 									mpDialog.show();
 									updateDishQuantity(position, -quantity);
 								}
-							})
-					.setNegativeButton("取消",null).show();
+							}).setNegativeButton("取消", null).show();
 		}
 	}
 
@@ -240,7 +250,7 @@ public class PhoneActivity extends BaseActivity {
 		new Thread() {
 			public void run() {
 				Message msg = new Message();
-				int ret = mMyOrder.updatePhoneOrder(Info.getTableId(), mMyOrder
+				int ret = mPhoneOrder.updatePhoneOrder(Info.getTableId(), mMyOrder
 						.getOrderedDish(position).getQuantity(), mMyOrder
 						.getDishId(position));
 				if (ret < 0) {
@@ -256,16 +266,15 @@ public class PhoneActivity extends BaseActivity {
 	private void delPhoneTableThread(final int position) {
 		new Thread() {
 			public void run() {
-				int ret = mMyOrder.delPhoneTable(
-						Info.getTableId(),
+				Message msg = new Message();
+				int ret = mPhoneOrder.delPhoneTable(Info.getTableId(),
 						mMyOrder.getDishId(position));
 				mpDialog.cancel();
 				if (ret < 0) {
-					delPhoneOrderhandler
-							.sendEmptyMessage(-1);
+					delPhoneOrderhandler.sendEmptyMessage(-1);
 				} else {
-					delPhoneOrderhandler
-							.sendEmptyMessage(0);
+					msg.what = ret;
+					delPhoneOrderhandler.sendMessage(msg);
 				}
 			}
 		}.start();
@@ -275,7 +284,6 @@ public class PhoneActivity extends BaseActivity {
 
 		@Override
 		public void onClick(View v) {
-			mMyOrder.clear();
 			PhoneActivity.this.finish();
 		}
 	};
@@ -332,7 +340,7 @@ public class PhoneActivity extends BaseActivity {
 						if ("".equals(ret)) {
 							handler.sendEmptyMessage(0);
 							mSettings.updatusStatus(Info.getTableId(), 1);
-							mMyOrder.delPhoneTable(Info.getTableId(), 0);
+							mPhoneOrder.delPhoneTable(Info.getTableId(), 0);
 						} else {
 							handler.sendEmptyMessage(-1);
 						}
@@ -342,28 +350,26 @@ public class PhoneActivity extends BaseActivity {
 			}.start();
 		}
 	};
-	
+
 	private OnClickListener leftBtnClicked = new OnClickListener() {
 
 		@Override
 		public void onClick(View v) {
 			Intent intent = new Intent();
 			intent.setClass(PhoneActivity.this, MenuActivity.class);
-			Info.setMode(Info.WORK_MODE_CUSTOMER);
+			Info.setMode(Info.WORK_MODE_PHONE);
 			startActivity(intent);
 		}
 	};
-	
+
 	private Handler handler = new Handler() {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
 			if (msg.what < 0) {
 				new AlertDialog.Builder(PhoneActivity.this)
-						.setCancelable(false)
-						.setTitle("出错了")
-						.setMessage("提交订单失败")
-						.setPositiveButton("确定",
-								null).show();
+						.setCancelable(false).setTitle("出错了")
+						.setMessage("提交订单失败").setPositiveButton("确定", null)
+						.show();
 			} else {
 				new AlertDialog.Builder(PhoneActivity.this)
 						.setCancelable(false)
@@ -387,24 +393,22 @@ public class PhoneActivity extends BaseActivity {
 		public void handleMessage(Message msg) {
 			if (msg.what < 0) {
 				new AlertDialog.Builder(PhoneActivity.this)
-				.setCancelable(false)
-				.setTitle("出错了")
-				.setMessage("删除失败")
-				.setPositiveButton("确定",
-						new DialogInterface.OnClickListener() {
+						.setCancelable(false)
+						.setTitle("出错了")
+						.setMessage("删除失败")
+						.setPositiveButton("确定",
+								new DialogInterface.OnClickListener() {
 
-					@Override
-					public void onClick(DialogInterface dialog,
-							int which) {
-						
-					}
-				}).show();
+									@Override
+									public void onClick(DialogInterface dialog,
+											int which) {
+
+									}
+								}).show();
 			} else {
-				
+
 			}
 		}
 	};
-	
-	
 
 }

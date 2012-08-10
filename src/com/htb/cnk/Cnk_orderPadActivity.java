@@ -1,13 +1,8 @@
 package com.htb.cnk;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -100,9 +95,6 @@ public class Cnk_orderPadActivity extends Activity {
 			Intent intent = new Intent();
 			intent.setClass(Cnk_orderPadActivity.this, TableActivity.class);
 			Cnk_orderPadActivity.this.startActivity(intent);
-			// AlertDialog.Builder addDialog = notificationDialog();
-			// addDialog.show();
-
 		}
 
 	};
@@ -118,37 +110,5 @@ public class Cnk_orderPadActivity extends Activity {
 			mpDialog.cancel();
 		}
 	};
-
-	private AlertDialog.Builder notificationDialog() {
-		// List <String> add =
-		// mNotificaion.getNotifiycationsType(Info.getTableId());
-		List<String> add = new ArrayList<String>();
-		add.add("aa");
-		add.add("b");
-		add.add("cc");
-		add.add("dd");
-		String[] additems = (String[]) add.toArray(new String[add.size()]);
-		// final CharSequence[] additems = { "手机已点的菜" };
-
-		AlertDialog.Builder addPhoneDialog = new AlertDialog.Builder(
-				Cnk_orderPadActivity.this);
-		addPhoneDialog.setTitle("选择功能") // 标题
-				.setIcon(R.drawable.ic_launcher) // icon
-				// .setCancelable(true) // 不响应back按钮
-				.setItems(additems, new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						Intent intent = new Intent();
-						switch (which) {
-						// case 0:
-						// intent.setClass(TableActivity.this,
-						// PhoneActivity.class);
-						// TableActivity.this.startActivity(intent);
-						// break;
-						}
-					}
-				}).create();
-		return addPhoneDialog;
-	}
 
 }

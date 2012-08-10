@@ -7,11 +7,8 @@ import android.widget.BaseAdapter;
 
 import com.htb.cnk.data.MyOrder;
 
-/**
- * @author josh
- *
- */
-public class MyOrderAdapter extends BaseAdapter {
+public class MyOrderAdapter extends BaseAdapter{
+
 	private MyOrder mMyOrder;
 	
 	public MyOrderAdapter(Context context, MyOrder order) {
@@ -34,7 +31,8 @@ public class MyOrderAdapter extends BaseAdapter {
 	}
 
 	@Override
-	public View getView(int arg0, View arg1, ViewGroup arg2) {
+	public View getView(int position, View convertView, ViewGroup parent) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 }

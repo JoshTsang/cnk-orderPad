@@ -12,15 +12,12 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.TextView;
 
-import com.htb.cnk.adapter.MyOrderAdapter;
+import com.htb.cnk.adapter.PadOrderAdapter;
 import com.htb.cnk.data.Info;
-import com.htb.cnk.data.MyOrder;
-import com.htb.cnk.data.MyOrder.OrderedDish;
+import com.htb.cnk.data.PadOrder.OrderedDish;
 import com.htb.cnk.data.TableSetting;
-import com.htb.cnk.lib.BaseActivity;
 import com.htb.cnk.lib.OrderBaseActivity;
 
 /**
@@ -28,7 +25,7 @@ import com.htb.cnk.lib.OrderBaseActivity;
  *
  */
 public class MyOrderActivity extends OrderBaseActivity {
-	private MyOrderAdapter mMyOrderAdapter;
+	private PadOrderAdapter mMyOrderAdapter;
 	private ProgressDialog mpDialog;
 	private TableSetting mSettings = new TableSetting();
 
@@ -49,8 +46,8 @@ public class MyOrderActivity extends OrderBaseActivity {
 		mMyOrderLst.setAdapter(mMyOrderAdapter);
 	}
 
-	private MyOrderAdapter getMyOrderAdapterInstance() {
-		return new MyOrderAdapter(this, mMyOrder) {
+	private PadOrderAdapter getMyOrderAdapterInstance() {
+		return new PadOrderAdapter(this, mMyOrder) {
 			@Override
 			public View getView(int position, View convertView, ViewGroup arg2) {
 				TextView dishName;
@@ -186,7 +183,6 @@ public class MyOrderActivity extends OrderBaseActivity {
 				}).show();
 				return ;
 			}
-			//TODO auth
 			mpDialog = new ProgressDialog(MyOrderActivity.this);  
 	        mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 	        mpDialog.setTitle("请稍等");
@@ -202,8 +198,6 @@ public class MyOrderActivity extends OrderBaseActivity {
 					} else {
 						if ("".equals(ret)) {
 							handler.sendEmptyMessage(0);
-						//	mSettings.setstatus(Info.getTableId(), 1);
-							Log.d("tableid", "id:"+Info.getTableId());
 							mSettings.updatusStatus(Info.getTableId(), 1);
 						} else {
 							handler.sendEmptyMessage(-1);
@@ -225,11 +219,10 @@ public class MyOrderActivity extends OrderBaseActivity {
 				.setMessage("提交订单失败")
 				.setPositiveButton("确定",
 					new DialogInterface.OnClickListener() {
-
 						@Override
 						public void onClick(DialogInterface dialog,
 								int which) {
-
+							
 						}
 				})
 				.show();

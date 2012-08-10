@@ -14,15 +14,15 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.htb.cnk.adapter.MyOrderAdapter;
+import com.htb.cnk.adapter.PadOrderAdapter;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.TableSetting;
-import com.htb.cnk.data.MyOrder.OrderedDish;
+import com.htb.cnk.data.PadOrder.OrderedDish;
 import com.htb.cnk.lib.OrderBaseActivity;
 
 
 public class DelOrderActivity extends OrderBaseActivity {
-	private MyOrderAdapter mMyOrderAdapter;
+	private PadOrderAdapter mMyOrderAdapter;
 	private TableSetting mSettings = new TableSetting();
 
 	@Override
@@ -44,7 +44,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 		mDishCountTxt.setText(Integer.toString(mMyOrder.totalQuantity()) + " 道菜");
 		mTotalPriceTxt
 				.setText(Double.toString(mMyOrder.getTotalPrice()) + " 元");
-		mMyOrderAdapter = new MyOrderAdapter(this, mMyOrder) {
+		mMyOrderAdapter = new PadOrderAdapter(this, mMyOrder) {
 			@Override
 			public View getView(int position, View convertView, ViewGroup arg2) {
 				TextView dishName;
