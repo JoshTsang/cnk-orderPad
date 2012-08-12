@@ -7,6 +7,7 @@ package com.htb.cnk.data;
 public class Info {
 	final static public int WORK_MODE_CUSTOMER = 0;
 	final static public int WORK_MODE_WAITER = 1;
+	final static public int WORK_MODE_PHONE = 2;
 	
 	static private int mMode;
 	static private int mTableId;

@@ -62,7 +62,17 @@ public class TableSetting {
 	public int getStatus(int index) {
 		return mTableSettings.get(index).getStatus();
 	}
-
+	
+	public int getStatusTableId(int index){
+		int i;
+		for(i = 0;i< mTableSettings.size()-1;i++){
+			if(index == mTableSettings.get(i).getId()){
+				break;
+			}
+		}
+		return mTableSettings.get(i).getStatus();
+	}
+	
 	public int getId(int index) {
 		return mTableSettings.get(index).getId();
 	}
