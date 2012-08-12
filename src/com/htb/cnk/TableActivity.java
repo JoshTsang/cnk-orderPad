@@ -34,6 +34,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.htb.cnk.data.Info;
+import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.data.UserData;
 import com.htb.cnk.lib.BaseActivity;
@@ -232,6 +233,7 @@ public class TableActivity extends BaseActivity {
 						Intent intent = new Intent();
 						switch (which) {
 						case 0:
+							MyOrder.clear();
 							intent.setClass(TableActivity.this,
 									MenuActivity.class);
 							Info.setMode(Info.WORK_MODE_CUSTOMER);
@@ -240,6 +242,7 @@ public class TableActivity extends BaseActivity {
 							TableActivity.this.finish();
 							break;
 						case 1:
+							MyOrder.clear();
 							intent.setClass(TableActivity.this,
 									MenuActivity.class);
 							Info.setMode(Info.WORK_MODE_WAITER);
@@ -310,6 +313,7 @@ public class TableActivity extends BaseActivity {
 							TableActivity.this.startActivity(intent);
 							break;
 						case 2:
+							MyOrder.clear();
 							intent.setClass(TableActivity.this,
 									MenuActivity.class);
 							Info.setMode(Info.WORK_MODE_WAITER);

@@ -154,7 +154,7 @@ public class MyOrder {
 
 	}
 
-	public void clear() {
+	public static void clear() {
 		mOrder.clear();
 	}
 
