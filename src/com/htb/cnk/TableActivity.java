@@ -276,7 +276,6 @@ public class TableActivity extends BaseActivity {
 						Intent intent = new Intent();
 						switch (which) {
 						case 0:
-							MyOrder.clear();
 							intent.setClass(TableActivity.this,
 									MenuActivity.class);
 							Info.setMode(Info.WORK_MODE_CUSTOMER);
@@ -285,7 +284,6 @@ public class TableActivity extends BaseActivity {
 							TableActivity.this.finish();
 							break;
 						case 1:
-							MyOrder.clear();
 							intent.setClass(TableActivity.this,
 									MenuActivity.class);
 							Info.setMode(Info.WORK_MODE_WAITER);
@@ -370,7 +368,6 @@ public class TableActivity extends BaseActivity {
 							TableActivity.this.startActivity(intent);
 							break;
 						case 2:
-							MyOrder.clear();
 							intent.setClass(TableActivity.this,
 									MenuActivity.class);
 							Info.setMode(Info.WORK_MODE_WAITER);
