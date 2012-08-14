@@ -20,6 +20,7 @@ public class OrderBaseActivity extends BaseActivity {
 	protected Button mBackBtn;
 	protected Button mSubmitBtn;
 	protected Button mLeftBtn;
+	protected Button mRefreshBtn;
 	protected TextView mTableNumTxt;
 	protected TextView mDishCountTxt;
 	protected TextView mTotalPriceTxt;
@@ -44,6 +45,7 @@ public class OrderBaseActivity extends BaseActivity {
 		mTotalPriceTxt = (TextView) findViewById(R.id.totalPrice);
 		mMyOrderLst = (ListView) findViewById(R.id.myOrderList);
 		mLeftBtn = (Button) findViewById(R.id.left_btn);
+		mRefreshBtn = (Button) findViewById(R.id.refresh);
 	}
 
 	private void fillData() {

@@ -39,6 +39,7 @@ public class MyOrderActivity extends OrderBaseActivity {
 
 	private void setOrderViews() {
 		mLeftBtn.setVisibility(View.GONE);
+		mRefreshBtn.setVisibility(View.GONE);
 	}
 
 	private void fillOrderData() {

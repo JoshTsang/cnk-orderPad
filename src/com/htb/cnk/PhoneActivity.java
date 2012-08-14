@@ -81,10 +81,10 @@ public class PhoneActivity extends BaseActivity {
 		mDishCountTxt = (TextView) findViewById(R.id.dishCount);
 		mTotalPriceTxt = (TextView) findViewById(R.id.totalPrice);
 		mMyOrderLst = (ListView) findViewById(R.id.myOrderList);
+		mLeftBtn.setText(R.string.phoneAdd);
 	}
 
 	private void fillData(){
-		mLeftBtn.setText(R.string.phoneAdd);
 		mTableNumTxt.setText(Info.getTableName());
 		mMyOrderAdapter = getMyOrderAdapterInstance();
 		mMyOrderLst.setAdapter(mMyOrderAdapter);
@@ -164,14 +164,14 @@ public class PhoneActivity extends BaseActivity {
 
 	Handler queryHandler = new Handler() {
 		public void handleMessage(Message msg) {
-		
+			mpDialog.cancel();
 			if (msg.what < 0) {
 				Toast.makeText(getApplicationContext(),
 						getResources().getString(R.string.delWarning),
 						Toast.LENGTH_SHORT).show();
 			} else {
 				mMyOrder.addOrder();
-				mpDialog.cancel();
+				
 				mMyOrderAdapter.notifyDataSetChanged();
 				Log.d("phone", (mMyOrderAdapter.getCount()+" a"));
 			}
