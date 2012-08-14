@@ -9,7 +9,7 @@ import android.widget.TextView;
 
 import com.htb.cnk.R;
 import com.htb.cnk.data.Info;
-import com.htb.cnk.data.PadOrder;
+import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.lib.BaseActivity;
 
 /**
@@ -25,13 +25,13 @@ public class OrderBaseActivity extends BaseActivity {
 	protected TextView mDishCountTxt;
 	protected TextView mTotalPriceTxt;
 	protected ListView mMyOrderLst;
-	protected PadOrder mMyOrder;
+	protected MyOrder mMyOrder;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.myorder_activity);
-		mMyOrder = new PadOrder(OrderBaseActivity.this);
+		mMyOrder = new MyOrder(OrderBaseActivity.this);
 		findViews();
 		fillData();
 		setClickListener();

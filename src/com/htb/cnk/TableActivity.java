@@ -32,10 +32,9 @@ import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 import com.htb.cnk.data.Info;
-import com.htb.cnk.data.PadOrder;
+import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.NotificationTypes;
 import com.htb.cnk.data.Notifications;
-import com.htb.cnk.data.PhoneOrder;
 import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.data.UserData;
 import com.htb.cnk.lib.BaseActivity;
@@ -55,8 +54,7 @@ public class TableActivity extends BaseActivity {
 	private ArrayList<HashMap<String, Object>> lstImageItem = new ArrayList<HashMap<String, Object>>();
 	private Notifications mNotificaion = new Notifications();
 	private NotificationTypes mNotificationType = new NotificationTypes();
-	private PadOrder mMyOrder;
-	private PhoneOrder mPhoneOrder;
+	private MyOrder mMyOrder;
 
 
 	@Override
@@ -87,8 +85,7 @@ public class TableActivity extends BaseActivity {
 		this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setContentView(R.layout.table_activity);
-		mMyOrder = new PadOrder(TableActivity.this);
-		mPhoneOrder = new  PhoneOrder(TableActivity.this);
+		mMyOrder = new MyOrder(TableActivity.this);
 		findViews();
 		setClickListeners();
 		mpDialog = new ProgressDialog(TableActivity.this);
@@ -230,6 +227,7 @@ public class TableActivity extends BaseActivity {
 					@Override
 					public void onClick(DialogInterface dialog, int i) {
 						dialog.cancel();
+						mpDialog.cancel();
 						finish();
 					}
 				});
@@ -529,7 +527,7 @@ public class TableActivity extends BaseActivity {
 				try {
 					Message msg = new Message();
 					mSettings.updatusStatus(Info.getTableId(), 0);
-					mPhoneOrder.delPhoneTable(Info.getTableId(), 0);
+					mMyOrder.delPhoneTable(Info.getTableId(), 0);
 					mSettings.cleanTalble(Info.getTableId());
 					mSettings.clear();
 					mNotificaion.getNotifiycations();

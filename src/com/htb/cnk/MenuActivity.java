@@ -36,7 +36,7 @@ import com.htb.cnk.data.Categories;
 import com.htb.cnk.data.Dish;
 import com.htb.cnk.data.Dishes;
 import com.htb.cnk.data.Info;
-import com.htb.cnk.data.PadOrder;
+import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.lib.BaseActivity;
 import com.htb.constant.ErrorNum;
 
@@ -56,13 +56,13 @@ public class MenuActivity extends BaseActivity {
 	private Categories mCategories;
 	private Dishes mDishes;
 	private DishListAdapter mDishLstAdapter;
-	private PadOrder mMyOrder;
+	private MyOrder mMyOrder;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.menu_activity);
-		mMyOrder = new PadOrder(MenuActivity.this);
+		mMyOrder = new MyOrder(MenuActivity.this);
 		mDishes = new Dishes(this);
 		mCategories = new Categories(this);
 		findViews();
@@ -176,7 +176,7 @@ public class MenuActivity extends BaseActivity {
 
 			public void onClick(View v) {
 				final int position = Integer.parseInt(v.getTag().toString());
-				mMyOrder.add(mDishes.getDish(position), 1,Info.getTableId());
+				mMyOrder.add(mDishes.getDish(position), 1,Info.getTableId(),0);
 				updateOrderedDishCount();
 				mDishLstAdapter.notifyDataSetChanged();
 			}
@@ -231,7 +231,7 @@ public class MenuActivity extends BaseActivity {
 
 			public void onClick(View v) {
 				final int position = Integer.parseInt(v.getTag().toString());
-				mMyOrder.add(mDishes.getDish(position), 1, Info.getTableId());
+				mMyOrder.add(mDishes.getDish(position), 1, Info.getTableId(),0);
 				updateOrderedDishCount();
 				mDishLstAdapter.notifyDataSetChanged();
 			}

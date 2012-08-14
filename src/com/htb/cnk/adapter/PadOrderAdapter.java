@@ -5,16 +5,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
-import com.htb.cnk.data.PadOrder;
+import com.htb.cnk.data.MyOrder;
 
 /**
  * @author josh
  *
  */
 public class PadOrderAdapter extends BaseAdapter {
-	private PadOrder mPadOrder;
+	private MyOrder mPadOrder;
 	
-	public PadOrderAdapter(Context context, PadOrder order) {
+	public PadOrderAdapter(Context context, MyOrder order) {
 		mPadOrder = order;
 	}
 	
