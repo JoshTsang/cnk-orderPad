@@ -180,15 +180,10 @@ public class PhoneActivity extends BaseActivity {
 				int ret = mMyOrder.getTablePhoneFromDB(Info.getTableId());
 				msg.what = ret;
 				mpDialog.cancel();
-				if (ret < 0) {
-					queryHandler.sendMessage(msg);
-				}else{
-					queryHandler.sendMessage(msg);
-				}
+				queryHandler.sendMessage(msg);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-
 		}
 
 	}

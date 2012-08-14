@@ -238,6 +238,9 @@ public class UpdateMenuActivity extends BaseActivity {
 					ret = downloadPic(Server.IMG_PATH+ picName, "hdpi_" + picName);
 					if (ret < 0) {
 						count++;
+						if (count >= 10) {
+							return ErrorNum.DOWNLOAD_PIC_FAILED;
+						}
 					}
 				}
 			}
