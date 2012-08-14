@@ -16,7 +16,7 @@ import android.widget.TextView;
 
 import com.htb.cnk.adapter.PadOrderAdapter;
 import com.htb.cnk.data.Info;
-import com.htb.cnk.data.PadOrder.OrderedDish;
+import com.htb.cnk.data.MyOrder.OrderedDish;
 import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.lib.OrderBaseActivity;
 
@@ -39,6 +39,7 @@ public class MyOrderActivity extends OrderBaseActivity {
 
 	private void setOrderViews() {
 		mLeftBtn.setVisibility(View.GONE);
+		mRefreshBtn.setVisibility(View.GONE);
 	}
 
 	private void fillOrderData() {

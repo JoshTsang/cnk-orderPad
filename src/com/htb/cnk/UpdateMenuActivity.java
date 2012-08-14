@@ -222,11 +222,13 @@ public class UpdateMenuActivity extends BaseActivity {
 	
 	private int downloadHugePic() {
 		int ret;
+		int count = 0;
 		try {
 			mCnkDbHelper = new CnkDbHelper(UpdateMenuActivity.this,
 					CnkDbHelper.DATABASE_NAME,
 					null, 1);
 			mDb = mCnkDbHelper.getReadableDatabase();
+			
 			Cursor dishes = mDb.query(CnkDbHelper.DISH_TABLE_NAME, new String[] {
 					  CnkDbHelper.DISH_PIC},
 					  null, null, null, null, null);
@@ -235,7 +237,10 @@ public class UpdateMenuActivity extends BaseActivity {
 				if (picName != null && !"".equals(picName) && !"null".equals(picName)) {
 					ret = downloadPic(Server.IMG_PATH+ picName, "hdpi_" + picName);
 					if (ret < 0) {
-						return ret;
+						count++;
+						if (count >= 10) {
+							return ErrorNum.DOWNLOAD_PIC_FAILED;
+						}
 					}
 				}
 			}
@@ -246,6 +251,9 @@ public class UpdateMenuActivity extends BaseActivity {
             file.delete();
             e.printStackTrace();
 			return ErrorNum.DB_BROKEN;
+		}
+		if(count > 0) {
+			return ErrorNum.DOWNLOAD_PIC_FAILED;
 		}
 		return 0;
 	}

@@ -11,7 +11,7 @@ import android.widget.Toast;
 
 import com.htb.cnk.adapter.PadOrderAdapter;
 import com.htb.cnk.data.Info;
-import com.htb.cnk.data.PadOrder.OrderedDish;
+import com.htb.cnk.data.MyOrder.OrderedDish;
 import com.htb.cnk.lib.OrderBaseActivity;
 
 public class QueryOrderActivity extends OrderBaseActivity {
