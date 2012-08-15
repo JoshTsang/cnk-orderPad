@@ -27,6 +27,7 @@ public class QueryOrderActivity extends OrderBaseActivity {
 	private void setQueryViews() {
 		mSubmitBtn.setVisibility(View.GONE);
 		mLeftBtn.setVisibility(View.GONE);
+		mRefreshBtn.setVisibility(View.GONE);
 	}
 
 	private void setAdapter() {
