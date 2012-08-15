@@ -38,7 +38,6 @@ public class PhoneActivity extends BaseActivity {
 	private TextView mTotalPriceTxt;
 	private ListView mMyOrderLst;
 	private MyOrder mMyOrder;
-	// private PhoneOrder mPhoneOrder;
 	private PadOrderAdapter mMyOrderAdapter;
 	private ProgressDialog mpDialog;
 	private TableSetting mSettings = new TableSetting();
@@ -46,7 +45,10 @@ public class PhoneActivity extends BaseActivity {
 	@Override
 	protected void onResume() {
 		Log.d("onResume", "onResume");
+		mpDialog.setMessage("正在更新数据，请稍等");
+		mpDialog.show();
 		updateTabelInfos();
+		
 		super.onResume();
 	}
 
@@ -64,7 +66,6 @@ public class PhoneActivity extends BaseActivity {
 		findViews();
 		setClickListener();
 		fillData();
-
 	}
 
 	private void findViews() {
@@ -81,7 +82,6 @@ public class PhoneActivity extends BaseActivity {
 		mLeftBtn.setText(R.string.phoneAdd);
 		mTableNumTxt.setText(Info.getTableName());
 		mMyOrderAdapter = getMyOrderAdapterInstance();
-		mMyOrderLst.setAdapter(mMyOrderAdapter);
 	}
 
 	private PadOrderAdapter getMyOrderAdapterInstance() {
@@ -89,38 +89,43 @@ public class PhoneActivity extends BaseActivity {
 		return new PadOrderAdapter(this, mMyOrder) {
 			@Override
 			public View getView(int position, View convertView, ViewGroup arg2) {
-				TextView dishName;
-				TextView dishPrice;
-				TextView dishQuantity;
-				Button plusBtn;
-				Button minusBtn;
-				Button plus5Btn;
-				Button minus5Btn;
-
+				viewHolder1 holder1;
+				Log.d("position", "position:" + position);
+				OrderedDish dishDetail = mMyOrder.getOrderedDish(position);
 				if (convertView == null) {
 					convertView = LayoutInflater.from(PhoneActivity.this)
 							.inflate(R.layout.item_ordereddish, null);
+
+					holder1 = new viewHolder1();
+					holder1.dishName = (TextView) convertView
+							.findViewById(R.id.dishName);
+					holder1.dishPrice = (TextView) convertView
+							.findViewById(R.id.dishPrice);
+					holder1.dishQuantity = (TextView) convertView
+							.findViewById(R.id.dishQuantity);
+					holder1.plusBtn = (Button) convertView
+							.findViewById(R.id.dishPlus);
+					holder1.minusBtn = (Button) convertView
+							.findViewById(R.id.dishMinus);
+					holder1.plus5Btn = (Button) convertView
+							.findViewById(R.id.dishPlus5);
+					holder1.minus5Btn = (Button) convertView
+							.findViewById(R.id.dishMinus5);
+
+					convertView.setTag(holder1);
+				} else {
+					Log.d("viewHolder", "Tag");
+					holder1 = (viewHolder1) convertView.getTag();
 				}
-				OrderedDish dishDetail = mMyOrder.getOrderedDish(position);
-				Log.d("OrderedDish",
-						(dishDetail.getName() + " aaa " + dishDetail.getPrice()));
-				dishName = (TextView) convertView.findViewById(R.id.dishName);
-				dishPrice = (TextView) convertView.findViewById(R.id.dishPrice);
-				dishQuantity = (TextView) convertView
-						.findViewById(R.id.dishQuantity);
-				plusBtn = (Button) convertView.findViewById(R.id.dishPlus);
-				minusBtn = (Button) convertView.findViewById(R.id.dishMinus);
-				plus5Btn = (Button) convertView.findViewById(R.id.dishPlus5);
-				minus5Btn = (Button) convertView.findViewById(R.id.dishMinus5);
+				holder1.dishName.setText(dishDetail.getName());
+				holder1.dishPrice
+						.setText(Double.toString(dishDetail.getPrice())
+								+ " 元/份");
+				holder1.dishQuantity.setText(Integer.toString(dishDetail
+						.getQuantity()));
 
-				dishName.setText(dishDetail.getName());
-				dishPrice.setText(Double.toString(dishDetail.getPrice())
-						+ " 元/份");
-				dishQuantity
-						.setText(Integer.toString(dishDetail.getQuantity()));
-
-				plusBtn.setTag(position);
-				plusBtn.setOnClickListener(new OnClickListener() {
+				holder1.plusBtn.setTag(position);
+				holder1.plusBtn.setOnClickListener(new OnClickListener() {
 
 					public void onClick(View v) {
 						final int position = Integer.parseInt(v.getTag()
@@ -129,12 +134,12 @@ public class PhoneActivity extends BaseActivity {
 					}
 				});
 
-				minusBtn.setTag(position);
-				minusBtn.setOnClickListener(minusClicked);
+				holder1.minusBtn.setTag(position);
+				holder1.minusBtn.setOnClickListener(minusClicked);
 
-				plus5Btn.setTag(position);
+				holder1.plus5Btn.setTag(position);
 
-				plus5Btn.setOnClickListener(new OnClickListener() {
+				holder1.plus5Btn.setOnClickListener(new OnClickListener() {
 
 					public void onClick(View v) {
 						final int position = Integer.parseInt(v.getTag()
@@ -143,10 +148,18 @@ public class PhoneActivity extends BaseActivity {
 					}
 				});
 
-				minus5Btn.setTag(position);
-
-				minus5Btn.setOnClickListener(minus5Clicked);
+				holder1.minus5Btn.setTag(position);
+				holder1.minus5Btn.setOnClickListener(minus5Clicked);
 				return convertView;
+			}
+			class viewHolder1 {
+				TextView dishName;
+				TextView dishPrice;
+				TextView dishQuantity;
+				Button plusBtn;
+				Button minusBtn;
+				Button plus5Btn;
+				Button minus5Btn;
 			}
 		};
 	}
@@ -159,17 +172,21 @@ public class PhoneActivity extends BaseActivity {
 
 	Handler queryHandler = new Handler() {
 		public void handleMessage(Message msg) {
+
+			mMyOrderLst.setAdapter(mMyOrderAdapter);
 			if (msg.what < 0) {
+				Log.d("debug", "<0");
 				Toast.makeText(getApplicationContext(),
 						getResources().getString(R.string.delPhoneWarning),
 						Toast.LENGTH_SHORT).show();
 			} else {
-				mMyOrderAdapter.notifyDataSetChanged();
+				 mMyOrderAdapter.notifyDataSetChanged();
 			}
-			mDishCountTxt.setText(Integer.toString(mMyOrder.totalQuantity())
-					+ " 道菜");
-			mTotalPriceTxt.setText(Double.toString(mMyOrder.getTotalPrice())
-					+ " 元");
+			 mDishCountTxt.setText(Integer.toString(mMyOrder.totalQuantity())
+			 + " 道菜");
+			 mTotalPriceTxt.setText(Double.toString(mMyOrder.getTotalPrice())
+			 + " 元");
+			mpDialog.cancel();
 		}
 	};
 
@@ -179,8 +196,13 @@ public class PhoneActivity extends BaseActivity {
 			try {
 				int ret = mMyOrder.getTablePhoneFromDB(Info.getTableId());
 				msg.what = ret;
-				mpDialog.cancel();
-				queryHandler.sendMessage(msg);
+
+				if (ret < 0) {
+					queryHandler.sendEmptyMessage(ret);
+				} else {
+					queryHandler.sendMessage(msg);
+				}
+
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -192,9 +214,9 @@ public class PhoneActivity extends BaseActivity {
 		if (quantity < 0) {
 
 			int result = mMyOrder.minus(position, -quantity);
-			Log.d("update", "result"+result);
+			Log.d("update", "result" + result);
 			if (result > 0) {
-				Log.d("updateresult", "result"+result);
+				Log.d("updateresult", "result" + result);
 				updatePhoneOrder(position, result);
 				mpDialog.show();
 			}
@@ -210,15 +232,14 @@ public class PhoneActivity extends BaseActivity {
 	}
 
 	private void updateTabelInfos() {
-		mpDialog.setMessage("正在更新数据，请稍等");
-		mpDialog.show();
 		new Thread(new queryThread()).start();
 	}
 
 	private void minusDishQuantity(final int position, final int quantity) {
 		if (mMyOrder.getOrderedDish(position).getQuantity() > quantity) {
-			Log.d("updateQuantity", "quantity:"+quantity+"  mMyOrder:"+ mMyOrder.getOrderedDish(position).getQuantity());
-			updateDishQuantity(position, -quantity); 
+			Log.d("updateQuantity", "quantity:" + quantity + "  mMyOrder:"
+					+ mMyOrder.getOrderedDish(position).getQuantity());
+			updateDishQuantity(position, -quantity);
 		} else {
 			new AlertDialog.Builder(PhoneActivity.this)
 					.setTitle("请注意")
@@ -236,10 +257,12 @@ public class PhoneActivity extends BaseActivity {
 									mpDialog.show();
 									mMyOrder.minus(position, quantity);
 									mMyOrderAdapter.notifyDataSetChanged();
-									mDishCountTxt.setText(Integer.toString(mMyOrder.totalQuantity())
+									mDishCountTxt.setText(Integer
+											.toString(mMyOrder.totalQuantity())
 											+ " 道菜");
-									mTotalPriceTxt
-											.setText(Double.toString(mMyOrder.getTotalPrice()) + " 元");
+									mTotalPriceTxt.setText(Double
+											.toString(mMyOrder.getTotalPrice())
+											+ " 元");
 								}
 							}).setNegativeButton("取消", null).show();
 		}
@@ -249,13 +272,17 @@ public class PhoneActivity extends BaseActivity {
 		new Thread() {
 			public void run() {
 				Message msg = new Message();
-				Log.d("quanPhone", "mMyOrder.quantity:"+(mMyOrder.getOrderedDish(position)
-										.getQuantity() - quantity)+"  Phone.quantity:"+mMyOrder.getOrderedDish(position)
+				Log.d("quanPhone",
+						"mMyOrder.quantity:"
+								+ (mMyOrder.getOrderedDish(position)
+										.getQuantity() - quantity)
+								+ "  Phone.quantity:"
+								+ mMyOrder.getOrderedDish(position)
 										.getQuantity());
-				int ret = mMyOrder
-						.updatePhoneOrder(Info.getTableId(),
-								quantity, mMyOrder
-										.getDishId(position));
+
+				int ret = mMyOrder.updatePhoneOrder(Info.getTableId(),
+						quantity, mMyOrder.getDishId(position));
+
 
 				if (ret < 0) {
 					delPhoneOrderhandler.sendEmptyMessage(-1);
@@ -274,7 +301,9 @@ public class PhoneActivity extends BaseActivity {
 				Message msg = new Message();
 				int ret = mMyOrder.delPhoneTable(Info.getTableId(),
 						mMyOrder.getDishId(position));
-				Log.d("delPhone", "getDishId:"+mMyOrder.getDishId(position));
+
+				Log.d("delPhone", "getDishId:" + mMyOrder.getDishId(position));
+
 
 				mpDialog.cancel();
 				if (ret < 0) {
@@ -413,7 +442,7 @@ public class PhoneActivity extends BaseActivity {
 									}
 								}).show();
 			} else {
-				
+
 			}
 		}
 	};
