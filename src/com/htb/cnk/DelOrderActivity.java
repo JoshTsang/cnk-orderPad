@@ -36,7 +36,8 @@ public class DelOrderActivity extends OrderBaseActivity {
 
 	private void setDelViews() {
 		mSubmitBtn.setVisibility(View.GONE);
-		mLeftBtn.setText("全部删除");
+		mLeftBtn.setText("全删");
+		mRefreshBtn.setVisibility(View.GONE);
 	}
 
 	private void fillDelData() {
