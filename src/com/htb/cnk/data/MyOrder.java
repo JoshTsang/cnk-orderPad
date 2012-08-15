@@ -12,6 +12,7 @@ import org.json.JSONObject;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.util.Log;
 
 import com.htb.cnk.lib.Http;
@@ -182,7 +183,6 @@ public class MyOrder {
 
 	public int getDishId(int position) {
 		if (position < mOrder.size()) {
-//			Log.d("position", "position:" + position + " size:" + mOrder.size() + " getDishId:"+ mOrder.get(position).dish.getId());
 			return mOrder.get(position).dish.getId();
 		}
 		return -1;
@@ -206,12 +206,20 @@ public class MyOrder {
 	public OrderedDish getOrderedDish(int position) {
 		return mOrder.get(position);
 	}
-	
-	public void removeItem(int did){
+
+	public void removeItem(int did) {
 		mOrder.remove(did);
 	}
+
 	public void clear() {
 		mOrder.clear();
+	}
+
+	public void talbeClear() {
+		if (count() > 0 && getTableId() != Info.getTableId()) {
+			mOrder.clear();
+			Log.d("talbeClear", "clear");
+		}
 	}
 
 	public int getOrderedCount(int did) {
@@ -294,21 +302,26 @@ public class MyOrder {
 	}
 
 	public int getTablePhoneFromDB(int tableId) {
+		talbeClear();
 		String response = Http.get(Server.GET_GETPHONEORDER, "TID=" + tableId);
 		Log.d("resp", "Phone:" + response);
-		if(response == null){
+		if (response == null) {
 			return -1;
 		}
 		try {
 			JSONArray tableList = new JSONArray(response);
 			int length = tableList.length();
-			if (count() > 0 && getTableId() != tableId) {
-				clear();
-			} else {
-				for (OrderedDish item : mOrder) {
+			for (int i = 0; i < mOrder.size(); i++) {
+				OrderedDish item = (OrderedDish) mOrder.get(i);
+				if (item.padQuantity == 0) {
+					mOrder.remove(item);
+					i--;
+				} else {
 					item.phoneQuantity = 0;
 				}
+
 			}
+
 			for (int i = 0; i < length; i++) {
 				JSONObject item = tableList.getJSONObject(i);
 				int quantity = item.getInt("quantity");
@@ -318,6 +331,7 @@ public class MyOrder {
 				double dishPrice = cur.getDouble(1);
 				Dish mDish = new Dish(dishId, name, dishPrice, null);
 				addOrder(mDish, quantity, tableId, MODE_PHONE);
+				Log.d("phone", "phoneNum :" + i);
 			}
 			return 0;
 
@@ -371,7 +385,7 @@ public class MyOrder {
 		if (tableStatusPkg == null) {
 			return -1;
 		}
-		
+
 		return 0;
 	}
 

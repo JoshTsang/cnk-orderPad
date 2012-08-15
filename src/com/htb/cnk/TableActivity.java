@@ -40,7 +40,9 @@ import com.htb.cnk.data.UserData;
 import com.htb.cnk.lib.BaseActivity;
 
 public class TableActivity extends BaseActivity {
-
+	private final int UPDATE_TABLE_INFOS = 5;
+	private final int DISABLE_GRIDVIEW = 10;
+	
 	private TableSetting mSettings = new TableSetting();
 	protected List<Map<String, String>> mTableSettings = new ArrayList<Map<String, String>>();
 	private Button mBackBtn;
@@ -51,6 +53,7 @@ public class TableActivity extends BaseActivity {
 	private ProgressDialog mpDialog;
 	private SimpleAdapter saImageItems;
 	private Handler handler = new Handler();
+	private ItemClickListener mTableClicked;
 	private ArrayList<HashMap<String, Object>> lstImageItem = new ArrayList<HashMap<String, Object>>();
 	private Notifications mNotificaion = new Notifications();
 	private NotificationTypes mNotificationType = new NotificationTypes();
@@ -102,9 +105,11 @@ public class TableActivity extends BaseActivity {
 		mUpdateBtn = (Button) findViewById(R.id.updateMenu);
 		mStatisticsBtn = (Button) findViewById(R.id.statistics);
 		mManageBtn = (Button) findViewById(R.id.management);
+		gridview = (GridView) findViewById(R.id.gridview);
 	}
 
 	private void setClickListeners() {
+		mTableClicked = new ItemClickListener();
 		mBackBtn.setOnClickListener(backClicked);
 		mUpdateBtn.setOnClickListener(updateClicked);
 		mStatisticsBtn.setOnClickListener(statisticsClicked);
@@ -115,17 +120,17 @@ public class TableActivity extends BaseActivity {
 		public void run() {
 			try {
 				Message msg = new Message();
+				tableHandle.sendEmptyMessage(DISABLE_GRIDVIEW);
 				mSettings.clear();
 				mNotificaion.clear();
 				mNotificaion.getNotifiycations();
 				mNotificationType.getNotifiycationsType();
 				int ret = mSettings.getTableStatus();
-				mpDialog.cancel();
 				if (ret < 0) {
 					tableHandle.sendEmptyMessage(ret);
 					return;
 				}
-				msg.what = ret;
+				msg.what = UPDATE_TABLE_INFOS;
 				tableHandle.sendMessage(msg);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -391,103 +396,104 @@ public class TableActivity extends BaseActivity {
 				final AlertDialog.Builder mAlertDialog = networkDialog();
 				mAlertDialog.show();
 			} else {
-				gridview = (GridView) findViewById(R.id.gridview);
-				mTableSettings.clear();
-				Log.d("Notification", "NotificationNum:" + mNotificaion.size());
-				if (lstImageItem.size() > 0) {
-					for (int i = 0, n = 0; i < mSettings.size(); i++) {
-						int status = mSettings.getStatus(i);
-						if (status < 100
-								&& mNotificaion.getId(n) == mSettings.getId(i)) {
-
-							status = status + 100;
-							n++;
-							Log.d("mNotificaionID", "mNotificaionID"
-									+ mNotificaion.getId(n)
-									+ " mSettings.getId:" + mSettings.getId(i));
-							Log.d("statusImage", "statusImage" + status
-									+ " num:" + i);
-						}
-
-						switch (status) {
-						case 1:
-							lstImageItem.get(i).put("imageItem",
-									R.drawable.table_blue);
-							break;
-						case 2:
-							lstImageItem.get(i).put("imageItem",
-									R.drawable.table_yellow);
-							break;
-						case 100:
-							lstImageItem.get(i).put("imageItem",
-									R.drawable.table_rednotification);
-							mSettings.setStatus(i, 100);
-							break;
-						case 101:
-							lstImageItem.get(i).put("imageItem",
-									R.drawable.table_bluenotification);
-							mSettings.setStatus(i, 101);
-							break;
-						case 102:
-							lstImageItem.get(i).put("imageItem",
-									R.drawable.table_yellownotification);
-							mSettings.setStatus(i, 102);
-							break;
-						default:
-							lstImageItem.get(i).put("imageItem",
-									R.drawable.table_red);
-							break;
-						}
-					}
-				} else {
-					for (int i = 0, n = 0; i < mSettings.size(); i++) {
-						int status = mSettings.getStatus(i);
-						if (status < 100
-								&& mNotificaion.getId(n) == mSettings.getId(i)) {
-							status = status + 100;
-							n++;
-						}
-
-						HashMap<String, Object> map = new HashMap<String, Object>();
-						map.put("ItemText", "第" + mSettings.getName(i) + "桌");
-						switch (status) {
-						case 1:
-							map.put("imageItem", R.drawable.table_blue);
-							break;
-						case 2:
-							map.put("imageItem", R.drawable.table_yellow);
-							break;
-						case 100:
-							map.put("imageItem",
-									R.drawable.table_rednotification);
-							mSettings.setStatus(i, 100);
-							break;
-						case 101:
-							map.put("imageItem",
-									R.drawable.table_bluenotification);
-							mSettings.setStatus(i, 101);
-							break;
-						case 102:
-							map.put("imageItem",
-									R.drawable.table_yellownotification);
-							mSettings.setStatus(i, 102);
-							break;
-						default:
-							map.put("imageItem", R.drawable.table_red);
-							break;
-
-						}
-						lstImageItem.add(map);
-					}
-					saImageItems = new SimpleAdapter(TableActivity.this,
-							lstImageItem, R.layout.grid_item, new String[] {
-									"imageItem", "ItemText" }, new int[] {
-									R.id.ItemImage, R.id.ItemText }) {
-					};
-					gridview.setAdapter(saImageItems);
+				switch(msg.what) {
+				case UPDATE_TABLE_INFOS:
+					setTableInfos();
+					break;
+				case DISABLE_GRIDVIEW:
+					gridview.setOnItemClickListener(null);
+					break;
+				default:
+						break;
 				}
-				saImageItems.notifyDataSetChanged();
-				gridview.setOnItemClickListener(new ItemClickListener());
+			}
+		}
+
+		private void setTableInfos() {
+			mTableSettings.clear();
+			Log.d("Notification", "NotificationNum:" + mNotificaion.size());
+			if (lstImageItem.size() > 0) {
+				for (int i = 0, n = 0; i < mSettings.size(); i++) {
+					int status = mSettings.getStatus(i);
+					if (status < 100
+							&& mNotificaion.getId(n) == mSettings.getId(i)) {
+
+						status = status + 100;
+						n++;
+						Log.d("mNotificaionID", "mNotificaionID"
+								+ mNotificaion.getId(n)
+								+ " mSettings.getId:" + mSettings.getId(i));
+						Log.d("statusImage", "statusImage" + status
+								+ " num:" + i);
+					}
+
+					setTableIcon(i, status);
+				}
+			} else {
+				for (int i = 0, n = 0; i < mSettings.size(); i++) {
+					int status = mSettings.getStatus(i);
+					if (status < 100
+							&& mNotificaion.getId(n) == mSettings.getId(i)) {
+						status = status + 100;
+						n++;
+					}
+
+					setTableIcon(i, status);
+				}
+				saImageItems = new SimpleAdapter(TableActivity.this,
+						lstImageItem, R.layout.grid_item, new String[] {
+								"imageItem", "ItemText" }, new int[] {
+								R.id.ItemImage, R.id.ItemText }) {
+				};
+				gridview.setAdapter(saImageItems);
+			}
+
+			gridview.setVisibility(View.VISIBLE);
+			saImageItems.notifyDataSetChanged();
+			mpDialog.cancel();
+			gridview.setOnItemClickListener(mTableClicked);
+		}
+
+		private void setTableIcon(int position, int status) {
+			HashMap<String, Object> map;
+			if (lstImageItem.size() <= position) {
+				map = new HashMap<String, Object>();
+				map.put("ItemText", "第" + mSettings.getName(position) + "桌");
+			} else {
+				map = lstImageItem.get(position);
+			}
+			
+			switch (status) {
+			case 1:
+				map.put("imageItem",
+						R.drawable.table_blue);
+				break;
+			case 2:
+				map.put("imageItem",
+						R.drawable.table_yellow);
+				break;
+			case 100:
+				map.put("imageItem",
+						R.drawable.table_rednotification);
+				mSettings.setStatus(position, 100);
+				break;
+			case 101:
+				map.put("imageItem",
+						R.drawable.table_bluenotification);
+				mSettings.setStatus(position, 101);
+				break;
+			case 102:
+				map.put("imageItem",
+						R.drawable.table_yellownotification);
+				mSettings.setStatus(position, 102);
+				break;
+			default:
+				map.put("imageItem",
+						R.drawable.table_red);
+				break;
+			}
+			if (lstImageItem.size() <= position) {
+				lstImageItem.add(map);
 			}
 		}
 	};
