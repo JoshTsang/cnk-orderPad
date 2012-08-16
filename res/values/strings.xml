@@ -44,7 +44,7 @@
 	<string name="manageUri">http://www.cainaoke.com/manage/index.php</string>
 	<string name="phoneOrder">手机点的菜</string>
 	<string name="claenNotificaion">亲：还不快点，客人都着急啦！</string>
-	<string name="phoneAdd">添加</string>
+	<string name="phoneAdd">加菜</string>
 	<string name="refresh">刷新</string>
 	<string name="delPhoneWarning">亲：你手机没有点菜哦</string>
 </resources>
