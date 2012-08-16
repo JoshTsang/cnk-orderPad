@@ -11,6 +11,7 @@ import android.os.Message;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.htb.cnk.data.Info;
@@ -18,7 +19,9 @@ import com.htb.cnk.data.Info;
 public class Cnk_orderPadActivity extends Activity {
 	/** Called when the activity is first created. */
 	private ImageButton mMenuBtn;
+	private TextView mMenuTxt;
 	private ImageButton mSettingsBtn;
+	private TextView mSettingsTxt;
 	private ProgressDialog mpDialog;
 	private final static int UPDATE_MENU = 0;
 	private final static int LATEST_MENU = 1;
@@ -36,12 +39,16 @@ public class Cnk_orderPadActivity extends Activity {
 
 	private void findViews() {
 		mMenuBtn = (ImageButton) findViewById(R.id.menu);
+		mMenuTxt =  (TextView) findViewById(R.id.menuTxt);
 		mSettingsBtn = (ImageButton) findViewById(R.id.settings);
+		mSettingsTxt = (TextView) findViewById(R.id.settingsTxt);
 	}
 
 	private void setClickListeners() {
 		mMenuBtn.setOnClickListener(menuClicked);
+		mMenuTxt.setOnClickListener(menuClicked);
 		mSettingsBtn.setOnClickListener(settingsClicked);
+		mSettingsTxt.setOnClickListener(settingsClicked);
 	}
 
 	private int getCurrentMenuVer() {
