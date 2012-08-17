@@ -12,6 +12,7 @@ import org.json.JSONObject;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.util.Log;
 
 import com.htb.cnk.lib.Http;
@@ -462,6 +463,7 @@ public class MyOrder {
 		Log.d("JSON", order.toString());
 
 		String response = Http.post(Server.DEL_ORDER, order.toString());
+		Log.d("response", "response:"+response);
 		if (response == null) {
 			return -1;
 		}

@@ -39,7 +39,7 @@ public class NotificationTypes {
 			notificationTypes.add(map);
 			return 0;
 		} catch (Exception e) {
-			// TODO: handle exception
+			e.printStackTrace();
 		}
 
 		return -1;

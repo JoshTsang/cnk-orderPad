@@ -102,7 +102,7 @@ public class Notifications {
 			}
 			return 0;
 		} catch (Exception e) {
-			// TODO: handle exception
+			e.printStackTrace();
 		}
 
 		return -1;
