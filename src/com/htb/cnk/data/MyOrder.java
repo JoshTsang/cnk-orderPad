@@ -12,7 +12,6 @@ import org.json.JSONObject;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.util.Log;
 
 import com.htb.cnk.lib.Http;
@@ -214,7 +213,20 @@ public class MyOrder {
 	public void clear() {
 		mOrder.clear();
 	}
+	
+	public void phoneClear(){
+		for (int i = 0; i < mOrder.size(); i++) {
+			OrderedDish item = (OrderedDish) mOrder.get(i);
+			if (item.padQuantity == 0) {
+				mOrder.remove(item);
+				i--;
+			} else {
+				item.phoneQuantity = 0;
+			}
 
+		}
+	}
+	
 	public void talbeClear() {
 		if (count() > 0 && getTableId() != Info.getTableId()) {
 			mOrder.clear();

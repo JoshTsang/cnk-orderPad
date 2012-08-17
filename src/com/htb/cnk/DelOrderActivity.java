@@ -14,7 +14,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.htb.cnk.adapter.PadOrderAdapter;
+import com.htb.cnk.adapter.MyOrderAdapter;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.data.MyOrder.OrderedDish;
@@ -22,7 +22,7 @@ import com.htb.cnk.lib.OrderBaseActivity;
 
 
 public class DelOrderActivity extends OrderBaseActivity {
-	private PadOrderAdapter mMyOrderAdapter;
+	private MyOrderAdapter mMyOrderAdapter;
 	private TableSetting mSettings = new TableSetting();
 
 	@Override
@@ -36,7 +36,8 @@ public class DelOrderActivity extends OrderBaseActivity {
 
 	private void setDelViews() {
 		mSubmitBtn.setVisibility(View.GONE);
-		mLeftBtn.setText("全部删除");
+		mLeftBtn.setText(R.string.cleanAll);
+		mRefreshBtn.setVisibility(View.GONE);
 	}
 
 	private void fillDelData() {
@@ -44,12 +45,12 @@ public class DelOrderActivity extends OrderBaseActivity {
 		mDishCountTxt.setText(Integer.toString(mMyOrder.totalQuantity()) + " 道菜");
 		mTotalPriceTxt
 				.setText(Double.toString(mMyOrder.getTotalPrice()) + " 元");
-		mMyOrderAdapter = new PadOrderAdapter(this, mMyOrder) {
+		mMyOrderAdapter = new MyOrderAdapter(this, mMyOrder) {
 			@Override
 			public View getView(int position, View convertView, ViewGroup arg2) {
 				TextView dishName;
 				TextView dishPrice;
-				// TextView dishQuantity;
+				 TextView dishQuantity;
 				Button delBtn;
 
 				if (convertView == null) {
@@ -60,15 +61,15 @@ public class DelOrderActivity extends OrderBaseActivity {
 
 				dishName = (TextView) convertView.findViewById(R.id.dishName);
 				dishPrice = (TextView) convertView.findViewById(R.id.dishPrice);
-				// dishQuantity = (TextView) convertView
-				// .findViewById(R.id.dishQuantity);
+				 dishQuantity = (TextView) convertView
+				 .findViewById(R.id.dishQuantity);
 				delBtn = (Button) convertView.findViewById(R.id.dishMinus);
 
 				dishName.setText(dishDetail.getName());
 				dishPrice.setText(Double.toString(dishDetail.getPrice())
 						+ " 元/份");
-				// dishQuantity
-				// .setText(Integer.toString(dishDetail.getQuantity()));
+				 dishQuantity
+				 .setText(Integer.toString(dishDetail.getQuantity()));
 
 
 				delBtn.setTag(position);
@@ -213,11 +214,10 @@ public class DelOrderActivity extends OrderBaseActivity {
 				mMyOrder.clear();
 				mMyOrderAdapter.notifyDataSetChanged();
 				fillDelData();
-
 			}
 		}
 	};
-
+ 
 	private OnClickListener delClicked = new OnClickListener() {
 
 		public void onClick(View v) {

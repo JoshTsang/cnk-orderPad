@@ -85,7 +85,7 @@ public class TableSetting {
 		mTableSettings.get(index).setStatus(n);
 	}
 
-	public int getTableStatus() {
+	public int getTableStatusFromServer() {
 		String tableStatusPkg = Http.get(Server.GET_TABLE_STATUS, "");
 		if(tableStatusPkg == null){
 			return -1;
@@ -149,4 +149,15 @@ public class TableSetting {
 		}
 		return 0;
 	}
+
+
+
+	public void backUpTableStatus(int[] mTableStatus) {
+		for(int i=0 ;i<mTableSettings.size();i++){
+			mTableStatus[i] = getStatus(i);
+		}
+		
+	}
+
+
 }
