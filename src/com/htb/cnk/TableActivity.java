@@ -45,7 +45,7 @@ public class TableActivity extends BaseActivity {
 	private final int PHONE_STATUS = 50;
 	private final int NOTIFICATION_STATUS = 100;
 	private TableSetting mSettings = new TableSetting();
-	protected List<Map<String, String>> mTableSettings = new ArrayList<Map<String, String>>();
+	private List<Map<String, String>> mTableSettings = new ArrayList<Map<String, String>>();
 	private Button mBackBtn;
 	private Button mUpdateBtn;
 	private Button mStatisticsBtn;
@@ -76,6 +76,10 @@ public class TableActivity extends BaseActivity {
 
 	@Override
 	protected void onResume() {
+		mpDialog.setTitle("请稍等");
+		mpDialog.setMessage("正在获取状态...");
+		mpDialog.setIndeterminate(false);
+		mpDialog.setCancelable(false);
 		mpDialog.show();
 		handler.postDelayed(runnable, 1000 * 1);
 		super.onResume();
@@ -93,11 +97,6 @@ public class TableActivity extends BaseActivity {
 		setClickListeners();
 		mpDialog = new ProgressDialog(TableActivity.this);
 		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-		mpDialog.setTitle("请稍等");
-		mpDialog.setMessage("正在获取状态...");
-		mpDialog.setIndeterminate(false);
-		mpDialog.setCancelable(false);
-
 	}
 
 	private void findViews() {
@@ -121,12 +120,12 @@ public class TableActivity extends BaseActivity {
 			try {
 				Message msg = new Message();
 				tableHandle.sendEmptyMessage(DISABLE_GRIDVIEW);	
+				mTableSettings.clear();
 				mSettings.clear();
 				mNotificaion.clear();
 				mNotificaion.getNotifiycations();
 				mNotificationType.getNotifiycationsType();
 				int ret = mSettings.getTableStatusFromServer();
-
 				if (ret < 0) {
 					tableHandle.sendEmptyMessage(ret);
 					return;
@@ -226,10 +225,12 @@ public class TableActivity extends BaseActivity {
 
 					@Override
 					public void onClick(DialogInterface dialog, int i) {
-						dialog.cancel();
+						mpDialog.setTitle("请稍等");
+						mpDialog.setMessage("正在获取状态...");
+						mpDialog.setIndeterminate(false);
+						mpDialog.setCancelable(false);
 						mpDialog.show();
-						new Thread(new tableThread()).start();
-						handler.postDelayed(runnable, 1000 * 5);
+						handler.postDelayed(runnable, 1000 * 1);
 					}
 				});
 		mAlertDialog.setNegativeButton("退出",
@@ -255,8 +256,13 @@ public class TableActivity extends BaseActivity {
 
 					@Override
 					public void onClick(DialogInterface dialog, int i) {
+						//dialog.cancel();
+						mpDialog.setTitle("请稍等");
+						mpDialog.setMessage("正在清台...");
+						mpDialog.setIndeterminate(false);
+						mpDialog.setCancelable(false);
+						mpDialog.show();
 						cleanTableThread();
-						dialog.cancel();
 					}
 				});
 		mAlertDialog.setNegativeButton("取消",
@@ -280,6 +286,11 @@ public class TableActivity extends BaseActivity {
 
 					@Override
 					public void onClick(DialogInterface dialog, int i) {
+						mpDialog.setTitle("请稍等");
+						mpDialog.setMessage("正在删除手机点的菜...");
+						mpDialog.setIndeterminate(false);
+						mpDialog.setCancelable(false);
+						mpDialog.show();
 						cleanPhoneThread(position);
 						dialog.cancel();
 					}
@@ -426,7 +437,9 @@ public class TableActivity extends BaseActivity {
 
 	private Handler tableHandle = new Handler() {
 		public void handleMessage(Message msg) {
+			
 			if (msg.what < 0) {
+				mpDialog.cancel();
 				handler.removeCallbacks(runnable); // 停止刷新
 				handler.removeCallbacksAndMessages(runnable); // 停止刷新
 				AlertDialog.Builder mAlertDialog = networkDialog();
@@ -444,34 +457,9 @@ public class TableActivity extends BaseActivity {
 				}
 			}
 		}
-
-	};
-	
-	private Handler phoneHandle = new Handler() {
-		public void handleMessage(Message msg) {
-			if (msg.what < 0) {
-				Toast.makeText(getApplicationContext(),
-						getResources().getString(R.string.phoneWarning),
-						Toast.LENGTH_SHORT).show();
-			} else {
-				switch (msg.what) {
-				case UPDATE_TABLE_INFOS:
-					setTableInfos();
-					break;
-				case DISABLE_GRIDVIEW:
-					gridview.setOnItemClickListener(null);
-					break;
-				default:
-					break;
-				}
-				handler.postDelayed(runnable, 1000 * 1);
-			}
-		}
-
 	};
 	
 	private void setTableInfos() {
-		mTableSettings.clear();
 		Log.d("Notification", "NotificationNum:" + mNotificaion.size());
 		if (lstImageItem.size() > 0) {
 			for (int i = 0, n = 0; i < mSettings.size(); i++) {
@@ -582,13 +570,15 @@ public class TableActivity extends BaseActivity {
 			public void run() {
 				try {
 					Message msg = new Message();
-					mSettings.updatusStatus(Info.getTableId(), 0);
-					mMyOrder.delPhoneTable(Info.getTableId(), 0);
-					mSettings.cleanTalble(Info.getTableId());
+					int ret,statusRet,delRet,cleanRet;
+					statusRet = mSettings.updatusStatus(Info.getTableId(), 0);
+					delRet = mMyOrder.delPhoneTable(Info.getTableId(), 0);
+					cleanRet = mSettings.cleanTalble(Info.getTableId());
+					lstImageItem.clear();
 					mSettings.clear();
 					mNotificaion.getNotifiycations();
-					int ret = mSettings.getTableStatusFromServer();
-					if (ret < 0) {
+					ret =  mSettings.getTableStatusFromServer();
+					if (ret < 0 || statusRet < 0 || delRet< 0 || cleanRet < 0) {
 						tableHandle.sendEmptyMessage(ret);
 						return;
 					}
@@ -606,19 +596,20 @@ public class TableActivity extends BaseActivity {
 			public void run() {
 				try {
 					Message msg = new Message();
-					mSettings.updatusStatus(Info.getTableId(),
+					int ret,statusRet,delRet;
+					statusRet = mSettings.updatusStatus(Info.getTableId(),
 							mSettings.getStatus(position) - PHONE_STATUS);
-					mMyOrder.delPhoneTable(Info.getTableId(), 0);
+					delRet = mMyOrder.delPhoneTable(Info.getTableId(), 0);
 					mMyOrder.phoneClear();
 					mSettings.clear();
 					mNotificaion.getNotifiycations();
-					int ret = mSettings.getTableStatusFromServer();
-					if (ret < 0) {
-						phoneHandle.sendEmptyMessage(ret);
+					ret =  mSettings.getTableStatusFromServer();
+					if (ret < 0 || statusRet < 0 || delRet< 0) {
+						tableHandle.sendEmptyMessage(ret);
 						return;
 					}
 					msg.what = UPDATE_TABLE_INFOS;
-					phoneHandle.sendMessage(msg);
+					tableHandle.sendMessage(msg);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
