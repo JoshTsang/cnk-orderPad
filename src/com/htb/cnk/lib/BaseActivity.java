@@ -1,6 +1,7 @@
 package com.htb.cnk.lib;
 
 import android.app.Activity;
+import android.os.Bundle;
 import android.view.KeyEvent;
 
 import com.umeng.analytics.MobclickAgent;
@@ -16,6 +17,12 @@ public class BaseActivity extends Activity {
 			return super.onKeyDown(keyCode, event);
 		}
 	}
+	
+	@Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        MobclickAgent.onError(this);
+    }
 	
 	@Override
 	protected void onResume() {
