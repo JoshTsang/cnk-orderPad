@@ -435,7 +435,7 @@ public class MyOrder {
 			if (dishId == -1) {
 				for (int i = 0; i < mOrder.size(); i++) {
 					JSONObject dish = new JSONObject();
-					dish.put("disId", mOrder.get(i).dish.getId());
+					dish.put("dishId", mOrder.get(i).dish.getId());
 					dish.put("name", mOrder.get(i).dish.getName());
 					dish.put("price", mOrder.get(i).dish.getPrice());
 					dish.put(
