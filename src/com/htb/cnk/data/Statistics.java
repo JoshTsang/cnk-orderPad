@@ -171,7 +171,6 @@ public class Statistics {
 			salesData.put("timeStart", timestamp.format(start.getTime()));
 			salesData.put("timeEnd", timestamp.format(end.getTime()));
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
