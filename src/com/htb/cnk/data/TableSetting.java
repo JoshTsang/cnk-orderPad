@@ -139,7 +139,6 @@ public class TableSetting {
 			order.put("timestamp", time);
 			order.put("TID", tableId);
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		Log.d("JSON", order.toString());
