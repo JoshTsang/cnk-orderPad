@@ -42,7 +42,8 @@ import com.htb.cnk.lib.BaseActivity;
 public class TableActivity extends BaseActivity {
 	private final int UPDATE_TABLE_INFOS = 5;
 	private final int DISABLE_GRIDVIEW = 10;
-	
+	private final int PHONE_STATUS = 50;
+	private final int NOTIFICATION_STATUS = 100;
 	private TableSetting mSettings = new TableSetting();
 	protected List<Map<String, String>> mTableSettings = new ArrayList<Map<String, String>>();
 	private Button mBackBtn;
@@ -58,7 +59,6 @@ public class TableActivity extends BaseActivity {
 	private Notifications mNotificaion = new Notifications();
 	private NotificationTypes mNotificationType = new NotificationTypes();
 	private MyOrder mMyOrder;
-
 
 	@Override
 	protected void onDestroy() {
@@ -120,12 +120,13 @@ public class TableActivity extends BaseActivity {
 		public void run() {
 			try {
 				Message msg = new Message();
-				tableHandle.sendEmptyMessage(DISABLE_GRIDVIEW);
+				tableHandle.sendEmptyMessage(DISABLE_GRIDVIEW);	
 				mSettings.clear();
 				mNotificaion.clear();
 				mNotificaion.getNotifiycations();
 				mNotificationType.getNotifiycationsType();
-				int ret = mSettings.getTableStatus();
+				int ret = mSettings.getTableStatusFromServer();
+
 				if (ret < 0) {
 					tableHandle.sendEmptyMessage(ret);
 					return;
@@ -143,6 +144,7 @@ public class TableActivity extends BaseActivity {
 			try {
 				Message msg = new Message();
 				handler.removeCallbacks(runnable); // 停止刷新
+//				handler.removeCallbacksAndMessages(runnable); // 停止刷新
 				int ret = mNotificaion.cleanNotifications(Info.getTableId());
 				if (ret < 0) {
 					notificationHandle.sendEmptyMessage(ret);
@@ -167,19 +169,22 @@ public class TableActivity extends BaseActivity {
 
 			Info.setTableName(mSettings.getName(arg2));
 			Info.setTableId(mSettings.getId(arg2));
-			int id = mSettings.getStatus(arg2);
-			switch (id) {
+			int status = mSettings.getStatus(arg2);
+			Log.d("status", "status:"+status);
+			switch (status) {
 			case 1:
 				Dialog cleanDialog = cleanDialog();
 				cleanDialog.show();
 				break;
-			case 2:
-				AlertDialog.Builder addPhoneDilog = addPhoneDialog();
+			case 50:
+			case 51:
+				AlertDialog.Builder addPhoneDilog = addPhoneDialog(arg2);
 				addPhoneDilog.show();
 				break;
 			case 100:
 			case 101:
-			case 102:
+			case 150:
+			case 151:
 				AlertDialog.Builder notificationDialog = notificationDialog();
 				notificationDialog.show();
 				break;
@@ -224,6 +229,7 @@ public class TableActivity extends BaseActivity {
 						dialog.cancel();
 						mpDialog.show();
 						new Thread(new tableThread()).start();
+						handler.postDelayed(runnable, 1000 * 5);
 					}
 				});
 		mAlertDialog.setNegativeButton("退出",
@@ -249,8 +255,33 @@ public class TableActivity extends BaseActivity {
 
 					@Override
 					public void onClick(DialogInterface dialog, int i) {
-						dialog.cancel();
 						cleanTableThread();
+						dialog.cancel();
+					}
+				});
+		mAlertDialog.setNegativeButton("取消",
+				new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int i) {
+						dialog.cancel();
+					}
+				});
+		return mAlertDialog;
+	}
+
+	private AlertDialog.Builder cleanPhoneDialog(final int position) {
+		final AlertDialog.Builder mAlertDialog = new AlertDialog.Builder(
+				TableActivity.this);
+		mAlertDialog.setMessage("请确认是否清除手机点菜");// 设置对话框内容
+		mAlertDialog.setCancelable(false);
+		mAlertDialog.setPositiveButton("清除",
+				new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int i) {
+						cleanPhoneThread(position);
+						dialog.cancel();
 					}
 				});
 		mAlertDialog.setNegativeButton("取消",
@@ -298,7 +329,7 @@ public class TableActivity extends BaseActivity {
 		return addDialog;
 	}
 
-	private AlertDialog.Builder addPhoneDialog() {
+	private AlertDialog.Builder addPhoneDialog(final int position) {
 		final CharSequence[] additems = { "手机已点的菜", "取消手机已点菜" };
 
 		AlertDialog.Builder addPhoneDialog = new AlertDialog.Builder(
@@ -317,8 +348,8 @@ public class TableActivity extends BaseActivity {
 							TableActivity.this.startActivity(intent);
 							break;
 						case 1:
-							final AlertDialog.Builder mAlertDialog = cleanTableDialog();
-							mAlertDialog.show();
+							final AlertDialog.Builder phoneDialog = cleanPhoneDialog(position);
+							phoneDialog.show();
 							break;
 						default:
 							break;
@@ -335,12 +366,15 @@ public class TableActivity extends BaseActivity {
 		AlertDialog.Builder addPhoneDialog = new AlertDialog.Builder(
 				TableActivity.this);
 		addPhoneDialog.setTitle("客户呼叫需求").setIcon(R.drawable.ic_launcher)
-				.setItems(additems, new DialogInterface.OnClickListener() {
+				.setItems(additems, null)
+				.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
+
 					}
 				})
-				.setNegativeButton("确定", new DialogInterface.OnClickListener() {
+				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
@@ -393,10 +427,12 @@ public class TableActivity extends BaseActivity {
 	private Handler tableHandle = new Handler() {
 		public void handleMessage(Message msg) {
 			if (msg.what < 0) {
-				final AlertDialog.Builder mAlertDialog = networkDialog();
+				handler.removeCallbacks(runnable); // 停止刷新
+				handler.removeCallbacksAndMessages(runnable); // 停止刷新
+				AlertDialog.Builder mAlertDialog = networkDialog();
 				mAlertDialog.show();
 			} else {
-				switch(msg.what) {
+				switch (msg.what) {
 				case UPDATE_TABLE_INFOS:
 					setTableInfos();
 					break;
@@ -404,99 +440,113 @@ public class TableActivity extends BaseActivity {
 					gridview.setOnItemClickListener(null);
 					break;
 				default:
-						break;
+					break;
 				}
 			}
 		}
 
-		private void setTableInfos() {
-			mTableSettings.clear();
-			Log.d("Notification", "NotificationNum:" + mNotificaion.size());
-			if (lstImageItem.size() > 0) {
-				for (int i = 0, n = 0; i < mSettings.size(); i++) {
-					int status = mSettings.getStatus(i);
-					if (status < 100
-							&& mNotificaion.getId(n) == mSettings.getId(i)) {
-
-						status = status + 100;
-						n++;
-						Log.d("mNotificaionID", "mNotificaionID"
-								+ mNotificaion.getId(n)
-								+ " mSettings.getId:" + mSettings.getId(i));
-						Log.d("statusImage", "statusImage" + status
-								+ " num:" + i);
-					}
-
-					setTableIcon(i, status);
-				}
-			} else {
-				for (int i = 0, n = 0; i < mSettings.size(); i++) {
-					int status = mSettings.getStatus(i);
-					if (status < 100
-							&& mNotificaion.getId(n) == mSettings.getId(i)) {
-						status = status + 100;
-						n++;
-					}
-
-					setTableIcon(i, status);
-				}
-				saImageItems = new SimpleAdapter(TableActivity.this,
-						lstImageItem, R.layout.grid_item, new String[] {
-								"imageItem", "ItemText" }, new int[] {
-								R.id.ItemImage, R.id.ItemText }) {
-				};
-				gridview.setAdapter(saImageItems);
-			}
-
-			gridview.setVisibility(View.VISIBLE);
-			saImageItems.notifyDataSetChanged();
-			mpDialog.cancel();
-			gridview.setOnItemClickListener(mTableClicked);
-		}
-
-		private void setTableIcon(int position, int status) {
-			HashMap<String, Object> map;
-			if (lstImageItem.size() <= position) {
-				map = new HashMap<String, Object>();
-				map.put("ItemText", "第" + mSettings.getName(position) + "桌");
-			} else {
-				map = lstImageItem.get(position);
-			}
-			
-			switch (status) {
-			case 1:
-				map.put("imageItem",
-						R.drawable.table_blue);
-				break;
-			case 2:
-				map.put("imageItem",
-						R.drawable.table_yellow);
-				break;
-			case 100:
-				map.put("imageItem",
-						R.drawable.table_rednotification);
-				mSettings.setStatus(position, 100);
-				break;
-			case 101:
-				map.put("imageItem",
-						R.drawable.table_bluenotification);
-				mSettings.setStatus(position, 101);
-				break;
-			case 102:
-				map.put("imageItem",
-						R.drawable.table_yellownotification);
-				mSettings.setStatus(position, 102);
-				break;
-			default:
-				map.put("imageItem",
-						R.drawable.table_red);
-				break;
-			}
-			if (lstImageItem.size() <= position) {
-				lstImageItem.add(map);
-			}
-		}
 	};
+	
+	private Handler phoneHandle = new Handler() {
+		public void handleMessage(Message msg) {
+			if (msg.what < 0) {
+				Toast.makeText(getApplicationContext(),
+						getResources().getString(R.string.phoneWarning),
+						Toast.LENGTH_SHORT).show();
+			} else {
+				switch (msg.what) {
+				case UPDATE_TABLE_INFOS:
+					setTableInfos();
+					break;
+				case DISABLE_GRIDVIEW:
+					gridview.setOnItemClickListener(null);
+					break;
+				default:
+					break;
+				}
+				handler.postDelayed(runnable, 1000 * 1);
+			}
+		}
+
+	};
+	
+	private void setTableInfos() {
+		mTableSettings.clear();
+		Log.d("Notification", "NotificationNum:" + mNotificaion.size());
+		if (lstImageItem.size() > 0) {
+			for (int i = 0, n = 0; i < mSettings.size(); i++) {
+				int status = mSettings.getStatus(i);
+				if (status < NOTIFICATION_STATUS && mNotificaion.getId(n) == mSettings.getId(i)) {
+
+					status = status + NOTIFICATION_STATUS;
+					n++;
+				}
+				setTableIcon(i, status);
+			}
+		} else {
+			for (int i = 0, n = 0; i < mSettings.size(); i++) {
+				int status = mSettings.getStatus(i);
+				if (status < NOTIFICATION_STATUS && mNotificaion.getId(n) == mSettings.getId(i)) {
+					status = status + NOTIFICATION_STATUS;
+					n++;
+				}
+				setTableIcon(i, status);
+			}
+			saImageItems = new SimpleAdapter(TableActivity.this, lstImageItem,
+					R.layout.grid_item,
+					new String[] { "imageItem", "ItemText" }, new int[] {
+							R.id.ItemImage, R.id.ItemText }) {
+			};
+			gridview.setAdapter(saImageItems);
+		}
+
+		gridview.setVisibility(View.VISIBLE);
+		saImageItems.notifyDataSetChanged();
+		mpDialog.cancel();
+		gridview.setOnItemClickListener(mTableClicked);
+	}
+
+	private void setTableIcon(int position, int status) {
+		HashMap<String, Object> map;
+		if (lstImageItem.size() <= position) {
+			map = new HashMap<String, Object>();
+			map.put("ItemText", "第" + mSettings.getName(position) + "桌");
+		} else {
+			map = lstImageItem.get(position);
+		}
+
+		switch (status) {
+		case 0:
+			map.put("imageItem", R.drawable.table_red);
+			break;
+		case 1:
+			map.put("imageItem", R.drawable.table_blue);
+			break;
+		case 50:
+		case 51:
+			map.put("imageItem", R.drawable.table_yellow);
+			break;
+		case 100:
+			map.put("imageItem", R.drawable.table_rednotification);
+			mSettings.setStatus(position, status);
+			break;
+		case 101:
+			map.put("imageItem", R.drawable.table_bluenotification);
+			mSettings.setStatus(position, status);
+			break;
+		case 150:
+		case 151:
+			map.put("imageItem", R.drawable.table_yellownotification);
+			mSettings.setStatus(position, status);
+			break;
+		default:
+			map.put("imageItem", R.drawable.table_red);
+			break;
+		}
+		if (lstImageItem.size() <= position) {
+			lstImageItem.add(map);
+		}
+	}
 
 	private Handler userHandle = new Handler() {
 
@@ -537,13 +587,38 @@ public class TableActivity extends BaseActivity {
 					mSettings.cleanTalble(Info.getTableId());
 					mSettings.clear();
 					mNotificaion.getNotifiycations();
-					int ret = mSettings.getTableStatus();
+					int ret = mSettings.getTableStatusFromServer();
 					if (ret < 0) {
 						tableHandle.sendEmptyMessage(ret);
 						return;
 					}
-					msg.what = ret;
+					msg.what = UPDATE_TABLE_INFOS;
 					tableHandle.sendMessage(msg);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}.start();
+	}
+
+	private void cleanPhoneThread(final int position) {
+		new Thread() {
+			public void run() {
+				try {
+					Message msg = new Message();
+					mSettings.updatusStatus(Info.getTableId(),
+							mSettings.getStatus(position) - PHONE_STATUS);
+					mMyOrder.delPhoneTable(Info.getTableId(), 0);
+					mMyOrder.phoneClear();
+					mSettings.clear();
+					mNotificaion.getNotifiycations();
+					int ret = mSettings.getTableStatusFromServer();
+					if (ret < 0) {
+						phoneHandle.sendEmptyMessage(ret);
+						return;
+					}
+					msg.what = UPDATE_TABLE_INFOS;
+					phoneHandle.sendMessage(msg);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -659,7 +734,6 @@ public class TableActivity extends BaseActivity {
 
 		void update() {
 			// 刷新msg的内容
-		//	Log.d("runnalbe", "update");
 			new Thread(new tableThread()).start();
 			handler.postDelayed(this, 1000 * 15);// 间隔15秒
 		}

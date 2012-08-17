@@ -214,7 +214,20 @@ public class MyOrder {
 	public void clear() {
 		mOrder.clear();
 	}
+	
+	public void phoneClear(){
+		for (int i = 0; i < mOrder.size(); i++) {
+			OrderedDish item = (OrderedDish) mOrder.get(i);
+			if (item.padQuantity == 0) {
+				mOrder.remove(item);
+				i--;
+			} else {
+				item.phoneQuantity = 0;
+			}
 
+		}
+	}
+	
 	public void talbeClear() {
 		if (count() > 0 && getTableId() != Info.getTableId()) {
 			mOrder.clear();
@@ -450,6 +463,7 @@ public class MyOrder {
 		Log.d("JSON", order.toString());
 
 		String response = Http.post(Server.DEL_ORDER, order.toString());
+		Log.d("response", "response:"+response);
 		if (response == null) {
 			return -1;
 		}

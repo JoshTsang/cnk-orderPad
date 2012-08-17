@@ -16,7 +16,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.htb.cnk.adapter.PadOrderAdapter;
+import com.htb.cnk.adapter.MyOrderAdapter;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder.OrderedDish;
 import com.htb.cnk.data.TableSetting;
@@ -27,7 +27,7 @@ import com.htb.cnk.lib.OrderBaseActivity;
  *
  */
 public class MyOrderActivity extends OrderBaseActivity {
-	private PadOrderAdapter mMyOrderAdapter;
+	private MyOrderAdapter mMyOrderAdapter;
 	private ProgressDialog mpDialog;
 	private TableSetting mSettings = new TableSetting();
 
@@ -49,8 +49,8 @@ public class MyOrderActivity extends OrderBaseActivity {
 		mMyOrderLst.setAdapter(mMyOrderAdapter);
 	}
 
-	private PadOrderAdapter getMyOrderAdapterInstance() {
-		return new PadOrderAdapter(this, mMyOrder) {
+	private MyOrderAdapter getMyOrderAdapterInstance() {
+		return new MyOrderAdapter(this, mMyOrder) {
 			@Override
 			public View getView(int position, View convertView, ViewGroup arg2) {
 				TextView dishName;
