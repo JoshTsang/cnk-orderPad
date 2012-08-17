@@ -8,7 +8,11 @@
 
 	<uses-permission android:name="android.permission.INTERNET"/>
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-	
+	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"></uses-permission>
+	<uses-permission android:name="android.permission.READ_PHONE_STATE"></uses-permission>
+	<uses-permission android:name="android.permission.READ_LOGS"></uses-permission>
+	<meta-data android:value="502dfea75270151398000058" android:name="UMENG_APPKEY"></meta-data>
+	<meta-data android:value="TEST" android:name="UMENG_CHANNEL"/>
     <application
         android:icon="@drawable/logo"
         android:label="@string/app_name" >
