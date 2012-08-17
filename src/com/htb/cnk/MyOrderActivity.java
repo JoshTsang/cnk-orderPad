@@ -3,10 +3,12 @@ package com.htb.cnk;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -109,6 +111,7 @@ public class MyOrderActivity extends OrderBaseActivity {
 
 	private void setOrderClickListener() {
 		mSubmitBtn.setOnClickListener(submitBtnClicked);
+		mBackBtn.setOnClickListener(backClicked);
 	}
 
 	private void updateDishQuantity(int position, int quantity) {
@@ -148,7 +151,16 @@ public class MyOrderActivity extends OrderBaseActivity {
 			}).show();
 		}
 	}
-
+	
+	private OnClickListener backClicked = new OnClickListener() {
+		public void onClick(View v) {
+			Intent intent = new Intent();
+			intent.setClass(MyOrderActivity.this, MenuActivity.class);
+			startActivity(intent);
+			finish();
+		}
+	};
+	
 	private OnClickListener minusClicked = new OnClickListener() {
 
 		public void onClick(View v) {
@@ -240,10 +252,22 @@ public class MyOrderActivity extends OrderBaseActivity {
 								int which) {
 							mMyOrder.clear();
 							mMyOrderAdapter.notifyDataSetChanged();
+							finish();
 						}
 				}).show();
 			}
 		}
 	};
 
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		// TODO Auto-generated method stub
+		boolean ret = super.onKeyDown(keyCode, event);
+		Intent intent = new Intent();
+		intent.setClass(MyOrderActivity.this, MenuActivity.class);
+		startActivity(intent);
+		return ret;
+	}
+
+	
 }

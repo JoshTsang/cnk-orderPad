@@ -384,6 +384,7 @@ public class MenuActivity extends BaseActivity {
 				Intent intent = new Intent();
 				intent.setClass(MenuActivity.this, MyOrderActivity.class);
 				startActivity(intent);
+				finish();
 			}
 		}
 	};
