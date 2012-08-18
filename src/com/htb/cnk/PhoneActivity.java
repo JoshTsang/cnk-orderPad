@@ -207,12 +207,13 @@ public class PhoneActivity extends BaseActivity {
 
 	class queryThread implements Runnable {
 		public void run() {
+			int ret = -1;
 			try {
-				int ret = mMyOrder.getPhoneOrderFromServer(Info.getTableId());
+				ret = mMyOrder.getPhoneOrderFromServer(Info.getTableId());
 				queryHandler.sendEmptyMessage(ret);
-
 			} catch (Exception e) {
 				e.printStackTrace();
+				queryHandler.sendEmptyMessage(ret);
 			}
 		}
 
