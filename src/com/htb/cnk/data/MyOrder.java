@@ -225,12 +225,14 @@ public class MyOrder {
 	}
 	
 	public void phoneClear() {
-		for (OrderedDish item:mOrder) {
-			if (item.padQuantity == 0) {
-				mOrder.remove(item);
-			} else {
-				item.phoneQuantity = 0;
-			}
+		 for (int i = 0; i < mOrder.size(); i++) {
+			 OrderedDish item = (OrderedDish) mOrder.get(i);
+			 if (item.padQuantity == 0) {
+			      mOrder.remove(item);
+			       i--;
+			 } else {
+				 item.phoneQuantity = 0;
+			 }
 		}
 	}
 

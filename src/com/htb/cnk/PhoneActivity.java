@@ -45,11 +45,11 @@ public class PhoneActivity extends BaseActivity {
 //	private ProgressDialog mDialogCancel;
 	@Override
 	protected void onResume() {
+		super.onResume();
 		Log.d("onResume", "onResume");
 		mpDialog.setMessage("正在更新数据，请稍等");
 		mpDialog.show();
 		updateTabelInfos();
-		super.onResume();
 	}
 
 	@Override
