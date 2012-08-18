@@ -110,7 +110,16 @@ public class TableSetting {
 
 		return -1;
 	}
-
+	
+	public int getItemTableStatus(int tableId) {
+		String tableStatusPkg = Http.get(Server.GET_ITEM_TABLE_STATUS, "TSI=" + tableId);
+		Log.d("res", tableStatusPkg);
+		if(tableStatusPkg == null){
+			return -1;
+		}
+		return Integer.parseInt(tableStatusPkg);
+	}
+	
 	public int updatusStatus(int tableId, int status) {
 		String tableStatusPkg = Http.get(Server.UPDATE_TABLE_STATUS, "TID="
 				+ tableId + "&TST=" + status);
@@ -119,7 +128,9 @@ public class TableSetting {
 		}
 		return 0;
 	}
+	
 
+	
 	public int remove(int index) {
 		mTableSettings.remove(index);
 		return 0;
