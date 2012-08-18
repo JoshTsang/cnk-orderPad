@@ -138,10 +138,15 @@ public class MyOrder {
 	public int minus(Dish dish, int quantity) {
 		for (OrderedDish item : mOrder) {
 			if (item.dish.getId() == dish.getId()) {
-				if (item.padQuantity > 0) {
-					item.padQuantity -= quantity;
-				} else if (item.padQuantity == 0 && item.phoneQuantity > 0) {
-					item.phoneQuantity -= quantity;
+				if ((item.padQuantity + item.phoneQuantity) > quantity) {
+					if (item.padQuantity > quantity) {
+						item.padQuantity -= quantity;
+					} else {
+						quantity -= item.padQuantity;
+						item.padQuantity = 0;
+						item.phoneQuantity -= quantity;
+						return item.phoneQuantity;
+					}
 				} else {
 					mOrder.remove(item);
 				}

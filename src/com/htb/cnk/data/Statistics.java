@@ -171,6 +171,7 @@ public class Statistics {
 			salesData.put("timeStart", timestamp.format(start.getTime()));
 			salesData.put("timeEnd", timestamp.format(end.getTime()));
 		} catch (JSONException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -193,8 +194,12 @@ public class Statistics {
 		String response = Http.post(Server.STATISTICS_PRINT, salesData.toString());
 		if (response == null) {
 			Log.d("Respond", "die/ok");
-		} else {
+			return 0;
+		} else if ("".equals(response)) {
 			Log.d("Respond",response);
+		} else { 
+			Log.d("Respond",response);
+			return -1;
 		}
 		return 0;
 	}
