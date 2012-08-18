@@ -44,6 +44,7 @@ public class TableActivity extends BaseActivity {
 	private final int DISABLE_GRIDVIEW = 10;
 	private final int PHONE_STATUS = 50;
 	private final int NOTIFICATION_STATUS = 100;
+	private static int ARERTDIALOG = 0;
 	private TableSetting mSettings = new TableSetting();
 	private List<Map<String, String>> mTableSettings = new ArrayList<Map<String, String>>();
 	private Button mBackBtn;
@@ -59,6 +60,8 @@ public class TableActivity extends BaseActivity {
 	private Notifications mNotificaion = new Notifications();
 	private NotificationTypes mNotificationType = new NotificationTypes();
 	private MyOrder mMyOrder;
+	private AlertDialog.Builder mNetWrorkAlertDialog;
+	private AlertDialog mNetWrorkcancel;
 
 	@Override
 	protected void onDestroy() {
@@ -76,11 +79,17 @@ public class TableActivity extends BaseActivity {
 
 	@Override
 	protected void onResume() {
+		// mNetWrorkAlertDialog.;
+		if (ARERTDIALOG == 1) {
+			mNetWrorkcancel.cancel();
+			ARERTDIALOG = 0;
+		}
 		mpDialog.setTitle("请稍等");
 		mpDialog.setMessage("正在获取状态...");
 		mpDialog.setIndeterminate(false);
 		mpDialog.setCancelable(false);
 		mpDialog.show();
+
 		handler.postDelayed(runnable, 1000 * 1);
 		super.onResume();
 	}
@@ -97,6 +106,7 @@ public class TableActivity extends BaseActivity {
 		setClickListeners();
 		mpDialog = new ProgressDialog(TableActivity.this);
 		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+		mNetWrorkAlertDialog = networkDialog();
 	}
 
 	private void findViews() {
@@ -119,7 +129,7 @@ public class TableActivity extends BaseActivity {
 		public void run() {
 			try {
 				Message msg = new Message();
-				tableHandle.sendEmptyMessage(DISABLE_GRIDVIEW);	
+				tableHandle.sendEmptyMessage(DISABLE_GRIDVIEW);
 				mTableSettings.clear();
 				mSettings.clear();
 				mNotificaion.clear();
@@ -127,6 +137,7 @@ public class TableActivity extends BaseActivity {
 				mNotificationType.getNotifiycationsType();
 				int ret = mSettings.getTableStatusFromServer();
 				if (ret < 0) {
+					Log.d("ret", "ret: " + ret);
 					tableHandle.sendEmptyMessage(ret);
 					return;
 				}
@@ -143,7 +154,7 @@ public class TableActivity extends BaseActivity {
 			try {
 				Message msg = new Message();
 				handler.removeCallbacks(runnable); // 停止刷新
-//				handler.removeCallbacksAndMessages(runnable); // 停止刷新
+				handler.removeCallbacksAndMessages(runnable); // 停止刷新
 				int ret = mNotificaion.cleanNotifications(Info.getTableId());
 				if (ret < 0) {
 					notificationHandle.sendEmptyMessage(ret);
@@ -169,7 +180,7 @@ public class TableActivity extends BaseActivity {
 			Info.setTableName(mSettings.getName(arg2));
 			Info.setTableId(mSettings.getId(arg2));
 			int status = mSettings.getStatus(arg2);
-			Log.d("status", "status:"+status);
+			Log.d("status", "status:" + status);
 			switch (status) {
 			case 1:
 				Dialog cleanDialog = cleanDialog();
@@ -225,6 +236,8 @@ public class TableActivity extends BaseActivity {
 
 					@Override
 					public void onClick(DialogInterface dialog, int i) {
+						dialog.cancel();
+						ARERTDIALOG = 0;
 						mpDialog.setTitle("请稍等");
 						mpDialog.setMessage("正在获取状态...");
 						mpDialog.setIndeterminate(false);
@@ -238,11 +251,13 @@ public class TableActivity extends BaseActivity {
 
 					@Override
 					public void onClick(DialogInterface dialog, int i) {
+						ARERTDIALOG = 0;
 						dialog.cancel();
 						mpDialog.cancel();
 						finish();
 					}
 				});
+		
 		return mAlertDialog;
 	}
 
@@ -256,7 +271,7 @@ public class TableActivity extends BaseActivity {
 
 					@Override
 					public void onClick(DialogInterface dialog, int i) {
-						//dialog.cancel();
+						// dialog.cancel();
 						mpDialog.setTitle("请稍等");
 						mpDialog.setMessage("正在清台...");
 						mpDialog.setIndeterminate(false);
@@ -281,7 +296,7 @@ public class TableActivity extends BaseActivity {
 				TableActivity.this);
 		mAlertDialog.setMessage("请确认是否清除手机点菜");// 设置对话框内容
 		mAlertDialog.setCancelable(false);
-		mAlertDialog.setPositiveButton("清除",
+		mAlertDialog.setPositiveButton("是",
 				new DialogInterface.OnClickListener() {
 
 					@Override
@@ -295,7 +310,7 @@ public class TableActivity extends BaseActivity {
 						dialog.cancel();
 					}
 				});
-		mAlertDialog.setNegativeButton("取消",
+		mAlertDialog.setNegativeButton("否",
 				new DialogInterface.OnClickListener() {
 
 					@Override
@@ -341,7 +356,7 @@ public class TableActivity extends BaseActivity {
 	}
 
 	private AlertDialog.Builder addPhoneDialog(final int position) {
-		final CharSequence[] additems = { "手机已点的菜", "取消手机已点菜" };
+		final CharSequence[] additems = { "查看手机已点的菜", "取消手机已点的菜" };
 
 		AlertDialog.Builder addPhoneDialog = new AlertDialog.Builder(
 				TableActivity.this);
@@ -437,13 +452,13 @@ public class TableActivity extends BaseActivity {
 
 	private Handler tableHandle = new Handler() {
 		public void handleMessage(Message msg) {
-			
+
 			if (msg.what < 0) {
-				mpDialog.cancel();
 				handler.removeCallbacks(runnable); // 停止刷新
 				handler.removeCallbacksAndMessages(runnable); // 停止刷新
-				AlertDialog.Builder mAlertDialog = networkDialog();
-				mAlertDialog.show();
+				mpDialog.cancel();
+				ARERTDIALOG = 1;
+				mNetWrorkcancel = mNetWrorkAlertDialog.show();
 			} else {
 				switch (msg.what) {
 				case UPDATE_TABLE_INFOS:
@@ -458,13 +473,14 @@ public class TableActivity extends BaseActivity {
 			}
 		}
 	};
-	
+
 	private void setTableInfos() {
 		Log.d("Notification", "NotificationNum:" + mNotificaion.size());
 		if (lstImageItem.size() > 0) {
 			for (int i = 0, n = 0; i < mSettings.size(); i++) {
 				int status = mSettings.getStatus(i);
-				if (status < NOTIFICATION_STATUS && mNotificaion.getId(n) == mSettings.getId(i)) {
+				if (status < NOTIFICATION_STATUS
+						&& mNotificaion.getId(n) == mSettings.getId(i)) {
 
 					status = status + NOTIFICATION_STATUS;
 					n++;
@@ -474,7 +490,8 @@ public class TableActivity extends BaseActivity {
 		} else {
 			for (int i = 0, n = 0; i < mSettings.size(); i++) {
 				int status = mSettings.getStatus(i);
-				if (status < NOTIFICATION_STATUS && mNotificaion.getId(n) == mSettings.getId(i)) {
+				if (status < NOTIFICATION_STATUS
+						&& mNotificaion.getId(n) == mSettings.getId(i)) {
 					status = status + NOTIFICATION_STATUS;
 					n++;
 				}
@@ -570,15 +587,15 @@ public class TableActivity extends BaseActivity {
 			public void run() {
 				try {
 					Message msg = new Message();
-					int ret,statusRet,delRet,cleanRet;
+					int ret, statusRet, delRet, cleanRet;
 					statusRet = mSettings.updatusStatus(Info.getTableId(), 0);
 					delRet = mMyOrder.delPhoneTable(Info.getTableId(), 0);
 					cleanRet = mSettings.cleanTalble(Info.getTableId());
 					lstImageItem.clear();
 					mSettings.clear();
 					mNotificaion.getNotifiycations();
-					ret =  mSettings.getTableStatusFromServer();
-					if (ret < 0 || statusRet < 0 || delRet< 0 || cleanRet < 0) {
+					ret = mSettings.getTableStatusFromServer();
+					if (ret < 0 || statusRet < 0 || delRet < 0 || cleanRet < 0) {
 						tableHandle.sendEmptyMessage(ret);
 						return;
 					}
@@ -596,15 +613,15 @@ public class TableActivity extends BaseActivity {
 			public void run() {
 				try {
 					Message msg = new Message();
-					int ret,statusRet,delRet;
+					int ret, statusRet, delRet;
 					statusRet = mSettings.updatusStatus(Info.getTableId(),
 							mSettings.getStatus(position) - PHONE_STATUS);
 					delRet = mMyOrder.delPhoneTable(Info.getTableId(), 0);
 					mMyOrder.phoneClear();
 					mSettings.clear();
 					mNotificaion.getNotifiycations();
-					ret =  mSettings.getTableStatusFromServer();
-					if (ret < 0 || statusRet < 0 || delRet< 0) {
+					ret = mSettings.getTableStatusFromServer();
+					if (ret < 0 || statusRet < 0 || delRet < 0) {
 						tableHandle.sendEmptyMessage(ret);
 						return;
 					}

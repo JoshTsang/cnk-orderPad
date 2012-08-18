@@ -418,7 +418,7 @@ public class PhoneActivity extends BaseActivity {
 									public void onClick(DialogInterface dialog,
 											int which) {
 										mMyOrder.clear();
-										mMyOrderAdapter.notifyDataSetChanged();
+										finish();
 									}
 								}).show();
 			}
