@@ -589,7 +589,7 @@ public class TableActivity extends BaseActivity {
 					Message msg = new Message();
 					int ret, statusRet, delRet, cleanRet;
 					statusRet = mSettings.updatusStatus(Info.getTableId(), 0);
-					delRet = mMyOrder.delPhoneTable(Info.getTableId(), 0);
+					delRet = mMyOrder.delPhoneTable(Info.getTableId(), 0, -1);
 					cleanRet = mSettings.cleanTalble(Info.getTableId());
 					lstImageItem.clear();
 					mSettings.clear();
@@ -616,7 +616,7 @@ public class TableActivity extends BaseActivity {
 					int ret, statusRet, delRet;
 					statusRet = mSettings.updatusStatus(Info.getTableId(),
 							mSettings.getStatus(position) - PHONE_STATUS);
-					delRet = mMyOrder.delPhoneTable(Info.getTableId(), 0);
+					delRet = mMyOrder.delPhoneTable(Info.getTableId(), 0, -1);
 					mMyOrder.phoneClear();
 					mSettings.clear();
 					mNotificaion.getNotifiycations();
@@ -743,7 +743,7 @@ public class TableActivity extends BaseActivity {
 		void update() {
 			// 刷新msg的内容
 			new Thread(new tableThread()).start();
-			handler.postDelayed(this, 1000 * 15);// 间隔15秒
+			handler.postDelayed(this, 1000 * 20);// 间隔20秒
 		}
 	};
 }

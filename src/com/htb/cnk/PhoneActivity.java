@@ -42,7 +42,7 @@ public class PhoneActivity extends BaseActivity {
 	private MyOrderAdapter mMyOrderAdapter;
 	private ProgressDialog mpDialog;
 	private TableSetting mSettings = new TableSetting();
-
+//	private ProgressDialog mDialogCancel;
 	@Override
 	protected void onResume() {
 		Log.d("onResume", "onResume");
@@ -220,7 +220,6 @@ public class PhoneActivity extends BaseActivity {
 
 	private void updateDishQuantity(int position, int quantity) {
 		if (quantity < 0) {
-
 			int result = mMyOrder.minus(position, -quantity);
 			Log.d("update", "result" + result);
 			if (result > 0) {
@@ -265,17 +264,11 @@ public class PhoneActivity extends BaseActivity {
 							@Override
 							public void onClick(DialogInterface dialog,
 									int which) {
-								delPhoneTableThread(position);
-								mpDialog.setMessage("正在删除菜单...");
+								mpDialog.setMessage("正在删除菜单,请稍等");
 								mpDialog.show();
-								mMyOrder.minus(position, quantity);
-								mMyOrderAdapter.notifyDataSetChanged();
-								mDishCountTxt.setText(Integer
-										.toString(mMyOrder.totalQuantity())
-										+ " 道菜");
-								mTotalPriceTxt.setText(Double
-										.toString(mMyOrder.getTotalPrice())
-										+ " 元");
+								delPhoneTableThread(position,quantity);
+								
+								
 							}
 						}).setNegativeButton("取消", null).show();
 	}
@@ -296,13 +289,12 @@ public class PhoneActivity extends BaseActivity {
 		}.start();
 	}
 
-	private void delPhoneTableThread(final int position) {
+	private void delPhoneTableThread(final int position,final int quantity) {
 		new Thread() {
 			public void run() {
 				Message msg = new Message();
 				int ret = mMyOrder.delPhoneTable(Info.getTableId(),
-						mMyOrder.getDishId(position));
-				mpDialog.cancel();
+						mMyOrder.getDishId(position),position);
 				if (ret < 0) {
 					delPhoneOrderhandler.sendEmptyMessage(-1);
 				} else {
@@ -328,7 +320,7 @@ public class PhoneActivity extends BaseActivity {
 					if ("".equals(ret)) {
 						handler.sendEmptyMessage(0);
 						mSettings.updatusStatus(Info.getTableId(), 1);
-						mMyOrder.delPhoneTable(Info.getTableId(), 0);
+						mMyOrder.delPhoneTable(Info.getTableId(), 0, -1);
 					} else {
 						handler.sendEmptyMessage(-1);
 					}
@@ -450,7 +442,13 @@ public class PhoneActivity extends BaseActivity {
 									}
 								}).show();
 			} else {
-
+				mMyOrderAdapter.notifyDataSetChanged();
+				mDishCountTxt.setText(Integer
+						.toString(mMyOrder.totalQuantity())
+						+ " 道菜");
+				mTotalPriceTxt.setText(Double
+						.toString(mMyOrder.getTotalPrice())
+						+ " 元");
 			}
 		}
 	};

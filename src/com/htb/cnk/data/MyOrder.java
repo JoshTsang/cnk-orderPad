@@ -164,6 +164,8 @@ public class MyOrder {
 			if (mOrder.get(position).padQuantity > quantity) {
 				mOrder.get(position).padQuantity -= quantity;
 			} else {
+				Log.d("phoneQuan", "phone: "
+						+ mOrder.get(position).phoneQuantity);
 				quantity -= mOrder.get(position).padQuantity;
 				mOrder.get(position).padQuantity = 0;
 				mOrder.get(position).phoneQuantity -= quantity;
@@ -231,7 +233,7 @@ public class MyOrder {
 			}
 		}
 	}
-	
+
 	public void talbeClear() {
 		if (count() > 0 && getTableId() != Info.getTableId()) {
 			mOrder.clear();
@@ -342,7 +344,6 @@ public class MyOrder {
 				double dishPrice = cur.getDouble(1);
 				Dish mDish = new Dish(dishId, name, dishPrice, null);
 				addOrder(mDish, quantity, tableId, MODE_PHONE);
-				Log.d("phone", "phoneNum :" + i);
 			}
 			return 0;
 
@@ -383,7 +384,7 @@ public class MyOrder {
 		return null;
 	}
 
-	public int delPhoneTable(int tableId, int dishId) {
+	public int delPhoneTable(int tableId, int dishId, int position) {
 		String tableStatusPkg;
 		if (dishId == 0) {
 			tableStatusPkg = Http.get(Server.DELETE_PHONEORDER, "TID="
@@ -392,11 +393,16 @@ public class MyOrder {
 			tableStatusPkg = Http.get(Server.DELETE_PHONEORDER, "TID="
 					+ tableId + "&DID=" + dishId);
 		}
+		Log.d("delPhone", "tableId: " + tableId + " dishId: " + dishId);
 		Log.d("Respond", "tableStatusPkg: " + tableStatusPkg);
 		if (tableStatusPkg == null) {
 			return -1;
 		}
-
+		if (position == -1) {
+			mOrder.clear();
+		} else if (position >= 0) {
+			mOrder.remove(position);
+		}
 		return 0;
 	}
 
@@ -461,7 +467,7 @@ public class MyOrder {
 		Log.d("JSON", order.toString());
 
 		String response = Http.post(Server.DEL_ORDER, order.toString());
-		Log.d("response", "response:"+response);
+		Log.d("response", "response:" + response);
 		if (response == null) {
 			return -1;
 		}
