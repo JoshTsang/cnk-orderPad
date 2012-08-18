@@ -132,12 +132,12 @@ public class UpdateMenuActivity extends BaseActivity {
 	public static boolean isUpdateNeed(int currentMenuVer) {
 		String serverRespond = Http.get(Server.MENU_VERSION, "");
 		if (serverRespond == null || "".equals(serverRespond)) {
-			mMenuVer = 1;
+			return false;
 		} else {
 			int start = serverRespond.indexOf("[") + 1;
 			int end = serverRespond.indexOf("]");
 			if (start < 0 || end < 0) {
-				mMenuVer = 1;
+				return false;
 			} else {
 				String ver = serverRespond.substring(start, end);
 				mMenuVer = Integer.parseInt(ver);

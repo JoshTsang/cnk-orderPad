@@ -79,7 +79,7 @@ public class Notifications {
 
 	public int getNotifiycations() {
 		String notificationPkg = Http.get(Server.GET_NOTIFICATION, null);
-		if (notificationPkg == null) {
+		if (notificationPkg == null || "null".equals(notificationPkg)) {
 			return -1;
 		}
 		try {
@@ -102,7 +102,7 @@ public class Notifications {
 			}
 			return 0;
 		} catch (Exception e) {
-			// TODO: handle exception
+			e.printStackTrace();
 		}
 
 		return -1;

@@ -117,7 +117,6 @@ public class StatisticsActivity extends BaseActivity {
 				try {
 					Thread.sleep(1000);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				int ret = mStatistics.downloadDB(Server.SERVER_DB_SALES);
@@ -290,7 +289,6 @@ public class StatisticsActivity extends BaseActivity {
 				d = df.parse(mLatestStatistics);
 				mStart.setTime(d);
 			} catch (ParseException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			mEnd.setTimeInMillis(System.currentTimeMillis());

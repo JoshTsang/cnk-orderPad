@@ -9,13 +9,13 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.htb.cnk.adapter.PadOrderAdapter;
+import com.htb.cnk.adapter.MyOrderAdapter;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder.OrderedDish;
 import com.htb.cnk.lib.OrderBaseActivity;
 
 public class QueryOrderActivity extends OrderBaseActivity {
-	private PadOrderAdapter mMyOrderAdapter;
+	private MyOrderAdapter mMyOrderAdapter;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +31,7 @@ public class QueryOrderActivity extends OrderBaseActivity {
 	}
 
 	private void setAdapter() {
-		mMyOrderAdapter = new PadOrderAdapter(this, mMyOrder) {
+		mMyOrderAdapter = new MyOrderAdapter(this, mMyOrder) {
 			@Override
 			public View getView(int position, View convertView, ViewGroup arg2) {
 				TextView dishName;

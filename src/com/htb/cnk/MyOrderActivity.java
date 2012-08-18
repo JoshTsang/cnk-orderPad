@@ -3,10 +3,12 @@ package com.htb.cnk;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -14,7 +16,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.htb.cnk.adapter.PadOrderAdapter;
+import com.htb.cnk.adapter.MyOrderAdapter;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder.OrderedDish;
 import com.htb.cnk.data.TableSetting;
@@ -25,7 +27,7 @@ import com.htb.cnk.lib.OrderBaseActivity;
  *
  */
 public class MyOrderActivity extends OrderBaseActivity {
-	private PadOrderAdapter mMyOrderAdapter;
+	private MyOrderAdapter mMyOrderAdapter;
 	private ProgressDialog mpDialog;
 	private TableSetting mSettings = new TableSetting();
 
@@ -47,8 +49,8 @@ public class MyOrderActivity extends OrderBaseActivity {
 		mMyOrderLst.setAdapter(mMyOrderAdapter);
 	}
 
-	private PadOrderAdapter getMyOrderAdapterInstance() {
-		return new PadOrderAdapter(this, mMyOrder) {
+	private MyOrderAdapter getMyOrderAdapterInstance() {
+		return new MyOrderAdapter(this, mMyOrder) {
 			@Override
 			public View getView(int position, View convertView, ViewGroup arg2) {
 				TextView dishName;
@@ -109,6 +111,7 @@ public class MyOrderActivity extends OrderBaseActivity {
 
 	private void setOrderClickListener() {
 		mSubmitBtn.setOnClickListener(submitBtnClicked);
+		mBackBtn.setOnClickListener(backClicked);
 	}
 
 	private void updateDishQuantity(int position, int quantity) {
@@ -148,7 +151,16 @@ public class MyOrderActivity extends OrderBaseActivity {
 			}).show();
 		}
 	}
-
+	
+	private OnClickListener backClicked = new OnClickListener() {
+		public void onClick(View v) {
+			Intent intent = new Intent();
+			intent.setClass(MyOrderActivity.this, MenuActivity.class);
+			startActivity(intent);
+			finish();
+		}
+	};
+	
 	private OnClickListener minusClicked = new OnClickListener() {
 
 		public void onClick(View v) {
@@ -199,7 +211,12 @@ public class MyOrderActivity extends OrderBaseActivity {
 					} else {
 						if ("".equals(ret)) {
 							handler.sendEmptyMessage(0);
-							mSettings.updatusStatus(Info.getTableId(), 1);
+							int result = mSettings.getItemTableStatus(Info.getTableId());
+							if( result >= 50){
+								mSettings.updatusStatus(Info.getTableId(),result);
+							}else{
+								mSettings.updatusStatus(Info.getTableId(), 1);
+							}
 						} else {
 							handler.sendEmptyMessage(-1);
 						}						
@@ -240,10 +257,22 @@ public class MyOrderActivity extends OrderBaseActivity {
 								int which) {
 							mMyOrder.clear();
 							mMyOrderAdapter.notifyDataSetChanged();
+							finish();
 						}
 				}).show();
 			}
 		}
 	};
 
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		// TODO Auto-generated method stub
+		boolean ret = super.onKeyDown(keyCode, event);
+		Intent intent = new Intent();
+		intent.setClass(MyOrderActivity.this, MenuActivity.class);
+		startActivity(intent);
+		return ret;
+	}
+
+	
 }

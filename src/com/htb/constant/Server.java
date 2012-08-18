@@ -31,7 +31,7 @@ public class Server {
 	public final static String GET_NOTIFICATIONTYPES = PHP_DIR +"getNotificationTypes.php";
 	public final static String CLEANNOTIFICATION = PHP_DIR + "cleanNotification.php";
 	public final static String UPDATE_PHONE_ORDER = PHP_DIR + "updatePhoneOrder.php";
-
+	public final static String GET_ITEM_TABLE_STATUS = PHP_DIR + "getItemTableStatus.php";
 	/* Database */
 	public final static String DB_DIR = "db/";
 	public final static String DB_MENU = DB_DIR + "menu.db";

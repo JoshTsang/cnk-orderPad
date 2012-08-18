@@ -161,6 +161,7 @@ public class MenuActivity extends BaseActivity {
 			Resources resources = MenuActivity.this.getResources();
 			dishPic.setBackgroundDrawable(resources
 					.getDrawable(R.drawable.no_pic_bigl));
+			dishPic.setOnClickListener(null);
 		}
 
 		dishName.setText(dishDetail.getName());
@@ -277,6 +278,9 @@ public class MenuActivity extends BaseActivity {
 		FileInputStream inStream = null;
 		try {
 			// TODO usehdpi cause no ldpi pic available
+			if (name == null || "".equals(name) || "null".equals(name)) {
+				return null;
+			}
 			Log.d("fileName", "hdpi_" + name);
 			inStream = openFileInput("hdpi_" + name);
 		} catch (FileNotFoundException e) {
@@ -380,6 +384,7 @@ public class MenuActivity extends BaseActivity {
 				Intent intent = new Intent();
 				intent.setClass(MenuActivity.this, MyOrderActivity.class);
 				startActivity(intent);
+				finish();
 			}
 		}
 	};
