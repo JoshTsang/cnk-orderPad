@@ -12,15 +12,17 @@ import org.json.JSONObject;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.util.Log;
 
 import com.htb.cnk.lib.Http;
 import com.htb.constant.Server;
 
 public class MyOrder {
-	private int MODE_PAD = 0;
-	private int MODE_PHONE = 1;
+	public final static int ERR_GET_PHONE_ORDER_FAILED = -10;
+	public final static int RET_NULL_PHONE_ORDER = 1;
+	
+	private final static int MODE_PAD = 0;
+	private final static int MODE_PHONE = 1;
 
 	public class OrderedDish {
 		Dish dish;
@@ -220,16 +222,13 @@ public class MyOrder {
 		mOrder.clear();
 	}
 	
-	public void phoneClear(){
-		for (int i = 0; i < mOrder.size(); i++) {
-			OrderedDish item = (OrderedDish) mOrder.get(i);
+	public void phoneClear() {
+		for (OrderedDish item:mOrder) {
 			if (item.padQuantity == 0) {
 				mOrder.remove(item);
-				i--;
 			} else {
 				item.phoneQuantity = 0;
 			}
-
 		}
 	}
 	
@@ -319,26 +318,20 @@ public class MyOrder {
 		return -1;
 	}
 
-	public int getTablePhoneFromDB(int tableId) {
+	public int getPhoneOrderFromServer(int tableId) {
 		talbeClear();
 		String response = Http.get(Server.GET_GETPHONEORDER, "TID=" + tableId);
 		Log.d("resp", "Phone:" + response);
 		if (response == null) {
 			return -1;
+		} else if ("null".equals(response)) {
+			return RET_NULL_PHONE_ORDER;
 		}
+		
 		try {
 			JSONArray tableList = new JSONArray(response);
 			int length = tableList.length();
-			for (int i = 0; i < mOrder.size(); i++) {
-				OrderedDish item = (OrderedDish) mOrder.get(i);
-				if (item.padQuantity == 0) {
-					mOrder.remove(item);
-					i--;
-				} else {
-					item.phoneQuantity = 0;
-				}
-
-			}
+			phoneClear();
 
 			for (int i = 0; i < length; i++) {
 				JSONObject item = tableList.getJSONObject(i);

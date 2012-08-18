@@ -174,15 +174,29 @@ public class PhoneActivity extends BaseActivity {
 		public void handleMessage(Message msg) {
 
 			mMyOrderLst.setAdapter(mMyOrderAdapter);
+			mpDialog.cancel();
 			if (msg.what < 0) {
-				mpDialog.cancel();
-				mMyOrder.clear();
+				mMyOrder.phoneClear();
+				new AlertDialog.Builder(PhoneActivity.this)
+				.setTitle("请注意")
+				.setMessage("无法连接服务器")
+				.setPositiveButton("确定",
+						new DialogInterface.OnClickListener() {
+
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+								
+							}
+						}).show();
+			} else if (msg.what == MyOrder.RET_NULL_PHONE_ORDER) {
+				mMyOrder.phoneClear();
 				Toast.makeText(getApplicationContext(),
 						getResources().getString(R.string.delPhoneWarning),
 						Toast.LENGTH_SHORT).show();
-			} else {
-				 mMyOrderAdapter.notifyDataSetChanged();
 			}
+			
+			mMyOrderAdapter.notifyDataSetChanged();
 			 mDishCountTxt.setText(Integer.toString(mMyOrder.totalQuantity())
 			 + " 道菜");
 			 mTotalPriceTxt.setText(Double.toString(mMyOrder.getTotalPrice())
@@ -193,16 +207,9 @@ public class PhoneActivity extends BaseActivity {
 
 	class queryThread implements Runnable {
 		public void run() {
-			Message msg = new Message();
 			try {
-				int ret = mMyOrder.getTablePhoneFromDB(Info.getTableId());
-				msg.what = ret;
-
-				if (ret < 0) {
-					queryHandler.sendEmptyMessage(ret);
-				} else {
-					queryHandler.sendMessage(msg);
-				}
+				int ret = mMyOrder.getPhoneOrderFromServer(Info.getTableId());
+				queryHandler.sendEmptyMessage(ret);
 
 			} catch (Exception e) {
 				e.printStackTrace();
