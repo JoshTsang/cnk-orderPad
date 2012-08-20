@@ -116,7 +116,6 @@ public class UpdateMenuActivity extends BaseActivity {
 		};
 		
 		updateMenu.start();
-		
 	}
 	
 	public static boolean isUpdateNeed(int currentMenuVer) {
@@ -190,6 +189,7 @@ public class UpdateMenuActivity extends BaseActivity {
         		e.printStackTrace();
         		return ErrorNum.DOWNLOAD_DB_FAILED;
         	}
+        	
             if (mDBFile.copyDatabase(CnkDbHelper.DB_MENU) < 0) {
             	return ErrorNum.COPY_DB_FAILED;
             }
