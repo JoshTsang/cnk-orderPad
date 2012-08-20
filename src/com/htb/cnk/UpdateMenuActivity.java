@@ -87,11 +87,6 @@ public class UpdateMenuActivity extends BaseActivity {
 			
 				ret = downloadDB(Server.SERVER_DB_MENU);
 				if (ret < 0) {
-					try {
-						Thread.sleep(3000);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
 					handler.sendEmptyMessage(ret);
 					return ;
 				}
@@ -106,11 +101,6 @@ public class UpdateMenuActivity extends BaseActivity {
 				handler.sendEmptyMessage(DOWNLOAD_PIC);
 				ret = downloadHugePic();
 				if (ret < 0) {
-					try {
-						Thread.sleep(3000);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
 					handler.sendEmptyMessage(ret);
 					return ;
 				}
@@ -160,6 +150,7 @@ public class UpdateMenuActivity extends BaseActivity {
                 dir.mkdir();
             }
             File file=new File(filePath+"cnk.db");
+            file.delete();
             file.createNewFile();
             
         	try {
@@ -198,9 +189,11 @@ public class UpdateMenuActivity extends BaseActivity {
         		e.printStackTrace();
         		return ErrorNum.DOWNLOAD_DB_FAILED;
         	}
+        	
             if (mDBFile.copyDatabase(CnkDbHelper.DB_MENU) < 0) {
             	return ErrorNum.COPY_DB_FAILED;
             }
+            file.delete();
             return 0;
         } catch (Exception e) {
             e.printStackTrace();
