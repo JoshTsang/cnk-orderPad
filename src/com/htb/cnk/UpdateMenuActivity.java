@@ -126,7 +126,6 @@ public class UpdateMenuActivity extends BaseActivity {
 		};
 		
 		updateMenu.start();
-		
 	}
 	
 	public static boolean isUpdateNeed(int currentMenuVer) {
@@ -207,17 +206,6 @@ public class UpdateMenuActivity extends BaseActivity {
             e.printStackTrace();
             return ErrorNum.DOWNLOAD_DB_FAILED;
         }
-	}
-	
-	private int downloadSmallPic() {
-		int ret;
-		for (int i=0; i<10; i++) {
-			ret = downloadPic(Server.IMG_PATH+ i + ".jpg", "ldpi_" + i + ".jpg");
-			if (ret < 0) {
-				return ret;
-			}
-		}
-		return 0;
 	}
 	
 	private int downloadHugePic() {

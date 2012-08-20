@@ -21,6 +21,7 @@ import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder.OrderedDish;
 import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.lib.OrderBaseActivity;
+import com.htb.constant.ErrorNum;
 
 /**
  * @author josh
@@ -205,22 +206,17 @@ public class MyOrderActivity extends OrderBaseActivity {
 	        mpDialog.show();
 			new Thread() {
 				public void run() {
-					String ret = mMyOrder.submit();
-					if (ret == null) {
-						handler.sendEmptyMessage(-1);
+					int ret = mMyOrder.submit();
+					if (ret < 0) {
+						handler.sendEmptyMessage(ret);
 					} else {
-						if ("".equals(ret)) {
-							handler.sendEmptyMessage(0);
-							int result = mSettings.getItemTableStatus(Info.getTableId());
-							if( result >= 50){
-								mSettings.updatusStatus(Info.getTableId(),result);
-							}else{
-								mSettings.updatusStatus(Info.getTableId(), 1);
-							}
-						} else {
-							handler.sendEmptyMessage(-1);
-						}						
-						Log.d("Respond", ret);
+						handler.sendEmptyMessage(0);
+						int result = mSettings.getItemTableStatus(Info.getTableId());
+						if( result >= 50){
+							mSettings.updatusStatus(Info.getTableId(),result);
+						}else{
+							mSettings.updatusStatus(Info.getTableId(), 1);
+						}
 					}
 				}
 			}.start();
@@ -231,19 +227,14 @@ public class MyOrderActivity extends OrderBaseActivity {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
 			if (msg.what < 0) {
+				String errMsg = "提交订单失败";
+				if (msg.what == ErrorNum.PRINTER_ERR_CONNECT_TIMEOUT || msg.what == ErrorNum.PRINTER_ERR_NO_PAPER) {
+					errMsg += ":无法连接打印机或打印机缺纸";
+				}
 				new AlertDialog.Builder(MyOrderActivity.this)
-				.setCancelable(false)
-				.setTitle("出错了")
-				.setMessage("提交订单失败")
-				.setPositiveButton("确定",
-					new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog,
-								int which) {
-							
-						}
-				})
-				.show();
+						.setCancelable(false).setTitle("出错了")
+						.setMessage(errMsg).setPositiveButton("确定", null)
+						.show();
 			} else {
 				new AlertDialog.Builder(MyOrderActivity.this)
 				.setCancelable(false)

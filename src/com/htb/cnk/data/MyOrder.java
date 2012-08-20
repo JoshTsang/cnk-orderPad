@@ -252,16 +252,21 @@ public class MyOrder {
 		return 0;
 	}
 
-	public String submit() {
+	public int submit() {
 		JSONObject order = new JSONObject();
 		Date date = new Date();
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String time = df.format(date);
 
 		if (mOrder.size() <= 0) {
-			return null;
+			return -1;
 		}
 
+		int ret = Http.getPrinterStatus();
+		if (ret < 0) {
+			return ret;
+		}
+		
 		try {
 			order.put("tableId", Info.getTableId());
 			order.put("tableName", Info.getTableName());
@@ -285,16 +290,18 @@ public class MyOrder {
 			order.put("order", dishes);
 		} catch (JSONException e) {
 			e.printStackTrace();
+			return -1;
 		}
 
 		Log.d("JSON", order.toString());
 		String response = Http.post(Server.SUBMIT_ORDER, order.toString());
-		if (response == null) {
+		if ("".equals(response)) {
 			Log.d("Respond", "ok");
+			return 0;
 		} else {
 			Log.d("Respond", response);
+			return -1;
 		}
-		return response;
 	}
 
 	public int getTableFromDB(int tableId) {
