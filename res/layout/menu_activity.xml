@@ -38,8 +38,9 @@
 	    <!-- footer -->
 	    <LinearLayout android:id="@+id/myOrderBar"
 	        android:layout_width="fill_parent"
-    		android:layout_height="wrap_content"
+    		android:layout_height="56dip"
     		android:orientation="horizontal"
+    		android:background="@drawable/left_bottom"
     		android:layout_alignParentBottom="true">
 	        <Button android:id="@+id/myOrder"
 		        android:text="@string/myOrder"
@@ -49,7 +50,7 @@
 	    		android:layout_height="fill_parent"
 	    		android:gravity="center"
 			    android:background="#00000000"/>
-	        <ImageView android:layout_height="46dip"
+	        <ImageView android:layout_height="56dip"
 	            android:layout_width="wrap_content"
 	            android:background="@drawable/left_divider"/>
 	        <TextView android:id="@+id/orderedCount"

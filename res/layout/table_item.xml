@@ -4,17 +4,19 @@
     android:layout_height="wrap_content" >
 
     <ImageView
-        android:id="@+id/TableItemImage"
-        android:layout_width="35dp"
+        android:id="@+id/ItemImage"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true">
+        android:layout_centerHorizontal="true" >
     </ImageView>
 
     <TextView
         android:id="@+id/ItemText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/TableItemImage"
+        android:textSize="25dp"
+        android:textColor="#4D2412"
+        android:layout_below="@+id/ItemImage"
         android:layout_centerHorizontal="true" >
     </TextView>
 

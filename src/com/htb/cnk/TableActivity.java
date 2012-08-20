@@ -498,7 +498,7 @@ public class TableActivity extends BaseActivity {
 				setTableIcon(i, status);
 			}
 			saImageItems = new SimpleAdapter(TableActivity.this, lstImageItem,
-					R.layout.grid_item,
+					R.layout.table_item,
 					new String[] { "imageItem", "ItemText" }, new int[] {
 							R.id.ItemImage, R.id.ItemText }) {
 			};
