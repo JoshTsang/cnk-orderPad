@@ -131,7 +131,7 @@ public class TableActivity extends BaseActivity {
 				Message msg = new Message();
 				tableHandle.sendEmptyMessage(DISABLE_GRIDVIEW);
 				mTableSettings.clear();
-				mSettings.clear();
+				//mSettings.clear();
 				mNotificaion.clear();
 				mNotificaion.getNotifiycations();
 				mNotificationType.getNotifiycationsType();
@@ -498,7 +498,7 @@ public class TableActivity extends BaseActivity {
 				setTableIcon(i, status);
 			}
 			saImageItems = new SimpleAdapter(TableActivity.this, lstImageItem,
-					R.layout.grid_item,
+					R.layout.table_item,
 					new String[] { "imageItem", "ItemText" }, new int[] {
 							R.id.ItemImage, R.id.ItemText }) {
 			};
@@ -592,7 +592,7 @@ public class TableActivity extends BaseActivity {
 					delRet = mMyOrder.delPhoneTable(Info.getTableId(), 0, -1);
 					cleanRet = mSettings.cleanTalble(Info.getTableId());
 					lstImageItem.clear();
-					mSettings.clear();
+					//mSettings.clear();
 					mNotificaion.getNotifiycations();
 					ret = mSettings.getTableStatusFromServer();
 					if (ret < 0 || statusRet < 0 || delRet < 0 || cleanRet < 0) {
@@ -618,7 +618,7 @@ public class TableActivity extends BaseActivity {
 							mSettings.getStatus(position) - PHONE_STATUS);
 					delRet = mMyOrder.delPhoneTable(Info.getTableId(), 0, -1);
 					mMyOrder.phoneClear();
-					mSettings.clear();
+					//mSettings.clear();
 					mNotificaion.getNotifiycations();
 					ret = mSettings.getTableStatusFromServer();
 					if (ret < 0 || statusRet < 0 || delRet < 0) {
