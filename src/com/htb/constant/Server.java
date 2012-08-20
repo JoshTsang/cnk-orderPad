@@ -3,7 +3,7 @@ package com.htb.constant;
 public class Server {
 	public final static String SERVER_IP = "192.168.0.1";
 	public final static String SERVER_DOMIN = "http://" + SERVER_IP;
-	public final static String SERVER_DB_MENU = "menu.db";
+	public final static String SERVER_DB_MENU = "test.db3";
 	public final static String SERVER_DB_SALES = "sales.db";
 	
 	public final static String FTP_USERNAME = "root";
@@ -26,7 +26,7 @@ public class Server {
 	public final static String GET_PERMINSSION = PHP_DIR + "getPerminssion.php";
 	public final static String GET_GETPHONEORDER = PHP_DIR +"getPhoneOrder.php";
 	public final static String DELETE_PHONEORDER = PHP_DIR +"deletePhoneOrder.php";
-
+	public final static String PRINTER_LIST = PHP_DIR + "getPrinterList.php";
 	public final static String GET_NOTIFICATION = PHP_DIR +"getNotification.php";
 	public final static String GET_NOTIFICATIONTYPES = PHP_DIR +"getNotificationTypes.php";
 	public final static String CLEANNOTIFICATION = PHP_DIR + "cleanNotification.php";
