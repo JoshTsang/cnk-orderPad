@@ -23,6 +23,7 @@ import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.MyOrder.OrderedDish;
 import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.lib.BaseActivity;
+import com.htb.constant.ErrorNum;
 
 /**
  * @author josh
@@ -314,18 +315,13 @@ public class PhoneActivity extends BaseActivity {
 		mpDialog.show();
 		new Thread() {
 			public void run() {
-				String ret = mMyOrder.submit();
-				if (ret == null) {
-					handler.sendEmptyMessage(-1);
+				int ret = mMyOrder.submit();
+				if (ret < 0) {
+					handler.sendEmptyMessage(ret);
 				} else {
-					if ("".equals(ret)) {
-						handler.sendEmptyMessage(0);
-						mSettings.updatusStatus(Info.getTableId(), 1);
-						mMyOrder.delPhoneTable(Info.getTableId(), 0, -1);
-					} else {
-						handler.sendEmptyMessage(-1);
-					}
-					Log.d("Respond", ret);
+					handler.sendEmptyMessage(0);
+					mSettings.updatusStatus(Info.getTableId(), 1);
+					mMyOrder.delPhoneTable(Info.getTableId(), 0, -1);
 				}
 			}
 		}.start();
@@ -402,9 +398,13 @@ public class PhoneActivity extends BaseActivity {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
 			if (msg.what < 0) {
+				String errMsg = "提交订单失败";
+				if (msg.what == ErrorNum.PRINTER_ERR_CONNECT_TIMEOUT || msg.what == ErrorNum.PRINTER_ERR_NO_PAPER) {
+					errMsg += ":无法连接打印机或打印机缺纸";
+				}
 				new AlertDialog.Builder(PhoneActivity.this)
 						.setCancelable(false).setTitle("出错了")
-						.setMessage("提交订单失败").setPositiveButton("确定", null)
+						.setMessage(errMsg).setPositiveButton("确定", null)
 						.show();
 			} else {
 				new AlertDialog.Builder(PhoneActivity.this)

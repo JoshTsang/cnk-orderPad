@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -57,6 +58,7 @@ public class MenuActivity extends BaseActivity {
 	private Dishes mDishes;
 	private DishListAdapter mDishLstAdapter;
 	private MyOrder mMyOrder;
+	private ProgressDialog mpDialog;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +70,12 @@ public class MenuActivity extends BaseActivity {
 		findViews();
 		setListData();
 		setClickListener();
+
+		mpDialog = new ProgressDialog(MenuActivity.this);
+		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+		mpDialog.setTitle("请稍等");
+		mpDialog.setIndeterminate(false);
+		mpDialog.setCancelable(false);
 
 		if (Info.isNewCustomer() && Info.getMode() == Info.WORK_MODE_CUSTOMER) {
 			showGuide();
@@ -177,7 +185,7 @@ public class MenuActivity extends BaseActivity {
 
 			public void onClick(View v) {
 				final int position = Integer.parseInt(v.getTag().toString());
-				mMyOrder.add(mDishes.getDish(position), 1,Info.getTableId(),0);
+				mMyOrder.add(mDishes.getDish(position), 1, Info.getTableId(), 0);
 				updateOrderedDishCount();
 				mDishLstAdapter.notifyDataSetChanged();
 			}
@@ -232,7 +240,7 @@ public class MenuActivity extends BaseActivity {
 
 			public void onClick(View v) {
 				final int position = Integer.parseInt(v.getTag().toString());
-				mMyOrder.add(mDishes.getDish(position), 1, Info.getTableId(),0);
+				mMyOrder.add(mDishes.getDish(position), 1, Info.getTableId(), 0);
 				updateOrderedDishCount();
 				mDishLstAdapter.notifyDataSetChanged();
 			}
@@ -241,15 +249,7 @@ public class MenuActivity extends BaseActivity {
 		// minusBtn.setVisibility(View.INVISIBLE);
 
 		minusBtn.setTag(position);
-		minusBtn.setOnClickListener(new OnClickListener() {
-
-			public void onClick(View v) {
-				final int position = Integer.parseInt(v.getTag().toString());
-				mMyOrder.minus(mDishes.getDish(position), 1);
-				updateOrderedDishCount();
-				mDishLstAdapter.notifyDataSetChanged();
-			}
-		});
+		minusBtn.setOnClickListener(minusClicked);
 
 		// minus5Btn.setVisibility(View.INVISIBLE);
 		return convertView;
@@ -418,6 +418,92 @@ public class MenuActivity extends BaseActivity {
 				}
 			});
 			dialog.show();
+		}
+	};
+
+	private OnClickListener minusClicked = new OnClickListener() {
+
+		public void onClick(View v) {
+			final int position = Integer.parseInt(v.getTag().toString());
+			minusDishQuantity(position, 1);
+		}
+	};
+
+	private void minusDishQuantity(final int position, final int quantity) {
+		updateDishQuantity(position, -quantity);
+	}
+
+	private void updateDishQuantity(int position, int quantity) {
+		if (quantity < 0) {
+			int result = mMyOrder.minus(mDishes.getDish(position), -quantity);
+			if (result > 0) {
+				updatePhoneOrder(position, result);
+				mpDialog.setMessage("正在删除手机...");
+				mpDialog.show();
+			} else if (result == 0) {
+				delPhoneTableThread(position);
+			}
+		} else {
+			mMyOrder.add(position, quantity);
+		}
+		updateOrderedDishCount();
+		mDishLstAdapter.notifyDataSetChanged();
+
+	}
+
+	private void updatePhoneOrder(final int position, final int quantity) {
+		new Thread() {
+			public void run() {
+				Message msg = new Message();
+				int ret = mMyOrder.updatePhoneOrder(Info.getTableId(),
+						quantity, mDishes.getDish(position).getId());
+				if (ret < 0) {
+					delPhoneOrderhandler.sendEmptyMessage(-1);
+				} else {
+					msg.what = ret;
+					delPhoneOrderhandler.sendMessage(msg);
+				}
+			}
+		}.start();
+	}
+
+	private void delPhoneTableThread(final int position) {
+		new Thread() {
+			public void run() {
+				Message msg = new Message();
+				int ret = mMyOrder.delPhoneTable(Info.getTableId(),
+						mDishes.getDish(position).getId(), position);
+				if (ret < 0) {
+					delPhoneOrderhandler.sendEmptyMessage(-1);
+				} else {
+					msg.what = ret;
+					delPhoneOrderhandler.sendMessage(msg);
+				}
+			}
+		}.start();
+	}
+
+	private Handler delPhoneOrderhandler = new Handler() {
+		public void handleMessage(Message msg) {
+			mpDialog.cancel();
+			if (msg.what < 0) {
+				new AlertDialog.Builder(MenuActivity.this)
+						.setCancelable(false)
+						.setTitle("出错了")
+						.setMessage("删除失败")
+						.setPositiveButton("确定",
+								new DialogInterface.OnClickListener() {
+
+									@Override
+									public void onClick(DialogInterface dialog,
+											int which) {
+
+									}
+								}).show();
+			} else {
+				updateOrderedDishCount();
+				mDishLstAdapter.notifyDataSetChanged();
+			}
 		}
 	};
 

@@ -1,7 +1,13 @@
 package com.htb.cnk.lib;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.net.SocketAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -60,6 +66,67 @@ public class Http {
 		}
 		
 		return null;
+	}
+	
+	public static int getPrinterStatus() {
+		int ret;
+		String printers[] = getPrinterList();
+		for(String printerIp:printers) {
+			ret = getPrinterStatus(printerIp);
+			if (ret < 0) {
+				return ret;
+			}
+		}
+		
+		return 0;
+	}
+	
+	private static String[] getPrinterList() {
+		String response = Http.get(Server.PRINTER_LIST, "");
+		if (response == null || "".equals(response)) {
+			return null;
+		} else {
+			int start, end;
+			start = response.indexOf("[");
+			end = response.indexOf("]");
+			if (start < 0 || end < 0) {
+				return null;
+			}
+			return response.substring(start+1, end).split(",");
+		}
+	}
+	
+	private static int getPrinterStatus(String printerIp) {
+		Socket socket = null;
+		byte buffer[] = new byte[2];
+        try {
+            socket = new Socket();
+            socket.setSoTimeout(2000);
+			SocketAddress socketAddress = new InetSocketAddress(printerIp,9100); //获取sockaddress对象
+			socket.connect(socketAddress,2000);
+//            socket.set
+            //获取输出流，用于客户端向服务器端发送数据
+            DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
+            //获取输入流，用于接收服务器端发送来的数据
+            DataInputStream dis = new DataInputStream(socket.getInputStream());
+            //客户端向服务器端发送数据
+            dos.writeBytes("\020\004\004");
+            Log.d("printer", "cmd send");
+            //打印出从服务器端接收到的数据
+            dis.read(buffer);
+            socket.close();
+            if (buffer[0] == 18) {
+            	return 0;
+            } else {
+            	return ErrorNum.PRINTER_ERR_NO_PAPER;
+            }
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+            return ErrorNum.PRINTER_ERR_CONNECT_TIMEOUT;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ErrorNum.PRINTER_ERR_CONNECT_TIMEOUT;
+        }
 	}
 	
 	private static String httpRequestPost(String page, String msg) {

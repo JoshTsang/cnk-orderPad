@@ -81,7 +81,7 @@ public class Cnk_orderPadActivity extends Activity {
 
 		@Override
 		public void onClick(View arg0) {
-			if (Info.getTableId() < 0) {
+			if (Info.getTableId() < 0 || Info.getMode() != Info.WORK_MODE_CUSTOMER) {
 				Toast.makeText(getApplicationContext(),
 						getResources().getString(R.string.tableNotSet),
 						Toast.LENGTH_SHORT).show();

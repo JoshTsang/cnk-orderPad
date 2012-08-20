@@ -322,7 +322,7 @@ public class TableActivity extends BaseActivity {
 	}
 
 	private AlertDialog.Builder addDialog() {
-		final CharSequence[] additems = { "开台（客户模式）", "开台（服务员模式）" };
+		final CharSequence[] additems = { "开台-顾客模式 ", "开台-服务模式" };
 
 		AlertDialog.Builder addDialog = new AlertDialog.Builder(
 				TableActivity.this);
@@ -591,7 +591,6 @@ public class TableActivity extends BaseActivity {
 					statusRet = mSettings.updatusStatus(Info.getTableId(), 0);
 					delRet = mMyOrder.delPhoneTable(Info.getTableId(), 0, -1);
 					cleanRet = mSettings.cleanTalble(Info.getTableId());
-					lstImageItem.clear();
 					mSettings.clear();
 					mNotificaion.getNotifiycations();
 					ret = mSettings.getTableStatusFromServer();

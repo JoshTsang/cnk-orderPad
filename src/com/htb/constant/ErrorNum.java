@@ -16,6 +16,9 @@ public class ErrorNum {
 	public final static int GET_LATEST_STATISTICS_FAILED = -10;
 	public final static int GET_SOLDOUT_ITEM_FAILED = -11;
 	
+	public final static int PRINTER_ERR_CONNECT_TIMEOUT = -21;
+	public final static int PRINTER_ERR_NO_PAPER = -22;
+	
 	/* Http errors */
 	public final static int HTTP_TIMEOUT = -400;
 	public final static int HTTP_PAGE_NOT_FOUND = -404;
