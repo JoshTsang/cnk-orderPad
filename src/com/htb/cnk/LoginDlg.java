@@ -2,7 +2,6 @@ package com.htb.cnk;
 
 import java.lang.reflect.Method;
 
-import com.htb.cnk.data.Info;
 import com.htb.cnk.data.UserData;
 
 import android.app.AlertDialog;
@@ -40,7 +39,7 @@ public class LoginDlg {
 		final View DialogView = factory.inflate(R.layout.setting_dialog,
 				null);
 		SharedPreferences sharedPre = mActivity.getSharedPreferences("userInfo",
-				Context.MODE_WORLD_WRITEABLE | Context.MODE_WORLD_READABLE);
+				Context.MODE_PRIVATE);
 		String userName = sharedPre.getString("name", "");
 		EditText userNameET = (EditText) DialogView
 				.findViewById(R.id.edit_username);
@@ -71,8 +70,7 @@ public class LoginDlg {
 								} else {
 									SharedPreferences sharedPre = mActivity.getSharedPreferences(
 											"userInfo",
-											Context.MODE_WORLD_WRITEABLE
-													| Context.MODE_WORLD_READABLE);
+											Context.MODE_PRIVATE);
 									Editor editor = sharedPre.edit();
 									editor.putString("name", userName);
 									editor.commit();

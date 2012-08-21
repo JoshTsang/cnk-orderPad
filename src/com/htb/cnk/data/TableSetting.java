@@ -108,7 +108,7 @@ public class TableSetting {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return 0;
+		return -1;
 	}
 	
 	public int getItemTableStatus(int tableId) {
