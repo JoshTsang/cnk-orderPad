@@ -126,6 +126,32 @@ public class MyOrderActivity extends OrderBaseActivity {
 		updateTabelInfos();
 	}
 
+	public void submitOrder() {
+		mpDialog = new ProgressDialog(MyOrderActivity.this);  
+		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+		mpDialog.setTitle("请稍等");
+		mpDialog.setMessage("正在提交订单...");  
+		mpDialog.setIndeterminate(false);
+		mpDialog.setCancelable(false);
+		mpDialog.show();
+		new Thread() {
+			public void run() {
+				int ret = mMyOrder.submit();
+				if (ret < 0) {
+					handler.sendEmptyMessage(ret);
+				} else {
+					handler.sendEmptyMessage(0);
+					int result = mSettings.getItemTableStatus(Info.getTableId());
+					if( result >= 50){
+						mSettings.updatusStatus(Info.getTableId(),result);
+					}else{
+						mSettings.updatusStatus(Info.getTableId(), 1);
+					}
+				}
+			}
+		}.start();
+	}
+
 	private void minusDishQuantity(final int position, final int quantity) {
 		if (mMyOrder.getOrderedDish(position).getQuantity() > quantity) {
 			updateDishQuantity(position, -quantity);
@@ -197,29 +223,34 @@ public class MyOrderActivity extends OrderBaseActivity {
 				}).show();
 				return ;
 			}
-			mpDialog = new ProgressDialog(MyOrderActivity.this);  
-	        mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-	        mpDialog.setTitle("请稍等");
-	        mpDialog.setMessage("正在提交订单...");  
-	        mpDialog.setIndeterminate(false);
-	        mpDialog.setCancelable(false);
-	        mpDialog.show();
-			new Thread() {
-				public void run() {
-					int ret = mMyOrder.submit();
-					if (ret < 0) {
-						handler.sendEmptyMessage(ret);
-					} else {
-						handler.sendEmptyMessage(0);
-						int result = mSettings.getItemTableStatus(Info.getTableId());
-						if( result >= 50){
-							mSettings.updatusStatus(Info.getTableId(),result);
-						}else{
-							mSettings.updatusStatus(Info.getTableId(), 1);
+			
+			if(Info.getMode() == Info.WORK_MODE_CUSTOMER) {
+				new AlertDialog.Builder(MyOrderActivity.this)
+				.setTitle("提交订单")
+				.setMessage("呼叫服务员确认订单")
+				.setPositiveButton("确定",
+					new DialogInterface.OnClickListener() {
+
+						@Override
+						public void onClick(DialogInterface dialog,
+								int which) {
+							LoginDlg loginDlg = new LoginDlg(MyOrderActivity.this, LoginDlg.ACTION_SUBMIT);
+							loginDlg.show();
 						}
+				})
+				.setNegativeButton("继续点菜",
+						new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog,
+							int which) {
+						
 					}
-				}
-			}.start();
+				}).show();
+				return ;
+			} else {
+				submitOrder();
+			}
 		}
 	};
 
