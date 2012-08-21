@@ -99,9 +99,15 @@ public class Cnk_orderPadActivity extends Activity {
 
 		@Override
 		public void onClick(View v) {
-			Intent intent = new Intent();
-			intent.setClass(Cnk_orderPadActivity.this, TableActivity.class);
-			Cnk_orderPadActivity.this.startActivity(intent);
+			if (Info.getMode() == Info.WORK_MODE_CUSTOMER) {
+				LoginDlg loginDlg = new LoginDlg(Cnk_orderPadActivity.this, TableActivity.class);
+				loginDlg.show();
+				Info.setMode(Info.WORK_MODE_WAITER);
+			} else {
+				Intent intent = new Intent();
+				intent.setClass(Cnk_orderPadActivity.this, TableActivity.class);
+				Cnk_orderPadActivity.this.startActivity(intent);
+			}
 		}
 
 	};
