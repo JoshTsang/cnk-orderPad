@@ -85,9 +85,9 @@ public class TableSetting {
 		mTableSettings.get(index).setStatus(n);
 	}
 
-	public int getTableStatusFromServer() {
+	public synchronized  int getTableStatusFromServer() {
 		String tableStatusPkg = Http.get(Server.GET_TABLE_STATUS, "");
-		if(tableStatusPkg == null){
+		if("null".equals(tableStatusPkg)){
 			return -1;
 		}
 		try {
@@ -103,12 +103,12 @@ public class TableSetting {
 				asItem = new TableSettingItem(status, name, id);
 				add(asItem);
 			}
+			notify();
 			return 0;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
-		return -1;
+		return 0;
 	}
 	
 	public int getItemTableStatus(int tableId) {
