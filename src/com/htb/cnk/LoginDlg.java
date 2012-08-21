@@ -1,5 +1,7 @@
 package com.htb.cnk;
 
+import java.lang.reflect.Method;
+
 import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.UserData;
 
@@ -114,8 +116,14 @@ public class LoginDlg {
 				} else {
 					switch(mAction) {
 					case ACTION_SUBMIT:
-						MyOrder order = new MyOrder(mActivity);
-						order.submit();
+						try {
+							Method method = mActivity.getClass().getMethod("submitOrder", new Class[0]);
+							method.invoke(mActivity, new Object[0]);
+						} catch (NoSuchMethodException e) {
+							e.printStackTrace();
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 						break;
 					default:
 						break;
