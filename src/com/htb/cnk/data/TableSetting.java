@@ -85,24 +85,23 @@ public class TableSetting {
 		mTableSettings.get(index).setStatus(n);
 	}
 
-	public synchronized  int getTableStatusFromServer() throws JSONException {
+	public synchronized  int getTableStatusFromServer() {
 		String tableStatusPkg = Http.get(Server.GET_TABLE_STATUS, "");
 		if("null".equals(tableStatusPkg)){
 			return -1;
 		}
-		mTableSettings.clear();
 		try {
 			JSONArray tableList = new JSONArray(tableStatusPkg);
 			int length = tableList.length();
 			TableSettingItem asItem;
-			TableSetting setting = new TableSetting();
+			clear();
 			for (int i = 0; i < length; i++) {// 遍历JSONArray
 				JSONObject item = tableList.getJSONObject(i);
 				int id = item.getInt("id");
 				String name = item.getString("name");
 				int status = item.getInt("status");
 				asItem = new TableSettingItem(status, name, id);
-				setting.add(asItem);
+				add(asItem);
 			}
 			notify();
 			return 0;

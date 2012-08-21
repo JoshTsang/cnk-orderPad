@@ -130,7 +130,7 @@ public class TableActivity extends BaseActivity {
 			try {
 				Message msg = new Message();
 				tableHandle.sendEmptyMessage(DISABLE_GRIDVIEW);
-//				mTableSettings.clear();
+				mTableSettings.clear();
 				mNotificaion.clear();
 				mNotificaion.getNotifiycations();
 				mNotificationType.getNotifiycationsType();
@@ -204,23 +204,6 @@ public class TableActivity extends BaseActivity {
 			}
 			saImageItems.notifyDataSetChanged();
 
-		}
-	}
-
-	class userThread implements Runnable {
-		public void run() {
-			try {
-				Message msg = new Message();
-				int ret = UserData.Compare();
-				if (ret < 0) {
-					userHandle.sendEmptyMessage(ret);
-					return;
-				}
-				msg.what = ret;
-				userHandle.sendMessage(msg);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
 		}
 	}
 
@@ -497,7 +480,7 @@ public class TableActivity extends BaseActivity {
 				setTableIcon(i, status);
 			}
 			saImageItems = new SimpleAdapter(TableActivity.this, lstImageItem,
-					R.layout.grid_item,
+					R.layout.table_item,
 					new String[] { "imageItem", "ItemText" }, new int[] {
 							R.id.ItemImage, R.id.ItemText }) {
 			};
@@ -552,21 +535,6 @@ public class TableActivity extends BaseActivity {
 		}
 	}
 
-	private Handler userHandle = new Handler() {
-
-		public void handleMessage(Message msg) {
-			if (msg.what < 0) {
-				Toast.makeText(getApplicationContext(),
-						getResources().getString(R.string.userWarning),
-						Toast.LENGTH_SHORT).show();
-			} else {
-				Intent intent = new Intent();
-				intent.setClass(TableActivity.this, StatisticsActivity.class);
-				TableActivity.this.startActivity(intent);
-			}
-		}
-	};
-
 	private Handler notificationHandle = new Handler() {
 		public void handleMessage(Message msg) {
 			if (msg.what < 0) {
@@ -586,14 +554,31 @@ public class TableActivity extends BaseActivity {
 			public void run() {
 				try {
 					Message msg = new Message();
-					int ret, statusRet, delRet, cleanRet;
-					statusRet = mSettings.updatusStatus(Info.getTableId(), 0);
-					delRet = mMyOrder.delPhoneTable(Info.getTableId(), 0, -1);
-					cleanRet = mSettings.cleanTalble(Info.getTableId());
-					mSettings.clear();
+					int ret;
+					ret = mSettings.updatusStatus(Info.getTableId(), 0);
+					if (ret < 0) {
+						tableHandle.sendEmptyMessage(ret);
+						return;
+					}
+					
+					ret = mMyOrder.delPhoneTable(Info.getTableId(), 0, -1);
+					if (ret < 0) {
+						tableHandle.sendEmptyMessage(ret);
+						return;
+					}
+					
+					ret = mSettings.cleanTalble(Info.getTableId());
+					if (ret < 0) {
+						tableHandle.sendEmptyMessage(ret);
+						return;
+					}
+
+					//lstImageItem.clear();
+					//mSettings.clear();
+
 					mNotificaion.getNotifiycations();
 					ret = mSettings.getTableStatusFromServer();
-					if (ret < 0 || statusRet < 0 || delRet < 0 || cleanRet < 0) {
+					if (ret < 0) {
 						tableHandle.sendEmptyMessage(ret);
 						return;
 					}
@@ -611,15 +596,25 @@ public class TableActivity extends BaseActivity {
 			public void run() {
 				try {
 					Message msg = new Message();
-					int ret, statusRet, delRet;
-					statusRet = mSettings.updatusStatus(Info.getTableId(),
+					int ret;
+					ret = mSettings.updatusStatus(Info.getTableId(),
 							mSettings.getStatus(position) - PHONE_STATUS);
-					delRet = mMyOrder.delPhoneTable(Info.getTableId(), 0, -1);
-					mMyOrder.phoneClear();
-					mSettings.clear();
+					if (ret < 0 ) {
+						tableHandle.sendEmptyMessage(ret);
+						return;
+					}
+					
+					ret = mMyOrder.delPhoneTable(Info.getTableId(), 0, -1);
+					if (ret < 0 ) {
+						tableHandle.sendEmptyMessage(ret);
+						return;
+					}
+					
+					//mSettings.clear();
 					mNotificaion.getNotifiycations();
+					mMyOrder.phoneClear();
 					ret = mSettings.getTableStatusFromServer();
-					if (ret < 0 || statusRet < 0 || delRet < 0) {
+					if (ret < 0 ) {
 						tableHandle.sendEmptyMessage(ret);
 						return;
 					}
@@ -670,65 +665,8 @@ public class TableActivity extends BaseActivity {
 	private OnClickListener statisticsClicked = new OnClickListener() {
 		@Override
 		public void onClick(View v) {
-
-			// 点击确定转向登录对话框
-			LayoutInflater factory = LayoutInflater.from(TableActivity.this);
-			// 得到自定义对话框
-			final View DialogView = factory.inflate(R.layout.setting_dialog,
-					null);
-			SharedPreferences sharedPre = getSharedPreferences("userInfo",
-					Context.MODE_WORLD_WRITEABLE | Context.MODE_WORLD_READABLE);
-			String userName = sharedPre.getString("name", "");
-			EditText userNameET = (EditText) DialogView
-					.findViewById(R.id.edit_username);
-			userNameET.setText(userName);
-			// 创建对话框
-			AlertDialog dlg = new AlertDialog.Builder(TableActivity.this)
-					.setTitle("登录框")
-					.setView(DialogView)
-					// 设置自定义对话框样式
-					.setPositiveButton("确定",
-							new DialogInterface.OnClickListener() {// 设置监听事件
-
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
-									EditText mUserName = (EditText) DialogView
-											.findViewById(R.id.edit_username);
-									final String userName = mUserName.getText()
-											.toString();
-									EditText mUserPwd = (EditText) DialogView
-											.findViewById(R.id.edit_password);
-									final String userPwd = mUserPwd.getText()
-											.toString();
-									UserData.clean();
-									if ("".equals(userName)
-											|| "".equals(userPwd)) {
-										dialog.cancel();
-									} else {
-										SharedPreferences sharedPre = getSharedPreferences(
-												"userInfo",
-												Context.MODE_WORLD_WRITEABLE
-														| Context.MODE_WORLD_READABLE);
-										Editor editor = sharedPre.edit();
-										editor.putString("name", userName);
-										editor.commit();
-
-										UserData.setUserName(userName);
-										UserData.setUserPwd(userPwd);
-									}
-									new Thread(new userThread()).start();
-								}
-							}).setNegativeButton("取消",// 设置取消按钮
-							new DialogInterface.OnClickListener() {
-
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
-								}
-							}).create();// 创建对话框
-			dlg.show();// 显示对话框
-
+			LoginDlg loginDlg = new LoginDlg(TableActivity.this, StatisticsActivity.class);
+			loginDlg.show();
 		}
 
 	};

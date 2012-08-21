@@ -43,7 +43,7 @@ public class UserData {
 			return -1;
 		}
 		Log.d("pwd", "userPerminssion:"+userPerminssion);
-		if(UserData.mPwd.equals(userPwd) && "0".equals(userPerminssion)){
+		if(userPwd.equals(UserData.mPwd) && "0".equals(userPerminssion)){
 			return 1;
 		}else{
 			return -1;
