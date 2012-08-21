@@ -2,7 +2,7 @@ package com.htb.cnk;
 
 import java.lang.reflect.Method;
 
-import com.htb.cnk.data.MyOrder;
+import com.htb.cnk.data.Info;
 import com.htb.cnk.data.UserData;
 
 import android.app.AlertDialog;

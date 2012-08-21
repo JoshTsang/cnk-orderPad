@@ -107,6 +107,7 @@ public class TableActivity extends BaseActivity {
 		mpDialog = new ProgressDialog(TableActivity.this);
 		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 		mNetWrorkAlertDialog = networkDialog();
+		Info.setMode(Info.WORK_MODE_WAITER);
 	}
 
 	private void findViews() {
