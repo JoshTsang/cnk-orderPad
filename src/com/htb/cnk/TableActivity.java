@@ -130,8 +130,7 @@ public class TableActivity extends BaseActivity {
 			try {
 				Message msg = new Message();
 				tableHandle.sendEmptyMessage(DISABLE_GRIDVIEW);
-				mTableSettings.clear();
-				mSettings.clear();
+//				mTableSettings.clear();
 				mNotificaion.clear();
 				mNotificaion.getNotifiycations();
 				mNotificationType.getNotifiycationsType();
@@ -294,7 +293,7 @@ public class TableActivity extends BaseActivity {
 	private AlertDialog.Builder cleanPhoneDialog(final int position) {
 		final AlertDialog.Builder mAlertDialog = new AlertDialog.Builder(
 				TableActivity.this);
-		mAlertDialog.setMessage("请确认是否清除手机点菜");// 设置对话框内容
+		mAlertDialog.setMessage("是否清除顾客点的菜");// 设置对话框内容
 		mAlertDialog.setCancelable(false);
 		mAlertDialog.setPositiveButton("是",
 				new DialogInterface.OnClickListener() {
@@ -356,7 +355,7 @@ public class TableActivity extends BaseActivity {
 	}
 
 	private AlertDialog.Builder addPhoneDialog(final int position) {
-		final CharSequence[] additems = { "查看手机已点的菜", "取消手机已点的菜" };
+		final CharSequence[] additems = { "查看顾客已点的菜", "取消顾客已点的菜" };
 
 		AlertDialog.Builder addPhoneDialog = new AlertDialog.Builder(
 				TableActivity.this);

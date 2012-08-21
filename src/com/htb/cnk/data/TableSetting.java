@@ -85,11 +85,12 @@ public class TableSetting {
 		mTableSettings.get(index).setStatus(n);
 	}
 
-	public int getTableStatusFromServer() {
+	public synchronized  int getTableStatusFromServer() throws JSONException {
 		String tableStatusPkg = Http.get(Server.GET_TABLE_STATUS, "");
-		if(tableStatusPkg == null){
+		if("null".equals(tableStatusPkg)){
 			return -1;
 		}
+		mTableSettings.clear();
 		try {
 			JSONArray tableList = new JSONArray(tableStatusPkg);
 			int length = tableList.length();
@@ -103,12 +104,12 @@ public class TableSetting {
 				asItem = new TableSettingItem(status, name, id);
 				setting.add(asItem);
 			}
+			notify();
 			return 0;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
-		return -1;
+		return 0;
 	}
 	
 	public int getItemTableStatus(int tableId) {
