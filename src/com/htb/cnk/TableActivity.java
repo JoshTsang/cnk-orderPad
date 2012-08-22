@@ -556,7 +556,7 @@ public class TableActivity extends BaseActivity {
 						return;
 					}
 					
-					ret = mMyOrder.delPhoneTable(Info.getTableId(), 0, -1);
+					ret = mMyOrder.cleanServerPhoneOrder(Info.getTableId());
 					if (ret < 0) {
 						tableHandle.sendEmptyMessage(ret);
 						return;
@@ -599,7 +599,7 @@ public class TableActivity extends BaseActivity {
 						return;
 					}
 					
-					ret = mMyOrder.delPhoneTable(Info.getTableId(), 0, -1);
+					ret = mMyOrder.cleanServerPhoneOrder(Info.getTableId());
 					if (ret < 0 ) {
 						tableHandle.sendEmptyMessage(ret);
 						return;

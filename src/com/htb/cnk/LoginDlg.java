@@ -36,22 +36,19 @@ public class LoginDlg {
 	
 	public void show() {
 		LayoutInflater factory = LayoutInflater.from(mActivity);
-		// 得到自定义对话框
-		final View DialogView = factory.inflate(R.layout.setting_dialog,
-				null);
+		final View DialogView = factory.inflate(R.layout.setting_dialog, null);
 		SharedPreferences sharedPre = mActivity.getSharedPreferences("userInfo",
 				Context.MODE_PRIVATE);
 		String userName = sharedPre.getString("name", "");
-		EditText userNameET = (EditText) DialogView
-				.findViewById(R.id.edit_username);
+		EditText userNameET = (EditText) DialogView.findViewById(R.id.edit_username);
+		
 		userNameET.setText(userName);
-		// 创建对话框
+		
 		AlertDialog dlg = new AlertDialog.Builder(mActivity)
 				.setTitle("登录框")
 				.setView(DialogView)
-				// 设置自定义对话框样式
 				.setPositiveButton("确定",
-						new DialogInterface.OnClickListener() {// 设置监听事件
+						new DialogInterface.OnClickListener() {
 
 							@Override
 							public void onClick(DialogInterface dialog,
@@ -82,24 +79,47 @@ public class LoginDlg {
 								new Thread() {
 								public void run() {
 									try {
-										int ret = UserData.Compare();
+										int ret = UserData.compare();
 										userHandle.sendEmptyMessage(ret);
 									} catch (Exception e) {
 										e.printStackTrace();
 									}
 								}}.start();
 							}
-						}).setNegativeButton("取消",// 设置取消按钮
+						}).setNegativeButton("取消",
 						new DialogInterface.OnClickListener() {
 
 							@Override
 							public void onClick(DialogInterface dialog,
 									int which) {
 							}
-						}).create();// 创建对话框
-		dlg.show();// 显示对话框
+						}).create();
+		dlg.show();
 	}
 	
+	private void login() {
+		if (mDestActivity != null) {
+			Intent intent = new Intent();
+			intent.setClass(mActivity, mDestActivity);
+			mActivity.startActivity(intent);
+		} else {
+			switch(mAction) {
+			case ACTION_SUBMIT:
+				try {
+					Method method = mActivity.getClass().getMethod("submitOrder", new Class[0]);
+					method.invoke(mActivity, new Object[0]);
+				} catch (NoSuchMethodException e) {
+					e.printStackTrace();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				break;
+			default:
+				break;
+			}
+		}
+	}
+
 	private Handler userHandle = new Handler() {
 
 		public void handleMessage(Message msg) {
@@ -120,26 +140,7 @@ public class LoginDlg {
 				}
 				
 			} else {
-				if (mDestActivity != null) {
-					Intent intent = new Intent();
-					intent.setClass(mActivity, mDestActivity);
-					mActivity.startActivity(intent);
-				} else {
-					switch(mAction) {
-					case ACTION_SUBMIT:
-						try {
-							Method method = mActivity.getClass().getMethod("submitOrder", new Class[0]);
-							method.invoke(mActivity, new Object[0]);
-						} catch (NoSuchMethodException e) {
-							e.printStackTrace();
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-						break;
-					default:
-						break;
-					}
-				}
+				login();
 			}
 		}
 	};

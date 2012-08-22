@@ -275,34 +275,23 @@ public class MenuActivity extends BaseActivity {
 				}).show();
 	}
 
-	private void updateDishQuantity(int position, int quantity) {
+	private void updateDishQuantity(final int position, final int quantity) {
 		if (quantity < 0) {
-			int result = mMyOrder.minus(mDishes.getDish(position), -quantity);
-			if (result >= 0) {
-				updatePhoneOrder(position, result);
-			}
+			mpDialog.setMessage("正在删除...");
+			mpDialog.show();
+			new Thread() {
+				public void run() {
+					int ret = mMyOrder.minus(mDishes.getDish(position), -quantity);
+					minushandler.sendEmptyMessage(ret);
+				}
+			}.start();
+			
 		} else {
 			mMyOrder.add(position, quantity);
 		}
 		updateOrderedDishCount();
 		mDishLstAdapter.notifyDataSetChanged();
 	
-	}
-
-	private void updatePhoneOrder(final int position, final int quantity) {
-		mpDialog.setMessage("正在删除手机...");
-		mpDialog.show();
-		delPhoneTableThread(position);
-	}
-
-	private void delPhoneTableThread(final int position) {
-		new Thread() {
-			public void run() {
-				int ret = mMyOrder.delPhoneTable(Info.getTableId(),
-						mDishes.getDish(position).getId(), position);
-				delPhoneOrderhandler.sendEmptyMessage(ret);
-			}
-		}.start();
 	}
 
 	private OnItemClickListener CategoryListClicked = new OnItemClickListener() {
@@ -401,7 +390,7 @@ public class MenuActivity extends BaseActivity {
 		}
 	};
 
-	private Handler delPhoneOrderhandler = new Handler() {
+	private Handler minushandler = new Handler() {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
 			if (msg.what < 0) {
