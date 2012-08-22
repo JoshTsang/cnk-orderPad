@@ -435,9 +435,9 @@ public class MyOrder {
 			String phoneOrderPkg = Http.get(Server.UPDATE_PHONE_ORDER, "DID="
 					+ dishId + "&DNUM=" + quantity + "&TID=" + tableId);
 			Log.d("resp", "resp:" + phoneOrderPkg);
-//			if (phoneOrderPkg == null || "null".equals(phoneOrderPkg)) {
-//				return -1;
-//			}
+			if (phoneOrderPkg == null || !"".equals(phoneOrderPkg)) {
+				return -1;
+			}
 		} else {
 			return delPhoneOrderedDish(tableId, dishId);
 		}
