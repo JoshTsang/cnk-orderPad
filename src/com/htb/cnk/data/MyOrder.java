@@ -148,9 +148,14 @@ public class MyOrder {
 				if (minusPhoneOrderOnServer(Info.getTableId(), quantity, item.getId()) < 0) {
 					return -1;
 				} else {
+<<<<<<< HEAD
+					mOrder.remove(item);
+					return RET_MINUS_SUCC;
+=======
 					item.phoneQuantity -= quantity;
 					item.padQuantity = 0;
 					return 0;
+>>>>>>> 65ac320fb9da6702a51061447c5fea891a4035ca
 				}
 				
 			}
@@ -221,8 +226,8 @@ public class MyOrder {
 		return mOrder.get(position).phoneQuantity;
 	}
 
-	public void removeItem(int did) {
-		mOrder.remove(did);
+	public void removeItem(int position) {
+		mOrder.remove(position);
 	}
 
 	public int remove(int dishId) {
@@ -407,6 +412,41 @@ public class MyOrder {
 		return null;
 	}
 
+<<<<<<< HEAD
+	public int delPhoneTable(int tableId, int dishId) {
+		String tableStatusPkg;
+		if (dishId == 0) {
+			tableStatusPkg = Http.get(Server.DELETE_PHONEORDER, "TID="
+					+ tableId);
+			mOrder.clear();
+		} else {
+			tableStatusPkg = Http.get(Server.DELETE_PHONEORDER, "TID="
+					+ tableId + "&DID=" + dishId);
+		}
+
+		if ("".equals(tableStatusPkg)) {
+			for (int i = 0; i < mOrder.size(); i++) {
+				OrderedDish item = (OrderedDish) mOrder.get(i);
+				if (item.dish.getId() == dishId) {
+					mOrder.remove(item);
+					return 0;
+				}
+			}
+			return 0;
+		} else {
+			return -1;
+		}
+	}
+
+	public int updatePhoneOrder(int tableId, int quantity, int dishId) {
+		String phoneOrderPkg = Http.get(Server.UPDATE_PHONE_ORDER, "DID="
+				+ dishId + "&DNUM=" + quantity + "&TID=" + tableId);
+		Log.d("resp", "resp:" + phoneOrderPkg);
+		if ("".equals(phoneOrderPkg)) {
+			return 0;
+		} else {
+			return -1;
+=======
 	//TODO handle err
 	public int cleanServerPhoneOrder(int tableId) {
 		String tableStatusPkg = Http.get(Server.DELETE_PHONEORDER, "TID="
@@ -440,12 +480,17 @@ public class MyOrder {
 			}
 		} else {
 			return delPhoneOrderedDish(tableId, dishId);
+>>>>>>> 65ac320fb9da6702a51061447c5fea891a4035ca
 		}
-		return 0;
 	}
 
+<<<<<<< HEAD
+	public int delDish(int position) {
+
+=======
 	public int submitDelDish(int dishId) {
 		Log.d("DID", "" + dishId);
+>>>>>>> 65ac320fb9da6702a51061447c5fea891a4035ca
 		JSONObject order = new JSONObject();
 		Date date = new Date();
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -464,7 +509,7 @@ public class MyOrder {
 		JSONArray dishes = new JSONArray();
 		try {
 
-			if (dishId == -1) {
+			if (position == -1) {
 				for (int i = 0; i < mOrder.size(); i++) {
 					JSONObject dish = new JSONObject();
 					dish.put("dishId", mOrder.get(i).dish.getId());
@@ -478,13 +523,12 @@ public class MyOrder {
 				}
 			} else {
 				JSONObject dish = new JSONObject();
-				dish.put("dishId", mOrder.get(dishId).dish.getId());
-				dish.put("name", mOrder.get(dishId).dish.getName());
-				dish.put("price", mOrder.get(dishId).dish.getPrice());
-				dish.put(
-						"quan",
-						(mOrder.get(dishId).padQuantity + mOrder.get(dishId).phoneQuantity));
-				dish.put("id", mOrder.get(dishId).getDishId());
+				dish.put("dishId", mOrder.get(position).dish.getId());
+				dish.put("name", mOrder.get(position).dish.getName());
+				dish.put("price", mOrder.get(position).dish.getPrice());
+				dish.put("quan", (mOrder.get(position).padQuantity + mOrder
+						.get(position).phoneQuantity));
+				dish.put("id", mOrder.get(position).getDishId());
 				dishes.put(dish);
 			}
 			order.put("order", dishes);
@@ -495,11 +539,12 @@ public class MyOrder {
 		Log.d("JSON", order.toString());
 
 		String response = Http.post(Server.DEL_ORDER, order.toString());
-		Log.d("response", "response:" + response);
-		if (response == null) {
+		Log.d("post", "response:" + response);
+		if ("".equals(response)) {
+			return 0;
+		} else {
 			return -1;
 		}
-		return 0;
 	}
 
 	@Override

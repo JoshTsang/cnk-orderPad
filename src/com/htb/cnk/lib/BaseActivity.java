@@ -21,18 +21,18 @@ public class BaseActivity extends Activity {
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        MobclickAgent.onError(this);
+      // MobclickAgent.onError(this);
     }
 	
 	@Override
 	protected void onResume() {
 	    super.onResume();
-	    MobclickAgent.onResume(this);
+	 //   MobclickAgent.onResume(this);
 	}
 	
 	@Override
 	protected void onPause() {
 	    super.onPause();
-	    MobclickAgent.onPause(this);
+	  //  MobclickAgent.onPause(this);
 	}
 }

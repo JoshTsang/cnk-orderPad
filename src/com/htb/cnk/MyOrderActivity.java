@@ -143,9 +143,9 @@ public class MyOrderActivity extends OrderBaseActivity {
 					handler.sendEmptyMessage(0);
 					int result = mSettings.getItemTableStatus(Info.getTableId());
 					if( result >= 50){
-						mSettings.updatusStatus(Info.getTableId(),result);
+						mSettings.updateStatus(Info.getTableId(),result);
 					}else{
-						mSettings.updatusStatus(Info.getTableId(), 1);
+						mSettings.updateStatus(Info.getTableId(), 1);
 					}
 				}
 			}

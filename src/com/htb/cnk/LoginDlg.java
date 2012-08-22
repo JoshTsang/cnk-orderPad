@@ -137,6 +137,31 @@ public class LoginDlg {
 					break;
 				default:
 					Log.e("LoginDlg", "unknown err msg");
+<<<<<<< HEAD
+				}
+				
+			} else {
+				if (mDestActivity != null) {
+					Intent intent = new Intent();
+					intent.setClass(mActivity, mDestActivity);
+					mActivity.startActivity(intent);
+				} else {
+					switch(mAction) {
+					case ACTION_SUBMIT:
+						try {
+							Method method = mActivity.getClass().getMethod("submitOrder", new Class[0]);
+							method.invoke(mActivity, new Object[0]);
+						} catch (NoSuchMethodException e) {
+							e.printStackTrace();
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+						break;
+					default:
+						break;
+					}
+=======
+>>>>>>> 65ac320fb9da6702a51061447c5fea891a4035ca
 				}
 				
 			} else {
