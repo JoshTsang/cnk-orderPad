@@ -111,19 +111,15 @@ public class Notifications {
 	public List <String> getNotifiycationsType(int index){
 		Notifications setting = new Notifications();
 		String types[] = setting.getTypeAll(index);
-		Log.d("type", types[0]);
 		List <String> temp = new ArrayList<String>();
 		for(int i = 0; i < types.length;i++){
-			Log.d("type", types[i]);
 			temp.add(NotificationTypes.getName(Integer.parseInt(types[i]))) ;
 		}
 		return temp;
 	}
 	
 	public int cleanNotifications(int index){
-		Log.d("index", "index "+index);
 		String notificationPkg = Http.get(Server.CLEANNOTIFICATION, "TID=" + index);
-		
 		if (notificationPkg == null) {
 			return -1;
 		}

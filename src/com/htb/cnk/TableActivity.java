@@ -1,24 +1,22 @@
 package com.htb.cnk;
 
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Semaphore;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -26,7 +24,6 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
@@ -36,7 +33,6 @@ import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.NotificationTypes;
 import com.htb.cnk.data.Notifications;
 import com.htb.cnk.data.TableSetting;
-import com.htb.cnk.data.UserData;
 import com.htb.cnk.lib.BaseActivity;
 
 public class TableActivity extends BaseActivity {
@@ -45,6 +41,7 @@ public class TableActivity extends BaseActivity {
 	private final int PHONE_STATUS = 50;
 	private final int NOTIFICATION_STATUS = 100;
 	private static int ARERTDIALOG = 0;
+	private boolean mUpdateFlg = true;
 	private TableSetting mSettings = new TableSetting();
 	private List<Map<String, String>> mTableSettings = new ArrayList<Map<String, String>>();
 	private Button mBackBtn;
@@ -53,8 +50,7 @@ public class TableActivity extends BaseActivity {
 	private Button mManageBtn;
 	private GridView gridview;
 	private ProgressDialog mpDialog;
-	private SimpleAdapter saImageItems;
-	private Handler handler = new Handler();
+	private SimpleAdapter mImageItems;
 	private ItemClickListener mTableClicked;
 	private ArrayList<HashMap<String, Object>> lstImageItem = new ArrayList<HashMap<String, Object>>();
 	private Notifications mNotificaion = new Notifications();
@@ -62,35 +58,28 @@ public class TableActivity extends BaseActivity {
 	private MyOrder mMyOrder;
 	private AlertDialog.Builder mNetWrorkAlertDialog;
 	private AlertDialog mNetWrorkcancel;
+	private Thread tableUpdeteThread;
 
 	@Override
 	protected void onDestroy() {
-		handler.removeCallbacks(runnable); // 停止刷新
-		handler.removeCallbacksAndMessages(runnable); // 停止刷新
+		startUpdate(false);
 		super.onDestroy();
 	}
 
 	@Override
 	protected void onStop() {
-		handler.removeCallbacks(runnable); // 停止刷新
-		handler.removeCallbacksAndMessages(runnable); // 停止刷新
+		startUpdate(false);
 		super.onStop();
 	}
 
 	@Override
 	protected void onResume() {
-		// mNetWrorkAlertDialog.;
 		if (ARERTDIALOG == 1) {
 			mNetWrorkcancel.cancel();
 			ARERTDIALOG = 0;
 		}
-		mpDialog.setTitle("请稍等");
-		mpDialog.setMessage("正在获取状态...");
-		mpDialog.setIndeterminate(false);
-		mpDialog.setCancelable(false);
-		mpDialog.show();
-
-		handler.postDelayed(runnable, 1000 * 1);
+		// mpDialog.show();
+		startUpdate(true);
 		super.onResume();
 	}
 
@@ -108,6 +97,12 @@ public class TableActivity extends BaseActivity {
 		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 		mNetWrorkAlertDialog = networkDialog();
 		Info.setMode(Info.WORK_MODE_WAITER);
+		mpDialog.setTitle("请稍等");
+		mpDialog.setMessage("正在获取状态...");
+		mpDialog.setIndeterminate(false);
+		mpDialog.setCancelable(false);
+		mpDialog.show();
+
 	}
 
 	private void findViews() {
@@ -126,25 +121,72 @@ public class TableActivity extends BaseActivity {
 		mManageBtn.setOnClickListener(manageClicked);
 	}
 
-	class tableThread implements Runnable {
+	public class tableThread extends Thread {
+		private int milliseconds; // 延迟的时间
+
+		public tableThread(int i) {
+			milliseconds = i;
+		}
+
 		public void run() {
-			try {
-				Message msg = new Message();
-				tableHandle.sendEmptyMessage(DISABLE_GRIDVIEW);
-				mTableSettings.clear();
-				mNotificaion.clear();
-				mNotificaion.getNotifiycations();
-				mNotificationType.getNotifiycationsType();
-				int ret = mSettings.getTableStatusFromServer();
-				if (ret < 0) {
-					Log.d("ret", "ret: " + ret);
-					tableHandle.sendEmptyMessage(ret);
-					return;
+			int i = 0;
+			while (true) {
+				i++;
+				if (mUpdateFlg == true) {
+					try {
+						Message msg = new Message();
+						tableHandle.sendEmptyMessage(DISABLE_GRIDVIEW);
+						mTableSettings.clear();
+						mNotificaion.clear();
+						mNotificaion.getNotifiycations();
+						mNotificationType.getNotifiycationsType();
+						int ret = mSettings.getTableStatusFromServer();
+						mpDialog.cancel();
+						if (ret < 0) {
+							tableHandle.sendEmptyMessage(ret);
+							synchronized (tableUpdeteThread) {
+								try {
+									tableThread.this.wait(); 
+								} catch (InterruptedException e) {
+									e.printStackTrace();
+								}
+							}
+						} else {
+							msg.what = UPDATE_TABLE_INFOS;
+							tableHandle.sendMessage(msg);
+							tableThread.sleep(milliseconds);
+						}
+
+					} catch (Exception e) {
+						Log.d("catch", "i: " + i);
+						e.printStackTrace();
+					}
+
+				} else {
+					Log.d("mUpdateFlg", "mUpdateFlg:flase " + i);
+					synchronized (tableUpdeteThread) {
+						tableUpdeteThread.interrupt();
+					}
 				}
-				msg.what = UPDATE_TABLE_INFOS;
-				tableHandle.sendMessage(msg);
-			} catch (Exception e) {
-				e.printStackTrace();
+			}
+
+		}
+	}
+
+	private void startUpdate(boolean flg) {
+		mUpdateFlg = flg;
+		if (tableUpdeteThread == null) {
+			tableUpdeteThread = new tableThread(1000 * 10);
+			Log.d("tableUpdeteThread", "start");
+			tableUpdeteThread.start();
+		} else {
+			synchronized (tableUpdeteThread) {
+				Log.d("tableUpdeteThread", "notify");
+				try {
+					tableUpdeteThread.notify();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 		}
 	}
@@ -153,8 +195,6 @@ public class TableActivity extends BaseActivity {
 		public void run() {
 			try {
 				Message msg = new Message();
-				handler.removeCallbacks(runnable); // 停止刷新
-				handler.removeCallbacksAndMessages(runnable); // 停止刷新
 				int ret = mNotificaion.cleanNotifications(Info.getTableId());
 				if (ret < 0) {
 					notificationHandle.sendEmptyMessage(ret);
@@ -203,7 +243,7 @@ public class TableActivity extends BaseActivity {
 				addDialog.show();
 				break;
 			}
-			saImageItems.notifyDataSetChanged();
+			mImageItems.notifyDataSetChanged();
 
 		}
 	}
@@ -226,7 +266,14 @@ public class TableActivity extends BaseActivity {
 						mpDialog.setIndeterminate(false);
 						mpDialog.setCancelable(false);
 						mpDialog.show();
-						handler.postDelayed(runnable, 1000 * 1);
+						synchronized (tableUpdeteThread) {
+							Log.d("tableUpdeteThread", "notify");
+							try {
+								tableUpdeteThread.notifyAll();
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+						}
 					}
 				});
 		mAlertDialog.setNegativeButton("退出",
@@ -240,7 +287,7 @@ public class TableActivity extends BaseActivity {
 						finish();
 					}
 				});
-		
+
 		return mAlertDialog;
 	}
 
@@ -435,13 +482,12 @@ public class TableActivity extends BaseActivity {
 
 	private Handler tableHandle = new Handler() {
 		public void handleMessage(Message msg) {
-
+			mpDialog.cancel();
 			if (msg.what < 0) {
-				handler.removeCallbacks(runnable); // 停止刷新
-				handler.removeCallbacksAndMessages(runnable); // 停止刷新
-				mpDialog.cancel();
 				ARERTDIALOG = 1;
+				Log.d("what", "-1");
 				mNetWrorkcancel = mNetWrorkAlertDialog.show();
+
 			} else {
 				switch (msg.what) {
 				case UPDATE_TABLE_INFOS:
@@ -480,16 +526,16 @@ public class TableActivity extends BaseActivity {
 				}
 				setTableIcon(i, status);
 			}
-			saImageItems = new SimpleAdapter(TableActivity.this, lstImageItem,
+			mImageItems = new SimpleAdapter(TableActivity.this, lstImageItem,
 					R.layout.table_item,
 					new String[] { "imageItem", "ItemText" }, new int[] {
 							R.id.ItemImage, R.id.ItemText }) {
 			};
-			gridview.setAdapter(saImageItems);
+			gridview.setAdapter(mImageItems);
 		}
 
 		gridview.setVisibility(View.VISIBLE);
-		saImageItems.notifyDataSetChanged();
+		mImageItems.notifyDataSetChanged();
 		mpDialog.cancel();
 		gridview.setOnItemClickListener(mTableClicked);
 	}
@@ -545,7 +591,7 @@ public class TableActivity extends BaseActivity {
 				Toast.makeText(getApplicationContext(),
 						getResources().getString(R.string.claenNotificaion),
 						Toast.LENGTH_SHORT).show();
-				handler.postDelayed(runnable, 100 * 1);
+				startUpdate(true);
 			}
 		}
 	};
@@ -556,26 +602,23 @@ public class TableActivity extends BaseActivity {
 				try {
 					Message msg = new Message();
 					int ret;
-					ret = mSettings.updatusStatus(Info.getTableId(), 0);
-					if (ret < 0) {
-						tableHandle.sendEmptyMessage(ret);
-						return;
-					}
-					
-					ret = mMyOrder.delPhoneTable(Info.getTableId(), 0, -1);
-					if (ret < 0) {
-						tableHandle.sendEmptyMessage(ret);
-						return;
-					}
-					
-					ret = mSettings.cleanTalble(Info.getTableId());
+					ret = mSettings.updateStatus(Info.getTableId(), 0);
 					if (ret < 0) {
 						tableHandle.sendEmptyMessage(ret);
 						return;
 					}
 
-					//lstImageItem.clear();
-					//mSettings.clear();
+					ret = mMyOrder.delPhoneTable(Info.getTableId(), 0);
+					if (ret < 0) {
+						tableHandle.sendEmptyMessage(ret);
+						return;
+					}
+
+					ret = mSettings.cleanTalble(Info.getTableId());
+					if (ret < 0) {
+						tableHandle.sendEmptyMessage(ret);
+						return;
+					}
 
 					mNotificaion.getNotifiycations();
 					ret = mSettings.getTableStatusFromServer();
@@ -598,24 +641,23 @@ public class TableActivity extends BaseActivity {
 				try {
 					Message msg = new Message();
 					int ret;
-					ret = mSettings.updatusStatus(Info.getTableId(),
+					ret = mSettings.updateStatus(Info.getTableId(),
 							mSettings.getStatus(position) - PHONE_STATUS);
-					if (ret < 0 ) {
+					if (ret < 0) {
 						tableHandle.sendEmptyMessage(ret);
 						return;
 					}
-					
-					ret = mMyOrder.delPhoneTable(Info.getTableId(), 0, -1);
-					if (ret < 0 ) {
+
+					ret = mMyOrder.delPhoneTable(Info.getTableId(), 0);
+					if (ret < 0) {
 						tableHandle.sendEmptyMessage(ret);
 						return;
 					}
-					
-					//mSettings.clear();
+
 					mNotificaion.getNotifiycations();
 					mMyOrder.phoneClear();
 					ret = mSettings.getTableStatusFromServer();
-					if (ret < 0 ) {
+					if (ret < 0) {
 						tableHandle.sendEmptyMessage(ret);
 						return;
 					}
@@ -659,28 +701,17 @@ public class TableActivity extends BaseActivity {
 			intent.setData(content_url);
 			// intent.setClassName("com.android.browser","com.android.browser.BrowserActivity");
 			startActivity(intent);
-
 		}
 	};
 
 	private OnClickListener statisticsClicked = new OnClickListener() {
 		@Override
 		public void onClick(View v) {
-			LoginDlg loginDlg = new LoginDlg(TableActivity.this, StatisticsActivity.class);
+			LoginDlg loginDlg = new LoginDlg(TableActivity.this,
+					StatisticsActivity.class);
 			loginDlg.show();
 		}
 
 	};
 
-	private Runnable runnable = new Runnable() {
-		public void run() {
-			this.update();
-		}
-
-		void update() {
-			// 刷新msg的内容
-			new Thread(new tableThread()).start();
-			handler.postDelayed(this, 1000 * 20);// 间隔20秒
-		}
-	};
 }

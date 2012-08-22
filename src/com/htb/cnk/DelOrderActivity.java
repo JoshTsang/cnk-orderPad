@@ -88,21 +88,18 @@ public class DelOrderActivity extends OrderBaseActivity {
 	}
 
 
-	private void delDish(int position) {
-		final int dId = position;
-		Log.d("dId", "did+" + mMyOrder.getOrderedDish(dId).getDishId());
+	private void delDish(final int position) {
 		new Thread() {
 			public void run() {
 				try {
 					Message msg = new Message();
 					int ret = 1;
-					ret = mMyOrder.delDish(dId);
+					ret = mMyOrder.delDish(position);
 					if (ret < 0) {
 						delHandler.sendEmptyMessage(ret);
 						return;
 					}
-					Log.d("dId", "did+" + dId);
-					mMyOrder.removeItem(dId);
+					mMyOrder.removeItem(position);
 					msg.what = ret;
 					delHandler.sendMessage(msg);
 				} catch (Exception e) {

@@ -85,7 +85,7 @@ public class TableSetting {
 		mTableSettings.get(index).setStatus(n);
 	}
 
-	public synchronized  int getTableStatusFromServer() {
+	public  int getTableStatusFromServer() {
 		String tableStatusPkg = Http.get(Server.GET_TABLE_STATUS, "");
 		if("null".equals(tableStatusPkg)){
 			return -1;
@@ -94,7 +94,7 @@ public class TableSetting {
 			JSONArray tableList = new JSONArray(tableStatusPkg);
 			int length = tableList.length();
 			TableSettingItem asItem;
-			clear();
+			mTableSettings.clear();
 			for (int i = 0; i < length; i++) {// 遍历JSONArray
 				JSONObject item = tableList.getJSONObject(i);
 				int id = item.getInt("id");
@@ -103,12 +103,13 @@ public class TableSetting {
 				asItem = new TableSettingItem(status, name, id);
 				add(asItem);
 			}
-			notify();
 			return 0;
 		} catch (Exception e) {
 			e.printStackTrace();
+
 		}
-		return 0;
+
+		return -1;
 	}
 	
 	public int getItemTableStatus(int tableId) {
@@ -120,24 +121,12 @@ public class TableSetting {
 		return Integer.parseInt(tableStatusPkg);
 	}
 	
-	public int updatusStatus(int tableId, int status) {
+	public int updateStatus(int tableId, int status) {
 		String tableStatusPkg = Http.get(Server.UPDATE_TABLE_STATUS, "TID="
 				+ tableId + "&TST=" + status);
 		if (tableStatusPkg == null) {
 			return -1;
 		}
-		return 0;
-	}
-	
-
-	
-	public int remove(int index) {
-		mTableSettings.remove(index);
-		return 0;
-	}
-
-	public int clear() {
-		mTableSettings.clear();
 		return 0;
 	}
 	
@@ -159,15 +148,5 @@ public class TableSetting {
 		}
 		return 0;
 	}
-
-
-
-	public void backUpTableStatus(int[] mTableStatus) {
-		for(int i=0 ;i<mTableSettings.size();i++){
-			mTableStatus[i] = getStatus(i);
-		}
-		
-	}
-
 
 }

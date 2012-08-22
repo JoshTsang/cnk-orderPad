@@ -296,7 +296,7 @@ public class PhoneActivity extends BaseActivity {
 			public void run() {
 				Message msg = new Message();
 				int ret = mMyOrder.delPhoneTable(Info.getTableId(),
-						mMyOrder.getDishId(position),position);
+						mMyOrder.getDishId(position));
 				if (ret < 0) {
 					delPhoneOrderhandler.sendEmptyMessage(-1);
 				} else {
@@ -320,8 +320,8 @@ public class PhoneActivity extends BaseActivity {
 					handler.sendEmptyMessage(ret);
 				} else {
 					handler.sendEmptyMessage(0);
-					mSettings.updatusStatus(Info.getTableId(), 1);
-					mMyOrder.delPhoneTable(Info.getTableId(), 0, -1);
+					mSettings.updateStatus(Info.getTableId(), 1);
+					mMyOrder.delPhoneTable(Info.getTableId(), 0);
 				}
 			}
 		}.start();
