@@ -272,42 +272,8 @@ public class PhoneActivity extends BaseActivity {
 						}).setNegativeButton("取消", null).show();
 	}
 
-<<<<<<< HEAD
-	private void updatePhoneOrder(final int position, final int quantity) {
-		new Thread() {
-			public void run() {
-				Message msg = new Message();
-				int ret = mMyOrder.updatePhoneOrder(Info.getTableId(),
-						quantity, mMyOrder.getDishId(position));
-				if (ret < 0) {
-					delPhoneOrderhandler.sendEmptyMessage(-1);
-				} else {
-					msg.what = ret;
-					delPhoneOrderhandler.sendMessage(msg);
-				}
-			}
-		}.start();
-	}
-
-	private void delPhoneTableThread(final int position,final int quantity) {
-		new Thread() {
-			public void run() {
-				Message msg = new Message();
-				int ret = mMyOrder.delPhoneTable(Info.getTableId(),
-						mMyOrder.getDishId(position));
-				if (ret < 0) {
-					delPhoneOrderhandler.sendEmptyMessage(-1);
-				} else {
-					msg.what = ret;
-					delPhoneOrderhandler.sendMessage(msg);
-				}
-			}
-		}.start();
-	}
-
-=======
 	//TODO bug might exist
->>>>>>> 65ac320fb9da6702a51061447c5fea891a4035ca
+
 	private void submitThread() {
 		mpDialog.setTitle("请稍等");
 		mpDialog.setMessage("正在提交订单...");
@@ -321,17 +287,14 @@ public class PhoneActivity extends BaseActivity {
 					handler.sendEmptyMessage(-1);
 				} else {
 					handler.sendEmptyMessage(0);
-<<<<<<< HEAD
-					mSettings.updateStatus(Info.getTableId(), 1);
-					mMyOrder.delPhoneTable(Info.getTableId(), 0);
-=======
+
 					int result = mSettings.getItemTableStatus(Info.getTableId());
 					if( result >= 50){
-						mSettings.updatusStatus(Info.getTableId(),result);
+						mSettings.updateStatus(Info.getTableId(),result);
 					}else{
-						mSettings.updatusStatus(Info.getTableId(), 1);
+						mSettings.updateStatus(Info.getTableId(), 1);
 					}
->>>>>>> 65ac320fb9da6702a51061447c5fea891a4035ca
+
 				}
 			}
 		}.start();

@@ -108,10 +108,6 @@ public class TableSetting {
 			e.printStackTrace();
 
 		}
-<<<<<<< HEAD
-
-=======
->>>>>>> 65ac320fb9da6702a51061447c5fea891a4035ca
 		return -1;
 	}
 	
