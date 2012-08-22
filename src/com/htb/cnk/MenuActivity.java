@@ -145,39 +145,43 @@ public class MenuActivity extends BaseActivity {
 	}
 
 	private View getMenuView(int position, View convertView) {
-		ItemViewHolder viewHolder = new ItemViewHolder();
-
+		ItemViewHolder viewHolder;
+		Dish dishDetail = mDishes.getDish(position);
+		
 		if (convertView == null) {
 			convertView = LayoutInflater.from(MenuActivity.this).inflate(
 					R.layout.item_dish, null);
+			viewHolder = new ItemViewHolder();
+			viewHolder.findViews(convertView, ItemViewHolder.ITEM_ORDER_VIEW);
+			viewHolder.setOnClickListener();
+			convertView.setTag(viewHolder);
+		} else {
+			viewHolder = (ItemViewHolder)convertView.getTag();
 		}
-		Dish dishDetail = mDishes.getDish(position);
-
-		viewHolder.findViews(convertView, ItemViewHolder.ITEM_ORDER_VIEW);
 
 		viewHolder.setPic(position, dishDetail.getPic());
-
 		viewHolder.setData(dishDetail);
-		viewHolder.setOnClickListener();
 		viewHolder.setTag(position);
 		return convertView;
 	}
 
 	private View getFastOrderMenu(int position, View convertView) {
-		ItemViewHolder viewHolder = new ItemViewHolder();
-
+		ItemViewHolder viewHolder;
+		Dish dishDetail = mDishes.getDish(position);
+		
 		if (convertView == null) {
+			viewHolder = new ItemViewHolder();
 			convertView = LayoutInflater.from(MenuActivity.this).inflate(
 					R.layout.item_fastorder, null);
+			viewHolder.findViews(convertView, ItemViewHolder.ITEM_FASTORDER_VIEW);
+			convertView.setTag(viewHolder);
+		} else {
+			viewHolder = (ItemViewHolder)convertView.getTag();
 		}
-		Dish dishDetail = mDishes.getDish(position);
-
-		viewHolder.findViews(convertView, ItemViewHolder.ITEM_FASTORDER_VIEW);
-
+		
 		viewHolder.setData(dishDetail);
 		viewHolder.setOnClickListener();
 		viewHolder.setTag(position);
-		
 		return convertView;
 	}
 
