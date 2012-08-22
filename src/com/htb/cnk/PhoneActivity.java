@@ -43,7 +43,7 @@ public class PhoneActivity extends BaseActivity {
 	private MyOrderAdapter mMyOrderAdapter;
 	private ProgressDialog mpDialog;
 	private TableSetting mSettings = new TableSetting();
-//	private ProgressDialog mDialogCancel;
+
 	@Override
 	protected void onResume() {
 		super.onResume();
@@ -220,16 +220,17 @@ public class PhoneActivity extends BaseActivity {
 
 	}
 
-	private void updateDishQuantity(int position, int quantity) {
+	private void updateDishQuantity(final int position, final int quantity) {
 		if (quantity < 0) {
-			int result = mMyOrder.minus(position, -quantity);
-			Log.d("update", "result" + result);
-			if (result > 0) {
-				Log.d("updateresult", "result" + result);
-				updatePhoneOrder(position, result);
-				mpDialog.setMessage("正在删除菜单...");
-				mpDialog.show();
-			}
+			mpDialog.setMessage("正在删除...");
+			mpDialog.show();
+			new Thread() {
+				public void run() {
+					int ret = mMyOrder.minus(position, -quantity);
+					delPhoneOrderhandler.sendEmptyMessage(ret);
+				}
+			}.start();
+			
 		} else {
 			mMyOrder.add(position, quantity);
 		}
@@ -266,15 +267,12 @@ public class PhoneActivity extends BaseActivity {
 							@Override
 							public void onClick(DialogInterface dialog,
 									int which) {
-								mpDialog.setMessage("正在删除菜单,请稍等");
-								mpDialog.show();
-								delPhoneTableThread(position,quantity);
-								
-								
+								updateDishQuantity(position, -quantity);
 							}
 						}).setNegativeButton("取消", null).show();
 	}
 
+<<<<<<< HEAD
 	private void updatePhoneOrder(final int position, final int quantity) {
 		new Thread() {
 			public void run() {
@@ -307,6 +305,9 @@ public class PhoneActivity extends BaseActivity {
 		}.start();
 	}
 
+=======
+	//TODO bug might exist
+>>>>>>> 65ac320fb9da6702a51061447c5fea891a4035ca
 	private void submitThread() {
 		mpDialog.setTitle("请稍等");
 		mpDialog.setMessage("正在提交订单...");
@@ -317,11 +318,20 @@ public class PhoneActivity extends BaseActivity {
 			public void run() {
 				int ret = mMyOrder.submit();
 				if (ret < 0) {
-					handler.sendEmptyMessage(ret);
+					handler.sendEmptyMessage(-1);
 				} else {
 					handler.sendEmptyMessage(0);
+<<<<<<< HEAD
 					mSettings.updateStatus(Info.getTableId(), 1);
 					mMyOrder.delPhoneTable(Info.getTableId(), 0);
+=======
+					int result = mSettings.getItemTableStatus(Info.getTableId());
+					if( result >= 50){
+						mSettings.updatusStatus(Info.getTableId(),result);
+					}else{
+						mSettings.updatusStatus(Info.getTableId(), 1);
+					}
+>>>>>>> 65ac320fb9da6702a51061447c5fea891a4035ca
 				}
 			}
 		}.start();
@@ -398,6 +408,7 @@ public class PhoneActivity extends BaseActivity {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
 			if (msg.what < 0) {
+				//TODO combine MyOrder
 				String errMsg = "提交订单失败";
 				if (msg.what == ErrorNum.PRINTER_ERR_CONNECT_TIMEOUT || msg.what == ErrorNum.PRINTER_ERR_NO_PAPER) {
 					errMsg += ":无法连接打印机或打印机缺纸";

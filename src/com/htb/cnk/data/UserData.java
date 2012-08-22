@@ -34,7 +34,11 @@ public class UserData {
 	}
 
 	//TODO need parameter permission
+<<<<<<< HEAD
 	public static int Compare(){
+=======
+	public static int compare(){
+>>>>>>> 65ac320fb9da6702a51061447c5fea891a4035ca
 		String userPwd = Http.get(Server.GET_PWD, "UNAME="+ UserData.mName);
 		Log.d("pwd", "pwd1:"+userPwd+"pwd2:"+UserData.mPwd);
 		if(userPwd == null){

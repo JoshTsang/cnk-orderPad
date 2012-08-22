@@ -94,7 +94,11 @@ public class DelOrderActivity extends OrderBaseActivity {
 				try {
 					Message msg = new Message();
 					int ret = 1;
+<<<<<<< HEAD
 					ret = mMyOrder.delDish(position);
+=======
+					ret = mMyOrder.submitDelDish(dId);
+>>>>>>> 65ac320fb9da6702a51061447c5fea891a4035ca
 					if (ret < 0) {
 						delHandler.sendEmptyMessage(ret);
 						return;
@@ -179,7 +183,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 						Message msg = new Message();
 						int ret = 1;
 						int result = 1;
-						result = mMyOrder.delDish(-1);
+						result = mMyOrder.submitDelDish(-1);
 						ret = mSettings.cleanTalble(Info.getTableId());
 						if (ret < 0 || result < 0) {
 							cleanAllHandler.sendEmptyMessage(ret);

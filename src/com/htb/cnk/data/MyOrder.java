@@ -138,23 +138,40 @@ public class MyOrder {
 		return 0;
 	}
 
+	private int minus(OrderedDish item, int quantity) {
+		if ((item.padQuantity + item.phoneQuantity) > quantity) {
+			if (item.padQuantity > quantity) {
+				item.padQuantity -= quantity;
+				return 0;
+			} else {
+				quantity -= item.padQuantity;
+				if (minusPhoneOrderOnServer(Info.getTableId(), quantity, item.getId()) < 0) {
+					return -1;
+				} else {
+<<<<<<< HEAD
+					mOrder.remove(item);
+					return RET_MINUS_SUCC;
+=======
+					item.phoneQuantity -= quantity;
+					item.padQuantity = 0;
+					return 0;
+>>>>>>> 65ac320fb9da6702a51061447c5fea891a4035ca
+				}
+				
+			}
+		} else {
+			if (minusPhoneOrderOnServer(Info.getTableId(), 0, item.getId()) < 0) {
+				return -1;
+			} else {
+				mOrder.remove(item);
+				return 0;
+			}
+		}
+	}
 	public int minus(Dish dish, int quantity) {
 		for (OrderedDish item : mOrder) {
 			if (item.dish.getId() == dish.getId()) {
-				if ((item.padQuantity + item.phoneQuantity) > quantity) {
-					if (item.padQuantity > quantity) {
-						item.padQuantity -= quantity;
-					} else {
-						quantity -= item.padQuantity;
-						item.padQuantity = 0;
-						item.phoneQuantity -= quantity;
-						return item.phoneQuantity;
-					}
-				} else {
-					mOrder.remove(item);
-					return RET_MINUS_SUCC;
-				}
-
+				return minus(item, quantity);
 			}
 		}
 
@@ -162,22 +179,8 @@ public class MyOrder {
 	}
 
 	public int minus(int position, int quantity) {
-		if ((mOrder.get(position).padQuantity + mOrder.get(position).phoneQuantity) > quantity) {
-			if (mOrder.get(position).padQuantity > quantity) {
-				mOrder.get(position).padQuantity -= quantity;
-			} else {
-				Log.d("phoneQuan", "phone: "
-						+ mOrder.get(position).phoneQuantity);
-				quantity -= mOrder.get(position).padQuantity;
-				mOrder.get(position).padQuantity = 0;
-				mOrder.get(position).phoneQuantity -= quantity;
-				return mOrder.get(position).phoneQuantity;
-			}
-		} else {
-			mOrder.remove(position);
-
-		}
-		return 0;
+		OrderedDish item = mOrder.get(position);
+		return minus(item, quantity);
 	}
 
 	public int count() {
@@ -227,6 +230,15 @@ public class MyOrder {
 		mOrder.remove(position);
 	}
 
+	public int remove(int dishId) {
+		for (OrderedDish item : mOrder) {
+			if (item.dish.getId() == dishId) {
+				mOrder.remove(item);
+				return 0;
+			}
+		}
+		return -1;
+	}
 	public void clear() {
 		mOrder.clear();
 	}
@@ -400,6 +412,7 @@ public class MyOrder {
 		return null;
 	}
 
+<<<<<<< HEAD
 	public int delPhoneTable(int tableId, int dishId) {
 		String tableStatusPkg;
 		if (dishId == 0) {
@@ -433,11 +446,51 @@ public class MyOrder {
 			return 0;
 		} else {
 			return -1;
+=======
+	//TODO handle err
+	public int cleanServerPhoneOrder(int tableId) {
+		String tableStatusPkg = Http.get(Server.DELETE_PHONEORDER, "TID="
+				+ tableId);
+		if (tableStatusPkg == null) {
+					return -1;
+		}
+		mOrder.clear();
+		return 0;
+	}
+	
+	//TODO handle err
+	private int delPhoneOrderedDish(int tableId, int dishId) {
+		String tableStatusPkg = Http.get(Server.DELETE_PHONEORDER, "TID="
+				+ tableId + "&DID=" + dishId);
+		if (tableStatusPkg == null) {
+			return -1;
+		}
+		remove(dishId);
+		return 0;
+	}
+
+	//TODO
+	private int minusPhoneOrderOnServer(int tableId, int quantity, int dishId) {
+		if (quantity != 0) {
+			String phoneOrderPkg = Http.get(Server.UPDATE_PHONE_ORDER, "DID="
+					+ dishId + "&DNUM=" + quantity + "&TID=" + tableId);
+			Log.d("resp", "resp:" + phoneOrderPkg);
+//			if (phoneOrderPkg == null || "null".equals(phoneOrderPkg)) {
+//				return -1;
+//			}
+		} else {
+			return delPhoneOrderedDish(tableId, dishId);
+>>>>>>> 65ac320fb9da6702a51061447c5fea891a4035ca
 		}
 	}
 
+<<<<<<< HEAD
 	public int delDish(int position) {
 
+=======
+	public int submitDelDish(int dishId) {
+		Log.d("DID", "" + dishId);
+>>>>>>> 65ac320fb9da6702a51061447c5fea891a4035ca
 		JSONObject order = new JSONObject();
 		Date date = new Date();
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

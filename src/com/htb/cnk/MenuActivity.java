@@ -275,12 +275,26 @@ public class MenuActivity extends BaseActivity {
 				}).show();
 	}
 
+<<<<<<< HEAD
 	private void updateDishQuantity(int position, int quantity) {
 		if (quantity < 0) {
 			int result = mMyOrder.minus(mDishes.getDish(position), -quantity);
 			if (result >= 0) {
 				updatePhoneOrder(position, result);
 			}
+=======
+	private void updateDishQuantity(final int position, final int quantity) {
+		if (quantity < 0) {
+			mpDialog.setMessage("正在删除...");
+			mpDialog.show();
+			new Thread() {
+				public void run() {
+					int ret = mMyOrder.minus(mDishes.getDish(position), -quantity);
+					minushandler.sendEmptyMessage(ret);
+				}
+			}.start();
+			
+>>>>>>> 65ac320fb9da6702a51061447c5fea891a4035ca
 		} else {
 			mMyOrder.add(position, quantity);
 		}
@@ -289,6 +303,7 @@ public class MenuActivity extends BaseActivity {
 	
 	}
 
+<<<<<<< HEAD
 	private void updatePhoneOrder(final int position, final int quantity) {
 		mpDialog.setMessage("正在删除手机...");
 		mpDialog.show();
@@ -305,6 +320,8 @@ public class MenuActivity extends BaseActivity {
 		}.start();
 	}
 
+=======
+>>>>>>> 65ac320fb9da6702a51061447c5fea891a4035ca
 	private OnItemClickListener CategoryListClicked = new OnItemClickListener() {
 
 		@Override
@@ -401,7 +418,7 @@ public class MenuActivity extends BaseActivity {
 		}
 	};
 
-	private Handler delPhoneOrderhandler = new Handler() {
+	private Handler minushandler = new Handler() {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
 			if (msg.what < 0) {

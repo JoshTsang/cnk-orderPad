@@ -607,8 +607,13 @@ public class TableActivity extends BaseActivity {
 						tableHandle.sendEmptyMessage(ret);
 						return;
 					}
+<<<<<<< HEAD
 
 					ret = mMyOrder.delPhoneTable(Info.getTableId(), 0);
+=======
+					
+					ret = mMyOrder.cleanServerPhoneOrder(Info.getTableId());
+>>>>>>> 65ac320fb9da6702a51061447c5fea891a4035ca
 					if (ret < 0) {
 						tableHandle.sendEmptyMessage(ret);
 						return;
@@ -647,9 +652,15 @@ public class TableActivity extends BaseActivity {
 						tableHandle.sendEmptyMessage(ret);
 						return;
 					}
+<<<<<<< HEAD
 
 					ret = mMyOrder.delPhoneTable(Info.getTableId(), 0);
 					if (ret < 0) {
+=======
+					
+					ret = mMyOrder.cleanServerPhoneOrder(Info.getTableId());
+					if (ret < 0 ) {
+>>>>>>> 65ac320fb9da6702a51061447c5fea891a4035ca
 						tableHandle.sendEmptyMessage(ret);
 						return;
 					}

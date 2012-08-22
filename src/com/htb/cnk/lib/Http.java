@@ -71,10 +71,15 @@ public class Http {
 	public static int getPrinterStatus() {
 		int ret;
 		String printers[] = getPrinterList();
+<<<<<<< HEAD
 
 		if (printers == null) {
 			return ErrorNum.PRINTER_ERR_CONNECT_TIMEOUT;
 
+=======
+		if (printers == null) {
+			return ErrorNum.PRINTER_ERR_CONNECT_TIMEOUT;
+>>>>>>> 65ac320fb9da6702a51061447c5fea891a4035ca
 		}
 		for(String printerIp:printers) {
 			ret = getPrinterStatus(printerIp);
