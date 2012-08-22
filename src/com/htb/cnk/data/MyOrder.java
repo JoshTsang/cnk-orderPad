@@ -148,14 +148,9 @@ public class MyOrder {
 				if (minusPhoneOrderOnServer(Info.getTableId(), quantity, item.getId()) < 0) {
 					return -1;
 				} else {
-<<<<<<< HEAD
-					mOrder.remove(item);
-					return RET_MINUS_SUCC;
-=======
 					item.phoneQuantity -= quantity;
 					item.padQuantity = 0;
 					return 0;
->>>>>>> 65ac320fb9da6702a51061447c5fea891a4035ca
 				}
 				
 			}
@@ -412,41 +407,7 @@ public class MyOrder {
 		return null;
 	}
 
-<<<<<<< HEAD
-	public int delPhoneTable(int tableId, int dishId) {
-		String tableStatusPkg;
-		if (dishId == 0) {
-			tableStatusPkg = Http.get(Server.DELETE_PHONEORDER, "TID="
-					+ tableId);
-			mOrder.clear();
-		} else {
-			tableStatusPkg = Http.get(Server.DELETE_PHONEORDER, "TID="
-					+ tableId + "&DID=" + dishId);
-		}
 
-		if ("".equals(tableStatusPkg)) {
-			for (int i = 0; i < mOrder.size(); i++) {
-				OrderedDish item = (OrderedDish) mOrder.get(i);
-				if (item.dish.getId() == dishId) {
-					mOrder.remove(item);
-					return 0;
-				}
-			}
-			return 0;
-		} else {
-			return -1;
-		}
-	}
-
-	public int updatePhoneOrder(int tableId, int quantity, int dishId) {
-		String phoneOrderPkg = Http.get(Server.UPDATE_PHONE_ORDER, "DID="
-				+ dishId + "&DNUM=" + quantity + "&TID=" + tableId);
-		Log.d("resp", "resp:" + phoneOrderPkg);
-		if ("".equals(phoneOrderPkg)) {
-			return 0;
-		} else {
-			return -1;
-=======
 	//TODO handle err
 	public int cleanServerPhoneOrder(int tableId) {
 		String tableStatusPkg = Http.get(Server.DELETE_PHONEORDER, "TID="
@@ -480,17 +441,12 @@ public class MyOrder {
 			}
 		} else {
 			return delPhoneOrderedDish(tableId, dishId);
->>>>>>> 65ac320fb9da6702a51061447c5fea891a4035ca
 		}
+		return 0;
 	}
 
-<<<<<<< HEAD
-	public int delDish(int position) {
 
-=======
-	public int submitDelDish(int dishId) {
-		Log.d("DID", "" + dishId);
->>>>>>> 65ac320fb9da6702a51061447c5fea891a4035ca
+	public int submitDelDish(int position) {
 		JSONObject order = new JSONObject();
 		Date date = new Date();
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
