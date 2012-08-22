@@ -12,6 +12,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -103,9 +104,21 @@ public class LoginDlg {
 
 		public void handleMessage(Message msg) {
 			if (msg.what < 0) {
-				Toast.makeText(mActivity,
-						R.string.userWarning,
-						Toast.LENGTH_SHORT).show();
+				switch(msg.what) {
+				case UserData.PWD_INCORRECT:
+					Toast.makeText(mActivity,
+							R.string.userWarning,
+							Toast.LENGTH_SHORT).show();
+					break;
+				case UserData.PWD_NETWORK_ERR:
+					Toast.makeText(mActivity,
+							"网络错误",
+							Toast.LENGTH_SHORT).show();
+					break;
+				default:
+					Log.e("LoginDlg", "unknown err msg");
+				}
+				
 			} else {
 				if (mDestActivity != null) {
 					Intent intent = new Intent();

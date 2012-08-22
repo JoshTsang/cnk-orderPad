@@ -20,6 +20,7 @@ import com.htb.constant.Server;
 public class MyOrder {
 	public final static int ERR_GET_PHONE_ORDER_FAILED = -10;
 	public final static int RET_NULL_PHONE_ORDER = 1;
+	public final static int RET_MINUS_SUCC = -2;
 
 	private final static int MODE_PAD = 0;
 	private final static int MODE_PHONE = 1;
@@ -151,7 +152,7 @@ public class MyOrder {
 					}
 				} else {
 					mOrder.remove(item);
-					return 0;
+					return RET_MINUS_SUCC;
 				}
 
 			}

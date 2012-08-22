@@ -179,6 +179,31 @@ public class MyOrderActivity extends OrderBaseActivity {
 		}
 	}
 	
+	private void customerSubmitOrderDlg() {
+		new AlertDialog.Builder(MyOrderActivity.this)
+		.setTitle("提交订单")
+		.setMessage("呼叫服务员确认订单")
+		.setPositiveButton("确定",
+			new DialogInterface.OnClickListener() {
+	
+				@Override
+				public void onClick(DialogInterface dialog,
+						int which) {
+					LoginDlg loginDlg = new LoginDlg(MyOrderActivity.this, LoginDlg.ACTION_SUBMIT);
+					loginDlg.show();
+				}
+		})
+		.setNegativeButton("继续点菜",
+				new DialogInterface.OnClickListener() {
+	
+			@Override
+			public void onClick(DialogInterface dialog,
+					int which) {
+				
+			}
+		}).show();
+	}
+
 	private OnClickListener backClicked = new OnClickListener() {
 		public void onClick(View v) {
 			Intent intent = new Intent();
@@ -225,29 +250,7 @@ public class MyOrderActivity extends OrderBaseActivity {
 			}
 			
 			if(Info.getMode() == Info.WORK_MODE_CUSTOMER) {
-				new AlertDialog.Builder(MyOrderActivity.this)
-				.setTitle("提交订单")
-				.setMessage("呼叫服务员确认订单")
-				.setPositiveButton("确定",
-					new DialogInterface.OnClickListener() {
-
-						@Override
-						public void onClick(DialogInterface dialog,
-								int which) {
-							LoginDlg loginDlg = new LoginDlg(MyOrderActivity.this, LoginDlg.ACTION_SUBMIT);
-							loginDlg.show();
-						}
-				})
-				.setNegativeButton("继续点菜",
-						new DialogInterface.OnClickListener() {
-
-					@Override
-					public void onClick(DialogInterface dialog,
-							int which) {
-						
-					}
-				}).show();
-				return ;
+				customerSubmitOrderDlg();
 			} else {
 				submitOrder();
 			}
