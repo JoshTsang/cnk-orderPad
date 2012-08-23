@@ -286,8 +286,6 @@ public class PhoneActivity extends BaseActivity {
 					handler.sendEmptyMessage(-1);
 					return;
 				} else if (result >= 50) {
-					mSettings.updateStatus(Info.getTableId(), (result - 50));
-				} else {
 					mSettings.updateStatus(Info.getTableId(), 1);
 				}
 				ret = mMyOrder.cleanServerPhoneOrder(Info.getTableId());
