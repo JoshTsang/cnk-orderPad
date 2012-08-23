@@ -6,6 +6,8 @@ import java.util.HashMap;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import android.util.Log;
+
 import com.htb.cnk.lib.Http;
 import com.htb.constant.Server;
 
@@ -23,6 +25,7 @@ public class NotificationTypes {
 	public int getNotifiycationsType() {
 		String notificationTypePkg = Http.get(Server.GET_NOTIFICATIONTYPES,
 				null);
+//		Log.d("notificationTypePkg", notificationTypePkg);
 		if (notificationTypePkg == null) {
 			return -1;
 		}

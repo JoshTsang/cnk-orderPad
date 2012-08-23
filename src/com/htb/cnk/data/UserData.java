@@ -6,6 +6,9 @@ import com.htb.cnk.lib.Http;
 import com.htb.constant.Server;
 
 public class UserData {
+	public final static int PWD_NETWORK_ERR = -1;
+	public final static int PWD_INCORRECT = -2;
+	
 	static protected String mName;
 	static protected String mPwd;
 	
@@ -30,23 +33,24 @@ public class UserData {
 		UserData.mPwd = pwd;
 	}
 
-	
-	public static int Compare(){
+	//TODO need parameter permission
+
+	public static int compare(){
 		String userPwd = Http.get(Server.GET_PWD, "UNAME="+ UserData.mName);
 		Log.d("pwd", "pwd1:"+userPwd+"pwd2:"+UserData.mPwd);
 		if(userPwd == null){
-			return -1;
+			return PWD_NETWORK_ERR;
 		}
 		
 		String userPerminssion = Http.get(Server.GET_PERMINSSION, "UNAME="+ UserData.mName);
 		if (userPerminssion == null){
-			return -1;
+			return PWD_NETWORK_ERR;
 		}
 		Log.d("pwd", "userPerminssion:"+userPerminssion);
-		if(UserData.mPwd.equals(userPwd) && "0".equals(userPerminssion)){
+		if(userPwd.equals(UserData.mPwd) && "0".equals(userPerminssion)){
 			return 1;
 		}else{
-			return -1;
+			return PWD_INCORRECT;
 		}
 				
 	}

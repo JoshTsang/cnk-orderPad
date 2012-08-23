@@ -54,57 +54,19 @@ public class MyOrderActivity extends OrderBaseActivity {
 		return new MyOrderAdapter(this, mMyOrder) {
 			@Override
 			public View getView(int position, View convertView, ViewGroup arg2) {
-				TextView dishName;
-				TextView dishPrice;
-				TextView dishQuantity;
-				Button plusBtn;
-				Button minusBtn;
-				Button plus5Btn;
-				Button minus5Btn;
-
+				OrderedDish dishDetail = mMyOrder.getOrderedDish(position);
+				ItemViewHolder itemViewHolder;
 				if(convertView==null)
 				{
 					convertView=LayoutInflater.from(MyOrderActivity.this).inflate(R.layout.item_ordereddish, null);
+					itemViewHolder = new ItemViewHolder(convertView);
+					itemViewHolder.setOnClickListener();
+					convertView.setTag(itemViewHolder);
+				} else {
+					itemViewHolder = (ItemViewHolder) convertView.getTag();
 				}
-				OrderedDish dishDetail = mMyOrder.getOrderedDish(position);
-
-				dishName = (TextView) convertView.findViewById(R.id.dishName);
-				dishPrice = (TextView) convertView.findViewById(R.id.dishPrice);
-				dishQuantity = (TextView) convertView.findViewById(R.id.dishQuantity);
-				plusBtn = (Button) convertView.findViewById(R.id.dishPlus);
-				minusBtn = (Button) convertView.findViewById(R.id.dishMinus);
-				plus5Btn = (Button) convertView.findViewById(R.id.dishPlus5);
-				minus5Btn = (Button) convertView.findViewById(R.id.dishMinus5);
-
-				dishName.setText(dishDetail.getName());
-				dishPrice.setText(Double.toString(dishDetail.getPrice()) + " 元/份");
-				dishQuantity.setText(Integer.toString(dishDetail.getQuantity()));
-
-				plusBtn.setTag(position);
-				plusBtn.setOnClickListener(new OnClickListener() {
-
-					public void onClick(View v) {
-						final int position = Integer.parseInt(v.getTag().toString());
-						updateDishQuantity(position, 1);
-					}
-				});
-
-				minusBtn.setTag(position);
-				minusBtn.setOnClickListener(minusClicked);
-
-				plus5Btn.setTag(position);
-
-				plus5Btn.setOnClickListener(new OnClickListener() {
-
-					public void onClick(View v) {
-						final int position = Integer.parseInt(v.getTag().toString());
-						updateDishQuantity(position, 5);
-					}
-				});
-
-				minus5Btn.setTag(position);
-
-				minus5Btn.setOnClickListener(minus5Clicked);
+				itemViewHolder.setTag(position);
+				itemViewHolder.fillData(dishDetail);
 				return convertView;
 			}
 		};
@@ -124,6 +86,32 @@ public class MyOrderActivity extends OrderBaseActivity {
 
 		mMyOrderAdapter.notifyDataSetChanged();
 		updateTabelInfos();
+	}
+
+	public void submitOrder() {
+		mpDialog = new ProgressDialog(MyOrderActivity.this);  
+		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+		mpDialog.setTitle("请稍等");
+		mpDialog.setMessage("正在提交订单...");  
+		mpDialog.setIndeterminate(false);
+		mpDialog.setCancelable(false);
+		mpDialog.show();
+		new Thread() {
+			public void run() {
+				int ret = mMyOrder.submit();
+				if (ret < 0) {
+					handler.sendEmptyMessage(ret);
+				} else {
+					handler.sendEmptyMessage(0);
+					int result = mSettings.getItemTableStatus(Info.getTableId());
+					if( result >= 50){
+						mSettings.updateStatus(Info.getTableId(),result);
+					}else{
+						mSettings.updateStatus(Info.getTableId(), 1);
+					}
+				}
+			}
+		}.start();
 	}
 
 	private void minusDishQuantity(final int position, final int quantity) {
@@ -153,6 +141,31 @@ public class MyOrderActivity extends OrderBaseActivity {
 		}
 	}
 	
+	private void customerSubmitOrderDlg() {
+		new AlertDialog.Builder(MyOrderActivity.this)
+		.setTitle("提交订单")
+		.setMessage("呼叫服务员确认订单")
+		.setPositiveButton("确定",
+			new DialogInterface.OnClickListener() {
+	
+				@Override
+				public void onClick(DialogInterface dialog,
+						int which) {
+					LoginDlg loginDlg = new LoginDlg(MyOrderActivity.this, LoginDlg.ACTION_SUBMIT);
+					loginDlg.show();
+				}
+		})
+		.setNegativeButton("继续点菜",
+				new DialogInterface.OnClickListener() {
+	
+			@Override
+			public void onClick(DialogInterface dialog,
+					int which) {
+				
+			}
+		}).show();
+	}
+
 	private OnClickListener backClicked = new OnClickListener() {
 		public void onClick(View v) {
 			Intent intent = new Intent();
@@ -197,29 +210,12 @@ public class MyOrderActivity extends OrderBaseActivity {
 				}).show();
 				return ;
 			}
-			mpDialog = new ProgressDialog(MyOrderActivity.this);  
-	        mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-	        mpDialog.setTitle("请稍等");
-	        mpDialog.setMessage("正在提交订单...");  
-	        mpDialog.setIndeterminate(false);
-	        mpDialog.setCancelable(false);
-	        mpDialog.show();
-			new Thread() {
-				public void run() {
-					int ret = mMyOrder.submit();
-					if (ret < 0) {
-						handler.sendEmptyMessage(ret);
-					} else {
-						handler.sendEmptyMessage(0);
-						int result = mSettings.getItemTableStatus(Info.getTableId());
-						if( result >= 50){
-							mSettings.updatusStatus(Info.getTableId(),result);
-						}else{
-							mSettings.updatusStatus(Info.getTableId(), 1);
-						}
-					}
-				}
-			}.start();
+			
+			if(Info.getMode() == Info.WORK_MODE_CUSTOMER) {
+				customerSubmitOrderDlg();
+			} else {
+				submitOrder();
+			}
 		}
 	};
 
@@ -265,5 +261,55 @@ public class MyOrderActivity extends OrderBaseActivity {
 		return ret;
 	}
 
-	
+	class ItemViewHolder{
+		TextView dishName;
+		TextView dishPrice;
+		TextView dishQuantity;
+		Button plusBtn;
+		Button minusBtn;
+		Button plus5Btn;
+		Button minus5Btn;
+		
+		public ItemViewHolder(View convertView) {
+			dishName = (TextView) convertView.findViewById(R.id.dishName);
+			dishPrice = (TextView) convertView.findViewById(R.id.dishPrice);
+			dishQuantity = (TextView) convertView.findViewById(R.id.dishQuantity);
+			plusBtn = (Button) convertView.findViewById(R.id.dishPlus);
+			minusBtn = (Button) convertView.findViewById(R.id.dishMinus);
+			plus5Btn = (Button) convertView.findViewById(R.id.dishPlus5);
+			minus5Btn = (Button) convertView.findViewById(R.id.dishMinus5);
+		}
+		
+		public void setOnClickListener() {
+			plusBtn.setOnClickListener(new OnClickListener() {
+
+				public void onClick(View v) {
+					final int position = Integer.parseInt(v.getTag().toString());
+					updateDishQuantity(position, 1);
+				}
+			});
+			plus5Btn.setOnClickListener(new OnClickListener() {
+
+				public void onClick(View v) {
+					final int position = Integer.parseInt(v.getTag().toString());
+					updateDishQuantity(position, 5);
+				}
+			});
+			minusBtn.setOnClickListener(minusClicked);
+			minus5Btn.setOnClickListener(minus5Clicked);
+		}
+		
+		public void setTag(int position) {
+			plusBtn.setTag(position);
+			minusBtn.setTag(position);
+			plus5Btn.setTag(position);
+			minus5Btn.setTag(position);
+		}
+		
+		public void fillData(OrderedDish dishDetail) {
+			dishName.setText(dishDetail.getName());
+			dishPrice.setText(Double.toString(dishDetail.getPrice()) + " 元/份");
+			dishQuantity.setText(Integer.toString(dishDetail.getQuantity()));
+		}
+	}
 }

@@ -107,7 +107,7 @@ public class StatisticsActivity extends BaseActivity {
 	private void downloadDB() {
 		mpDialog = new ProgressDialog(StatisticsActivity.this);
 		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-		mpDialog.setTitle("请稍等..");
+		//mpDialog.setTitle("请稍等..");
 		mpDialog.setMessage("正在加载销售数据...");
 		mpDialog.setIndeterminate(false);
 		mpDialog.setCancelable(false);
@@ -143,34 +143,42 @@ public class StatisticsActivity extends BaseActivity {
 				mStatistics) {
 			@Override
 			public View getView(int position, View convertView, ViewGroup parent) {
-				TextView dishName;
-				TextView salesCount;
-				TextView totalAmount;
-				TextView percentage;
+				ViewHolder viewHolder;
 
 				if (convertView == null) {
+					viewHolder = new ViewHolder();
 					convertView = LayoutInflater.from(StatisticsActivity.this)
 							.inflate(R.layout.item_statistics, null);
+					viewHolder.dishName = (TextView) convertView
+							.findViewById(R.id.dishName);
+					viewHolder.salesCount = (TextView) convertView
+							.findViewById(R.id.salesCount);
+					viewHolder.totalAmount = (TextView) convertView
+							.findViewById(R.id.totalAmount);
+					viewHolder.percentage = (TextView) convertView
+							.findViewById(R.id.percentage);
+					convertView.setTag(viewHolder);
+				} else {
+					viewHolder = (ViewHolder) convertView.getTag();
 				}
 
-				dishName = (TextView) convertView.findViewById(R.id.dishName);
-				salesCount = (TextView) convertView
-						.findViewById(R.id.salesCount);
-				totalAmount = (TextView) convertView
-						.findViewById(R.id.totalAmount);
-				percentage = (TextView) convertView
-						.findViewById(R.id.percentage);
-
-				dishName.setText(mStatistics.getName(position));
-				salesCount.setText(Integer.toString(mStatistics
+				viewHolder.dishName.setText(mStatistics.getName(position));
+				viewHolder.salesCount.setText(Integer.toString(mStatistics
 						.getQuantity(position)));
-				totalAmount.setText(Double.toString(mStatistics
+				viewHolder.totalAmount.setText(Double.toString(mStatistics
 						.getAmount(position)));
 				DecimalFormat df = new DecimalFormat("0.00");
 				double percent = (mStatistics.getAmount(position) * 100)
 						/ mStatistics.getTotalAmount();
-				percentage.setText(df.format(percent) + "%");
+				viewHolder.percentage.setText(df.format(percent) + "%");
 				return convertView;
+			}
+			
+			class ViewHolder{
+				TextView dishName;
+				TextView salesCount;
+				TextView totalAmount;
+				TextView percentage;
 			}
 		};
 		mSalesData.setAdapter(mStatisticsAdapter);
@@ -328,6 +336,8 @@ public class StatisticsActivity extends BaseActivity {
 						Toast.LENGTH_LONG).show();
 				return;
 			}
+			mpDialog.setMessage("正在上传打印信息...");
+			mpDialog.show();
 			new Thread() {
 				public void run() {
 					int ret = mStatistics.print(mStart, mEnd);
@@ -345,12 +355,15 @@ public class StatisticsActivity extends BaseActivity {
 
 		@Override
 		public void onClick(View v) {
+			mpDialog.setMessage("请稍等...");
+			mpDialog.show();
 			DatePickerDialog date = new DatePickerDialog(
 					StatisticsActivity.this, startDateListener,
 					mStart.get(Calendar.YEAR), mStart.get(Calendar.MONTH),
 					mStart.get(Calendar.DAY_OF_MONTH));
 			date.setCancelable(false);
 			date.show();
+			mpDialog.cancel();
 		}
 	};
 
@@ -358,12 +371,15 @@ public class StatisticsActivity extends BaseActivity {
 
 		@Override
 		public void onClick(View v) {
+			mpDialog.setMessage("请稍等...");
+			mpDialog.show();
 			TimePickerDialog time = new TimePickerDialog(
 					StatisticsActivity.this, startTimeListener,
 					mStart.get(Calendar.HOUR_OF_DAY),
 					mStart.get(Calendar.MINUTE), true);
 			time.setCancelable(false);
 			time.show();
+			mpDialog.cancel();
 		}
 	};
 
@@ -371,12 +387,15 @@ public class StatisticsActivity extends BaseActivity {
 
 		@Override
 		public void onClick(View v) {
+			mpDialog.setMessage("请稍等...");
+			mpDialog.show();
 			DatePickerDialog date = new DatePickerDialog(
 					StatisticsActivity.this, endDateListener,
 					mEnd.get(Calendar.YEAR), mEnd.get(Calendar.MONTH),
 					mEnd.get(Calendar.DAY_OF_MONTH));
 			date.setCancelable(false);
 			date.show();
+			mpDialog.cancel();
 		}
 	};
 
@@ -384,12 +403,15 @@ public class StatisticsActivity extends BaseActivity {
 
 		@Override
 		public void onClick(View v) {
+			mpDialog.setMessage("请稍等...");
+			mpDialog.show();
 			TimePickerDialog time = new TimePickerDialog(
 					StatisticsActivity.this, endTimeListener,
 					mEnd.get(Calendar.HOUR_OF_DAY), mEnd.get(Calendar.MINUTE),
 					true);
 			time.setCancelable(false);
 			time.show();
+			mpDialog.cancel();
 		}
 	};
 
@@ -455,8 +477,8 @@ public class StatisticsActivity extends BaseActivity {
 
 	private Handler handlerPrint = new Handler() {
 		public void handleMessage(Message msg) {
+			mpDialog.cancel();
 			if (msg.what < 0) {
-				mpDialog.cancel();
 				new AlertDialog.Builder(StatisticsActivity.this)
 						.setTitle("错误")
 						.setMessage("打印出现错误,请检查打印机" + msg.what)
@@ -469,7 +491,17 @@ public class StatisticsActivity extends BaseActivity {
 									}
 								}).show();
 			} else {
-				mpDialog.cancel();
+				new AlertDialog.Builder(StatisticsActivity.this)
+				.setTitle("完成")
+				.setMessage("打印完成")
+				.setPositiveButton("确定",
+						new DialogInterface.OnClickListener() {
+
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+							}
+						}).show();
 			}
 		}
 	};

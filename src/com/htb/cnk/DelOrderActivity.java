@@ -88,21 +88,18 @@ public class DelOrderActivity extends OrderBaseActivity {
 	}
 
 
-	private void delDish(int position) {
-		final int dId = position;
-		Log.d("dId", "did+" + mMyOrder.getOrderedDish(dId).getDishId());
+	private void delDish(final int position) {
 		new Thread() {
 			public void run() {
 				try {
 					Message msg = new Message();
 					int ret = 1;
-					ret = mMyOrder.delDish(dId);
+					ret = mMyOrder.submitDelDish(position);
 					if (ret < 0) {
 						delHandler.sendEmptyMessage(ret);
 						return;
 					}
-					Log.d("dId", "did+" + dId);
-					mMyOrder.removeItem(dId);
+					mMyOrder.removeItem(position);
 					msg.what = ret;
 					delHandler.sendMessage(msg);
 				} catch (Exception e) {
@@ -113,41 +110,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 
 	}
 
-	Handler delHandler = new Handler() {
-		public void handleMessage(Message msg) {
-			if (msg.what < 0) {
-				Toast.makeText(getApplicationContext(),
-						getResources().getString(R.string.delWarning),
-						Toast.LENGTH_SHORT).show();
-			} else {
-				fillDelData();
-				mMyOrderAdapter.notifyDataSetChanged();
-			}
-		}
-	};
-
-	class delThread implements Runnable {
-		public void run() {
-			Message msg = new Message();
-			try {
-				int ret = mMyOrder.getTableFromDB(Info.getTableId());
-				if (ret < 0) {
-					delHandler.sendEmptyMessage(ret);
-					return;
-				}
-				msg.what = ret;
-				delHandler.sendMessage(msg);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
-		}
-
-	}
-
 	private void delDishAlert(final int position) {
-
-
 		new AlertDialog.Builder(DelOrderActivity.this)
 				.setTitle("请注意")
 				.setMessage(
@@ -156,9 +119,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-
 						delDish(position);
-
 					}
 				})
 				.setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -182,7 +143,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 						Message msg = new Message();
 						int ret = 1;
 						int result = 1;
-						result = mMyOrder.delDish(-1);
+						result = mMyOrder.submitDelDish(-1);
 						ret = mSettings.cleanTalble(Info.getTableId());
 						if (ret < 0 || result < 0) {
 							cleanAllHandler.sendEmptyMessage(ret);
@@ -204,6 +165,28 @@ public class DelOrderActivity extends OrderBaseActivity {
 		}
 	};
 
+	private OnClickListener delClicked = new OnClickListener() {
+	
+		public void onClick(View v) {
+			final int position = Integer.parseInt(v.getTag().toString());
+			delDishAlert(position);
+	
+		}
+	};
+	
+	Handler delHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			if (msg.what < 0) {
+				Toast.makeText(getApplicationContext(),
+						getResources().getString(R.string.delWarning),
+						Toast.LENGTH_SHORT).show();
+			} else {
+				fillDelData();
+				mMyOrderAdapter.notifyDataSetChanged();
+			}
+		}
+	};
+	
 	Handler cleanAllHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			if (msg.what < 0) {
@@ -217,14 +200,24 @@ public class DelOrderActivity extends OrderBaseActivity {
 			}
 		}
 	};
- 
-	private OnClickListener delClicked = new OnClickListener() {
-
-		public void onClick(View v) {
-			final int position = Integer.parseInt(v.getTag().toString());
-			delDishAlert(position);
-
+	
+	class delThread implements Runnable {
+		public void run() {
+			Message msg = new Message();
+			try {
+				int ret = mMyOrder.getTableFromDB(Info.getTableId());
+				if (ret < 0) {
+					delHandler.sendEmptyMessage(ret);
+					return;
+				}
+				msg.what = ret;
+				delHandler.sendMessage(msg);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+	
 		}
-	};
+	
+	}
 
 }

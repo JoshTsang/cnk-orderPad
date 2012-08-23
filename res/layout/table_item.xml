@@ -14,10 +14,10 @@
         android:id="@+id/ItemText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="25dp"
-        android:textColor="#4D2412"
         android:layout_below="@+id/ItemImage"
-        android:layout_centerHorizontal="true" >
+        android:layout_centerHorizontal="true"
+        android:textSize="25dp"
+        android:textColor="#4D2412" >
     </TextView>
 
 </RelativeLayout>

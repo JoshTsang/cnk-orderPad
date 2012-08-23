@@ -43,7 +43,7 @@ public class PhoneActivity extends BaseActivity {
 	private MyOrderAdapter mMyOrderAdapter;
 	private ProgressDialog mpDialog;
 	private TableSetting mSettings = new TableSetting();
-//	private ProgressDialog mDialogCancel;
+
 	@Override
 	protected void onResume() {
 		super.onResume();
@@ -68,6 +68,10 @@ public class PhoneActivity extends BaseActivity {
 		fillData();
 	}
 
+	public void showDeletePhoneOrderProcessDlg() {
+		delPhoneOrderhandler.sendEmptyMessage(2);
+	}
+	
 	private void findViews() {
 		mBackBtn = (Button) findViewById(R.id.back_btn);
 		mLeftBtn = (Button) findViewById(R.id.left_btn);
@@ -76,7 +80,7 @@ public class PhoneActivity extends BaseActivity {
 		mDishCountTxt = (TextView) findViewById(R.id.dishCount);
 		mTotalPriceTxt = (TextView) findViewById(R.id.totalPrice);
 		mMyOrderLst = (ListView) findViewById(R.id.myOrderList);
-		mRefresh = (Button)findViewById(R.id.refresh);
+		mRefresh = (Button) findViewById(R.id.refresh);
 	}
 
 	private void fillData() {
@@ -92,8 +96,8 @@ public class PhoneActivity extends BaseActivity {
 			@Override
 			public View getView(int position, View convertView, ViewGroup arg2) {
 				viewHolder1 holder1;
-				Log.d("position", "position:" + position);
 				OrderedDish dishDetail = mMyOrder.getOrderedDish(position);
+				
 				if (convertView == null) {
 					convertView = LayoutInflater.from(PhoneActivity.this)
 							.inflate(R.layout.item_ordereddish, null);
@@ -113,11 +117,11 @@ public class PhoneActivity extends BaseActivity {
 							.findViewById(R.id.dishPlus5);
 					holder1.minus5Btn = (Button) convertView
 							.findViewById(R.id.dishMinus5);
-
 					convertView.setTag(holder1);
 				} else {
 					holder1 = (viewHolder1) convertView.getTag();
 				}
+				
 				holder1.dishName.setText(dishDetail.getName());
 				holder1.dishPrice
 						.setText(Double.toString(dishDetail.getPrice())
@@ -126,33 +130,19 @@ public class PhoneActivity extends BaseActivity {
 						.getQuantity()));
 
 				holder1.plusBtn.setTag(position);
-				holder1.plusBtn.setOnClickListener(new OnClickListener() {
-
-					public void onClick(View v) {
-						final int position = Integer.parseInt(v.getTag()
-								.toString());
-						updateDishQuantity(position, 1);
-					}
-				});
+				holder1.plusBtn.setOnClickListener(plusClicked);
 
 				holder1.minusBtn.setTag(position);
 				holder1.minusBtn.setOnClickListener(minusClicked);
 
 				holder1.plus5Btn.setTag(position);
-
-				holder1.plus5Btn.setOnClickListener(new OnClickListener() {
-
-					public void onClick(View v) {
-						final int position = Integer.parseInt(v.getTag()
-								.toString());
-						updateDishQuantity(position, 5);
-					}
-				});
+				holder1.plus5Btn.setOnClickListener(plus5Clicked);
 
 				holder1.minus5Btn.setTag(position);
 				holder1.minus5Btn.setOnClickListener(minus5Clicked);
 				return convertView;
 			}
+
 			class viewHolder1 {
 				TextView dishName;
 				TextView dishPrice;
@@ -179,29 +169,29 @@ public class PhoneActivity extends BaseActivity {
 			if (msg.what < 0) {
 				mMyOrder.phoneClear();
 				new AlertDialog.Builder(PhoneActivity.this)
-				.setTitle("请注意")
-				.setMessage("无法连接服务器")
-				.setPositiveButton("确定",
-						new DialogInterface.OnClickListener() {
+						.setTitle("请注意")
+						.setMessage("无法连接服务器")
+						.setPositiveButton("确定",
+								new DialogInterface.OnClickListener() {
 
-							@Override
-							public void onClick(DialogInterface dialog,
-									int which) {
-								
-							}
-						}).show();
+									@Override
+									public void onClick(DialogInterface dialog,
+											int which) {
+
+									}
+								}).show();
 			} else if (msg.what == MyOrder.RET_NULL_PHONE_ORDER) {
 				mMyOrder.phoneClear();
 				Toast.makeText(getApplicationContext(),
 						getResources().getString(R.string.delPhoneWarning),
 						Toast.LENGTH_SHORT).show();
 			}
-			
+
 			mMyOrderAdapter.notifyDataSetChanged();
-			 mDishCountTxt.setText(Integer.toString(mMyOrder.totalQuantity())
-			 + " 道菜");
-			 mTotalPriceTxt.setText(Double.toString(mMyOrder.getTotalPrice())
-			 + " 元");
+			mDishCountTxt.setText(Integer.toString(mMyOrder.totalQuantity())
+					+ " 道菜");
+			mTotalPriceTxt.setText(Double.toString(mMyOrder.getTotalPrice())
+					+ " 元");
 			mpDialog.cancel();
 		}
 	};
@@ -220,27 +210,31 @@ public class PhoneActivity extends BaseActivity {
 
 	}
 
-	private void updateDishQuantity(int position, int quantity) {
+	private void updateDishQuantity(final int position, final int quantity) {
 		if (quantity < 0) {
-			int result = mMyOrder.minus(position, -quantity);
-			Log.d("update", "result" + result);
-			if (result > 0) {
-				Log.d("updateresult", "result" + result);
-				updatePhoneOrder(position, result);
-				mpDialog.setMessage("正在删除菜单...");
-				mpDialog.show();
-			}
+			new Thread() {
+				public void run() {
+					int ret = mMyOrder.minus(position, -quantity);
+					delPhoneOrderhandler.sendEmptyMessage(ret);
+				}
+			}.start();
+
 		} else {
 			mMyOrder.add(position, quantity);
+			updatedSummary();
 		}
 
+		
+	}
+
+	private void updatedSummary() {
 		mMyOrderAdapter.notifyDataSetChanged();
 		mDishCountTxt.setText(Integer.toString(mMyOrder.totalQuantity())
 				+ " 道菜");
 		mTotalPriceTxt
 				.setText(Double.toString(mMyOrder.getTotalPrice()) + " 元");
 	}
-
+	
 	private void updateTabelInfos() {
 		new Thread(new queryThread()).start();
 	}
@@ -257,72 +251,42 @@ public class PhoneActivity extends BaseActivity {
 		new AlertDialog.Builder(PhoneActivity.this)
 				.setTitle("请注意")
 				.setMessage(
-						"确认删除"
-								+ mMyOrder.getOrderedDish(position)
-										.getName())
-				.setPositiveButton("确定",
-						new DialogInterface.OnClickListener() {
+						"确认删除" + mMyOrder.getOrderedDish(position).getName())
+				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 
-							@Override
-							public void onClick(DialogInterface dialog,
-									int which) {
-								mpDialog.setMessage("正在删除菜单,请稍等");
-								mpDialog.show();
-								delPhoneTableThread(position,quantity);
-								
-								
-							}
-						}).setNegativeButton("取消", null).show();
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						updateDishQuantity(position, -quantity);
+					}
+				}).setNegativeButton("取消", null).show();
 	}
 
-	private void updatePhoneOrder(final int position, final int quantity) {
-		new Thread() {
-			public void run() {
-				Message msg = new Message();
-				int ret = mMyOrder.updatePhoneOrder(Info.getTableId(),
-						quantity, mMyOrder.getDishId(position));
-				if (ret < 0) {
-					delPhoneOrderhandler.sendEmptyMessage(-1);
-				} else {
-					msg.what = ret;
-					delPhoneOrderhandler.sendMessage(msg);
-				}
-			}
-		}.start();
-	}
-
-	private void delPhoneTableThread(final int position,final int quantity) {
-		new Thread() {
-			public void run() {
-				Message msg = new Message();
-				int ret = mMyOrder.delPhoneTable(Info.getTableId(),
-						mMyOrder.getDishId(position),position);
-				if (ret < 0) {
-					delPhoneOrderhandler.sendEmptyMessage(-1);
-				} else {
-					msg.what = ret;
-					delPhoneOrderhandler.sendMessage(msg);
-				}
-			}
-		}.start();
-	}
+	// TODO bug might exist
 
 	private void submitThread() {
-		mpDialog.setTitle("请稍等");
 		mpDialog.setMessage("正在提交订单...");
-		mpDialog.setIndeterminate(false);
-		mpDialog.setCancelable(false);
 		mpDialog.show();
 		new Thread() {
 			public void run() {
 				int ret = mMyOrder.submit();
 				if (ret < 0) {
-					handler.sendEmptyMessage(ret);
-				} else {
-					handler.sendEmptyMessage(0);
-					mSettings.updatusStatus(Info.getTableId(), 1);
-					mMyOrder.delPhoneTable(Info.getTableId(), 0, -1);
+					handler.sendEmptyMessage(-1);
+					return;
 				}
+				int result = mSettings.getItemTableStatus(Info.getTableId());
+				if (result < 0) {
+					handler.sendEmptyMessage(-1);
+					return;
+				} else if (result >= 50) {
+					mSettings.updateStatus(Info.getTableId(), 1);
+				}
+				ret = mMyOrder.cleanServerPhoneOrder(Info.getTableId());
+				if (ret < 0) {
+					handler.sendEmptyMessage(-1);
+					return;
+				}
+				handler.sendEmptyMessage(0);
+
 			}
 		}.start();
 	}
@@ -342,7 +306,7 @@ public class PhoneActivity extends BaseActivity {
 			minusDishQuantity(position, 1);
 		}
 	};
-
+	
 	private OnClickListener minus5Clicked = new OnClickListener() {
 
 		public void onClick(View v) {
@@ -350,6 +314,26 @@ public class PhoneActivity extends BaseActivity {
 			minusDishQuantity(position, 5);
 		}
 	};
+	
+	private OnClickListener plusClicked = new OnClickListener() {
+
+		public void onClick(View v) {
+			final int position = Integer.parseInt(v.getTag()
+					.toString());
+			updateDishQuantity(position, 1);
+		}
+	};
+	
+	private OnClickListener plus5Clicked = new OnClickListener() {
+
+		public void onClick(View v) {
+			final int position = Integer.parseInt(v.getTag()
+					.toString());
+			updateDishQuantity(position, 5);
+		}
+	};
+	
+	
 
 	private OnClickListener submitBtnClicked = new OnClickListener() {
 
@@ -384,7 +368,7 @@ public class PhoneActivity extends BaseActivity {
 			startActivity(intent);
 		}
 	};
-	
+
 	private OnClickListener refreshBtnClicked = new OnClickListener() {
 
 		@Override
@@ -398,8 +382,10 @@ public class PhoneActivity extends BaseActivity {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
 			if (msg.what < 0) {
+				// TODO combine MyOrder
 				String errMsg = "提交订单失败";
-				if (msg.what == ErrorNum.PRINTER_ERR_CONNECT_TIMEOUT || msg.what == ErrorNum.PRINTER_ERR_NO_PAPER) {
+				if (msg.what == ErrorNum.PRINTER_ERR_CONNECT_TIMEOUT
+						|| msg.what == ErrorNum.PRINTER_ERR_NO_PAPER) {
 					errMsg += ":无法连接打印机或打印机缺纸";
 				}
 				new AlertDialog.Builder(PhoneActivity.this)
@@ -417,7 +403,6 @@ public class PhoneActivity extends BaseActivity {
 									@Override
 									public void onClick(DialogInterface dialog,
 											int which) {
-										mMyOrder.clear();
 										finish();
 									}
 								}).show();
@@ -443,15 +428,15 @@ public class PhoneActivity extends BaseActivity {
 									}
 								}).show();
 			} else {
-				mMyOrderAdapter.notifyDataSetChanged();
-				mDishCountTxt.setText(Integer
-						.toString(mMyOrder.totalQuantity())
-						+ " 道菜");
-				mTotalPriceTxt.setText(Double
-						.toString(mMyOrder.getTotalPrice())
-						+ " 元");
+				switch (msg.what) {
+				case 0:
+					updatedSummary();
+					break;
+				default:
+					mpDialog.setMessage("正在删除...");
+					mpDialog.show();
+				}
 			}
 		}
 	};
-
 }

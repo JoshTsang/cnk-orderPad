@@ -1,5 +1,7 @@
 package com.htb.cnk.data;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -20,7 +22,8 @@ import com.htb.constant.Server;
 public class MyOrder {
 	public final static int ERR_GET_PHONE_ORDER_FAILED = -10;
 	public final static int RET_NULL_PHONE_ORDER = 1;
-	
+	public final static int RET_MINUS_SUCC = -2;
+
 	private final static int MODE_PAD = 0;
 	private final static int MODE_PHONE = 1;
 
@@ -85,12 +88,14 @@ public class MyOrder {
 
 	private CnkDbHelper mCnkDbHelper;
 	protected SQLiteDatabase mDb;
+	private Context mDelDlgActivity;
 	protected static List<OrderedDish> mOrder = new ArrayList<OrderedDish>();
 
 	public MyOrder(Context context) {
 		mCnkDbHelper = new CnkDbHelper(context, CnkDbHelper.DATABASE_NAME,
 				null, 1);
 		mDb = mCnkDbHelper.getReadableDatabase();
+		mDelDlgActivity = context;
 	}
 
 	public int addOrder(Dish dish, int quantity, int tableId, int type) {
@@ -140,19 +145,7 @@ public class MyOrder {
 	public int minus(Dish dish, int quantity) {
 		for (OrderedDish item : mOrder) {
 			if (item.dish.getId() == dish.getId()) {
-				if ((item.padQuantity + item.phoneQuantity) > quantity) {
-					if (item.padQuantity > quantity) {
-						item.padQuantity -= quantity;
-					} else {
-						quantity -= item.padQuantity;
-						item.padQuantity = 0;
-						item.phoneQuantity -= quantity;
-						return item.phoneQuantity;
-					}
-				} else {
-					mOrder.remove(item);
-				}
-				return 0;
+				return minus(item, quantity);
 			}
 		}
 
@@ -160,21 +153,8 @@ public class MyOrder {
 	}
 
 	public int minus(int position, int quantity) {
-		if ((mOrder.get(position).padQuantity + mOrder.get(position).phoneQuantity) > quantity) {
-			if (mOrder.get(position).padQuantity > quantity) {
-				mOrder.get(position).padQuantity -= quantity;
-			} else {
-				Log.d("phoneQuan", "phone: "
-						+ mOrder.get(position).phoneQuantity);
-				quantity -= mOrder.get(position).padQuantity;
-				mOrder.get(position).padQuantity = 0;
-				mOrder.get(position).phoneQuantity -= quantity;
-				return mOrder.get(position).phoneQuantity;
-			}
-		} else {
-			mOrder.remove(position);
-		}
-		return 0;
+		OrderedDish item = mOrder.get(position);
+		return minus(item, quantity);
 	}
 
 	public int count() {
@@ -216,23 +196,36 @@ public class MyOrder {
 		return mOrder.get(position);
 	}
 
-	public void removeItem(int did) {
-		mOrder.remove(did);
+	public int getPhoneQuantity(int position) {
+		return mOrder.get(position).phoneQuantity;
 	}
 
+	public void removeItem(int position) {
+		mOrder.remove(position);
+	}
+
+	public int remove(int dishId) {
+		for (OrderedDish item : mOrder) {
+			if (item.dish.getId() == dishId) {
+				mOrder.remove(item);
+				return 0;
+			}
+		}
+		return -1;
+	}
 	public void clear() {
 		mOrder.clear();
 	}
-	
+
 	public void phoneClear() {
-		 for (int i = 0; i < mOrder.size(); i++) {
-			 OrderedDish item = (OrderedDish) mOrder.get(i);
-			 if (item.padQuantity == 0) {
-			      mOrder.remove(item);
-			       i--;
-			 } else {
-				 item.phoneQuantity = 0;
-			 }
+		for (int i = 0; i < mOrder.size(); i++) {
+			OrderedDish item = (OrderedDish) mOrder.get(i);
+			if (item.padQuantity == 0) {
+				mOrder.remove(item);
+				i--;
+			} else {
+				item.phoneQuantity = 0;
+			}
 		}
 	}
 
@@ -338,7 +331,7 @@ public class MyOrder {
 		} else if ("null".equals(response)) {
 			return RET_NULL_PHONE_ORDER;
 		}
-		
+
 		try {
 			JSONArray tableList = new JSONArray(response);
 			int length = tableList.length();
@@ -371,6 +364,102 @@ public class MyOrder {
 		return name;
 	}
 
+	//TODO handle err
+	public int cleanServerPhoneOrder(int tableId) {
+		String tableStatusPkg = Http.get(Server.DELETE_PHONEORDER, "TID="
+				+ tableId);
+		if (tableStatusPkg == null) {
+					return -1;
+		}
+		phoneClear();
+		return 0;
+	}
+
+	public int submitDelDish(int position) {
+		JSONObject order = new JSONObject();
+		Date date = new Date();
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String time = df.format(date);
+		if (mOrder.size() <= 0) {
+			return -1;
+		}
+		try {
+			order.put("tableId", Info.getTableId());
+			order.put("tableName", Info.getTableName());
+			order.put("timestamp", time);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+	
+		JSONArray dishes = new JSONArray();
+		try {
+	
+			if (position == -1) {
+				for (int i = 0; i < mOrder.size(); i++) {
+					JSONObject dish = new JSONObject();
+					dish.put("dishId", mOrder.get(i).dish.getId());
+					dish.put("name", mOrder.get(i).dish.getName());
+					dish.put("price", mOrder.get(i).dish.getPrice());
+					dish.put(
+							"quan",
+							(mOrder.get(i).padQuantity + mOrder.get(i).phoneQuantity));
+					dish.put("id", mOrder.get(i).getDishId());
+					dishes.put(dish);
+				}
+			} else {
+				JSONObject dish = new JSONObject();
+				dish.put("dishId", mOrder.get(position).dish.getId());
+				dish.put("name", mOrder.get(position).dish.getName());
+				dish.put("price", mOrder.get(position).dish.getPrice());
+				dish.put("quan", (mOrder.get(position).padQuantity + mOrder
+						.get(position).phoneQuantity));
+				dish.put("id", mOrder.get(position).getDishId());
+				dishes.put(dish);
+			}
+			order.put("order", dishes);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+	
+		Log.d("JSON", order.toString());
+	
+		String response = Http.post(Server.DEL_ORDER, order.toString());
+		Log.d("post", "response:" + response);
+		if ("".equals(response)) {
+			return 0;
+		} else {
+			return -1;
+		}
+	}
+
+	private int minus(OrderedDish item, int quantity) {
+		if ((item.padQuantity + item.phoneQuantity) > quantity) {
+			if (item.padQuantity > quantity) {
+				item.padQuantity -= quantity;
+				return 0;
+			} else {
+				quantity -= item.padQuantity;
+				
+				if (minusPhoneOrderOnServer(Info.getTableId(), item.phoneQuantity - quantity, item.getId()) < 0) {
+					return -1;
+				} else {
+					item.phoneQuantity -= quantity;
+					item.padQuantity = 0;
+					return 0;
+				}
+				
+			}
+		} else {
+			if(item.phoneQuantity > 0) {
+				if (minusPhoneOrderOnServer(Info.getTableId(), 0, item.getId()) < 0) {
+					return -1;
+				}
+			}
+			mOrder.remove(item);
+			return 0;
+		}
+	}
+
 	private String getDishNameFromDB(int id) {
 		Cursor cur = mDb.query(CnkDbHelper.DISH_TABLE_NAME,
 				new String[] { CnkDbHelper.DISH_NAME }, CnkDbHelper.DISH_ID
@@ -393,95 +482,55 @@ public class MyOrder {
 		return null;
 	}
 
-	public int delPhoneTable(int tableId, int dishId, int position) {
-		String tableStatusPkg;
-		if (dishId == 0) {
-			tableStatusPkg = Http.get(Server.DELETE_PHONEORDER, "TID="
-					+ tableId);
-		} else {
-			tableStatusPkg = Http.get(Server.DELETE_PHONEORDER, "TID="
-					+ tableId + "&DID=" + dishId);
-		}
-		Log.d("delPhone", "tableId: " + tableId + " dishId: " + dishId);
-		Log.d("Respond", "tableStatusPkg: " + tableStatusPkg);
+
+	//TODO handle err
+	private int delPhoneOrderedDish(int tableId, int dishId) {
+		showServerDelProgress();
+		String tableStatusPkg = Http.get(Server.DELETE_PHONEORDER, "TID="
+				+ tableId + "&DID=" + dishId);
 		if (tableStatusPkg == null) {
 			return -1;
 		}
-		if (position == -1) {
-			mOrder.clear();
-		} else if (position >= 0) {
-			mOrder.remove(position);
-		}
+		remove(dishId);
 		return 0;
 	}
 
-	public int updatePhoneOrder(int tableId, int quantity, int dishId) {
-		String phoneOrderPkg = Http.get(Server.UPDATE_PHONE_ORDER, "DID="
-				+ dishId + "&DNUM=" + quantity + "&TID=" + tableId);
-		Log.d("resp", "resp:" + phoneOrderPkg);
-		if (phoneOrderPkg == null) {
-			return -1;
-		}
-		return 0;
-	}
-
-	public int delDish(int dishId) {
-		Log.d("DID", "" + dishId);
-		JSONObject order = new JSONObject();
-		Date date = new Date();
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		String time = df.format(date);
-		if (mOrder.size() <= 0) {
-			return -1;
-		}
-		try {
-			order.put("tableId", Info.getTableId());
-			order.put("tableName", Info.getTableName());
-			order.put("timestamp", time);
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-
-		JSONArray dishes = new JSONArray();
-		try {
-
-			if (dishId == -1) {
-				for (int i = 0; i < mOrder.size(); i++) {
-					JSONObject dish = new JSONObject();
-					dish.put("dishId", mOrder.get(i).dish.getId());
-					dish.put("name", mOrder.get(i).dish.getName());
-					dish.put("price", mOrder.get(i).dish.getPrice());
-					dish.put(
-							"quan",
-							(mOrder.get(i).padQuantity + mOrder.get(i).phoneQuantity));
-					dish.put("id", mOrder.get(i).getDishId());
-					dishes.put(dish);
-				}
-			} else {
-				JSONObject dish = new JSONObject();
-				dish.put("dishId", mOrder.get(dishId).dish.getId());
-				dish.put("name", mOrder.get(dishId).dish.getName());
-				dish.put("price", mOrder.get(dishId).dish.getPrice());
-				dish.put(
-						"quan",
-						(mOrder.get(dishId).padQuantity + mOrder.get(dishId).phoneQuantity));
-				dish.put("id", mOrder.get(dishId).getDishId());
-				dishes.put(dish);
+	//TODO
+	private int minusPhoneOrderOnServer(int tableId, int quantity, int dishId) {
+		if (quantity != 0) {
+			showServerDelProgress();
+			String phoneOrderPkg = Http.get(Server.UPDATE_PHONE_ORDER, "DID="
+					+ dishId + "&DNUM=" + quantity + "&TID=" + tableId);
+			Log.d("resp", "resp:" + phoneOrderPkg);
+			if (phoneOrderPkg == null || !"\r\n".equals(phoneOrderPkg)) {
+				return -1;
 			}
-			order.put("order", dishes);
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-
-		Log.d("JSON", order.toString());
-
-		String response = Http.post(Server.DEL_ORDER, order.toString());
-		Log.d("response", "response:" + response);
-		if (response == null) {
-			return -1;
+		} else {
+			return delPhoneOrderedDish(tableId, dishId);
 		}
 		return 0;
 	}
+
+	public void showServerDelProgress() {
+		Method showDelProcessDlg;
+		try {
+			showDelProcessDlg = mDelDlgActivity.getClass().getMethod("showDeletePhoneOrderProcessDlg", new Class[0]);
+			showDelProcessDlg.invoke(mDelDlgActivity, new Object[0]);
+		} catch (NoSuchMethodException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 
 	@Override
 	protected void finalize() throws Throwable {

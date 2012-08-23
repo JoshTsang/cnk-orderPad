@@ -165,6 +165,9 @@ public class Statistics {
 			return -1;
 		}
 		
+		if (Http.getPrinterStatus() < 0) {
+			return -1;
+		}
 		try {
 			SimpleDateFormat timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 			salesData.put("total", mTotalAmount);
@@ -190,11 +193,10 @@ public class Statistics {
 			e.printStackTrace();
 		}
  
-		Log.d("JSON",salesData.toString());
 		String response = Http.post(Server.STATISTICS_PRINT, salesData.toString());
 		if (response == null) {
 			Log.d("Respond", "die/ok");
-			return 0;
+			return -1;
 		} else if ("".equals(response)) {
 			Log.d("Respond",response);
 		} else { 
