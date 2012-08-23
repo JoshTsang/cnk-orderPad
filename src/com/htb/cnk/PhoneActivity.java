@@ -286,15 +286,14 @@ public class PhoneActivity extends BaseActivity {
 				if (ret < 0) {
 					handler.sendEmptyMessage(-1);
 				} else {
-					handler.sendEmptyMessage(0);
-
 					int result = mSettings.getItemTableStatus(Info.getTableId());
-					if( result >= 50){
-						mSettings.updateStatus(Info.getTableId(),result);
+					if( result > 50){
+						mSettings.updateStatus(Info.getTableId(),result - 50);
 					}else{
 						mSettings.updateStatus(Info.getTableId(), 1);
 					}
-
+					mMyOrder.cleanServerPhoneOrder(Info.getTableId());
+					handler.sendEmptyMessage(0);
 				}
 			}
 		}.start();

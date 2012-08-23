@@ -7,6 +7,8 @@ import android.view.KeyEvent;
 import com.umeng.analytics.MobclickAgent;
 
 public class BaseActivity extends Activity {
+	final static boolean enableUmeng = false;
+	
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 
@@ -21,18 +23,24 @@ public class BaseActivity extends Activity {
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-      // MobclickAgent.onError(this);
+        if (enableUmeng) {
+        	MobclickAgent.onError(this);
+        }
     }
 	
 	@Override
 	protected void onResume() {
 	    super.onResume();
-	 //   MobclickAgent.onResume(this);
+	    if (enableUmeng) {
+	    	MobclickAgent.onResume(this);
+	    }
 	}
 	
 	@Override
 	protected void onPause() {
 	    super.onPause();
-	  //  MobclickAgent.onPause(this);
+	    if (enableUmeng) {
+	    	MobclickAgent.onPause(this);
+	    }
 	}
 }
