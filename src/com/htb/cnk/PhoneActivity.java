@@ -92,8 +92,8 @@ public class PhoneActivity extends BaseActivity {
 			@Override
 			public View getView(int position, View convertView, ViewGroup arg2) {
 				viewHolder1 holder1;
-				Log.d("position", "position:" + position);
 				OrderedDish dishDetail = mMyOrder.getOrderedDish(position);
+				
 				if (convertView == null) {
 					convertView = LayoutInflater.from(PhoneActivity.this)
 							.inflate(R.layout.item_ordereddish, null);
@@ -113,11 +113,11 @@ public class PhoneActivity extends BaseActivity {
 							.findViewById(R.id.dishPlus5);
 					holder1.minus5Btn = (Button) convertView
 							.findViewById(R.id.dishMinus5);
-
 					convertView.setTag(holder1);
 				} else {
 					holder1 = (viewHolder1) convertView.getTag();
 				}
+				
 				holder1.dishName.setText(dishDetail.getName());
 				holder1.dishPrice
 						.setText(Double.toString(dishDetail.getPrice())
@@ -126,28 +126,13 @@ public class PhoneActivity extends BaseActivity {
 						.getQuantity()));
 
 				holder1.plusBtn.setTag(position);
-				holder1.plusBtn.setOnClickListener(new OnClickListener() {
-
-					public void onClick(View v) {
-						final int position = Integer.parseInt(v.getTag()
-								.toString());
-						updateDishQuantity(position, 1);
-					}
-				});
+				holder1.plusBtn.setOnClickListener(plusClicked);
 
 				holder1.minusBtn.setTag(position);
 				holder1.minusBtn.setOnClickListener(minusClicked);
 
 				holder1.plus5Btn.setTag(position);
-
-				holder1.plus5Btn.setOnClickListener(new OnClickListener() {
-
-					public void onClick(View v) {
-						final int position = Integer.parseInt(v.getTag()
-								.toString());
-						updateDishQuantity(position, 5);
-					}
-				});
+				holder1.plus5Btn.setOnClickListener(plus5Clicked);
 
 				holder1.minus5Btn.setTag(position);
 				holder1.minus5Btn.setOnClickListener(minus5Clicked);
@@ -314,7 +299,7 @@ public class PhoneActivity extends BaseActivity {
 			minusDishQuantity(position, 1);
 		}
 	};
-
+	
 	private OnClickListener minus5Clicked = new OnClickListener() {
 
 		public void onClick(View v) {
@@ -322,6 +307,26 @@ public class PhoneActivity extends BaseActivity {
 			minusDishQuantity(position, 5);
 		}
 	};
+	
+	private OnClickListener plusClicked = new OnClickListener() {
+
+		public void onClick(View v) {
+			final int position = Integer.parseInt(v.getTag()
+					.toString());
+			updateDishQuantity(position, 1);
+		}
+	};
+	
+	private OnClickListener plus5Clicked = new OnClickListener() {
+
+		public void onClick(View v) {
+			final int position = Integer.parseInt(v.getTag()
+					.toString());
+			updateDishQuantity(position, 5);
+		}
+	};
+	
+	
 
 	private OnClickListener submitBtnClicked = new OnClickListener() {
 

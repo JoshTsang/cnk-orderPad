@@ -3,8 +3,6 @@ package com.htb.cnk;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Semaphore;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -57,7 +55,6 @@ public class TableActivity extends BaseActivity {
 	private AlertDialog.Builder mNetWrorkAlertDialog;
 	private AlertDialog mNetWrorkcancel;
 	private Thread tableUpdeteThread;
-	
 
 	@Override
 	protected void onDestroy() {
@@ -72,14 +69,13 @@ public class TableActivity extends BaseActivity {
 		startUpdate(false);
 		super.onStop();
 	}
-	
+
 	@Override
 	protected void onPause() {
 		Log.d("onPause", "onPause");
 		startUpdate(false);
 		super.onPause();
 	}
-	
 
 	@Override
 	protected void onResume() {
@@ -139,10 +135,9 @@ public class TableActivity extends BaseActivity {
 		}
 
 		public void run() {
-			while (true) {
+			while (!isInterrupted()) {
 				if (mUpdateFlg == true) {
 					try {
-						Log.d("tableUpdeteThread", "return");
 						Message msg = new Message();
 						tableHandle.sendEmptyMessage(DISABLE_GRIDVIEW);
 						int ret;
@@ -160,14 +155,14 @@ public class TableActivity extends BaseActivity {
 								}
 							}
 						} else {
-//							Log.d("tableUpdeteThread.ture", "tableUpdeteThread.Id:"+tableUpdeteThread.getId());
 							msg.what = UPDATE_TABLE_INFOS;
 							tableHandle.sendMessage(msg);
-							sleep(milliseconds);
+							tableThread.sleep(milliseconds);
 						}
 
 					} catch (Exception e) {
 						e.printStackTrace();
+						System.exit(1);
 					}
 				} else {
 					synchronized (this) {
@@ -185,9 +180,9 @@ public class TableActivity extends BaseActivity {
 		mUpdateFlg = flg;
 		if (tableUpdeteThread == null) {
 			Log.d("tableUpdeteThread", "start");
-			tableUpdeteThread = new tableThread(1000 * 15);
+			tableUpdeteThread = new tableThread(1000 * 10);
 			tableUpdeteThread.start();
-		}  else {
+		} else {
 			synchronized (tableUpdeteThread) {
 				try {
 					Log.d("tableUpdeteThread", "notify");
