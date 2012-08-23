@@ -53,38 +53,19 @@ public class LoginDlg {
 							@Override
 							public void onClick(DialogInterface dialog,
 									int which) {
-								EditText mUserName = (EditText) DialogView
-										.findViewById(R.id.edit_username);
-								final String userName = mUserName.getText()
-										.toString();
-								EditText mUserPwd = (EditText) DialogView
-										.findViewById(R.id.edit_password);
-								final String userPwd = mUserPwd.getText()
-										.toString();
-								UserData.clean();
-								if ("".equals(userName)
-										|| "".equals(userPwd)) {
-									dialog.cancel();
+								if (getUserNameAndPwd(DialogView) < 0) {
+									Toast.makeText(mActivity, "用户名密码不能为空", Toast.LENGTH_SHORT).show();
 								} else {
-									SharedPreferences sharedPre = mActivity.getSharedPreferences(
-											"userInfo",
-											Context.MODE_PRIVATE);
-									Editor editor = sharedPre.edit();
-									editor.putString("name", userName);
-									editor.commit();
-
-									UserData.setUserName(userName);
-									UserData.setUserPwd(userPwd);
+									new Thread() {
+										public void run() {
+											try {
+												int ret = UserData.compare();
+												userHandle.sendEmptyMessage(ret);
+											} catch (Exception e) {
+												e.printStackTrace();
+											}
+										}}.start();
 								}
-								new Thread() {
-								public void run() {
-									try {
-										int ret = UserData.compare();
-										userHandle.sendEmptyMessage(ret);
-									} catch (Exception e) {
-										e.printStackTrace();
-									}
-								}}.start();
 							}
 						}).setNegativeButton("取消",
 						new DialogInterface.OnClickListener() {
@@ -93,7 +74,8 @@ public class LoginDlg {
 							public void onClick(DialogInterface dialog,
 									int which) {
 							}
-						}).create();
+						})
+				.setCancelable(false).create();
 		dlg.show();
 	}
 	
@@ -117,6 +99,32 @@ public class LoginDlg {
 			default:
 				break;
 			}
+		}
+	}
+
+	private int getUserNameAndPwd(final View DialogView) {
+		EditText mUserName = (EditText) DialogView
+				.findViewById(R.id.edit_username);
+		final String userName = mUserName.getText()
+				.toString();
+		EditText mUserPwd = (EditText) DialogView
+				.findViewById(R.id.edit_password);
+		final String userPwd = mUserPwd.getText()
+				.toString();
+		UserData.clean();
+		if ("".equals(userName) || "".equals(userPwd)) {
+			return -1;
+		} else {
+			SharedPreferences sharedPre = mActivity.getSharedPreferences(
+					"userInfo",
+					Context.MODE_PRIVATE);
+			Editor editor = sharedPre.edit();
+			editor.putString("name", userName);
+			editor.commit();
+	
+			UserData.setUserName(userName);
+			UserData.setUserPwd(userPwd);
+			return 0;
 		}
 	}
 

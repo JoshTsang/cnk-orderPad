@@ -163,7 +163,7 @@ public class TableActivity extends BaseActivity {
 					}
 
 				} else {
-					Log.d("mUpdateFlg", "mUpdateFlg:flase " + i);
+					//Log.d("mUpdateFlg", "mUpdateFlg:flase " + i);
 					synchronized (tableUpdeteThread) {
 						tableUpdeteThread.interrupt();
 					}

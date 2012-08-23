@@ -1,5 +1,7 @@
 package com.htb.cnk.data;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -86,12 +88,14 @@ public class MyOrder {
 
 	private CnkDbHelper mCnkDbHelper;
 	protected SQLiteDatabase mDb;
+	private Context mDelDlgActivity;
 	protected static List<OrderedDish> mOrder = new ArrayList<OrderedDish>();
 
 	public MyOrder(Context context) {
 		mCnkDbHelper = new CnkDbHelper(context, CnkDbHelper.DATABASE_NAME,
 				null, 1);
 		mDb = mCnkDbHelper.getReadableDatabase();
+		mDelDlgActivity = context;
 	}
 
 	public int addOrder(Dish dish, int quantity, int tableId, int type) {
@@ -138,31 +142,6 @@ public class MyOrder {
 		return 0;
 	}
 
-	private int minus(OrderedDish item, int quantity) {
-		if ((item.padQuantity + item.phoneQuantity) > quantity) {
-			if (item.padQuantity > quantity) {
-				item.padQuantity -= quantity;
-				return 0;
-			} else {
-				quantity -= item.padQuantity;
-				if (minusPhoneOrderOnServer(Info.getTableId(), quantity, item.getId()) < 0) {
-					return -1;
-				} else {
-					item.phoneQuantity -= quantity;
-					item.padQuantity = 0;
-					return 0;
-				}
-				
-			}
-		} else {
-			if (minusPhoneOrderOnServer(Info.getTableId(), 0, item.getId()) < 0) {
-				return -1;
-			} else {
-				mOrder.remove(item);
-				return 0;
-			}
-		}
-	}
 	public int minus(Dish dish, int quantity) {
 		for (OrderedDish item : mOrder) {
 			if (item.dish.getId() == dish.getId()) {
@@ -170,7 +149,7 @@ public class MyOrder {
 			}
 		}
 
-		return -1;
+		return 0;
 	}
 
 	public int minus(int position, int quantity) {
@@ -385,29 +364,6 @@ public class MyOrder {
 		return name;
 	}
 
-	private String getDishNameFromDB(int id) {
-		Cursor cur = mDb.query(CnkDbHelper.DISH_TABLE_NAME,
-				new String[] { CnkDbHelper.DISH_NAME }, CnkDbHelper.DISH_ID
-						+ "=" + id, null, null, null, null);
-
-		if (cur.moveToNext()) {
-			return cur.getString(0);
-		}
-		return null;
-	}
-
-	private Cursor getDishNameAndPriceFromDB(int id) {
-		Cursor cur = mDb.query(CnkDbHelper.DISH_TABLE_NAME, new String[] {
-				CnkDbHelper.DISH_NAME, CnkDbHelper.DISH_PRICE },
-				CnkDbHelper.DISH_ID + "=" + id, null, null, null, null);
-
-		if (cur.moveToNext()) {
-			return cur;
-		}
-		return null;
-	}
-
-
 	//TODO handle err
 	public int cleanServerPhoneOrder(int tableId) {
 		String tableStatusPkg = Http.get(Server.DELETE_PHONEORDER, "TID="
@@ -415,36 +371,9 @@ public class MyOrder {
 		if (tableStatusPkg == null) {
 					return -1;
 		}
-		mOrder.clear();
+		phoneClear();
 		return 0;
 	}
-	
-	//TODO handle err
-	private int delPhoneOrderedDish(int tableId, int dishId) {
-		String tableStatusPkg = Http.get(Server.DELETE_PHONEORDER, "TID="
-				+ tableId + "&DID=" + dishId);
-		if (tableStatusPkg == null) {
-			return -1;
-		}
-		remove(dishId);
-		return 0;
-	}
-
-	//TODO
-	private int minusPhoneOrderOnServer(int tableId, int quantity, int dishId) {
-		if (quantity != 0) {
-			String phoneOrderPkg = Http.get(Server.UPDATE_PHONE_ORDER, "DID="
-					+ dishId + "&DNUM=" + quantity + "&TID=" + tableId);
-			Log.d("resp", "resp:" + phoneOrderPkg);
-			if (phoneOrderPkg == null || !"".equals(phoneOrderPkg)) {
-				return -1;
-			}
-		} else {
-			return delPhoneOrderedDish(tableId, dishId);
-		}
-		return 0;
-	}
-
 
 	public int submitDelDish(int position) {
 		JSONObject order = new JSONObject();
@@ -461,10 +390,10 @@ public class MyOrder {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-
+	
 		JSONArray dishes = new JSONArray();
 		try {
-
+	
 			if (position == -1) {
 				for (int i = 0; i < mOrder.size(); i++) {
 					JSONObject dish = new JSONObject();
@@ -491,9 +420,9 @@ public class MyOrder {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-
+	
 		Log.d("JSON", order.toString());
-
+	
 		String response = Http.post(Server.DEL_ORDER, order.toString());
 		Log.d("post", "response:" + response);
 		if ("".equals(response)) {
@@ -502,6 +431,106 @@ public class MyOrder {
 			return -1;
 		}
 	}
+
+	private int minus(OrderedDish item, int quantity) {
+		if ((item.padQuantity + item.phoneQuantity) > quantity) {
+			if (item.padQuantity > quantity) {
+				item.padQuantity -= quantity;
+				return 0;
+			} else {
+				quantity -= item.padQuantity;
+				
+				if (minusPhoneOrderOnServer(Info.getTableId(), item.phoneQuantity - quantity, item.getId()) < 0) {
+					return -1;
+				} else {
+					item.phoneQuantity -= quantity;
+					item.padQuantity = 0;
+					return 0;
+				}
+				
+			}
+		} else {
+			if(item.phoneQuantity > 0) {
+				if (minusPhoneOrderOnServer(Info.getTableId(), 0, item.getId()) < 0) {
+					return -1;
+				}
+			}
+			mOrder.remove(item);
+			return 0;
+		}
+	}
+
+	private String getDishNameFromDB(int id) {
+		Cursor cur = mDb.query(CnkDbHelper.DISH_TABLE_NAME,
+				new String[] { CnkDbHelper.DISH_NAME }, CnkDbHelper.DISH_ID
+						+ "=" + id, null, null, null, null);
+
+		if (cur.moveToNext()) {
+			return cur.getString(0);
+		}
+		return null;
+	}
+
+	private Cursor getDishNameAndPriceFromDB(int id) {
+		Cursor cur = mDb.query(CnkDbHelper.DISH_TABLE_NAME, new String[] {
+				CnkDbHelper.DISH_NAME, CnkDbHelper.DISH_PRICE },
+				CnkDbHelper.DISH_ID + "=" + id, null, null, null, null);
+
+		if (cur.moveToNext()) {
+			return cur;
+		}
+		return null;
+	}
+
+
+	//TODO handle err
+	private int delPhoneOrderedDish(int tableId, int dishId) {
+		showServerDelProgress();
+		String tableStatusPkg = Http.get(Server.DELETE_PHONEORDER, "TID="
+				+ tableId + "&DID=" + dishId);
+		if (tableStatusPkg == null) {
+			return -1;
+		}
+		remove(dishId);
+		return 0;
+	}
+
+	//TODO
+	private int minusPhoneOrderOnServer(int tableId, int quantity, int dishId) {
+		if (quantity != 0) {
+			showServerDelProgress();
+			String phoneOrderPkg = Http.get(Server.UPDATE_PHONE_ORDER, "DID="
+					+ dishId + "&DNUM=" + quantity + "&TID=" + tableId);
+			Log.d("resp", "resp:" + phoneOrderPkg);
+			if (phoneOrderPkg == null || !"\r\n".equals(phoneOrderPkg)) {
+				return -1;
+			}
+		} else {
+			return delPhoneOrderedDish(tableId, dishId);
+		}
+		return 0;
+	}
+
+	public void showServerDelProgress() {
+		Method showDelProcessDlg;
+		try {
+			showDelProcessDlg = mDelDlgActivity.getClass().getMethod("showDeletePhoneOrderProcessDlg", new Class[0]);
+			showDelProcessDlg.invoke(mDelDlgActivity, new Object[0]);
+		} catch (NoSuchMethodException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 
 	@Override
 	protected void finalize() throws Throwable {

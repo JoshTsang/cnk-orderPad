@@ -177,15 +177,12 @@ public class UpdateMenuActivity extends BaseActivity {
         	    	return ErrorNum.DOWNLOAD_DB_FAILED;
         	    }
         	} catch (SocketException e) {
-        	    //Log.e(SorensonApplication.TAG, e.getStackTrace().toString());
         		e.printStackTrace();
         		return ErrorNum.DOWNLOAD_DB_FAILED;
         	} catch (UnknownHostException e) {
-        	    //Log.e(SorensonApplication.TAG, e.getStackTrace().toString());
         		e.printStackTrace();
         		return ErrorNum.DOWNLOAD_DB_FAILED;
         	} catch (IOException e) {
-        	    //Log.e(SorensonApplication.TAG, e.getStackTrace().toString());
         		e.printStackTrace();
         		return ErrorNum.DOWNLOAD_DB_FAILED;
         	}
@@ -240,8 +237,7 @@ public class UpdateMenuActivity extends BaseActivity {
 	}
 	
 	private int downloadPic(String src, String dest) {
-		try {  
-            //////////////// 取得的是byte数组, 从byte数组生成bitmap  
+		try {
             byte[] data = getImage(src);        
             if(data!=null){        
                 save(dest, data);
