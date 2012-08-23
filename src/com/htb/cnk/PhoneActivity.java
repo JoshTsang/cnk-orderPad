@@ -68,6 +68,10 @@ public class PhoneActivity extends BaseActivity {
 		fillData();
 	}
 
+	public void showDeletePhoneOrderProcessDlg() {
+		delPhoneOrderhandler.sendEmptyMessage(2);
+	}
+	
 	private void findViews() {
 		mBackBtn = (Button) findViewById(R.id.back_btn);
 		mLeftBtn = (Button) findViewById(R.id.left_btn);
@@ -208,8 +212,6 @@ public class PhoneActivity extends BaseActivity {
 
 	private void updateDishQuantity(final int position, final int quantity) {
 		if (quantity < 0) {
-			mpDialog.setMessage("正在删除...");
-			mpDialog.show();
 			new Thread() {
 				public void run() {
 					int ret = mMyOrder.minus(position, -quantity);
@@ -219,15 +221,20 @@ public class PhoneActivity extends BaseActivity {
 
 		} else {
 			mMyOrder.add(position, quantity);
+			updatedSummary();
 		}
 
+		
+	}
+
+	private void updatedSummary() {
 		mMyOrderAdapter.notifyDataSetChanged();
 		mDishCountTxt.setText(Integer.toString(mMyOrder.totalQuantity())
 				+ " 道菜");
 		mTotalPriceTxt
 				.setText(Double.toString(mMyOrder.getTotalPrice()) + " 元");
 	}
-
+	
 	private void updateTabelInfos() {
 		new Thread(new queryThread()).start();
 	}
@@ -421,15 +428,15 @@ public class PhoneActivity extends BaseActivity {
 									}
 								}).show();
 			} else {
-				mMyOrderAdapter.notifyDataSetChanged();
-				mDishCountTxt
-						.setText(Integer.toString(mMyOrder.totalQuantity())
-								+ " 道菜");
-				mTotalPriceTxt
-						.setText(Double.toString(mMyOrder.getTotalPrice())
-								+ " 元");
+				switch (msg.what) {
+				case 0:
+					updatedSummary();
+					break;
+				default:
+					mpDialog.setMessage("正在删除...");
+					mpDialog.show();
+				}
 			}
 		}
 	};
-
 }
