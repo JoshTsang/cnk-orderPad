@@ -83,8 +83,7 @@ public class TableActivity extends BaseActivity {
 			mNetWrorkcancel.cancel();
 			ARERTDIALOG = 0;
 		}
-		mpDialog.setMessage("正在获取状态...");
-		mpDialog.show();
+		showProgressDlg("正在获取状态...");
 		startUpdate(true);
 		super.onResume();
 	}
@@ -104,11 +103,14 @@ public class TableActivity extends BaseActivity {
 		mNetWrorkAlertDialog = networkDialog();
 		Info.setMode(Info.WORK_MODE_WAITER);
 		mpDialog.setTitle("请稍等");
-		mpDialog.setMessage("正在获取状态...");
 		mpDialog.setIndeterminate(false);
 		mpDialog.setCancelable(false);
-		mpDialog.show();
 
+	}
+
+	public void showProgressDlg(String msg) {
+		mpDialog.setMessage(msg);
+		mpDialog.show();
 	}
 
 	private void findViews() {
@@ -138,7 +140,6 @@ public class TableActivity extends BaseActivity {
 			while (!isInterrupted()) {
 				if (mUpdateFlg == true) {
 					try {
-						Message msg = new Message();
 						tableHandle.sendEmptyMessage(DISABLE_GRIDVIEW);
 						int ret;
 						mNotificaion.getNotifiycations();
@@ -155,8 +156,7 @@ public class TableActivity extends BaseActivity {
 								}
 							}
 						} else {
-							msg.what = UPDATE_TABLE_INFOS;
-							tableHandle.sendMessage(msg);
+							tableHandle.sendEmptyMessage(UPDATE_TABLE_INFOS);
 							tableThread.sleep(milliseconds);
 						}
 
@@ -264,8 +264,7 @@ public class TableActivity extends BaseActivity {
 					public void onClick(DialogInterface dialog, int i) {
 						dialog.cancel();
 						ARERTDIALOG = 0;
-						mpDialog.setMessage("正在获取状态...");
-						mpDialog.show();
+						showProgressDlg("正在获取状态...");
 						synchronized (tableUpdeteThread) {
 							Log.d("tableUpdeteThread", "notify");
 							try {
@@ -302,8 +301,7 @@ public class TableActivity extends BaseActivity {
 					@Override
 					public void onClick(DialogInterface dialog, int i) {
 						// dialog.cancel();
-						mpDialog.setMessage("正在清台...");
-						mpDialog.show();
+						showProgressDlg("正在清台...");
 						cleanTableThread();
 					}
 				});
@@ -328,8 +326,7 @@ public class TableActivity extends BaseActivity {
 
 					@Override
 					public void onClick(DialogInterface dialog, int i) {
-						mpDialog.setMessage("正在删除手机点的菜...");
-						mpDialog.show();
+						showProgressDlg("正在删除手机点的菜...");
 						cleanPhoneThread(position);
 						dialog.cancel();
 					}
