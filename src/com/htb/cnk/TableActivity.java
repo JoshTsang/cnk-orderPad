@@ -1,6 +1,5 @@
 package com.htb.cnk;
 
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,7 +42,6 @@ public class TableActivity extends BaseActivity {
 	private static int ARERTDIALOG = 0;
 	private boolean mUpdateFlg = true;
 	private TableSetting mSettings = new TableSetting();
-	private List<Map<String, String>> mTableSettings = new ArrayList<Map<String, String>>();
 	private Button mBackBtn;
 	private Button mUpdateBtn;
 	private Button mStatisticsBtn;
@@ -59,18 +57,29 @@ public class TableActivity extends BaseActivity {
 	private AlertDialog.Builder mNetWrorkAlertDialog;
 	private AlertDialog mNetWrorkcancel;
 	private Thread tableUpdeteThread;
+	
 
 	@Override
 	protected void onDestroy() {
+		Log.d("onDestroy", "onDestroy");
 		startUpdate(false);
 		super.onDestroy();
 	}
 
 	@Override
 	protected void onStop() {
+		Log.d("onStop", "onStop");
 		startUpdate(false);
 		super.onStop();
 	}
+	
+	@Override
+	protected void onPause() {
+		Log.d("onPause", "onPause");
+		startUpdate(false);
+		super.onPause();
+	}
+	
 
 	@Override
 	protected void onResume() {
@@ -78,7 +87,7 @@ public class TableActivity extends BaseActivity {
 			mNetWrorkcancel.cancel();
 			ARERTDIALOG = 0;
 		}
-		// mpDialog.show();
+		mpDialog.show();
 		startUpdate(true);
 		super.onResume();
 	}
@@ -129,60 +138,59 @@ public class TableActivity extends BaseActivity {
 		}
 
 		public void run() {
-			int i = 0;
 			while (true) {
-				i++;
 				if (mUpdateFlg == true) {
 					try {
+						Log.d("tableUpdeteThread", "return");
 						Message msg = new Message();
 						tableHandle.sendEmptyMessage(DISABLE_GRIDVIEW);
-						mTableSettings.clear();
-						mNotificaion.clear();
+						int ret;
 						mNotificaion.getNotifiycations();
 						mNotificationType.getNotifiycationsType();
-						int ret = mSettings.getTableStatusFromServer();
+						ret = mSettings.getTableStatusFromServer();
 						mpDialog.cancel();
 						if (ret < 0) {
 							tableHandle.sendEmptyMessage(ret);
-							synchronized (tableUpdeteThread) {
+							synchronized (this) {
 								try {
-									tableThread.this.wait(); 
+									wait();
 								} catch (InterruptedException e) {
 									e.printStackTrace();
 								}
 							}
 						} else {
+							Log.d("tableUpdeteThread.ture", "tableUpdeteThread.Id:"+tableUpdeteThread.getId());
 							msg.what = UPDATE_TABLE_INFOS;
 							tableHandle.sendMessage(msg);
-							tableThread.sleep(milliseconds);
+							sleep(milliseconds);
 						}
 
 					} catch (Exception e) {
-						Log.d("catch", "i: " + i);
 						e.printStackTrace();
 					}
-
 				} else {
-					Log.d("mUpdateFlg", "mUpdateFlg:flase " + i);
-					synchronized (tableUpdeteThread) {
-						tableUpdeteThread.interrupt();
+					Log.d("tableUpdeteThread.false", "tableUpdeteThread.Id:"+tableUpdeteThread.getId());
+					synchronized (this) {
+						this.interrupt();
 					}
+					tableUpdeteThread = null;
+					return;
 				}
 			}
-
 		}
+
 	}
 
 	private void startUpdate(boolean flg) {
 		mUpdateFlg = flg;
 		if (tableUpdeteThread == null) {
-			tableUpdeteThread = new tableThread(1000 * 10);
 			Log.d("tableUpdeteThread", "start");
+			tableUpdeteThread = new tableThread(1000 * 20);
 			tableUpdeteThread.start();
-		} else {
+		}  else {
 			synchronized (tableUpdeteThread) {
-				Log.d("tableUpdeteThread", "notify");
 				try {
+					Log.d("tableUpdeteThread", "notify");
 					tableUpdeteThread.notify();
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -261,15 +269,12 @@ public class TableActivity extends BaseActivity {
 					public void onClick(DialogInterface dialog, int i) {
 						dialog.cancel();
 						ARERTDIALOG = 0;
-						mpDialog.setTitle("请稍等");
 						mpDialog.setMessage("正在获取状态...");
-						mpDialog.setIndeterminate(false);
-						mpDialog.setCancelable(false);
 						mpDialog.show();
 						synchronized (tableUpdeteThread) {
 							Log.d("tableUpdeteThread", "notify");
 							try {
-								tableUpdeteThread.notifyAll();
+								tableUpdeteThread.notify();
 							} catch (Exception e) {
 								e.printStackTrace();
 							}
@@ -302,10 +307,7 @@ public class TableActivity extends BaseActivity {
 					@Override
 					public void onClick(DialogInterface dialog, int i) {
 						// dialog.cancel();
-						mpDialog.setTitle("请稍等");
 						mpDialog.setMessage("正在清台...");
-						mpDialog.setIndeterminate(false);
-						mpDialog.setCancelable(false);
 						mpDialog.show();
 						cleanTableThread();
 					}
@@ -331,10 +333,7 @@ public class TableActivity extends BaseActivity {
 
 					@Override
 					public void onClick(DialogInterface dialog, int i) {
-						mpDialog.setTitle("请稍等");
 						mpDialog.setMessage("正在删除手机点的菜...");
-						mpDialog.setIndeterminate(false);
-						mpDialog.setCancelable(false);
 						mpDialog.show();
 						cleanPhoneThread(position);
 						dialog.cancel();
@@ -358,7 +357,6 @@ public class TableActivity extends BaseActivity {
 				TableActivity.this);
 		addDialog.setTitle("选择功能") // 标题
 				.setIcon(R.drawable.ic_launcher) // icon
-				// .setCancelable(true) // 不响应back按钮
 				.setItems(additems, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
@@ -392,7 +390,6 @@ public class TableActivity extends BaseActivity {
 				TableActivity.this);
 		addPhoneDialog.setTitle("选择功能") // 标题
 				.setIcon(R.drawable.ic_launcher) // icon
-				// .setCancelable(true) // 不响应back按钮
 				.setItems(additems, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
@@ -444,7 +441,6 @@ public class TableActivity extends BaseActivity {
 		final CharSequence[] cleanitems = { "清台", "删除菜", "添加菜", "查看菜" };
 		Dialog cleanDialog = new AlertDialog.Builder(TableActivity.this)
 				.setTitle("选择功能")
-				// 设置标题
 				.setItems(cleanitems, new DialogInterface.OnClickListener() {
 
 					@Override
@@ -474,7 +470,6 @@ public class TableActivity extends BaseActivity {
 						default:
 							break;
 						}
-
 					}
 				}).create();
 		return cleanDialog;
@@ -485,9 +480,7 @@ public class TableActivity extends BaseActivity {
 			mpDialog.cancel();
 			if (msg.what < 0) {
 				ARERTDIALOG = 1;
-				Log.d("what", "-1");
 				mNetWrorkcancel = mNetWrorkAlertDialog.show();
-
 			} else {
 				switch (msg.what) {
 				case UPDATE_TABLE_INFOS:
@@ -585,13 +578,15 @@ public class TableActivity extends BaseActivity {
 	private Handler notificationHandle = new Handler() {
 		public void handleMessage(Message msg) {
 			if (msg.what < 0) {
-				Toast.makeText(getApplicationContext(), "b", Toast.LENGTH_SHORT)
-						.show();
+				// Toast.makeText(getApplicationContext(),
+				// getResources().getString(R.string.claenNotificaion),
+				// Toast.LENGTH_SHORT)
+				// .show();
 			} else {
 				Toast.makeText(getApplicationContext(),
 						getResources().getString(R.string.claenNotificaion),
 						Toast.LENGTH_SHORT).show();
-				startUpdate(true);
+				// startUpdate(true);
 			}
 		}
 	};
@@ -607,7 +602,7 @@ public class TableActivity extends BaseActivity {
 						tableHandle.sendEmptyMessage(ret);
 						return;
 					}
-					
+
 					ret = mMyOrder.cleanServerPhoneOrder(Info.getTableId());
 
 					if (ret < 0) {
@@ -648,9 +643,9 @@ public class TableActivity extends BaseActivity {
 						tableHandle.sendEmptyMessage(ret);
 						return;
 					}
-					
+
 					ret = mMyOrder.cleanServerPhoneOrder(Info.getTableId());
-					if (ret < 0 ) {
+					if (ret < 0) {
 
 						tableHandle.sendEmptyMessage(ret);
 						return;

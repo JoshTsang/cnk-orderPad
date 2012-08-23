@@ -85,8 +85,9 @@ public class TableSetting {
 		mTableSettings.get(index).setStatus(n);
 	}
 
-	public  int getTableStatusFromServer() {
+	public int getTableStatusFromServer() {
 		String tableStatusPkg = Http.get(Server.GET_TABLE_STATUS, "");
+//		Log.d("tableStatusPkg", tableStatusPkg);
 		if("null".equals(tableStatusPkg)){
 			return -1;
 		}
@@ -106,14 +107,12 @@ public class TableSetting {
 			return 0;
 		} catch (Exception e) {
 			e.printStackTrace();
-
 		}
 		return -1;
 	}
 	
 	public int getItemTableStatus(int tableId) {
 		String tableStatusPkg = Http.get(Server.GET_ITEM_TABLE_STATUS, "TSI=" + tableId);
-		Log.d("res", tableStatusPkg);
 		if(tableStatusPkg == null){
 			return -1;
 		}

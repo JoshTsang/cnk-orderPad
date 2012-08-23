@@ -76,7 +76,7 @@ public class PhoneActivity extends BaseActivity {
 		mDishCountTxt = (TextView) findViewById(R.id.dishCount);
 		mTotalPriceTxt = (TextView) findViewById(R.id.totalPrice);
 		mMyOrderLst = (ListView) findViewById(R.id.myOrderList);
-		mRefresh = (Button)findViewById(R.id.refresh);
+		mRefresh = (Button) findViewById(R.id.refresh);
 	}
 
 	private void fillData() {
@@ -153,6 +153,7 @@ public class PhoneActivity extends BaseActivity {
 				holder1.minus5Btn.setOnClickListener(minus5Clicked);
 				return convertView;
 			}
+
 			class viewHolder1 {
 				TextView dishName;
 				TextView dishPrice;
@@ -179,29 +180,29 @@ public class PhoneActivity extends BaseActivity {
 			if (msg.what < 0) {
 				mMyOrder.phoneClear();
 				new AlertDialog.Builder(PhoneActivity.this)
-				.setTitle("请注意")
-				.setMessage("无法连接服务器")
-				.setPositiveButton("确定",
-						new DialogInterface.OnClickListener() {
+						.setTitle("请注意")
+						.setMessage("无法连接服务器")
+						.setPositiveButton("确定",
+								new DialogInterface.OnClickListener() {
 
-							@Override
-							public void onClick(DialogInterface dialog,
-									int which) {
-								
-							}
-						}).show();
+									@Override
+									public void onClick(DialogInterface dialog,
+											int which) {
+
+									}
+								}).show();
 			} else if (msg.what == MyOrder.RET_NULL_PHONE_ORDER) {
 				mMyOrder.phoneClear();
 				Toast.makeText(getApplicationContext(),
 						getResources().getString(R.string.delPhoneWarning),
 						Toast.LENGTH_SHORT).show();
 			}
-			
+
 			mMyOrderAdapter.notifyDataSetChanged();
-			 mDishCountTxt.setText(Integer.toString(mMyOrder.totalQuantity())
-			 + " 道菜");
-			 mTotalPriceTxt.setText(Double.toString(mMyOrder.getTotalPrice())
-			 + " 元");
+			mDishCountTxt.setText(Integer.toString(mMyOrder.totalQuantity())
+					+ " 道菜");
+			mTotalPriceTxt.setText(Double.toString(mMyOrder.getTotalPrice())
+					+ " 元");
 			mpDialog.cancel();
 		}
 	};
@@ -230,7 +231,7 @@ public class PhoneActivity extends BaseActivity {
 					delPhoneOrderhandler.sendEmptyMessage(ret);
 				}
 			}.start();
-			
+
 		} else {
 			mMyOrder.add(position, quantity);
 		}
@@ -258,44 +259,44 @@ public class PhoneActivity extends BaseActivity {
 		new AlertDialog.Builder(PhoneActivity.this)
 				.setTitle("请注意")
 				.setMessage(
-						"确认删除"
-								+ mMyOrder.getOrderedDish(position)
-										.getName())
-				.setPositiveButton("确定",
-						new DialogInterface.OnClickListener() {
+						"确认删除" + mMyOrder.getOrderedDish(position).getName())
+				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 
-							@Override
-							public void onClick(DialogInterface dialog,
-									int which) {
-								updateDishQuantity(position, -quantity);
-							}
-						}).setNegativeButton("取消", null).show();
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						updateDishQuantity(position, -quantity);
+					}
+				}).setNegativeButton("取消", null).show();
 	}
 
-	//TODO bug might exist
+	// TODO bug might exist
 
 	private void submitThread() {
-		mpDialog.setTitle("请稍等");
 		mpDialog.setMessage("正在提交订单...");
-		mpDialog.setIndeterminate(false);
-		mpDialog.setCancelable(false);
 		mpDialog.show();
 		new Thread() {
 			public void run() {
 				int ret = mMyOrder.submit();
 				if (ret < 0) {
 					handler.sendEmptyMessage(-1);
-				} else {
-					handler.sendEmptyMessage(0);
-
-					int result = mSettings.getItemTableStatus(Info.getTableId());
-					if( result >= 50){
-						mSettings.updateStatus(Info.getTableId(),result);
-					}else{
-						mSettings.updateStatus(Info.getTableId(), 1);
-					}
-
+					return;
 				}
+				int result = mSettings.getItemTableStatus(Info.getTableId());
+				if (result < 0) {
+					handler.sendEmptyMessage(-1);
+					return;
+				} else if (result >= 50) {
+					mSettings.updateStatus(Info.getTableId(), (result - 50));
+				} else {
+					mSettings.updateStatus(Info.getTableId(), 1);
+				}
+				ret = mMyOrder.cleanServerPhoneOrder(Info.getTableId());
+				if (ret < 0) {
+					handler.sendEmptyMessage(-1);
+					return;
+				}
+				handler.sendEmptyMessage(0);
+
 			}
 		}.start();
 	}
@@ -357,7 +358,7 @@ public class PhoneActivity extends BaseActivity {
 			startActivity(intent);
 		}
 	};
-	
+
 	private OnClickListener refreshBtnClicked = new OnClickListener() {
 
 		@Override
@@ -371,9 +372,10 @@ public class PhoneActivity extends BaseActivity {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
 			if (msg.what < 0) {
-				//TODO combine MyOrder
+				// TODO combine MyOrder
 				String errMsg = "提交订单失败";
-				if (msg.what == ErrorNum.PRINTER_ERR_CONNECT_TIMEOUT || msg.what == ErrorNum.PRINTER_ERR_NO_PAPER) {
+				if (msg.what == ErrorNum.PRINTER_ERR_CONNECT_TIMEOUT
+						|| msg.what == ErrorNum.PRINTER_ERR_NO_PAPER) {
 					errMsg += ":无法连接打印机或打印机缺纸";
 				}
 				new AlertDialog.Builder(PhoneActivity.this)
@@ -391,7 +393,6 @@ public class PhoneActivity extends BaseActivity {
 									@Override
 									public void onClick(DialogInterface dialog,
 											int which) {
-										mMyOrder.clear();
 										finish();
 									}
 								}).show();
@@ -418,12 +419,12 @@ public class PhoneActivity extends BaseActivity {
 								}).show();
 			} else {
 				mMyOrderAdapter.notifyDataSetChanged();
-				mDishCountTxt.setText(Integer
-						.toString(mMyOrder.totalQuantity())
-						+ " 道菜");
-				mTotalPriceTxt.setText(Double
-						.toString(mMyOrder.getTotalPrice())
-						+ " 元");
+				mDishCountTxt
+						.setText(Integer.toString(mMyOrder.totalQuantity())
+								+ " 道菜");
+				mTotalPriceTxt
+						.setText(Double.toString(mMyOrder.getTotalPrice())
+								+ " 元");
 			}
 		}
 	};

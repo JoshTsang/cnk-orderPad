@@ -34,7 +34,6 @@ public class Notifications {
 		}
 	}
 	static List<NotificationItem> notifications = new ArrayList<NotificationItem>();
-//	private NotificationTypes mNotificationType = new NotificationTypes();
 
 	public Notifications() {
 
@@ -60,16 +59,12 @@ public class Notifications {
 
 	public String[] getTypeAll(int index) {
 		int i;
-//		if(index >= notifications.size()){
-//			return null;
-//		}
 		
 		for(i = 0;i< notifications.size()-1;i++){
 			if(index == notifications.get(i).getId()){
 				break;
 			}
 		}
-//		Log.d("getId","getId:"+notifications.get(i).getId()+" index:"+index);
 		return notifications.get(i).getTypeAll();
 	}
 	
@@ -79,14 +74,15 @@ public class Notifications {
 
 	public int getNotifiycations() {
 		String notificationPkg = Http.get(Server.GET_NOTIFICATION, null);
+//		Log.d("notificationPkg", notificationPkg);
 		if (notificationPkg == null || "null".equals(notificationPkg)) {
 			return -1;
 		}
 		try {
-			Log.d("pkg", notificationPkg);
 			JSONArray tableList = new JSONArray(notificationPkg);
 			int length = tableList.length();
 			NotificationItem asItem;
+			notifications.clear();
 			Notifications setting = new Notifications();
 			for (int i = 0; i < length; i++) {// 遍历JSONArray
 				JSONObject item = tableList.getJSONObject(i);
@@ -98,7 +94,7 @@ public class Notifications {
 				typesTemp= types.split(",");
 				asItem = new NotificationItem(id,typesTemp);
 				setting.add(asItem);
-				Log.d("settings", "settings:"+asItem.getId());
+//				Log.d("settings", "settings:"+asItem.getId());
 			}
 			return 0;
 		} catch (Exception e) {
