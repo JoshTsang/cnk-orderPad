@@ -7,7 +7,7 @@ import android.view.KeyEvent;
 import com.umeng.analytics.MobclickAgent;
 
 public class BaseActivity extends Activity {
-	final static boolean enableUmeng = false;
+	final static boolean enableUmeng = true;
 	
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {

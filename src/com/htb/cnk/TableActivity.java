@@ -197,14 +197,8 @@ public class TableActivity extends BaseActivity {
 	class cleanNotification implements Runnable {
 		public void run() {
 			try {
-				Message msg = new Message();
 				int ret = mNotificaion.cleanNotifications(Info.getTableId());
-				if (ret < 0) {
-					notificationHandle.sendEmptyMessage(ret);
-					return;
-				}
-				msg.what = ret;
-				notificationHandle.sendMessage(msg);
+				notificationHandle.sendEmptyMessage(ret);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

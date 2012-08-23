@@ -75,8 +75,11 @@ public class Notifications {
 	public int getNotifiycations() {
 		String notificationPkg = Http.get(Server.GET_NOTIFICATION, null);
 //		Log.d("notificationPkg", notificationPkg);
-		if (notificationPkg == null || "null".equals(notificationPkg)) {
+		if (notificationPkg == null) {
 			return -1;
+		} else if("null".equals(notificationPkg)){
+			notifications.clear();
+			return 0;
 		}
 		try {
 			JSONArray tableList = new JSONArray(notificationPkg);
