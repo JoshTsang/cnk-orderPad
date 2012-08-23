@@ -87,6 +87,7 @@ public class TableActivity extends BaseActivity {
 			mNetWrorkcancel.cancel();
 			ARERTDIALOG = 0;
 		}
+		mpDialog.setMessage("正在获取状态...");
 		mpDialog.show();
 		startUpdate(true);
 		super.onResume();
@@ -159,7 +160,7 @@ public class TableActivity extends BaseActivity {
 								}
 							}
 						} else {
-							Log.d("tableUpdeteThread.ture", "tableUpdeteThread.Id:"+tableUpdeteThread.getId());
+//							Log.d("tableUpdeteThread.ture", "tableUpdeteThread.Id:"+tableUpdeteThread.getId());
 							msg.what = UPDATE_TABLE_INFOS;
 							tableHandle.sendMessage(msg);
 							sleep(milliseconds);
@@ -169,7 +170,6 @@ public class TableActivity extends BaseActivity {
 						e.printStackTrace();
 					}
 				} else {
-					Log.d("tableUpdeteThread.false", "tableUpdeteThread.Id:"+tableUpdeteThread.getId());
 					synchronized (this) {
 						this.interrupt();
 					}
@@ -185,7 +185,7 @@ public class TableActivity extends BaseActivity {
 		mUpdateFlg = flg;
 		if (tableUpdeteThread == null) {
 			Log.d("tableUpdeteThread", "start");
-			tableUpdeteThread = new tableThread(1000 * 20);
+			tableUpdeteThread = new tableThread(1000 * 15);
 			tableUpdeteThread.start();
 		}  else {
 			synchronized (tableUpdeteThread) {

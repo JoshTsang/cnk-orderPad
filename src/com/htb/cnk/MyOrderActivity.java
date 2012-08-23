@@ -54,57 +54,19 @@ public class MyOrderActivity extends OrderBaseActivity {
 		return new MyOrderAdapter(this, mMyOrder) {
 			@Override
 			public View getView(int position, View convertView, ViewGroup arg2) {
-				TextView dishName;
-				TextView dishPrice;
-				TextView dishQuantity;
-				Button plusBtn;
-				Button minusBtn;
-				Button plus5Btn;
-				Button minus5Btn;
-
+				OrderedDish dishDetail = mMyOrder.getOrderedDish(position);
+				ItemViewHolder itemViewHolder;
 				if(convertView==null)
 				{
 					convertView=LayoutInflater.from(MyOrderActivity.this).inflate(R.layout.item_ordereddish, null);
+					itemViewHolder = new ItemViewHolder(convertView);
+					itemViewHolder.setOnClickListener();
+					convertView.setTag(itemViewHolder);
+				} else {
+					itemViewHolder = (ItemViewHolder) convertView.getTag();
 				}
-				OrderedDish dishDetail = mMyOrder.getOrderedDish(position);
-
-				dishName = (TextView) convertView.findViewById(R.id.dishName);
-				dishPrice = (TextView) convertView.findViewById(R.id.dishPrice);
-				dishQuantity = (TextView) convertView.findViewById(R.id.dishQuantity);
-				plusBtn = (Button) convertView.findViewById(R.id.dishPlus);
-				minusBtn = (Button) convertView.findViewById(R.id.dishMinus);
-				plus5Btn = (Button) convertView.findViewById(R.id.dishPlus5);
-				minus5Btn = (Button) convertView.findViewById(R.id.dishMinus5);
-
-				dishName.setText(dishDetail.getName());
-				dishPrice.setText(Double.toString(dishDetail.getPrice()) + " 元/份");
-				dishQuantity.setText(Integer.toString(dishDetail.getQuantity()));
-
-				plusBtn.setTag(position);
-				plusBtn.setOnClickListener(new OnClickListener() {
-
-					public void onClick(View v) {
-						final int position = Integer.parseInt(v.getTag().toString());
-						updateDishQuantity(position, 1);
-					}
-				});
-
-				minusBtn.setTag(position);
-				minusBtn.setOnClickListener(minusClicked);
-
-				plus5Btn.setTag(position);
-
-				plus5Btn.setOnClickListener(new OnClickListener() {
-
-					public void onClick(View v) {
-						final int position = Integer.parseInt(v.getTag().toString());
-						updateDishQuantity(position, 5);
-					}
-				});
-
-				minus5Btn.setTag(position);
-
-				minus5Btn.setOnClickListener(minus5Clicked);
+				itemViewHolder.setTag(position);
+				itemViewHolder.fillData(dishDetail);
 				return convertView;
 			}
 		};
@@ -299,5 +261,55 @@ public class MyOrderActivity extends OrderBaseActivity {
 		return ret;
 	}
 
-	
+	class ItemViewHolder{
+		TextView dishName;
+		TextView dishPrice;
+		TextView dishQuantity;
+		Button plusBtn;
+		Button minusBtn;
+		Button plus5Btn;
+		Button minus5Btn;
+		
+		public ItemViewHolder(View convertView) {
+			dishName = (TextView) convertView.findViewById(R.id.dishName);
+			dishPrice = (TextView) convertView.findViewById(R.id.dishPrice);
+			dishQuantity = (TextView) convertView.findViewById(R.id.dishQuantity);
+			plusBtn = (Button) convertView.findViewById(R.id.dishPlus);
+			minusBtn = (Button) convertView.findViewById(R.id.dishMinus);
+			plus5Btn = (Button) convertView.findViewById(R.id.dishPlus5);
+			minus5Btn = (Button) convertView.findViewById(R.id.dishMinus5);
+		}
+		
+		public void setOnClickListener() {
+			plusBtn.setOnClickListener(new OnClickListener() {
+
+				public void onClick(View v) {
+					final int position = Integer.parseInt(v.getTag().toString());
+					updateDishQuantity(position, 1);
+				}
+			});
+			plus5Btn.setOnClickListener(new OnClickListener() {
+
+				public void onClick(View v) {
+					final int position = Integer.parseInt(v.getTag().toString());
+					updateDishQuantity(position, 5);
+				}
+			});
+			minusBtn.setOnClickListener(minusClicked);
+			minus5Btn.setOnClickListener(minus5Clicked);
+		}
+		
+		public void setTag(int position) {
+			plusBtn.setTag(position);
+			minusBtn.setTag(position);
+			plus5Btn.setTag(position);
+			minus5Btn.setTag(position);
+		}
+		
+		public void fillData(OrderedDish dishDetail) {
+			dishName.setText(dishDetail.getName());
+			dishPrice.setText(Double.toString(dishDetail.getPrice()) + " 元/份");
+			dishQuantity.setText(Integer.toString(dishDetail.getQuantity()));
+		}
+	}
 }

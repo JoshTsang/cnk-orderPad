@@ -105,6 +105,73 @@ public class MenuActivity extends BaseActivity {
 		mSettingsBtn.setVisibility(View.INVISIBLE);
 	}
 
+	private View getMenuView(int position, View convertView) {
+		ItemViewHolder viewHolder;
+		Dish dishDetail = mDishes.getDish(position);
+		
+		if (convertView == null) {
+			convertView = LayoutInflater.from(MenuActivity.this).inflate(
+					R.layout.item_dish, null);
+			viewHolder = new ItemViewHolder();
+			viewHolder.findViews(convertView, ItemViewHolder.ITEM_ORDER_VIEW);
+			viewHolder.setOnClickListener();
+			convertView.setTag(viewHolder);
+		} else {
+			viewHolder = (ItemViewHolder)convertView.getTag();
+		}
+	
+		viewHolder.setPic(position, dishDetail.getPic());
+		viewHolder.setData(dishDetail);
+		viewHolder.setTag(position);
+		return convertView;
+	}
+
+	private View getFastOrderMenu(int position, View convertView) {
+		ItemViewHolder viewHolder;
+		Dish dishDetail = mDishes.getDish(position);
+		
+		if (convertView == null) {
+			viewHolder = new ItemViewHolder();
+			convertView = LayoutInflater.from(MenuActivity.this).inflate(
+					R.layout.item_fastorder, null);
+			viewHolder.findViews(convertView, ItemViewHolder.ITEM_FASTORDER_VIEW);
+			convertView.setTag(viewHolder);
+		} else {
+			viewHolder = (ItemViewHolder)convertView.getTag();
+		}
+		
+		viewHolder.setData(dishDetail);
+		viewHolder.setOnClickListener();
+		viewHolder.setTag(position);
+		return convertView;
+	}
+
+	private FileInputStream getPic(String name) {
+		FileInputStream isBigPic = null;
+		try {
+			isBigPic = openFileInput("hdpi_" + name);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		return isBigPic;
+	}
+
+	private FileInputStream getThumbnail(String name) {
+		FileInputStream inStream = null;
+		try {
+			// TODO usehdpi cause no ldpi pic available
+			if (name == null || "".equals(name) || "null".equals(name)) {
+				return null;
+			}
+			Log.d("fileName", "hdpi_" + name);
+			inStream = openFileInput("hdpi_" + name);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return null;
+		}
+		return inStream;
+	}
+
 	private void setListData() {
 		if (mCategories.count() <= 0) {
 			errorAccurDlg("菜谱数据损坏,请更新菜谱!", FINISH_ACTIVITY);
@@ -144,47 +211,6 @@ public class MenuActivity extends BaseActivity {
 		updateDishes(0);
 	}
 
-	private View getMenuView(int position, View convertView) {
-		ItemViewHolder viewHolder;
-		Dish dishDetail = mDishes.getDish(position);
-		
-		if (convertView == null) {
-			convertView = LayoutInflater.from(MenuActivity.this).inflate(
-					R.layout.item_dish, null);
-			viewHolder = new ItemViewHolder();
-			viewHolder.findViews(convertView, ItemViewHolder.ITEM_ORDER_VIEW);
-			viewHolder.setOnClickListener();
-			convertView.setTag(viewHolder);
-		} else {
-			viewHolder = (ItemViewHolder)convertView.getTag();
-		}
-
-		viewHolder.setPic(position, dishDetail.getPic());
-		viewHolder.setData(dishDetail);
-		viewHolder.setTag(position);
-		return convertView;
-	}
-
-	private View getFastOrderMenu(int position, View convertView) {
-		ItemViewHolder viewHolder;
-		Dish dishDetail = mDishes.getDish(position);
-		
-		if (convertView == null) {
-			viewHolder = new ItemViewHolder();
-			convertView = LayoutInflater.from(MenuActivity.this).inflate(
-					R.layout.item_fastorder, null);
-			viewHolder.findViews(convertView, ItemViewHolder.ITEM_FASTORDER_VIEW);
-			convertView.setTag(viewHolder);
-		} else {
-			viewHolder = (ItemViewHolder)convertView.getTag();
-		}
-		
-		viewHolder.setData(dishDetail);
-		viewHolder.setOnClickListener();
-		viewHolder.setTag(position);
-		return convertView;
-	}
-
 	private void setThumbnail(int position, ImageButton dishPic,
 			FileInputStream inStream) {
 		Bitmap photo = BitmapFactory.decodeStream(inStream);
@@ -192,32 +218,6 @@ public class MenuActivity extends BaseActivity {
 		dishPic.setTag(position);
 		dishPic.setBackgroundDrawable(drawable);
 		dishPic.setOnClickListener(thumbnailClicked);
-	}
-
-	private FileInputStream getPic(String name) {
-		FileInputStream isBigPic = null;
-		try {
-			isBigPic = openFileInput("hdpi_" + name);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		return isBigPic;
-	}
-
-	private FileInputStream getThumbnail(String name) {
-		FileInputStream inStream = null;
-		try {
-			// TODO usehdpi cause no ldpi pic available
-			if (name == null || "".equals(name) || "null".equals(name)) {
-				return null;
-			}
-			Log.d("fileName", "hdpi_" + name);
-			inStream = openFileInput("hdpi_" + name);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			return null;
-		}
-		return inStream;
 	}
 
 	private void setClickListener() {
@@ -242,6 +242,28 @@ public class MenuActivity extends BaseActivity {
 				handler.sendEmptyMessage(ret);
 			}
 		}.start();
+	}
+
+	private void updateDishQuantity(final int position, final int quantity) {
+		if (quantity < 0) {
+			new Thread() {
+				public void run() {
+					int ret = mMyOrder.minus(mDishes.getDish(position), -quantity);
+					minushandler.sendEmptyMessage(ret);
+				}
+			}.start();
+			
+		} else {
+			mMyOrder.add(position, quantity);
+		}
+		updateOrderedDishCount();
+		mDishLstAdapter.notifyDataSetChanged();
+	
+	}
+
+	//TODO Define
+	public void showDeletePhoneOrderProcessDlg() {
+		minushandler.sendEmptyMessage(2);
 	}
 
 	private void showGuide() {
@@ -275,25 +297,6 @@ public class MenuActivity extends BaseActivity {
 				}).show();
 	}
 
-
-	private void updateDishQuantity(final int position, final int quantity) {
-		if (quantity < 0) {
-			mpDialog.setMessage("正在删除...");
-			mpDialog.show();
-			new Thread() {
-				public void run() {
-					int ret = mMyOrder.minus(mDishes.getDish(position), -quantity);
-					minushandler.sendEmptyMessage(ret);
-				}
-			}.start();
-			
-		} else {
-			mMyOrder.add(position, quantity);
-		}
-		updateOrderedDishCount();
-		mDishLstAdapter.notifyDataSetChanged();
-	
-	}
 
 	private OnItemClickListener CategoryListClicked = new OnItemClickListener() {
 
@@ -397,8 +400,15 @@ public class MenuActivity extends BaseActivity {
 			if (msg.what < 0) {
 				errorAccurDlg("删除失败", DO_NOTHING);
 			} else {
-				updateOrderedDishCount();
-				mDishLstAdapter.notifyDataSetChanged();
+				switch (msg.what) {
+				case 0:
+					updateOrderedDishCount();
+					mDishLstAdapter.notifyDataSetChanged();
+					break;
+				default:
+					mpDialog.setMessage("正在删除...");
+					mpDialog.show();
+				}
 			}
 		}
 	};
