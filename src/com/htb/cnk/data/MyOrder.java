@@ -299,7 +299,7 @@ public class MyOrder {
 
 	public int getOrderFromServer(int tableId) {
 		String response = Http.get(Server.GET_MYORDER, "TID=" + tableId);
-//		Log.d("resp", response);
+		Log.d("resp", response);
 		if("null".equals(response)){
 			return -2;
 		}else if(response == null){
@@ -373,11 +373,11 @@ public class MyOrder {
 	public int cleanServerPhoneOrder(int tableId) {
 		String tableStatusPkg = Http.get(Server.DELETE_PHONEORDER, "TID="
 				+ tableId);
-		if (tableStatusPkg == null) {
-					return -1;
+		if ("".equals(tableStatusPkg)) {
+			phoneClear();	
+			return 0;
 		}
-		phoneClear();
-		return 0;
+		return -1;
 	}
 
 	public int submitDelDish(int position) {
@@ -507,7 +507,7 @@ public class MyOrder {
 			String phoneOrderPkg = Http.get(Server.UPDATE_PHONE_ORDER, "DID="
 					+ dishId + "&DNUM=" + quantity + "&TID=" + tableId);
 			Log.d("resp", "resp:" + phoneOrderPkg);
-			if (phoneOrderPkg == null || !"\r\n".equals(phoneOrderPkg)) {
+			if (phoneOrderPkg == null || !"\n".equals(phoneOrderPkg)) {
 				return -1;
 			}
 		} else {

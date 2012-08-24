@@ -6,7 +6,6 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -17,10 +16,9 @@ import android.widget.Toast;
 
 import com.htb.cnk.adapter.MyOrderAdapter;
 import com.htb.cnk.data.Info;
-import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.data.MyOrder.OrderedDish;
+import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.lib.OrderBaseActivity;
-import com.umeng.analytics.MobclickAgent;
 
 public class DelOrderActivity extends OrderBaseActivity {
 
