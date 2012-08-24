@@ -102,13 +102,13 @@ public class MyOrderActivity extends OrderBaseActivity {
 				if (ret < 0) {
 					handler.sendEmptyMessage(ret);
 				} else {
-					handler.sendEmptyMessage(0);
 					int result = mSettings.getItemTableStatus(Info.getTableId());
 					if( result >= 50){
 						mSettings.updateStatus(Info.getTableId(),result);
 					}else{
 						mSettings.updateStatus(Info.getTableId(), 1);
 					}
+					handler.sendEmptyMessage(0);
 				}
 			}
 		}.start();
@@ -245,6 +245,12 @@ public class MyOrderActivity extends OrderBaseActivity {
 							mMyOrder.clear();
 							mMyOrderAdapter.notifyDataSetChanged();
 							finish();
+							if (Info.getMode() == Info.WORK_MODE_CUSTOMER) {
+								Info.setMode(Info.WORK_MODE_WAITER);
+								Intent intent = new Intent();
+								intent.setClass(MyOrderActivity.this, TableActivity.class);
+								startActivity(intent);
+							}
 						}
 				}).show();
 			}
