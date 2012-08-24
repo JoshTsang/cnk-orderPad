@@ -1,5 +1,6 @@
 package com.htb.cnk;
 
+import java.lang.Thread.State;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,6 +39,7 @@ public class TableActivity extends BaseActivity {
 	private final int PHONE_STATUS = 50;
 	private final int NOTIFICATION_STATUS = 100;
 	private static int ARERTDIALOG = 0;
+	private final int MILLISECONDS = 1000 * 10;
 	private boolean mUpdateFlg = true;
 	private TableSetting mSettings = new TableSetting();
 	private Button mBackBtn;
@@ -55,6 +57,7 @@ public class TableActivity extends BaseActivity {
 	private AlertDialog.Builder mNetWrorkAlertDialog;
 	private AlertDialog mNetWrorkcancel;
 	private Thread tableUpdeteThread;
+	private Thread tableNodifyThread;
 
 	@Override
 	protected void onDestroy() {
@@ -85,6 +88,13 @@ public class TableActivity extends BaseActivity {
 		}
 		showProgressDlg("正在获取状态...");
 		startUpdate(true);
+		synchronized (tableUpdeteThread) {
+			try {
+				tableUpdeteThread.notify();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 		super.onResume();
 	}
 
@@ -130,58 +140,65 @@ public class TableActivity extends BaseActivity {
 	}
 
 	public class tableThread extends Thread {
-		private int milliseconds; // 延迟的时间
-
-		public tableThread(int i) {
-			milliseconds = i;
+		public void run() {
+			while (true) {
+				try {
+					tableHandle.sendEmptyMessage(DISABLE_GRIDVIEW);
+					int ret;
+					mNotificaion.getNotifiycations();
+					mNotificationType.getNotifiycationsType();
+					ret = mSettings.getTableStatusFromServer();
+					mpDialog.cancel();
+					if (ret < 0) {
+						tableHandle.sendEmptyMessage(ret);
+					} else {
+						tableHandle.sendEmptyMessage(UPDATE_TABLE_INFOS);
+					}
+					synchronized (this) {
+						try {
+							wait();
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
 		}
+	}
 
+	private class nodifyTableThead extends Thread {
 		public void run() {
 			while (!isInterrupted()) {
 				if (mUpdateFlg == true) {
 					try {
-						tableHandle.sendEmptyMessage(DISABLE_GRIDVIEW);
-						int ret;
-						mNotificaion.getNotifiycations();
-						mNotificationType.getNotifiycationsType();
-						ret = mSettings.getTableStatusFromServer();
-						mpDialog.cancel();
-						if (ret < 0) {
-							tableHandle.sendEmptyMessage(ret);
-							synchronized (this) {
-								try {
-									wait();
-								} catch (InterruptedException e) {
-									e.printStackTrace();
-								}
-							}
-						} else {
-							tableHandle.sendEmptyMessage(UPDATE_TABLE_INFOS);
-							tableThread.sleep(milliseconds);
+						if (tableUpdeteThread != null
+								&& tableUpdeteThread.getState() == State.TIMED_WAITING) {
+							tableUpdeteThread.notify();
 						}
-
 					} catch (Exception e) {
 						e.printStackTrace();
 						System.exit(1);
 					}
 				} else {
-					synchronized (this) {
-						this.interrupt();
-					}
-					tableUpdeteThread = null;
+					tableNodifyThread = null;
 					return;
 				}
 			}
 		}
-
 	}
 
 	private void startUpdate(boolean flg) {
 		mUpdateFlg = flg;
 		if (tableUpdeteThread == null) {
 			Log.d("tableUpdeteThread", "start");
-			tableUpdeteThread = new tableThread(1000 * 10);
+			tableUpdeteThread = new tableThread();
 			tableUpdeteThread.start();
+		}
+		if (tableNodifyThread == null) {
+			tableNodifyThread = new nodifyTableThead();
+			tableNodifyThread.start();
 		} else {
 			synchronized (tableUpdeteThread) {
 				try {
@@ -260,7 +277,6 @@ public class TableActivity extends BaseActivity {
 						ARERTDIALOG = 0;
 						showProgressDlg("正在获取状态...");
 						synchronized (tableUpdeteThread) {
-							Log.d("tableUpdeteThread", "notify");
 							try {
 								tableUpdeteThread.notify();
 							} catch (Exception e) {
@@ -572,7 +588,13 @@ public class TableActivity extends BaseActivity {
 				Toast.makeText(getApplicationContext(),
 						getResources().getString(R.string.claenNotificaion),
 						Toast.LENGTH_SHORT).show();
-				// startUpdate(true);
+				synchronized (tableUpdeteThread) {
+					try {
+						tableUpdeteThread.notify();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
 			}
 		}
 	};
