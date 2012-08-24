@@ -62,6 +62,7 @@ public class LoginDlg {
 												int ret = UserData.compare();
 												userHandle.sendEmptyMessage(ret);
 											} catch (Exception e) {
+												userHandle.sendEmptyMessage(UserData.PWD_NETWORK_ERR);
 												e.printStackTrace();
 											}
 										}}.start();
@@ -136,12 +137,12 @@ public class LoginDlg {
 				case UserData.PWD_INCORRECT:
 					Toast.makeText(mActivity,
 							R.string.userWarning,
-							Toast.LENGTH_SHORT).show();
+							Toast.LENGTH_LONG).show();
 					break;
 				case UserData.PWD_NETWORK_ERR:
 					Toast.makeText(mActivity,
 							"网络错误",
-							Toast.LENGTH_SHORT).show();
+							Toast.LENGTH_LONG).show();
 					break;
 				default:
 					Log.e("LoginDlg", "unknown err msg");

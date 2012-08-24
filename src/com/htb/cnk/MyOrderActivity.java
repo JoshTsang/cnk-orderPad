@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -91,7 +90,6 @@ public class MyOrderActivity extends OrderBaseActivity {
 	public void submitOrder() {
 		mpDialog = new ProgressDialog(MyOrderActivity.this);  
 		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-		mpDialog.setTitle("请稍等");
 		mpDialog.setMessage("正在提交订单...");  
 		mpDialog.setIndeterminate(false);
 		mpDialog.setCancelable(false);
@@ -102,13 +100,13 @@ public class MyOrderActivity extends OrderBaseActivity {
 				if (ret < 0) {
 					handler.sendEmptyMessage(ret);
 				} else {
-					handler.sendEmptyMessage(0);
 					int result = mSettings.getItemTableStatus(Info.getTableId());
 					if( result >= 50){
 						mSettings.updateStatus(Info.getTableId(),result);
 					}else{
 						mSettings.updateStatus(Info.getTableId(), 1);
 					}
+					handler.sendEmptyMessage(0);
 				}
 			}
 		}.start();
@@ -245,6 +243,12 @@ public class MyOrderActivity extends OrderBaseActivity {
 							mMyOrder.clear();
 							mMyOrderAdapter.notifyDataSetChanged();
 							finish();
+							if (Info.getMode() == Info.WORK_MODE_CUSTOMER) {
+								Info.setMode(Info.WORK_MODE_WAITER);
+								Intent intent = new Intent();
+								intent.setClass(MyOrderActivity.this, TableActivity.class);
+								startActivity(intent);
+							}
 						}
 				}).show();
 			}

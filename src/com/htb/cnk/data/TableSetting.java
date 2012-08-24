@@ -88,7 +88,7 @@ public class TableSetting {
 	public int getTableStatusFromServer() {
 		String tableStatusPkg = Http.get(Server.GET_TABLE_STATUS, "");
 //		Log.d("tableStatusPkg", tableStatusPkg);
-		if("null".equals(tableStatusPkg)){
+		if(tableStatusPkg == null || "null".equals(tableStatusPkg) || "".equals(tableStatusPkg)){
 			return -1;
 		}
 		try {
@@ -106,6 +106,7 @@ public class TableSetting {
 			}
 			return 0;
 		} catch (Exception e) {
+			Log.w("getTableStatus.php", tableStatusPkg);
 			e.printStackTrace();
 		}
 		return -1;
@@ -122,10 +123,10 @@ public class TableSetting {
 	public int updateStatus(int tableId, int status) {
 		String tableStatusPkg = Http.get(Server.UPDATE_TABLE_STATUS, "TID="
 				+ tableId + "&TST=" + status);
-		if (tableStatusPkg == null) {
-			return -1;
+		if ("\n".equals(tableStatusPkg)) {
+			return 0;
 		}
-		return 0;
+		return -1;
 	}
 	
 	public int cleanTalble(int tableId){
@@ -140,11 +141,11 @@ public class TableSetting {
 			e.printStackTrace();
 		}
 		Log.d("JSON", order.toString());
-		String tableStatusPkg = Http.post(Server.CLEAN_TABLE,order.toString() );
-		if (tableStatusPkg == null) {
-			return -1;
+		String tableCleanPkg = Http.post(Server.CLEAN_TABLE,order.toString() );
+		if("".equals(tableCleanPkg)){
+			return 0;
 		}
-		return 0;
+		return -1;
 	}
 
 }
