@@ -75,7 +75,7 @@ public class Notifications {
 	public int getNotifiycations() {
 		String notificationPkg = Http.get(Server.GET_NOTIFICATION, null);
 //		Log.d("notificationPkg", notificationPkg);
-		if (notificationPkg == null) {
+		if (notificationPkg == null || "".equals(notificationPkg)) {
 			return -1;
 		} else if("null".equals(notificationPkg)){
 			notifications.clear();
@@ -102,6 +102,7 @@ public class Notifications {
 			return 0;
 		} catch (Exception e) {
 			e.printStackTrace();
+			Log.e("getNotification.php", notificationPkg);
 		}
 
 		return -1;

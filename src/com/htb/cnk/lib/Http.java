@@ -107,17 +107,12 @@ public class Http {
         try {
             socket = new Socket();
             socket.setSoTimeout(2000);
-			SocketAddress socketAddress = new InetSocketAddress(printerIp,9100); //获取sockaddress对象
+			SocketAddress socketAddress = new InetSocketAddress(printerIp,9100);
 			socket.connect(socketAddress,2000);
-//            socket.set
-            //获取输出流，用于客户端向服务器端发送数据
             DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
-            //获取输入流，用于接收服务器端发送来的数据
             DataInputStream dis = new DataInputStream(socket.getInputStream());
-            //客户端向服务器端发送数据
             dos.writeBytes("\020\004\004");
             Log.d("printer", "cmd send");
-            //打印出从服务器端接收到的数据
             dis.read(buffer);
             socket.close();
             if (buffer[0] == 18) {

@@ -96,6 +96,7 @@ public class TableActivity extends BaseActivity {
 			}
 		}
 		super.onResume();
+
 	}
 
 	@Override
@@ -115,7 +116,7 @@ public class TableActivity extends BaseActivity {
 		mpDialog.setTitle("请稍等");
 		mpDialog.setIndeterminate(false);
 		mpDialog.setCancelable(false);
-
+		new Thread(new getNotificationType()).start();
 	}
 
 	public void showProgressDlg(String msg) {
@@ -144,11 +145,9 @@ public class TableActivity extends BaseActivity {
 			while (true) {
 				try {
 					tableHandle.sendEmptyMessage(DISABLE_GRIDVIEW);
-					int ret;
 					mNotificaion.getNotifiycations();
-					mNotificationType.getNotifiycationsType();
-					ret = mSettings.getTableStatusFromServer();
-					mpDialog.cancel();
+					// mNotificationType.getNotifiycationsType();
+					int ret = mSettings.getTableStatusFromServer();
 					if (ret < 0) {
 						tableHandle.sendEmptyMessage(ret);
 					} else {
@@ -173,10 +172,16 @@ public class TableActivity extends BaseActivity {
 			while (!isInterrupted()) {
 				if (mUpdateFlg == true) {
 					try {
-						if (tableUpdeteThread != null
-								&& tableUpdeteThread.getState() == State.TIMED_WAITING) {
-							tableUpdeteThread.notify();
+						if (tableUpdeteThread.getState() == State.WAITING) {
+							synchronized (tableUpdeteThread) {
+								try {
+									tableUpdeteThread.notify();
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
+							}
 						}
+						sleep(MILLISECONDS);
 					} catch (Exception e) {
 						e.printStackTrace();
 						System.exit(1);
@@ -192,17 +197,18 @@ public class TableActivity extends BaseActivity {
 	private void startUpdate(boolean flg) {
 		mUpdateFlg = flg;
 		if (tableUpdeteThread == null) {
-			Log.d("tableUpdeteThread", "start");
+			// Log.d("tableUpdeteThread", "start");
 			tableUpdeteThread = new tableThread();
 			tableUpdeteThread.start();
 		}
 		if (tableNodifyThread == null) {
+			// Log.d("tableNodifyThread", "start");
 			tableNodifyThread = new nodifyTableThead();
 			tableNodifyThread.start();
 		} else {
 			synchronized (tableUpdeteThread) {
 				try {
-					Log.d("tableUpdeteThread", "notify");
+					// Log.d("tableUpdeteThread", "notify");
 					tableUpdeteThread.notify();
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -215,6 +221,17 @@ public class TableActivity extends BaseActivity {
 		public void run() {
 			try {
 				int ret = mNotificaion.cleanNotifications(Info.getTableId());
+				notificationHandle.sendEmptyMessage(ret);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	class getNotificationType implements Runnable {
+		public void run() {
+			try {
+				int ret = mNotificationType.getNotifiycationsType();
 				notificationHandle.sendEmptyMessage(ret);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -499,7 +516,6 @@ public class TableActivity extends BaseActivity {
 	};
 
 	private void setTableInfos() {
-		Log.d("Notification", "NotificationNum:" + mNotificaion.size());
 		if (lstImageItem.size() > 0) {
 			for (int i = 0, n = 0; i < mSettings.size(); i++) {
 				int status = mSettings.getStatus(i);
@@ -531,7 +547,6 @@ public class TableActivity extends BaseActivity {
 
 		gridview.setVisibility(View.VISIBLE);
 		mImageItems.notifyDataSetChanged();
-		mpDialog.cancel();
 		gridview.setOnItemClickListener(mTableClicked);
 	}
 
@@ -580,19 +595,21 @@ public class TableActivity extends BaseActivity {
 	private Handler notificationHandle = new Handler() {
 		public void handleMessage(Message msg) {
 			if (msg.what < 0) {
-				// Toast.makeText(getApplicationContext(),
-				// getResources().getString(R.string.claenNotificaion),
-				// Toast.LENGTH_SHORT)
-				// .show();
+				ARERTDIALOG = 1;
+				mNetWrorkcancel = mNetWrorkAlertDialog.show();
 			} else {
-				Toast.makeText(getApplicationContext(),
-						getResources().getString(R.string.claenNotificaion),
-						Toast.LENGTH_SHORT).show();
-				synchronized (tableUpdeteThread) {
-					try {
-						tableUpdeteThread.notify();
-					} catch (Exception e) {
-						e.printStackTrace();
+				
+				if (tableUpdeteThread != null
+						&& tableUpdeteThread.getState() == State.WAITING) {
+					Toast.makeText(getApplicationContext(),
+							getResources().getString(R.string.claenNotificaion),
+							Toast.LENGTH_SHORT).show();
+					synchronized (tableUpdeteThread) {
+						try {
+							tableUpdeteThread.notify();
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 					}
 				}
 			}
@@ -606,30 +623,38 @@ public class TableActivity extends BaseActivity {
 					Message msg = new Message();
 					int ret;
 					ret = mSettings.updateStatus(Info.getTableId(), 0);
+					Log.d("updateStatus", "updateStatus "+ret);
 					if (ret < 0) {
 						tableHandle.sendEmptyMessage(ret);
+						Log.d("updateStatus", "updateStatus");
 						return;
 					}
-
+					
 					ret = mMyOrder.cleanServerPhoneOrder(Info.getTableId());
-
+					Log.d("cleanServerPhoneOrder", "cleanServerPhoneOrder "+ret);
 					if (ret < 0) {
+						Log.d("cleanServerPhoneOrder", "cleanServerPhoneOrder");
 						tableHandle.sendEmptyMessage(ret);
 						return;
 					}
 
 					ret = mSettings.cleanTalble(Info.getTableId());
+					Log.d("cleanTalble", "cleanTalble "+ret);
 					if (ret < 0) {
+						Log.d("cleanTalble", "cleanTalble");
 						tableHandle.sendEmptyMessage(ret);
 						return;
 					}
 
 					mNotificaion.getNotifiycations();
 					ret = mSettings.getTableStatusFromServer();
+					Log.d("getTableStatusFromServer", "getTableStatusFromServer "+ret);
 					if (ret < 0) {
+						Log.d("getTableStatusFromServer", "getTableStatusFromServer");
 						tableHandle.sendEmptyMessage(ret);
 						return;
 					}
+					Log.d("cleanServerPhoneOrder", "UPDATE_TABLE_INFOS");
 					msg.what = UPDATE_TABLE_INFOS;
 					tableHandle.sendMessage(msg);
 				} catch (Exception e) {
@@ -660,7 +685,6 @@ public class TableActivity extends BaseActivity {
 					}
 
 					mNotificaion.getNotifiycations();
-					mMyOrder.phoneClear();
 					ret = mSettings.getTableStatusFromServer();
 					if (ret < 0) {
 						tableHandle.sendEmptyMessage(ret);

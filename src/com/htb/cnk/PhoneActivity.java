@@ -60,7 +60,7 @@ public class PhoneActivity extends BaseActivity {
 		mMyOrder = new MyOrder(PhoneActivity.this);
 		mpDialog = new ProgressDialog(PhoneActivity.this);
 		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-		mpDialog.setTitle("请稍等");
+		//mpDialog.setTitle("请稍等");
 		mpDialog.setIndeterminate(false);
 		mpDialog.setCancelable(false);
 		findViews();
