@@ -141,10 +141,9 @@ public class TableActivity extends BaseActivity {
 				if (mUpdateFlg == true) {
 					try {
 						tableHandle.sendEmptyMessage(DISABLE_GRIDVIEW);
-						int ret;
 						mNotificaion.getNotifiycations();
 						mNotificationType.getNotifiycationsType();
-						ret = mSettings.getTableStatusFromServer();
+						int ret = mSettings.getTableStatusFromServer();
 						if (ret < 0) {
 							tableHandle.sendEmptyMessage(ret);
 							synchronized (this) {

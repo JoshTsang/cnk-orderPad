@@ -142,7 +142,7 @@ public class TableSetting {
 		}
 		Log.d("JSON", order.toString());
 		String tableStatusPkg = Http.post(Server.CLEAN_TABLE,order.toString() );
-		if (tableStatusPkg == null) {
+		if(tableStatusPkg == null){
 			return -1;
 		}
 		return 0;
