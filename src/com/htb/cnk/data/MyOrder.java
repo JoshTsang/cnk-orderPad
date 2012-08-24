@@ -297,9 +297,14 @@ public class MyOrder {
 		}
 	}
 
-	public int getTableFromDB(int tableId) {
+	public int getOrderFromServer(int tableId) {
 		String response = Http.get(Server.GET_MYORDER, "TID=" + tableId);
-		Log.d("resp", response);
+//		Log.d("resp", response);
+		if("null".equals(response)){
+			return -2;
+		}else if(response == null){
+			return -1;
+		}
 		try {
 			JSONArray tableList = new JSONArray(response);
 			int length = tableList.length();

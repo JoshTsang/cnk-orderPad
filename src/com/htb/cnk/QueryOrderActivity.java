@@ -79,7 +79,7 @@ public class QueryOrderActivity extends OrderBaseActivity {
 		public void run() {
 			Message msg = new Message();
 			try {
-				int ret = mMyOrder.getTableFromDB(Info.getTableId());
+				int ret = mMyOrder.getOrderFromServer(Info.getTableId());
 				msg.what = ret;
 				queryHandler.sendMessage(msg);
 			} catch (Exception e) {
