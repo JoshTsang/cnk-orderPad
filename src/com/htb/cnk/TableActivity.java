@@ -79,13 +79,13 @@ public class TableActivity extends BaseActivity {
 
 	@Override
 	protected void onResume() {
+		super.onResume();
 		if (ARERTDIALOG == 1) {
 			mNetWrorkcancel.cancel();
 			ARERTDIALOG = 0;
 		}
 		showProgressDlg("正在获取状态...");
 		startUpdate(true);
-		super.onResume();
 	}
 
 	@Override
@@ -102,7 +102,7 @@ public class TableActivity extends BaseActivity {
 		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 		mNetWrorkAlertDialog = networkDialog();
 		Info.setMode(Info.WORK_MODE_WAITER);
-		mpDialog.setTitle("请稍等");
+		//mpDialog.setTitle("请稍等");
 		mpDialog.setIndeterminate(false);
 		mpDialog.setCancelable(false);
 

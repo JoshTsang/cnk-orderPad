@@ -88,7 +88,7 @@ public class TableSetting {
 	public int getTableStatusFromServer() {
 		String tableStatusPkg = Http.get(Server.GET_TABLE_STATUS, "");
 //		Log.d("tableStatusPkg", tableStatusPkg);
-		if("null".equals(tableStatusPkg)){
+		if(tableStatusPkg == null || "null".equals(tableStatusPkg) || "".equals(tableStatusPkg)){
 			return -1;
 		}
 		try {
@@ -106,6 +106,7 @@ public class TableSetting {
 			}
 			return 0;
 		} catch (Exception e) {
+			Log.w("getTableStatus.php", tableStatusPkg);
 			e.printStackTrace();
 		}
 		return -1;
