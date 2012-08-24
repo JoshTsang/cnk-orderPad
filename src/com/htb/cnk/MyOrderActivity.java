@@ -91,7 +91,7 @@ public class MyOrderActivity extends OrderBaseActivity {
 	public void submitOrder() {
 		mpDialog = new ProgressDialog(MyOrderActivity.this);  
 		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-		mpDialog.setTitle("请稍等");
+		//mpDialog.setTitle("请稍等");
 		mpDialog.setMessage("正在提交订单...");  
 		mpDialog.setIndeterminate(false);
 		mpDialog.setCancelable(false);

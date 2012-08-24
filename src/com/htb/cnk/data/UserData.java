@@ -37,7 +37,6 @@ public class UserData {
 
 	public static int compare(){
 		String userPwd = Http.get(Server.GET_PWD, "UNAME="+ UserData.mName);
-		Log.d("pwd", "pwd1:"+userPwd+"pwd2:"+UserData.mPwd);
 		if(userPwd == null){
 			return PWD_NETWORK_ERR;
 		}

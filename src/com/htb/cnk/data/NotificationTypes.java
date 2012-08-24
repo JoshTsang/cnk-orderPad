@@ -25,10 +25,10 @@ public class NotificationTypes {
 	public int getNotifiycationsType() {
 		String notificationTypePkg = Http.get(Server.GET_NOTIFICATIONTYPES,
 				null);
-//		Log.d("notificationTypePkg", notificationTypePkg);
-		if (notificationTypePkg == null) {
+		if (notificationTypePkg == null || "".equals("notificationTypePkg")) {
 			return -1;
 		}
+		Log.d("notificationTypePkg", notificationTypePkg);
 		try {
 			JSONArray tableList = new JSONArray(notificationTypePkg);
 			int length = tableList.length();
@@ -42,6 +42,7 @@ public class NotificationTypes {
 			notificationTypes.add(map);
 			return 0;
 		} catch (Exception e) {
+			Log.d("getNotificationTypes.php", notificationTypePkg);
 			e.printStackTrace();
 		}
 
