@@ -145,7 +145,6 @@ public class TableActivity extends BaseActivity {
 						mNotificaion.getNotifiycations();
 						mNotificationType.getNotifiycationsType();
 						ret = mSettings.getTableStatusFromServer();
-						mpDialog.cancel();
 						if (ret < 0) {
 							tableHandle.sendEmptyMessage(ret);
 							synchronized (this) {
@@ -463,7 +462,6 @@ public class TableActivity extends BaseActivity {
 
 	private Handler tableHandle = new Handler() {
 		public void handleMessage(Message msg) {
-			mpDialog.cancel();
 			if (msg.what < 0) {
 				ARERTDIALOG = 1;
 				mNetWrorkcancel = mNetWrorkAlertDialog.show();
@@ -479,6 +477,8 @@ public class TableActivity extends BaseActivity {
 					break;
 				}
 			}
+
+			mpDialog.cancel();
 		}
 	};
 
@@ -515,7 +515,6 @@ public class TableActivity extends BaseActivity {
 
 		gridview.setVisibility(View.VISIBLE);
 		mImageItems.notifyDataSetChanged();
-		mpDialog.cancel();
 		gridview.setOnItemClickListener(mTableClicked);
 	}
 

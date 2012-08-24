@@ -76,7 +76,7 @@ public class MenuActivity extends BaseActivity {
 
 		mpDialog = new ProgressDialog(MenuActivity.this);
 		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-		mpDialog.setTitle("请稍等");
+		//mpDialog.setTitle("请稍等");
 		mpDialog.setIndeterminate(false);
 		mpDialog.setCancelable(false);
 

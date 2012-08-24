@@ -60,7 +60,7 @@ public class Cnk_orderPadActivity extends Activity {
 	private void syncWithServer() {
 		mpDialog = new ProgressDialog(Cnk_orderPadActivity.this);
 		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-		mpDialog.setTitle("请稍等");
+		//mpDialog.setTitle("请稍等");
 		mpDialog.setMessage("正在与服务器同步...");
 		mpDialog.setIndeterminate(false);
 		mpDialog.setCancelable(false);
