@@ -32,6 +32,7 @@ import com.htb.cnk.data.NotificationTypes;
 import com.htb.cnk.data.Notifications;
 import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.lib.BaseActivity;
+import com.htb.cnk.lib.Ringtone;
 
 public class TableActivity extends BaseActivity {
 	private final int UPDATE_TABLE_INFOS = 5;
@@ -58,6 +59,7 @@ public class TableActivity extends BaseActivity {
 	private AlertDialog mNetWrorkcancel;
 	private Thread tableUpdeteThread;
 	private Thread tableNodifyThread;
+	private Ringtone mRingtone;
 
 	@Override
 	protected void onDestroy() {
@@ -95,6 +97,7 @@ public class TableActivity extends BaseActivity {
 				e.printStackTrace();
 			}
 		}
+		mRingtone.play();
 		super.onResume();
 
 	}
@@ -107,6 +110,7 @@ public class TableActivity extends BaseActivity {
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setContentView(R.layout.table_activity);
 		mMyOrder = new MyOrder(TableActivity.this);
+		mRingtone = new Ringtone(TableActivity.this);
 		findViews();
 		setClickListeners();
 		mpDialog = new ProgressDialog(TableActivity.this);
@@ -598,7 +602,7 @@ public class TableActivity extends BaseActivity {
 				ARERTDIALOG = 1;
 				mNetWrorkcancel = mNetWrorkAlertDialog.show();
 			} else {
-				
+				mRingtone.play();
 				if (tableUpdeteThread != null
 						&& tableUpdeteThread.getState() == State.WAITING) {
 					Toast.makeText(getApplicationContext(),
