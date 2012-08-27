@@ -97,7 +97,7 @@ public class Notifications {
 				typesTemp= types.split(",");
 				asItem = new NotificationItem(id,typesTemp);
 				setting.add(asItem);
-//				Log.d("settings", "settings:"+asItem.getId());
+				Log.d("settings", "settings:"+asItem.getId());
 			}
 			return 0;
 		} catch (Exception e) {
