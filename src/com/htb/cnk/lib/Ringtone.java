@@ -26,6 +26,11 @@ public class Ringtone {
 			e.printStackTrace();
 		}
 		mediaPlayer.start();
+		mediaPlayer.start();
+	}
+	
+	public void stop() {
+		mediaPlayer.stop();
 	}
 
 	@Override
