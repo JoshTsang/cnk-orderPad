@@ -1,8 +1,10 @@
 package com.htb.cnk;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -15,8 +17,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.htb.cnk.data.Info;
+import com.htb.cnk.data.WifiAdmin;
+import com.htb.cnk.lib.BaseActivity;
 
-public class Cnk_orderPadActivity extends Activity {
+public class Cnk_orderPadActivity extends BaseActivity {
 	/** Called when the activity is first created. */
 	private ImageButton mMenuBtn;
 	private TextView mMenuTxt;
@@ -26,6 +30,14 @@ public class Cnk_orderPadActivity extends Activity {
 	private final static int UPDATE_MENU = 0;
 	private final static int LATEST_MENU = 1;
 
+	private WifiAdmin mWifiAdmin;
+
+	@Override
+	protected void onResume() {
+		initWifi();
+		super.onResume();
+	}
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -34,12 +46,18 @@ public class Cnk_orderPadActivity extends Activity {
 		setClickListeners();
 		Info.setNewCustomer(true);
 		Info.setTableId(-1);
+		mWifiAdmin = new WifiAdmin(Cnk_orderPadActivity.this);
+		mpDialog = new ProgressDialog(Cnk_orderPadActivity.this);
+		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+		mpDialog.setTitle("请稍等");
+		mpDialog.setIndeterminate(false);
+		mpDialog.setCancelable(false);
 		syncWithServer();
 	}
 
 	private void findViews() {
 		mMenuBtn = (ImageButton) findViewById(R.id.menu);
-		mMenuTxt =  (TextView) findViewById(R.id.menuTxt);
+		mMenuTxt = (TextView) findViewById(R.id.menuTxt);
 		mSettingsBtn = (ImageButton) findViewById(R.id.settings);
 		mSettingsTxt = (TextView) findViewById(R.id.settingsTxt);
 	}
@@ -60,7 +78,7 @@ public class Cnk_orderPadActivity extends Activity {
 	private void syncWithServer() {
 		mpDialog = new ProgressDialog(Cnk_orderPadActivity.this);
 		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-		//mpDialog.setTitle("请稍等");
+//		mpDialog.setTitle("请稍等");
 		mpDialog.setMessage("正在与服务器同步...");
 		mpDialog.setIndeterminate(false);
 		mpDialog.setCancelable(false);
@@ -81,7 +99,8 @@ public class Cnk_orderPadActivity extends Activity {
 
 		@Override
 		public void onClick(View arg0) {
-			if (Info.getTableId() < 0 || Info.getMode() != Info.WORK_MODE_CUSTOMER) {
+			if (Info.getTableId() < 0
+					|| Info.getMode() != Info.WORK_MODE_CUSTOMER) {
 				Toast.makeText(getApplicationContext(),
 						getResources().getString(R.string.tableNotSet),
 						Toast.LENGTH_SHORT).show();
@@ -99,14 +118,15 @@ public class Cnk_orderPadActivity extends Activity {
 
 		@Override
 		public void onClick(View v) {
-//			if (Info.getMode() == Info.WORK_MODE_CUSTOMER) {
-//				LoginDlg loginDlg = new LoginDlg(Cnk_orderPadActivity.this, TableActivity.class);
-//				loginDlg.show();
-//			} else {
+			if (Info.getMode() == Info.WORK_MODE_CUSTOMER) {
+				LoginDlg loginDlg = new LoginDlg(Cnk_orderPadActivity.this,
+						TableActivity.class);
+				loginDlg.show();
+			} else {
 				Intent intent = new Intent();
 				intent.setClass(Cnk_orderPadActivity.this, TableActivity.class);
 				Cnk_orderPadActivity.this.startActivity(intent);
-//			}
+			}
 		}
 
 	};
@@ -122,5 +142,71 @@ public class Cnk_orderPadActivity extends Activity {
 			mpDialog.cancel();
 		}
 	};
+
+	public void initWifi() {
+		if (mWifiAdmin.checkNetCardState() == 0
+				|| mWifiAdmin.checkNetCardState() == 1) {
+			wifiDialog().show();
+		} else {
+			mpDialog.cancel();
+		}
+	}
+
+	private AlertDialog.Builder wifiDialog() {
+		final AlertDialog.Builder mAlertDialog = new AlertDialog.Builder(
+				Cnk_orderPadActivity.this);
+		mAlertDialog.setTitle("错误");// 设置对话框标题
+		mAlertDialog.setMessage("网络连接失败，请检查网络后重试");// 设置对话框内容
+		mAlertDialog.setCancelable(false);
+		mAlertDialog.setPositiveButton("连接",
+				new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int i) {
+						mpDialog.setMessage("正在连接wifi，请稍等");
+						mpDialog.show();
+						new Thread(new wifiConnect()).start();
+					}
+				});
+		mAlertDialog.setNegativeButton("退出",
+				new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int i) {
+						finish();
+					}
+				});
+
+		return mAlertDialog;
+	}
+	
+	class wifiConnect implements Runnable {
+		public void run() {
+			try {
+				mWifiAdmin.openNetCard();
+				if (mWifiAdmin.checkNetCardState() == 0
+						|| mWifiAdmin.checkNetCardState() == 1) {
+					wifiConnectHandle.sendEmptyMessage(-1);
+				} else {
+					wifiConnectHandle.sendEmptyMessage(1);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	private Handler wifiConnectHandle = new Handler() {
+		public void handleMessage(Message msg) {
+			mpDialog.cancel();
+			if (msg.what < 0) {
+				wifiDialog();
+			} else {
+				Toast.makeText(Cnk_orderPadActivity.this, "当前wifi状态已经连接", 1)
+						.show();
+			}
+		}
+	};
+
 
 }

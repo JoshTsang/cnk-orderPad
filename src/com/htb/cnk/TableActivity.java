@@ -39,7 +39,7 @@ public class TableActivity extends BaseActivity {
 	private final int PHONE_STATUS = 50;
 	private final int NOTIFICATION_STATUS = 100;
 	private static int ARERTDIALOG = 0;
-	private final int MILLISECONDS = 1000 * 15;
+	private final int MILLISECONDS = 1000 * 10;
 	private boolean mUpdateFlg = true;
 	private TableSetting mSettings = new TableSetting();
 	private Button mBackBtn;
@@ -111,11 +111,11 @@ public class TableActivity extends BaseActivity {
 		setClickListeners();
 		mpDialog = new ProgressDialog(TableActivity.this);
 		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-		mNetWrorkAlertDialog = networkDialog();
-		Info.setMode(Info.WORK_MODE_WAITER);
 		mpDialog.setTitle("请稍等");
 		mpDialog.setIndeterminate(false);
 		mpDialog.setCancelable(false);
+		mNetWrorkAlertDialog = networkDialog();
+		Info.setMode(Info.WORK_MODE_WAITER);
 		new Thread(new getNotificationType()).start();
 	}
 
@@ -201,7 +201,6 @@ public class TableActivity extends BaseActivity {
 			tableUpdateThread.start();
 		}
 		if (tableNodifyThread == null) {
-			// Log.d("tableNodifyThread", "start");
 			tableNodifyThread = new nodifyTableThead();
 			tableNodifyThread.start();
 		}
@@ -283,7 +282,7 @@ public class TableActivity extends BaseActivity {
 						dialog.cancel();
 						ARERTDIALOG = 0;
 						showProgressDlg("正在获取状态...");
-						startUpdate(true);
+						nodifyTableUpdateThread();
 					}
 				});
 		mAlertDialog.setNegativeButton("退出",
@@ -482,8 +481,8 @@ public class TableActivity extends BaseActivity {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
 			if (msg.what < 0) {
-				startUpdate(false);
-				 ARERTDIALOG = 1;
+				
+				ARERTDIALOG = 1;
 				mNetWrorkcancel = mNetWrorkAlertDialog.show();
 			} else {
 				switch (msg.what) {
