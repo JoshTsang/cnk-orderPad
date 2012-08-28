@@ -520,6 +520,7 @@ public class TableActivity extends BaseActivity {
 				}
 				setTableIcon(i, status);
 			}
+
 			mImageItems = new SimpleAdapter(TableActivity.this, lstImageItem,
 					R.layout.table_item,
 					new String[] { "imageItem", "ItemText" }, new int[] {

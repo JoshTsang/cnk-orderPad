@@ -3,6 +3,6 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="fill_parent"
 	android:layout_height="60dip"
-	android:paddingLeft="15dip"
-	android:textSize="50dip"
+	android:paddingLeft="7dip"
+	android:textSize="35dip"
 	android:textColor="#652A25"/>
