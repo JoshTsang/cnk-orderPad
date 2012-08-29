@@ -44,7 +44,7 @@ public class Dishes {
 		if (ret < 0) {
 			return ret;
 		}
-		ret = removeSoldOutItems(mCategoryId);
+		//ret = removeSoldOutItems(mCategoryId);
 		return ret;
 	}
 	

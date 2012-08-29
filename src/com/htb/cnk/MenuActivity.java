@@ -234,14 +234,17 @@ public class MenuActivity extends BaseActivity {
 	private void updateDishes(final int position) {
 		mDishes.clear();
 		mDishLstAdapter.notifyDataSetChanged();
-		new Thread() {
-			public void run() {
-				int ret = mDishes.setCategory(
-						mCategories.getCategoryId(position),
-						mCategories.getTableName(position));
-				handler.sendEmptyMessage(ret);
-			}
-		}.start();
+//		new Thread() {
+//			public void run() {
+//				int ret = mDishes.setCategory(
+//						mCategories.getCategoryId(position),
+//						mCategories.getTableName(position));
+//				handler.sendEmptyMessage(ret);
+//			}
+//		}.start();
+		mDishes.setCategory(mCategories.getCategoryId(position),
+				mCategories.getTableName(position));
+		mDishLstAdapter.notifyDataSetChanged();
 	}
 
 	private void updateDishQuantity(final int position, final int quantity) {

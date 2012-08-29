@@ -48,6 +48,7 @@ public class Cnk_orderPadActivity extends BaseActivity {
 		findViews();
 		setClickListeners();
 		Info.setNewCustomer(true);
+		Info.setMode(Info.WORK_MODE_CUSTOMER);
 		Info.setTableId(-1);
 		mWifiAdmin = new WifiAdmin(Cnk_orderPadActivity.this);
 		mpDialog = new ProgressDialog(Cnk_orderPadActivity.this);
