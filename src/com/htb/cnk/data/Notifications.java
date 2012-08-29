@@ -99,7 +99,7 @@ public class Notifications {
 				setting.add(asItem);
 				Log.d("settings", "settings:"+asItem.getId());
 			}
-			return 0;
+			return 1;
 		} catch (Exception e) {
 			e.printStackTrace();
 			Log.e("getNotification.php", notificationPkg);

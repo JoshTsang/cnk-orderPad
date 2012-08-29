@@ -32,6 +32,7 @@ import com.htb.cnk.data.NotificationTypes;
 import com.htb.cnk.data.Notifications;
 import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.lib.BaseActivity;
+import com.htb.cnk.lib.Ringtone;
 
 public class TableActivity extends BaseActivity {
 	private final int UPDATE_TABLE_INFOS = 5;
@@ -58,6 +59,7 @@ public class TableActivity extends BaseActivity {
 	private AlertDialog mNetWrorkcancel;
 	private Thread tableUpdateThread;
 	private Thread tableNodifyThread;
+	private Ringtone mRingtone;
 
 	@Override
 	protected void onDestroy() {
@@ -69,7 +71,6 @@ public class TableActivity extends BaseActivity {
 	@Override
 	protected void onStop() {
 		Log.d("onStop", "onStop");
-//		wifiLockInterrupt();
 		super.onStop();
 	}
 
@@ -77,14 +78,12 @@ public class TableActivity extends BaseActivity {
 	protected void onPause() {
 		Log.d("onPause", "onPause");
 		super.onPause();
-//		startUpdate(false);
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
 		Log.d("onResume", "onResume");
-//		wifiLockInterrupt();
 		if (ARERTDIALOG == 1) {
 			mNetWrorkcancel.cancel();
 			ARERTDIALOG = 0;
@@ -110,6 +109,7 @@ public class TableActivity extends BaseActivity {
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setContentView(R.layout.table_activity);
 		mMyOrder = new MyOrder(TableActivity.this);
+		mRingtone = new Ringtone(TableActivity.this);
 		findViews();
 		setClickListeners();
 		mpDialog = new ProgressDialog(TableActivity.this);
@@ -149,9 +149,10 @@ public class TableActivity extends BaseActivity {
 				if (mUpdateFlg == true) {
 					try {
 						tableHandle.sendEmptyMessage(DISABLE_GRIDVIEW);
-						mNotificaion.getNotifiycations();
+						int ret = mNotificaion.getNotifiycations();
+						ringtoneHandler.sendEmptyMessage(ret);
 						// mNotificationType.getNotifiycationsType();
-						int ret = mSettings.getTableStatusFromServer();
+						ret = mSettings.getTableStatusFromServer();
 						if (ret < 0) {
 							tableHandle.sendEmptyMessage(ret);
 						} else {
@@ -579,13 +580,21 @@ public class TableActivity extends BaseActivity {
 		}
 	}
 
+	private Handler ringtoneHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			if (msg.what > 0) {
+				Log.d("ringtone", "play");
+				mRingtone.play();
+			}
+		}
+	};
+	
 	private Handler notificationHandle = new Handler() {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
 			if (msg.what < 0) {
 				// Todo network failure warning
 			} else {
-
 				if (tableUpdateThread != null
 						&& tableUpdateThread.getState() == State.WAITING) {
 					synchronized (tableUpdateThread) {
@@ -624,7 +633,8 @@ public class TableActivity extends BaseActivity {
 						return;
 					}
 
-					mNotificaion.getNotifiycations();
+					ret = mNotificaion.getNotifiycations();
+					ringtoneHandler.sendEmptyMessage(ret);
 					ret = mSettings.getTableStatusFromServer();
 					if (ret < 0) {
 						Log.d("getTableStatusFromServer",
@@ -662,7 +672,8 @@ public class TableActivity extends BaseActivity {
 						return;
 					}
 
-					mNotificaion.getNotifiycations();
+					ret = mNotificaion.getNotifiycations();
+					ringtoneHandler.sendEmptyMessage(ret);
 					ret = mSettings.getTableStatusFromServer();
 					if (ret < 0) {
 						tableHandle.sendEmptyMessage(ret);

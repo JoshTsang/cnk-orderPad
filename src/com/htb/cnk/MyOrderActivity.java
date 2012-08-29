@@ -108,6 +108,7 @@ public class MyOrderActivity extends OrderBaseActivity {
 					}
 					handler.sendEmptyMessage(0);
 				}
+				mpDialog.cancel();
 			}
 		}.start();
 	}

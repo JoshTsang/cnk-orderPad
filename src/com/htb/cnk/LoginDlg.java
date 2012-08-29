@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import com.htb.cnk.data.UserData;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -22,6 +23,7 @@ public class LoginDlg {
 	public final static int ACTION_SUBMIT = 10;
 	private Context mActivity;
 	private Class<?> mDestActivity;
+	ProgressDialog pdialog;
 	private int mAction;
 	
 	public LoginDlg(Context context, Class<?> dest) {
@@ -56,16 +58,23 @@ public class LoginDlg {
 								if (getUserNameAndPwd(DialogView) < 0) {
 									Toast.makeText(mActivity, "用户名密码不能为空", Toast.LENGTH_SHORT).show();
 								} else {
+									pdialog = new ProgressDialog(mActivity);
+									pdialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+									//mpDialog.setTitle("请稍等");
+									pdialog.setMessage("正在登陆...");
+									pdialog.setIndeterminate(false);
+									pdialog.setCancelable(false);
+									pdialog.show();
 									new Thread() {
-										public void run() {
-											try {
-												int ret = UserData.compare();
-												userHandle.sendEmptyMessage(ret);
-											} catch (Exception e) {
-												userHandle.sendEmptyMessage(UserData.PWD_NETWORK_ERR);
-												e.printStackTrace();
-											}
-										}}.start();
+									public void run() {
+										try {
+											int ret = UserData.compare();
+											userHandle.sendEmptyMessage(ret);
+										} catch (Exception e) {
+											userHandle.sendEmptyMessage(UserData.PWD_NETWORK_ERR);
+											e.printStackTrace();
+										}
+									}}.start();
 								}
 							}
 						}).setNegativeButton("取消",
@@ -132,6 +141,7 @@ public class LoginDlg {
 	private Handler userHandle = new Handler() {
 
 		public void handleMessage(Message msg) {
+			pdialog.cancel();
 			if (msg.what < 0) {
 				switch(msg.what) {
 				case UserData.PWD_INCORRECT:
