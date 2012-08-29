@@ -33,6 +33,7 @@ public class Cnk_orderPadActivity extends Activity {
 		findViews();
 		setClickListeners();
 		Info.setNewCustomer(true);
+		Info.setMode(Info.WORK_MODE_CUSTOMER);
 		Info.setTableId(-1);
 		syncWithServer();
 	}
