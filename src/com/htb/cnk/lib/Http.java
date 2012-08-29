@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -97,7 +98,16 @@ public class Http {
 			if (start < 0 || end < 0) {
 				return null;
 			}
-			return response.substring(start+1, end).split(",");
+			String[] str = response.substring(start+1, end).split(",");
+			Set<String> set = new TreeSet<String>();
+			for (int i = 0; i < str.length; i++) {
+				set.add(str[i]);
+			}
+			str = (String[]) set.toArray(new String[0]);
+			for (int i = 0; i < str.length; i++) {
+				System.out.println(str[i]);
+			}
+			return str;
 		}
 	}
 	
