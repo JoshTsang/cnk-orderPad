@@ -87,7 +87,7 @@ public class TableSetting {
 
 	public int getTableStatusFromServer() {
 		String tableStatusPkg = Http.get(Server.GET_TABLE_STATUS, "");
-//		Log.d("tableStatusPkg", tableStatusPkg);
+		Log.d("tableStatusPkg", tableStatusPkg);
 		if(tableStatusPkg == null || "null".equals(tableStatusPkg) || "".equals(tableStatusPkg)){
 			return -1;
 		}

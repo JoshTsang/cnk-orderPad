@@ -69,19 +69,22 @@ public class TableActivity extends BaseActivity {
 	@Override
 	protected void onStop() {
 		Log.d("onStop", "onStop");
-		startUpdate(false);
+//		wifiLockInterrupt();
 		super.onStop();
 	}
 
 	@Override
 	protected void onPause() {
 		Log.d("onPause", "onPause");
-		startUpdate(false);
 		super.onPause();
+//		startUpdate(false);
 	}
 
 	@Override
 	protected void onResume() {
+		super.onResume();
+		Log.d("onResume", "onResume");
+//		wifiLockInterrupt();
 		if (ARERTDIALOG == 1) {
 			mNetWrorkcancel.cancel();
 			ARERTDIALOG = 0;
@@ -95,7 +98,7 @@ public class TableActivity extends BaseActivity {
 				e.printStackTrace();
 			}
 		}
-		super.onResume();
+		
 
 	}
 
@@ -481,7 +484,7 @@ public class TableActivity extends BaseActivity {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
 			if (msg.what < 0) {
-				
+
 				ARERTDIALOG = 1;
 				mNetWrorkcancel = mNetWrorkAlertDialog.show();
 			} else {
@@ -585,10 +588,6 @@ public class TableActivity extends BaseActivity {
 
 				if (tableUpdateThread != null
 						&& tableUpdateThread.getState() == State.WAITING) {
-					Toast.makeText(
-							getApplicationContext(),
-							getResources().getString(R.string.claenNotificaion),
-							Toast.LENGTH_SHORT).show();
 					synchronized (tableUpdateThread) {
 						try {
 							tableUpdateThread.notify();
@@ -679,7 +678,8 @@ public class TableActivity extends BaseActivity {
 	}
 
 	private void nodifyTableUpdateThread() {
-		if (tableUpdateThread.getState() == State.WAITING) {
+		if (tableUpdateThread != null
+				&& tableUpdateThread.getState() == State.WAITING) {
 			synchronized (tableUpdateThread) {
 				try {
 					tableUpdateThread.notify();

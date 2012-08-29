@@ -1,6 +1,5 @@
 package com.htb.cnk;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -10,6 +9,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
@@ -21,6 +21,7 @@ import com.htb.cnk.data.WifiAdmin;
 import com.htb.cnk.lib.BaseActivity;
 
 public class Cnk_orderPadActivity extends BaseActivity {
+
 	/** Called when the activity is first created. */
 	private ImageButton mMenuBtn;
 	private TextView mMenuTxt;
@@ -31,13 +32,15 @@ public class Cnk_orderPadActivity extends BaseActivity {
 	private final static int LATEST_MENU = 1;
 
 	private WifiAdmin mWifiAdmin;
+	private boolean mWifiLock = false;
+	private Thread wifiLockNodifyThread;
 
 	@Override
 	protected void onResume() {
 		initWifi();
 		super.onResume();
 	}
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -53,6 +56,7 @@ public class Cnk_orderPadActivity extends BaseActivity {
 		mpDialog.setIndeterminate(false);
 		mpDialog.setCancelable(false);
 		syncWithServer();
+		startReleaseLock(true);
 	}
 
 	private void findViews() {
@@ -78,7 +82,7 @@ public class Cnk_orderPadActivity extends BaseActivity {
 	private void syncWithServer() {
 		mpDialog = new ProgressDialog(Cnk_orderPadActivity.this);
 		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-//		mpDialog.setTitle("请稍等");
+		// mpDialog.setTitle("请稍等");
 		mpDialog.setMessage("正在与服务器同步...");
 		mpDialog.setIndeterminate(false);
 		mpDialog.setCancelable(false);
@@ -179,7 +183,7 @@ public class Cnk_orderPadActivity extends BaseActivity {
 
 		return mAlertDialog;
 	}
-	
+
 	class wifiConnect implements Runnable {
 		public void run() {
 			try {
@@ -208,5 +212,29 @@ public class Cnk_orderPadActivity extends BaseActivity {
 		}
 	};
 
+	private void startReleaseLock(boolean flg) {
+		mWifiLock = flg;
+		if (wifiLockNodifyThread == null) {
+			wifiLockNodifyThread = new nodifyWifiLockThead();
+			wifiLockNodifyThread.start();
+		}
+		if (wifiLockNodifyThread.isAlive() == false) {
+			Log.d("wifiLockNodifyThread",
+					"isAlive: " + wifiLockNodifyThread.getId());
+			wifiLockNodifyThread.run();
+
+		}
+	}
+
+	private class nodifyWifiLockThead extends Thread {
+		public void run() {
+			try {
+				mWifiAdmin.creatWifiLock();
+				mWifiAdmin.acquireWifiLock();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
 }
