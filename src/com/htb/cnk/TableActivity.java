@@ -485,7 +485,9 @@ public class TableActivity extends BaseActivity {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
 			if (msg.what < 0) {
-
+				if (ARERTDIALOG == 1) {
+					mNetWrorkcancel.cancel();
+				}
 				ARERTDIALOG = 1;
 				mNetWrorkcancel = mNetWrorkAlertDialog.show();
 			} else {
