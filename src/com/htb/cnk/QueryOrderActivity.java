@@ -1,11 +1,14 @@
 package com.htb.cnk;
 
+import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.View.OnClickListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,9 +28,11 @@ public class QueryOrderActivity extends OrderBaseActivity {
 	}
 
 	private void setQueryViews() {
-		mSubmitBtn.setVisibility(View.GONE);
+		mSubmitBtn.setText("上菜");
 		mLeftBtn.setVisibility(View.GONE);
 		mRefreshBtn.setVisibility(View.GONE);
+		
+		mSubmitBtn.setOnClickListener(submitClicked);
 	}
 
 	private void setAdapter() {
@@ -49,11 +54,17 @@ public class QueryOrderActivity extends OrderBaseActivity {
 						.findViewById(R.id.dishQuantity);
 
 				dishName.setText(dishDetail.getName());
+				
 				dishPrice.setText(Double.toString(dishDetail.getPrice())
 						+ " 元/份");
 				dishQuantity
 						.setText(Integer.toString(dishDetail.getQuantity()));
-
+				if (dishDetail.getStatus() == 2) {
+					int color = Color.rgb(255, 0, 0);
+					dishName.setTextColor(color);
+					dishPrice.setTextColor(color);
+					dishQuantity.setTextColor(color);
+				}
 				return convertView;
 			}
 		};
@@ -93,5 +104,16 @@ public class QueryOrderActivity extends OrderBaseActivity {
 		mMyOrder.clear();
 		super.finish();
 	}
+	
+	private OnClickListener submitClicked = new OnClickListener() {
 
+		@Override
+		public void onClick(View arg0) {
+				Intent intent = new Intent();
+				intent.setClass(QueryOrderActivity.this, ServeOrderActivity.class);
+				startActivity(intent);
+				finish();
+		}
+
+	};
 }

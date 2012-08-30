@@ -35,9 +35,10 @@ public class MyOrder {
 		int status;
 		int tableId;
 
-		public OrderedDish(Dish dish, int quantity, int tableId, int type) {
+		public OrderedDish(Dish dish, int quantity, int tableId, int status, int type) {
 			this.dish = dish;
 			this.tableId = tableId;
+			this.status = status;
 			if (type == MODE_PAD) {
 				this.padQuantity = quantity;
 				this.phoneQuantity = 0;
@@ -103,7 +104,7 @@ public class MyOrder {
 				return 0;
 			}
 		}
-		mOrder.add(new OrderedDish(dish, quantity, tableId, type));
+		mOrder.add(new OrderedDish(dish, quantity, tableId, status, type));
 		return 0;
 	}
 
@@ -115,7 +116,7 @@ public class MyOrder {
 			}
 		}
 
-		mOrder.add(new OrderedDish(dish, quantity, tableId, type));
+		mOrder.add(new OrderedDish(dish, quantity, tableId, 1, type));
 		return 0;
 	}
 
@@ -141,6 +142,18 @@ public class MyOrder {
 
 	public int count() {
 		return mOrder.size();
+	}
+	
+	public int countServed() {
+		int count = 0;
+		
+		for (OrderedDish item : mOrder) {
+			if (item.status == 2) {
+				count ++;
+			}
+		}
+		
+		return count;
 	}
 
 	public int totalQuantity() {
@@ -174,6 +187,20 @@ public class MyOrder {
 		return mOrder.get(0).getTableId();
 	}
 
+	public int getDishStatus(int index) {
+		return mOrder.get(index).getStatus();
+	}
+	
+	public int setDishStatus(int index, int status) {
+		int ret = updateServerServedDish(Info.getTableId(), mOrder.get(index).getDishId());
+		if (ret < 0) {
+			return ret;
+		} else {
+			mOrder.get(index).setStatus(status);
+		}
+		return 0;
+	}
+	
 	public OrderedDish getOrderedDish(int position) {
 		return mOrder.get(position);
 	}
@@ -481,6 +508,15 @@ public class MyOrder {
 		return 0;
 	}
 
+	//TODO handle err
+	private int updateServerServedDish(int tableId, int dishId) {
+		String tableStatusPkg = Http.get(Server.SERVE_ORDER, "TID="
+				+ tableId + "&DID=" + dishId);
+		if (tableStatusPkg == null) {
+			return -1;
+		}
+		return 0;
+	}
 	//TODO
 	private int minusPhoneOrderOnServer(int tableId, int quantity, int dishId) {
 		if (quantity != 0) {
