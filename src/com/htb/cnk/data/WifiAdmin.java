@@ -1,12 +1,13 @@
 package com.htb.cnk.data;
 
 import java.util.List;
+
 import android.content.Context;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-import android.net.wifi.WifiManager.WifiLock;
+import android.os.PowerManager;
 import android.util.Log;
 
 public class WifiAdmin {
@@ -21,12 +22,20 @@ public class WifiAdmin {
 	// 网络连接列表
 	private List<WifiConfiguration> mWifiConfiguration;
 	// 定义一个WifiLock
-	WifiLock mWifiLock;
+	private final Context mContext;
+	private PowerManager.WakeLock mWakeLock = null;
+	private WifiManager.WifiLock mWifiLock = null;
 
 	/**
 	 * 构造方法
 	 */
 	public WifiAdmin(Context context) {
+		mContext = context;
+		PowerManager powerManager = (PowerManager) mContext
+				.getSystemService(Context.POWER_SERVICE);
+		mWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
+				"aa");
+		mWakeLock.setReferenceCounted(true);
 		mWifiManager = (WifiManager) context
 				.getSystemService(Context.WIFI_SERVICE);
 		mWifiInfo = mWifiManager.getConnectionInfo();
@@ -155,20 +164,24 @@ public class WifiAdmin {
 
 	// 锁定WifiLock
 	public void acquireWifiLock() {
-		mWifiLock.acquire();
+		mWakeLock.acquire();
+		if (!mWifiLock.isHeld()) {
+			mWifiLock.acquire();
+		}
 	}
 
 	// 解锁WifiLock
 	public void releaseWifiLock() {
 		// 判断时候锁定
 		if (mWifiLock.isHeld()) {
-			mWifiLock.acquire();
+			mWifiLock.release();
 		}
 	}
 
 	// 创建一个WifiLock
 	public void creatWifiLock() {
-		mWifiLock = mWifiManager.createWifiLock("cainaoke");
+		mWifiLock = mWifiManager.createWifiLock(TAG);
+		mWifiLock.setReferenceCounted(true);
 	}
 
 	// 得到配置好的网络
@@ -209,23 +222,23 @@ public class WifiAdmin {
 		return wcgID;
 	}
 
-//	public void connectCainaoke() {
-//		WifiConfiguration wc = new WifiConfiguration();
-//		wc.SSID = "\"my-cainaoke\"";// ssid
-//		wc.preSharedKey = "\"mycainaoke\"";//ssid密码
-//		wc.hiddenSSID = true;
-//		wc.status = WifiConfiguration.Status.ENABLED;
-//		wc.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
-//		wc.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
-//		wc.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
-//		wc.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.TKIP);
-//		wc.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.CCMP);
-//		wc.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
-//		int res = mWifiManager.addNetwork(wc);
-//		Log.e("WifiPreference", "add Network returned " + res);
-//		boolean b = mWifiManager.enableNetwork(res, true);
-//		Log.e("WifiPreference", "enableNetwork returned " + b);
-//	}
+	// public void connectCainaoke() {
+	// WifiConfiguration wc = new WifiConfiguration();
+	// wc.SSID = "\"my-cainaoke\"";// ssid
+	// wc.preSharedKey = "\"mycainaoke\"";//ssid密码
+	// wc.hiddenSSID = true;
+	// wc.status = WifiConfiguration.Status.ENABLED;
+	// wc.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
+	// wc.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
+	// wc.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
+	// wc.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.TKIP);
+	// wc.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.CCMP);
+	// wc.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
+	// int res = mWifiManager.addNetwork(wc);
+	// Log.e("WifiPreference", "add Network returned " + res);
+	// boolean b = mWifiManager.enableNetwork(res, true);
+	// Log.e("WifiPreference", "enableNetwork returned " + b);
+	// }
 
 	private WifiManager getSystemService(String wifiService) {
 		// TODO Auto-generated method stub

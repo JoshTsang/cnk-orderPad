@@ -9,7 +9,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
@@ -32,7 +31,6 @@ public class Cnk_orderPadActivity extends BaseActivity {
 	private final static int LATEST_MENU = 1;
 
 	private WifiAdmin mWifiAdmin;
-	private boolean mWifiLock = false;
 	private Thread wifiLockNodifyThread;
 
 	@Override
@@ -57,7 +55,6 @@ public class Cnk_orderPadActivity extends BaseActivity {
 		mpDialog.setIndeterminate(false);
 		mpDialog.setCancelable(false);
 		syncWithServer();
-		startReleaseLock(true);
 	}
 
 	private void findViews() {
@@ -155,6 +152,7 @@ public class Cnk_orderPadActivity extends BaseActivity {
 		} else {
 			mpDialog.cancel();
 		}
+		startLock();
 	}
 
 	private AlertDialog.Builder wifiDialog() {
@@ -213,29 +211,9 @@ public class Cnk_orderPadActivity extends BaseActivity {
 		}
 	};
 
-	private void startReleaseLock(boolean flg) {
-		mWifiLock = flg;
-		if (wifiLockNodifyThread == null) {
-			wifiLockNodifyThread = new nodifyWifiLockThead();
-			wifiLockNodifyThread.start();
-		}
-		if (wifiLockNodifyThread.isAlive() == false) {
-			Log.d("wifiLockNodifyThread",
-					"isAlive: " + wifiLockNodifyThread.getId());
-			wifiLockNodifyThread.run();
-
-		}
-	}
-
-	private class nodifyWifiLockThead extends Thread {
-		public void run() {
-			try {
-				mWifiAdmin.creatWifiLock();
-				mWifiAdmin.acquireWifiLock();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
+	private void startLock() {
+		mWifiAdmin.creatWifiLock();
+		mWifiAdmin.acquireWifiLock();
 	}
 
 }
