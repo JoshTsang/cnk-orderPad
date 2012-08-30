@@ -165,7 +165,7 @@ public class Statistics {
 			return -1;
 		}
 		
-		if (Http.getPrinterStatus() < 0) {
+		if (Http.getPrinterStatus(Server.PRINTER_CONTENT_TYPE_STATISTICS) < 0) {
 			return -1;
 		}
 		try {

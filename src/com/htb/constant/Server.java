@@ -39,4 +39,8 @@ public class Server {
 	
 	/* other */
 	public final static String IMG_PATH = Server.SERVER_DOMIN + "/upload/ftp_temp/temp/";
+	
+	/* printer */
+	public final static int PRINTER_CONTENT_TYPE_ORDER = 100;
+	public final static int PRINTER_CONTENT_TYPE_STATISTICS = 101;
 }
