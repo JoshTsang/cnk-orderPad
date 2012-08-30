@@ -24,6 +24,7 @@ public class QueryOrderActivity extends OrderBaseActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setQueryViews();
+		showProgressDlg("请稍候...");
 		new Thread(new queryThread()).start();
 	}
 
@@ -64,6 +65,11 @@ public class QueryOrderActivity extends OrderBaseActivity {
 					dishName.setTextColor(color);
 					dishPrice.setTextColor(color);
 					dishQuantity.setTextColor(color);
+				} else {
+					int color = Color.rgb(0, 0, 0);
+					dishName.setTextColor(color);
+					dishPrice.setTextColor(color);
+					dishQuantity.setTextColor(color);
 				}
 				return convertView;
 			}
@@ -74,6 +80,7 @@ public class QueryOrderActivity extends OrderBaseActivity {
 
 	Handler queryHandler = new Handler() {
 		public void handleMessage(Message msg) {
+			mpDialog.cancel();
 			if (msg.what < 0) {
 				Toast.makeText(getApplicationContext(),
 						getResources().getString(R.string.delWarning),
@@ -88,11 +95,9 @@ public class QueryOrderActivity extends OrderBaseActivity {
 
 	class queryThread implements Runnable {
 		public void run() {
-			Message msg = new Message();
 			try {
 				int ret = mMyOrder.getOrderFromServer(Info.getTableId());
-				msg.what = ret;
-				queryHandler.sendMessage(msg);
+				queryHandler.sendEmptyMessage(ret);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

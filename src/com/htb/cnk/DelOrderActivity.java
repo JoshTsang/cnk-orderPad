@@ -27,7 +27,6 @@ public class DelOrderActivity extends OrderBaseActivity {
 	private static int ARERTDIALOG = 0;
 	private MyOrderAdapter mMyOrderAdapter;
 	private TableSetting mSettings = new TableSetting();
-	private ProgressDialog mpDialog;
 	private AlertDialog mNetWrorkcancel;
 	private AlertDialog.Builder mNetWrorkAlertDialog;
 	
@@ -47,11 +46,6 @@ public class DelOrderActivity extends OrderBaseActivity {
 		super.onCreate(savedInstanceState);
 		setDelViews();
 		setDelClickListener();
-		mpDialog = new ProgressDialog(DelOrderActivity.this);
-		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-		mpDialog.setTitle("请稍等");
-		mpDialog.setIndeterminate(false);
-		mpDialog.setCancelable(false);
 		mNetWrorkAlertDialog = networkDialog();
 	}
 

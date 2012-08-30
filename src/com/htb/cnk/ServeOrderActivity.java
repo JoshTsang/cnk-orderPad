@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +25,6 @@ import com.htb.cnk.lib.OrderBaseActivity;
 public class ServeOrderActivity extends OrderBaseActivity {
 	private MyOrderAdapter mMyOrderAdapter;
 	private PositionIndexMaping postionToIndex = new PositionIndexMaping();
-	private ProgressDialog mpDialog;
 	
 	class PositionIndexMaping {
 		List<Integer> map = new ArrayList<Integer>();
@@ -51,10 +51,6 @@ public class ServeOrderActivity extends OrderBaseActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setQueryViews();
-		mpDialog = new ProgressDialog(ServeOrderActivity.this);
-		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-		mpDialog.setIndeterminate(false);
-		mpDialog.setCancelable(false);
 		showProgressDlg("请稍候...");
 		new Thread(new queryThread()).start();
 	}
@@ -63,11 +59,6 @@ public class ServeOrderActivity extends OrderBaseActivity {
 		mSubmitBtn.setVisibility(View.GONE);
 		mLeftBtn.setVisibility(View.GONE);
 		mRefreshBtn.setVisibility(View.GONE);
-	}
-	
-	public void showProgressDlg(String msg) {
-		mpDialog.setMessage(msg);
-		mpDialog.show();
 	}
 	
 	private void setAdapter() {
@@ -111,12 +102,14 @@ public class ServeOrderActivity extends OrderBaseActivity {
 	private OnItemClickListener servedClicked = new OnItemClickListener() {
 
 		@Override
-		public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
-				final long position) {
+		public void onItemClick(AdapterView<?> arg0, View arg1, final int position,
+				long arg3) {
+			Log.d("position", "p:"+position);
 			showProgressDlg("更新服务器状态...");
 			new Thread() {
 				public void run() {
-					int ret = mMyOrder.setDishStatus(postionToIndex.getIndex((int) position), 2);
+					Log.d("position", "p:"+position);
+					int ret = mMyOrder.setDishStatus(postionToIndex.getIndex(position), 2);
 					markServedHandle.sendEmptyMessage(ret);
 				}
 			}.start();
