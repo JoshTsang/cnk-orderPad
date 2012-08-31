@@ -241,7 +241,6 @@ public class WifiAdmin {
 	// }
 
 	private WifiManager getSystemService(String wifiService) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 }

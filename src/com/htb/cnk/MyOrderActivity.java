@@ -1,7 +1,6 @@
 package com.htb.cnk;
 
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -252,7 +251,6 @@ public class MyOrderActivity extends OrderBaseActivity {
 
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		// TODO Auto-generated method stub
 		boolean ret = super.onKeyDown(keyCode, event);
 		Intent intent = new Intent();
 		intent.setClass(MyOrderActivity.this, MenuActivity.class);

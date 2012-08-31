@@ -261,8 +261,6 @@ public class PhoneActivity extends BaseActivity {
 				}).setNegativeButton("取消", null).show();
 	}
 
-	// TODO bug might exist
-
 	private void submitThread() {
 		mpDialog.setMessage("正在提交订单...");
 		mpDialog.show();

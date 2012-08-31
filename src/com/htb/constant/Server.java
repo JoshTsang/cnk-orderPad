@@ -39,7 +39,8 @@ public class Server {
 	public final static String DB_SALES = DB_DIR + "sales.db";
 	
 	/* other */
-	public final static String IMG_PATH = Server.SERVER_DOMIN + "/upload/ftp_temp/temp/";
+	public final static String SERVER_PIC_DIR = "/upload/ftp_temp/temp/";
+	public final static String IMG_PATH = Server.SERVER_DOMIN + SERVER_PIC_DIR;
 	
 	/* printer */
 	public final static int PRINTER_CONTENT_TYPE_ORDER = 100;
