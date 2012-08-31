@@ -31,12 +31,14 @@ public class MyOrder {
 		Dish dish;
 		int padQuantity;
 		int phoneQuantity;
-		int orderDishId;
+		//int orderDishId;
+		int status;
 		int tableId;
 
-		public OrderedDish(Dish dish, int quantity, int tableId, int type) {
+		public OrderedDish(Dish dish, int quantity, int tableId, int status, int type) {
 			this.dish = dish;
 			this.tableId = tableId;
+			this.status = status;
 			if (type == MODE_PAD) {
 				this.padQuantity = quantity;
 				this.phoneQuantity = 0;
@@ -45,20 +47,6 @@ public class MyOrder {
 				this.padQuantity = 0;
 			}
 
-		}
-
-		public OrderedDish(Dish dish, int quantity, int id, int tableId,
-				int type) {
-			this.dish = dish;
-			this.orderDishId = id;
-			this.tableId = tableId;
-			if (type == MODE_PAD) {
-				this.padQuantity = quantity;
-				this.phoneQuantity = 0;
-			} else if (type == MODE_PHONE) {
-				this.phoneQuantity = quantity;
-				this.padQuantity = 0;
-			}
 		}
 
 		public String getName() {
@@ -74,11 +62,18 @@ public class MyOrder {
 		}
 
 		public int getDishId() {
-			return this.orderDishId;
+			return dish.getId();
 		}
 
-		public int getId() {
-			return dish.getId();
+//		public int getId() {
+//			return dish.getId();
+//		}
+		public int getStatus() {
+			return status;
+		}
+		
+		public void setStatus(int status) {
+			this.status = status;
 		}
 
 		public int getTableId() {
@@ -98,7 +93,7 @@ public class MyOrder {
 		mDelDlgActivity = context;
 	}
 
-	public int addOrder(Dish dish, int quantity, int tableId, int type) {
+	public int addOrder(Dish dish, int quantity, int tableId, int status, int type) {
 		for (OrderedDish item : mOrder) {
 			if (item.dish.getId() == dish.getId()) {
 				if (type == MODE_PAD) {
@@ -109,7 +104,7 @@ public class MyOrder {
 				return 0;
 			}
 		}
-		mOrder.add(new OrderedDish(dish, quantity, tableId, type));
+		mOrder.add(new OrderedDish(dish, quantity, tableId, status, type));
 		return 0;
 	}
 
@@ -121,19 +116,7 @@ public class MyOrder {
 			}
 		}
 
-		mOrder.add(new OrderedDish(dish, quantity, tableId, type));
-		return 0;
-	}
-
-	public int addItem(Dish dish, int quantity, int id, int tableId) {
-		for (OrderedDish item : mOrder) {
-			if (item.dish.getId() == dish.getId()) {
-				item.padQuantity += quantity;
-				return 0;
-			}
-		}
-
-		mOrder.add(new OrderedDish(dish, quantity, id, tableId));
+		mOrder.add(new OrderedDish(dish, quantity, tableId, 1, type));
 		return 0;
 	}
 
@@ -159,6 +142,18 @@ public class MyOrder {
 
 	public int count() {
 		return mOrder.size();
+	}
+	
+	public int countServed() {
+		int count = 0;
+		
+		for (OrderedDish item : mOrder) {
+			if (item.status == 2) {
+				count ++;
+			}
+		}
+		
+		return count;
 	}
 
 	public int totalQuantity() {
@@ -192,6 +187,20 @@ public class MyOrder {
 		return mOrder.get(0).getTableId();
 	}
 
+	public int getDishStatus(int index) {
+		return mOrder.get(index).getStatus();
+	}
+	
+	public int setDishStatus(int index, int status) {
+		int ret = updateServerServedDish(Info.getTableId(), mOrder.get(index).getDishId());
+		if (ret < 0) {
+			return ret;
+		} else {
+			mOrder.get(index).setStatus(status);
+		}
+		return 0;
+	}
+	
 	public OrderedDish getOrderedDish(int position) {
 		return mOrder.get(position);
 	}
@@ -238,7 +247,7 @@ public class MyOrder {
 
 	public int getOrderedCount(int did) {
 		for (OrderedDish dish : mOrder) {
-			if (dish.getId() == did) {
+			if (dish.getDishId() == did) {
 				return (dish.padQuantity + dish.phoneQuantity);
 			}
 		}
@@ -255,7 +264,7 @@ public class MyOrder {
 			return -1;
 		}
 
-		int ret = Http.getPrinterStatus();
+		int ret = Http.getPrinterStatus(Server.PRINTER_CONTENT_TYPE_ORDER);
 		if (ret < 0) {
 			return ret;
 		}
@@ -313,12 +322,11 @@ public class MyOrder {
 				JSONObject item = tableList.getJSONObject(i);
 				int quantity = item.getInt("quantity");
 				int dishId = item.getInt("dish_id");
+				int status = item.getInt("status");
 				double dishPrice = item.getInt("price");
-				Log.d("tableFromDB", "quantity" + quantity + "dishId" + dishId
-						+ "dishPrice" + dishPrice);
 				String name = getDishName(dishId);
 				Dish mDish = new Dish(dishId, name, dishPrice, null);
-				addOrder(mDish, quantity, tableId, MODE_PAD);
+				addOrder(mDish, quantity, tableId, status, MODE_PAD);
 			}
 			return 0;
 		} catch (Exception e) {
@@ -350,7 +358,7 @@ public class MyOrder {
 				String name = cur.getString(0);
 				double dishPrice = cur.getDouble(1);
 				Dish mDish = new Dish(dishId, name, dishPrice, null);
-				addOrder(mDish, quantity, tableId, MODE_PHONE);
+				addOrder(mDish, quantity, tableId, 1, MODE_PHONE);
 			}
 			return 0;
 
@@ -445,7 +453,7 @@ public class MyOrder {
 			} else {
 				quantity -= item.padQuantity;
 				
-				if (minusPhoneOrderOnServer(Info.getTableId(), item.phoneQuantity - quantity, item.getId()) < 0) {
+				if (minusPhoneOrderOnServer(Info.getTableId(), item.phoneQuantity - quantity, item.getDishId()) < 0) {
 					return -1;
 				} else {
 					item.phoneQuantity -= quantity;
@@ -456,7 +464,7 @@ public class MyOrder {
 			}
 		} else {
 			if(item.phoneQuantity > 0) {
-				if (minusPhoneOrderOnServer(Info.getTableId(), 0, item.getId()) < 0) {
+				if (minusPhoneOrderOnServer(Info.getTableId(), 0, item.getDishId()) < 0) {
 					return -1;
 				}
 			}
@@ -500,6 +508,15 @@ public class MyOrder {
 		return 0;
 	}
 
+	//TODO handle err
+	private int updateServerServedDish(int tableId, int dishId) {
+		String tableStatusPkg = Http.get(Server.SERVE_ORDER, "TID="
+				+ tableId + "&DID=" + dishId);
+		if (tableStatusPkg == null) {
+			return -1;
+		}
+		return 0;
+	}
 	//TODO
 	private int minusPhoneOrderOnServer(int tableId, int quantity, int dishId) {
 		if (quantity != 0) {

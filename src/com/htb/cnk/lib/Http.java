@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -68,9 +69,9 @@ public class Http {
 		return null;
 	}
 	
-	public static int getPrinterStatus() {
+	public static int getPrinterStatus(int contentType) {
 		int ret;
-		String printers[] = getPrinterList();
+		String printers[] = getPrinterList(contentType);
 
 		if (printers == null) {
 			return ErrorNum.PRINTER_ERR_CONNECT_TIMEOUT;
@@ -86,8 +87,8 @@ public class Http {
 		return 0;
 	}
 	
-	private static String[] getPrinterList() {
-		String response = Http.get(Server.PRINTER_LIST, "");
+	private static String[] getPrinterList(int contentType) {
+		String response = Http.get(Server.PRINTER_LIST, "for=" + contentType);
 		if (response == null || "".equals(response)) {
 			return null;
 		} else {
@@ -97,7 +98,13 @@ public class Http {
 			if (start < 0 || end < 0) {
 				return null;
 			}
-			return response.substring(start+1, end).split(",");
+			String[] str = response.substring(start+1, end).split(",");
+			Set<String> set = new TreeSet<String>();
+			for (int i = 0; i < str.length; i++) {
+				set.add(str[i]);
+			}
+			str = (String[]) set.toArray(new String[0]);
+			return str;
 		}
 	}
 	

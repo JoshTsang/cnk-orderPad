@@ -28,7 +28,6 @@ import com.htb.constant.ErrorNum;
  */
 public class MyOrderActivity extends OrderBaseActivity {
 	private MyOrderAdapter mMyOrderAdapter;
-	private ProgressDialog mpDialog;
 	private TableSetting mSettings = new TableSetting();
 
 	@Override
@@ -88,12 +87,7 @@ public class MyOrderActivity extends OrderBaseActivity {
 	}
 
 	public void submitOrder() {
-		mpDialog = new ProgressDialog(MyOrderActivity.this);  
-		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-		mpDialog.setMessage("正在提交订单...");  
-		mpDialog.setIndeterminate(false);
-		mpDialog.setCancelable(false);
-		mpDialog.show();
+		showProgressDlg("正在提交订单...");
 		new Thread() {
 			public void run() {
 				int ret = mMyOrder.submit();

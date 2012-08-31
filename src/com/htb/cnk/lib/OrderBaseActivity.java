@@ -1,5 +1,6 @@
 package com.htb.cnk.lib;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -7,6 +8,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.htb.cnk.MyOrderActivity;
 import com.htb.cnk.R;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder;
@@ -26,12 +28,17 @@ public class OrderBaseActivity extends BaseActivity {
 	protected TextView mTotalPriceTxt;
 	protected ListView mMyOrderLst;
 	protected MyOrder mMyOrder;
-
+	protected ProgressDialog mpDialog;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.myorder_activity);
 		mMyOrder = new MyOrder(OrderBaseActivity.this);
+		mpDialog = new ProgressDialog(OrderBaseActivity.this);  
+		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+		mpDialog.setIndeterminate(false);
+		mpDialog.setCancelable(false);
 		findViews();
 		fillData();
 		setClickListener();
@@ -62,6 +69,11 @@ public class OrderBaseActivity extends BaseActivity {
 		mTotalPriceTxt.setText(Double.toString(mMyOrder.getTotalPrice()) + " 元");
 	}
 
+	protected void showProgressDlg(String msg) {
+		mpDialog.setMessage(msg);
+		mpDialog.show();
+	}
+	
 	private OnClickListener backBtnClicked = new OnClickListener() {
 
 		@Override

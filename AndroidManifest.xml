@@ -6,25 +6,40 @@
 
     <uses-sdk android:minSdkVersion="15" />
 
-	<uses-permission android:name="android.permission.INTERNET"/>
-	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-	<uses-permission android:name="android.permission.READ_PHONE_STATE"></uses-permission>
-	<uses-permission android:name="android.permission.READ_LOGS"></uses-permission>
-	<uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" ></uses-permission>
-	<uses-permission android:name="android.permission.CHANGE_WIFI_STATE" ></uses-permission>
-	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" ></uses-permission>
-	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" ></uses-permission>
-	<uses-permission android:name="android.permission.UPDATE_DEVICE_STATS" ></uses-permission>
-	<uses-permission android:name="android.permission.WAKE_LOCK" />
-	<uses-permission android:name="android.permission.BROADCAST_STICKY" /> 
-	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-	
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.READ_LOGS" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.UPDATE_DEVICE_STATS" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.BROADCAST_STICKY" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="adnroid.permission.ACCESS_CHECKIN_PROPERTTES" >
+    </uses-permission>
+
     <application
         android:icon="@drawable/logo"
         android:label="@string/app_name" >
-		<meta-data android:value="502dfea75270151398000058" android:name="UMENG_APPKEY"></meta-data>
-		<meta-data android:value="TEST" android:name="UMENG_CHANNEL"/>
+        <meta-data
+            android:name="UMENG_APPKEY"
+            android:value="502dfea75270151398000058" >
+        </meta-data>
+        <meta-data
+            android:name="UMENG_CHANNEL"
+            android:value="TEST" />
+
         <activity
             android:name=".Cnk_orderPadActivity"
             android:label="@string/app_name"
@@ -32,32 +47,33 @@
             android:theme="@android:style/Theme.NoTitleBar" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".MenuActivity"
             android:label="@string/app_name"
-            android:theme="@android:style/Theme.NoTitleBar"  
-			android:screenOrientation="landscape" >
+            android:screenOrientation="landscape"
+            android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
         <activity
             android:name=".OrderActivity"
             android:label="@string/app_name"
-            android:theme="@android:style/Theme.NoTitleBar"  
-			android:screenOrientation="landscape" >
+            android:screenOrientation="landscape"
+            android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
         <activity
             android:name=".SettingsActivity"
             android:label="@string/app_name"
-            android:theme="@android:style/Theme.NoTitleBar"  
-			android:screenOrientation="landscape" >
+            android:screenOrientation="landscape"
+            android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
         <activity
             android:name=".MyOrderActivity"
             android:label="@string/app_name"
-            android:theme="@android:style/Theme.NoTitleBar"  
-			android:screenOrientation="landscape" >
+            android:screenOrientation="landscape"
+            android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
         <activity
             android:name=".UpdateMenuActivity"
@@ -65,14 +81,13 @@
             android:screenOrientation="landscape"
             android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
-
         <activity
             android:name=".StatisticsActivity"
             android:label="@string/app_name"
-            android:theme="@android:style/Theme.NoTitleBar"  
-			android:screenOrientation="landscape" >
+            android:screenOrientation="landscape"
+            android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
-	<activity
+        <activity
             android:name=".TableActivity"
             android:label="@string/app_name"
             android:screenOrientation="landscape"
@@ -84,22 +99,36 @@
             android:screenOrientation="landscape"
             android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
-          <activity
+        <activity
             android:name=".QueryOrderActivity"
             android:label="@string/app_name"
             android:screenOrientation="landscape"
             android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
-           <activity
+        <activity
+            android:name=".ServeOrderActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="landscape"
+            android:theme="@android:style/Theme.NoTitleBar" >
+        </activity>
+        <activity
             android:name=".PhoneActivity"
             android:label="@string/app_name"
             android:screenOrientation="landscape"
             android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
-        
-        <service android:name=".NotificationTableService"
+
+        <service
+            android:name=".NotificationTableService"
             android:exported="true" >
-		</service>
+        </service>
+
+        <receiver android:name=".receiver.StartupIntentReceiver" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <category android:name="android.intent.category.HOME" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

@@ -26,6 +26,7 @@ public class Server {
 	public final static String GET_PERMINSSION = PHP_DIR + "getPerminssion.php";
 	public final static String GET_GETPHONEORDER = PHP_DIR +"getPhoneOrder.php";
 	public final static String DELETE_PHONEORDER = PHP_DIR +"deletePhoneOrder.php";
+	public final static String SERVE_ORDER = PHP_DIR +"updateDishStatus.php";
 	public final static String PRINTER_LIST = PHP_DIR + "getPrinterList.php";
 	public final static String GET_NOTIFICATION = PHP_DIR +"getNotification.php";
 	public final static String GET_NOTIFICATIONTYPES = PHP_DIR +"getNotificationTypes.php";
@@ -39,4 +40,8 @@ public class Server {
 	
 	/* other */
 	public final static String IMG_PATH = Server.SERVER_DOMIN + "/upload/ftp_temp/temp/";
+	
+	/* printer */
+	public final static int PRINTER_CONTENT_TYPE_ORDER = 100;
+	public final static int PRINTER_CONTENT_TYPE_STATISTICS = 101;
 }
