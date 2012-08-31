@@ -74,7 +74,7 @@ public class Notifications {
 
 	public int getNotifiycations() {
 		String notificationPkg = Http.get(Server.GET_NOTIFICATION, null);
-//		Log.d("notificationPkg", notificationPkg);
+	//	Log.d("notificationPkg", notificationPkg);
 		if (notificationPkg == null || "".equals(notificationPkg)) {
 			return -1;
 		} else if("null".equals(notificationPkg)){

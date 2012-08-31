@@ -1,6 +1,5 @@
 package com.htb.cnk;
 
-import java.lang.Thread.State;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,11 +7,17 @@ import java.util.List;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
@@ -24,8 +29,8 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.SimpleAdapter;
-import android.widget.Toast;
 
+import com.htb.cnk.NotificationTableService.MyBinder;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.NotificationTypes;
@@ -40,9 +45,7 @@ public class TableActivity extends BaseActivity {
 	private final int PHONE_STATUS = 50;
 	private final int NOTIFICATION_STATUS = 100;
 	private static int ARERTDIALOG = 0;
-	private final int MILLISECONDS = 1000 * 10;
-	private boolean mUpdateFlg = true;
-	private TableSetting mSettings = new TableSetting();
+	private TableSetting mSettings;
 	private Button mBackBtn;
 	private Button mUpdateBtn;
 	private Button mStatisticsBtn;
@@ -57,14 +60,18 @@ public class TableActivity extends BaseActivity {
 	private MyOrder mMyOrder;
 	private AlertDialog.Builder mNetWrorkAlertDialog;
 	private AlertDialog mNetWrorkcancel;
-	private Thread tableUpdateThread;
-	private Thread tableNodifyThread;
 	private Ringtone mRingtone;
+	private int mTableMsg;
+	private int mRingtoneMsg;
+	private MyReceiver mReceiver;
+	private NotificationTableService.MyBinder binder;
+	private boolean binderFlag = false;
+	private Intent intent;
 
 	@Override
 	protected void onDestroy() {
 		Log.d("onDestroy", "onDestroy");
-		startUpdate(false);
+		unregisterReceiver(mReceiver);
 		super.onDestroy();
 	}
 
@@ -88,17 +95,8 @@ public class TableActivity extends BaseActivity {
 			mNetWrorkcancel.cancel();
 			ARERTDIALOG = 0;
 		}
-		showProgressDlg("正在获取状态...");
-		startUpdate(true);
-		synchronized (tableUpdateThread) {
-			try {
-				tableUpdateThread.notify();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		
-
+		showProgressDlg("正在获取状态，请稍等。。。");
+		binderStart();
 	}
 
 	@Override
@@ -120,6 +118,14 @@ public class TableActivity extends BaseActivity {
 		mNetWrorkAlertDialog = networkDialog();
 		Info.setMode(Info.WORK_MODE_WAITER);
 		new Thread(new getNotificationType()).start();
+
+		intent = new Intent(TableActivity.this, NotificationTableService.class);
+		startService(intent);
+		bindService(intent, conn, Context.BIND_AUTO_CREATE);
+		mReceiver = new MyReceiver();
+		IntentFilter filter = new IntentFilter(
+				NotificationTableService.SERVICE_IDENTIFIER);
+		registerReceiver(mReceiver, filter);
 	}
 
 	public void showProgressDlg(String msg) {
@@ -143,72 +149,20 @@ public class TableActivity extends BaseActivity {
 		mManageBtn.setOnClickListener(manageClicked);
 	}
 
-	public class tableThread extends Thread {
-		public void run() {
-			while (!isInterrupted()) {
-				if (mUpdateFlg == true) {
-					try {
-						tableHandle.sendEmptyMessage(DISABLE_GRIDVIEW);
-						int ret = mNotificaion.getNotifiycations();
-						ringtoneHandler.sendEmptyMessage(ret);
-						// mNotificationType.getNotifiycationsType();
-						ret = mSettings.getTableStatusFromServer();
-						if (ret < 0) {
-							tableHandle.sendEmptyMessage(ret);
-						} else {
-							tableHandle.sendEmptyMessage(UPDATE_TABLE_INFOS);
-						}
-						synchronized (this) {
-							try {
-								wait();
-							} catch (InterruptedException e) {
-								e.printStackTrace();
-							}
-						}
-					} catch (Exception e) {
-						e.printStackTrace();
-						System.exit(1);
-					}
-				} else {
-					tableUpdateThread = null;
-					return;
-				}
-			}
-		}
-	}
+	private ServiceConnection conn = new ServiceConnection() {
 
-	private class nodifyTableThead extends Thread {
-		public void run() {
-			while (!isInterrupted()) {
-				if (mUpdateFlg == true) {
-					try {
-						nodifyTableUpdateThread();
-						sleep(MILLISECONDS);
-					} catch (Exception e) {
-						e.printStackTrace();
-						System.exit(1);
-					}
-				} else {
-					nodifyTableUpdateThread();
-					tableNodifyThread = null;
-					return;
-				}
-			}
+		@Override
+		public void onServiceConnected(ComponentName arg0, IBinder arg1) {
+			binder = (MyBinder) arg1;
+			binderFlag = true;
 		}
-	}
 
-	private void startUpdate(boolean flg) {
-		mUpdateFlg = flg;
-		if (tableUpdateThread == null) {
-			Log.d("tableUpdeteThread", "start");
-			tableUpdateThread = new tableThread();
-			tableUpdateThread.start();
+		@Override
+		public void onServiceDisconnected(ComponentName name) {
+			// TODO Auto-generated method stub
+
 		}
-		if (tableNodifyThread == null) {
-			tableNodifyThread = new nodifyTableThead();
-			tableNodifyThread.start();
-		}
-	}
+	};
 
 	class cleanNotification implements Runnable {
 		public void run() {
@@ -244,7 +198,6 @@ public class TableActivity extends BaseActivity {
 			Info.setTableName(mSettings.getName(arg2));
 			Info.setTableId(mSettings.getId(arg2));
 			int status = mSettings.getStatus(arg2);
-			Log.d("status", "status:" + status);
 			switch (status) {
 			case 1:
 				Dialog cleanDialog = cleanDialog();
@@ -286,7 +239,7 @@ public class TableActivity extends BaseActivity {
 						dialog.cancel();
 						ARERTDIALOG = 0;
 						showProgressDlg("正在获取状态...");
-						nodifyTableUpdateThread();
+						binderStart();
 					}
 				});
 		mAlertDialog.setNegativeButton("退出",
@@ -296,7 +249,6 @@ public class TableActivity extends BaseActivity {
 					public void onClick(DialogInterface dialog, int i) {
 						ARERTDIALOG = 0;
 						dialog.cancel();
-						// mpDialog.cancel();
 						finish();
 					}
 				});
@@ -314,7 +266,6 @@ public class TableActivity extends BaseActivity {
 
 					@Override
 					public void onClick(DialogInterface dialog, int i) {
-						// dialog.cancel();
 						showProgressDlg("正在清台...");
 						cleanTableThread();
 					}
@@ -484,6 +435,7 @@ public class TableActivity extends BaseActivity {
 	private Handler tableHandle = new Handler() {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
+
 			if (msg.what < 0) {
 				if (ARERTDIALOG == 1) {
 					mNetWrorkcancel.cancel();
@@ -526,7 +478,6 @@ public class TableActivity extends BaseActivity {
 				}
 				setTableIcon(i, status);
 			}
-
 			mImageItems = new SimpleAdapter(TableActivity.this, lstImageItem,
 					R.layout.table_item,
 					new String[] { "imageItem", "ItemText" }, new int[] {
@@ -590,23 +541,12 @@ public class TableActivity extends BaseActivity {
 			}
 		}
 	};
-	
+
 	private Handler notificationHandle = new Handler() {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
 			if (msg.what < 0) {
 				// Todo network failure warning
-			} else {
-				if (tableUpdateThread != null
-						&& tableUpdateThread.getState() == State.WAITING) {
-					synchronized (tableUpdateThread) {
-						try {
-							tableUpdateThread.notify();
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-					}
-				}
 			}
 		}
 	};
@@ -639,12 +579,9 @@ public class TableActivity extends BaseActivity {
 					ringtoneHandler.sendEmptyMessage(ret);
 					ret = mSettings.getTableStatusFromServer();
 					if (ret < 0) {
-						Log.d("getTableStatusFromServer",
-								"getTableStatusFromServer");
 						tableHandle.sendEmptyMessage(ret);
 						return;
 					}
-					Log.d("cleanServerPhoneOrder", "UPDATE_TABLE_INFOS");
 					msg.what = UPDATE_TABLE_INFOS;
 					tableHandle.sendMessage(msg);
 				} catch (Exception e) {
@@ -690,16 +627,10 @@ public class TableActivity extends BaseActivity {
 		}.start();
 	}
 
-	private void nodifyTableUpdateThread() {
-		if (tableUpdateThread != null
-				&& tableUpdateThread.getState() == State.WAITING) {
-			synchronized (tableUpdateThread) {
-				try {
-					tableUpdateThread.notify();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
+	private void binderStart() {
+		if (binderFlag) {
+			binder.start();
+			return;
 		}
 	}
 
@@ -746,5 +677,19 @@ public class TableActivity extends BaseActivity {
 		}
 
 	};
+
+	public class MyReceiver extends BroadcastReceiver {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			Bundle bundle = intent.getExtras();
+			mRingtoneMsg = bundle.getInt("ringtoneMessage");
+			mTableMsg = bundle.getInt("tableMessage");
+			mSettings = (TableSetting) bundle
+					.getSerializable(NotificationTableService.SER_KEY);
+			tableHandle.sendEmptyMessage(mTableMsg);
+			ringtoneHandler.sendEmptyMessage(mRingtoneMsg);
+		}
+	}
 
 }

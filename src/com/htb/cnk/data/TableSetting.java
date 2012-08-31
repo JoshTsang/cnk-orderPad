@@ -1,5 +1,6 @@
 package com.htb.cnk.data;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -9,14 +10,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-
-
 import android.util.Log;
 
 import com.htb.cnk.lib.Http;
 import com.htb.constant.Server;
 
-public class TableSetting {
+public class TableSetting implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
 	public class TableSettingItem {
 		protected int mStatus;
 		protected String mName;
@@ -45,7 +47,7 @@ public class TableSetting {
 		}
 	}
 
-	static List<TableSettingItem> mTableSettings = new ArrayList<TableSettingItem>();
+	private static List<TableSettingItem> mTableSettings = new ArrayList<TableSettingItem>();
 
 	public TableSetting() {
 
@@ -87,7 +89,7 @@ public class TableSetting {
 
 	public int getTableStatusFromServer() {
 		String tableStatusPkg = Http.get(Server.GET_TABLE_STATUS, "");
-//		Log.d("tableStatusPkg", tableStatusPkg);
+	//	Log.d("tableStatusPkg", tableStatusPkg);
 		if(tableStatusPkg == null || "null".equals(tableStatusPkg) || "".equals(tableStatusPkg)){
 			return -1;
 		}
