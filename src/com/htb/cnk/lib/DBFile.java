@@ -61,13 +61,35 @@ public class DBFile {
         
     }
 
+	public int backup(String name) {
+		File dbFile = mContext.getDatabasePath("cnk.db");
+        File exportDir = new File(Environment
+                .getExternalStorageDirectory().getAbsolutePath()
+                + "/cainaoke/backup");
+        
+        if (!exportDir.exists()) {
+            exportDir.mkdirs();
+        }
+        
+        File backup = new File(exportDir, name);
+        try {
+            fileCopy(dbFile, backup);
+            Log.d("backup", "success");
+            return 0;
+        } catch (Exception e) {
+            // TODO: handle exception
+            e.printStackTrace();
+            Log.d("backup", "fail");
+            return -1;
+        }
+	}
+	
     private void fileCopy(File dbFile, File backup) throws IOException {
         FileChannel inChannel = new FileInputStream(dbFile).getChannel();
         FileChannel outChannel = new FileOutputStream(backup).getChannel();
         try {
             inChannel.transferTo(0, inChannel.size(), outChannel);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } finally {
             if (inChannel != null) {

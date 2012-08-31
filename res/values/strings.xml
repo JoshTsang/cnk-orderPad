@@ -36,6 +36,9 @@
     <string name="updateMenu">更新菜谱</string>
     <string name="statistics">统计</string>
     <string name="mangement">管理</string>
+    <string name="menuMangement">菜谱管理</string>
+    <string name="backup">备份</string>
+    <string name="restore">恢复</string>
     <string name="queryId">选择桌号</string>
 	<string name="userWarning">用户名密码不正确</string>
 	<string name="tableNotSet">还未设定桌号</string>
@@ -49,4 +52,7 @@
 	<string name="delPhoneWarning">亲：你手机没有点菜哦</string>
 	<string name="phoneWarning">网络连接不上</string>
 	<string name= "cleanAllWarning">亲：已经删除完了，不要再删了！</string>
+	<string name="menuBackupTime">菜谱数据备份时间：</string>
+	<string name="menuPicBackupTime">菜谱图片备份时间：</string>
+	<string name="salesBackupTime">销售数据备份时间：</string>
 </resources>

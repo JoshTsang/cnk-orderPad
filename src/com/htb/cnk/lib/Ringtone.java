@@ -19,10 +19,8 @@ public class Ringtone {
         try {
 			mediaPlayer.prepare();
 		} catch (IllegalStateException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		mediaPlayer.start();
@@ -35,7 +33,6 @@ public class Ringtone {
 
 	@Override
 	protected void finalize() throws Throwable {
-		// TODO Auto-generated method stub
 		if (mediaPlayer != null) {
 			mediaPlayer.release();
 			mediaPlayer = null;
