@@ -158,15 +158,15 @@ public class Cnk_orderPadActivity extends BaseActivity {
 
 		@Override
 		public void onClick(View v) {
-			if (Info.getMode() == Info.WORK_MODE_CUSTOMER) {
-				LoginDlg loginDlg = new LoginDlg(Cnk_orderPadActivity.this,
-						TableActivity.class);
-				loginDlg.show();
-			} else {
+//			if (Info.getMode() == Info.WORK_MODE_CUSTOMER) {
+//				LoginDlg loginDlg = new LoginDlg(Cnk_orderPadActivity.this,
+//						TableActivity.class);
+//				loginDlg.show();
+//			} else {
 				Intent intent = new Intent();
 				intent.setClass(Cnk_orderPadActivity.this, TableActivity.class);
 				Cnk_orderPadActivity.this.startActivity(intent);
-			}
+//			}
 		}
 
 	};

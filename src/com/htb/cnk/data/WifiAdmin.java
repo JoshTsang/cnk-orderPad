@@ -239,7 +239,6 @@ public class WifiAdmin {
 	// boolean b = mWifiManager.enableNetwork(res, true);
 	// Log.e("WifiPreference", "enableNetwork returned " + b);
 	// }
-
 	private WifiManager getSystemService(String wifiService) {
 		return null;
 	}

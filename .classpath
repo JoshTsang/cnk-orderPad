@@ -6,5 +6,6 @@
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry kind="lib" path="libs/commons-net-3.1.jar"/>
 	<classpathentry kind="lib" path="libs/umeng_sdk.jar"/>
+	<classpathentry kind="lib" path="libs/pinyin4j-2.5.0.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

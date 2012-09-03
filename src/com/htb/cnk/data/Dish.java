@@ -16,7 +16,7 @@ public class Dish {
 		mPrice = price;
 		mPic = pic;
 	}
-	
+
 	public int getId() {
 		return mId;
 	}

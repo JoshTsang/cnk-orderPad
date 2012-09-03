@@ -318,21 +318,27 @@ public class TableActivity extends BaseActivity {
 					public void onClick(DialogInterface dialog, int which) {
 						mMyOrder.clear();
 						Intent intent = new Intent();
-						switch (which) {
-						case 0:
+						if (Info.getMenu() == Info.ORDER_QUCIK_MENU) {
 							intent.setClass(TableActivity.this,
-									MenuActivity.class);
-							Info.setMode(Info.WORK_MODE_CUSTOMER);
-							Info.setNewCustomer(true);
+									QuickMenuActivity.class);
 							TableActivity.this.startActivity(intent);
-							TableActivity.this.finish();
-							break;
-						case 1:
-							intent.setClass(TableActivity.this,
-									MenuActivity.class);
-							Info.setMode(Info.WORK_MODE_WAITER);
-							TableActivity.this.startActivity(intent);
-							break;
+						} else {
+							switch (which) {
+							case 0:
+								intent.setClass(TableActivity.this,
+										MenuActivity.class);
+								Info.setMode(Info.WORK_MODE_CUSTOMER);
+								Info.setNewCustomer(true);
+								TableActivity.this.startActivity(intent);
+								TableActivity.this.finish();
+								break;
+							case 1:
+								intent.setClass(TableActivity.this,
+										MenuActivity.class);
+								Info.setMode(Info.WORK_MODE_WAITER);
+								TableActivity.this.startActivity(intent);
+								break;
+							}
 						}
 					}
 				}).create();
