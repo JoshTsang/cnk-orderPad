@@ -45,4 +45,9 @@ public class Server {
 	/* printer */
 	public final static int PRINTER_CONTENT_TYPE_ORDER = 100;
 	public final static int PRINTER_CONTENT_TYPE_STATISTICS = 101;
+	
+	/* apk */
+	public final static String SETTING_DIR = "setting/";
+	public final static String APK_VERSION = PHP_DIR + SETTING_DIR + "getApkVer.php";
+	public final static String APK_DIR = PHP_DIR + SETTING_DIR;
 }
