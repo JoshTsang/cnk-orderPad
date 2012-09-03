@@ -124,7 +124,7 @@ public class Cnk_orderPadActivity extends BaseActivity {
 				if (getServerVerCode()) {
 					doNewVersionUpdate();
 				}
-				handlerSync.sendEmptyMessage(1);
+				handlerSync.sendEmptyMessage(LATEST_MENU);
 				int menuVer = getCurrentMenuVer();
 				if (UpdateMenuActivity.isUpdateNeed(menuVer)) {
 					handlerSync.sendEmptyMessage(UPDATE_MENU);
@@ -269,7 +269,7 @@ public class Cnk_orderPadActivity extends BaseActivity {
 
 
 	private void doNewVersionUpdate() {
-		handlerSync.sendEmptyMessage(2);
+		handlerSync.sendEmptyMessage(DOWNLOAD_NEW_APP);
 		downFile(mUrl);
 	}
 

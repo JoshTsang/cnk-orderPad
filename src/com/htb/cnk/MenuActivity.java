@@ -47,7 +47,7 @@ import com.htb.constant.ErrorNum;
  * 
  */
 public class MenuActivity extends BaseActivity {
-
+	private final String TAG = "MenuActivity";
 	private final int DO_NOTHING = 0;
 	private final int FINISH_ACTIVITY = 1;
 	private final int SHOW_PROGRESS_DLG = 2;
@@ -175,6 +175,7 @@ public class MenuActivity extends BaseActivity {
 	private void setListData() {
 		if (mCategories.count() <= 0) {
 			errorAccurDlg("菜谱数据损坏,请更新菜谱!", FINISH_ACTIVITY);
+			Log.e(TAG, "menu data base is broken");
 			return;
 		}
 		setCategories();

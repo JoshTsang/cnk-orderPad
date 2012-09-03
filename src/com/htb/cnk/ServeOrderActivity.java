@@ -103,11 +103,9 @@ public class ServeOrderActivity extends OrderBaseActivity {
 		@Override
 		public void onItemClick(AdapterView<?> arg0, View arg1, final int position,
 				long arg3) {
-			Log.d("position", "p:"+position);
 			showProgressDlg("更新服务器状态...");
 			new Thread() {
 				public void run() {
-					Log.d("position", "p:"+position);
 					int ret = mMyOrder.setDishStatus(postionToIndex.getIndex(position), 2);
 					markServedHandle.sendEmptyMessage(ret);
 				}

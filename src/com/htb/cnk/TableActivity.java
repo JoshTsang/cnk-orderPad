@@ -14,7 +14,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -135,8 +134,8 @@ public class TableActivity extends BaseActivity {
 
 	private void findViews() {
 		mBackBtn = (Button) findViewById(R.id.back);
-		mUpdateBtn = (Button) findViewById(R.id.updateMenu);
-		mStatisticsBtn = (Button) findViewById(R.id.statistics);
+		mUpdateBtn = (Button) findViewById(R.id.combineTable);
+		mStatisticsBtn = (Button) findViewById(R.id.logout);
 		mManageBtn = (Button) findViewById(R.id.management);
 		gridview = (GridView) findViewById(R.id.gridview);
 	}
@@ -145,7 +144,7 @@ public class TableActivity extends BaseActivity {
 		mTableClicked = new ItemClickListener();
 		mBackBtn.setOnClickListener(backClicked);
 		mUpdateBtn.setOnClickListener(updateClicked);
-		mStatisticsBtn.setOnClickListener(statisticsClicked);
+		mStatisticsBtn.setOnClickListener(logoutClicked);
 		mManageBtn.setOnClickListener(manageClicked);
 	}
 
@@ -646,11 +645,7 @@ public class TableActivity extends BaseActivity {
 
 		@Override
 		public void onClick(View v) {
-			Intent intent = new Intent();
-			intent.setClass(TableActivity.this, UpdateMenuActivity.class);
-			TableActivity.this.startActivity(intent);
-			TableActivity.this.finish();
-
+			
 		}
 	};
 
@@ -664,12 +659,12 @@ public class TableActivity extends BaseActivity {
 		}
 	};
 
-	private OnClickListener statisticsClicked = new OnClickListener() {
+	private OnClickListener logoutClicked = new OnClickListener() {
 		@Override
 		public void onClick(View v) {
-			LoginDlg loginDlg = new LoginDlg(TableActivity.this,
-					StatisticsActivity.class);
-			loginDlg.show();
+			Info.setMode(Info.WORK_MODE_CUSTOMER);
+			Info.setTableId(-1);
+			finish();
 		}
 
 	};

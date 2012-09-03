@@ -14,6 +14,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -37,6 +38,7 @@ import com.htb.constant.Server;
  * 
  */
 public class StatisticsActivity extends BaseActivity {
+	private final String TAG = "StatisticsActivity";
 	public final static int QUERY_BY_TIME = 0;
 	public final static int QUERY_TODAY = 1;
 	private Button mBackBtn;
@@ -107,7 +109,6 @@ public class StatisticsActivity extends BaseActivity {
 	private void downloadDB() {
 		mpDialog = new ProgressDialog(StatisticsActivity.this);
 		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-		//mpDialog.setTitle("请稍等..");
 		mpDialog.setMessage("正在加载销售数据...");
 		mpDialog.setIndeterminate(false);
 		mpDialog.setCancelable(false);
@@ -122,12 +123,14 @@ public class StatisticsActivity extends BaseActivity {
 				int ret = mStatistics.downloadDB(Server.SERVER_DB_SALES);
 				if (ret < 0) {
 					handler.sendEmptyMessage(ret);
+					Log.e(TAG, "Download sales db failed:" + ret);
 					return;
 				}
 
 				String respond = Http.get(Server.LATEST_STATISTICS, "do=get");
 				if (respond == null) {
 					handler.sendEmptyMessage(ErrorNum.GET_LATEST_STATISTICS_FAILED);
+					Log.e(TAG, "get latest statistics time failed");
 					return;
 				}
 				int start = respond.indexOf("[") + 1;
