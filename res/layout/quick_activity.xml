@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/quick_menu"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal" >
+
+    <!-- 分类 -->
+
+    <RelativeLayout
+        android:layout_width="200dip"
+        android:layout_height="match_parent"
+        android:background="@drawable/left"
+        android:orientation="vertical" >
+
+        <!-- banner -->
+
+        <RelativeLayout
+            android:id="@+id/titleBar"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <Button
+                android:id="@+id/back_btn"
+                android:layout_width="100dip"
+                android:layout_height="45dip"
+                android:background="#00000000"
+                android:gravity="center"
+                android:text="@string/back"
+                android:textColor="#F9E8BB"
+                android:textSize="35dip" />
+
+            <Button
+                android:id="@+id/settings_btn"
+                android:layout_width="100dip"
+                android:layout_height="45dip"
+                android:layout_alignParentRight="true"
+                android:background="#00000000"
+                android:gravity="center"
+                android:text="@string/settings"
+                android:textColor="#F9E8BB"
+                android:textSize="35dip" />
+        </RelativeLayout>
+
+        <!-- footer -->
+
+        <LinearLayout
+            android:id="@+id/myOrderBar"
+            android:layout_width="fill_parent"
+            android:layout_height="56dip"
+            android:layout_alignParentBottom="true"
+            android:background="@drawable/left_bottom"
+            android:orientation="horizontal" >
+
+            <Button
+                android:id="@+id/myOrder"
+                android:layout_width="140dip"
+                android:layout_height="fill_parent"
+                android:background="#00000000"
+                android:gravity="center"
+                android:text="@string/myOrder"
+                android:textColor="#F9E8BB"
+                android:textSize="32dip" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="56dip"
+                android:background="@drawable/left_divider" />
+
+            <TextView
+                android:id="@+id/orderedCount"
+                android:layout_width="50dip"
+                android:layout_height="fill_parent"
+                android:gravity="center"
+                android:textColor="#FFFFFF"
+                android:textSize="25dip" />
+        </LinearLayout>
+
+       <EditText
+            android:id="@+id/edit_quick"
+            android:layout_width="fill_parent"
+            android:layout_height="44dip"
+            android:layout_below="@id/titleBar"
+            android:layout_marginTop="5dip"
+            android:gravity="center"
+            android:imeOptions="flagNoExtractUi"
+            android:inputType="textUri|textMultiLine"
+            android:textColor="#652A25"
+            android:textSize="27dip" >
+        </EditText>
+    </RelativeLayout>
+
+    <!-- 菜谱 -->
+
+   <!-- 菜谱  -->
+    <LinearLayout 
+	    android:layout_width="fill_parent"
+	    android:layout_height="match_parent"
+	    android:orientation="vertical"
+	    android:background="@drawable/right" >
+	    <TextView android:id="@+id/category"
+	    	android:layout_width="fill_parent"
+	    	android:layout_height="44dip"
+	    	android:gravity="center"
+	    	android:textSize="27dip"
+	    	android:textColor="#652A25"/>
+	    <ListView android:id="@+id/dishes"
+	        android:layout_width="fill_parent"
+	    	android:layout_height="match_parent"
+	    	android:layout_marginLeft="12dip"
+	    	android:divider="#DECFBB"
+	    	android:dividerHeight="1dip">
+	    </ListView>
+    </LinearLayout>
+
+</LinearLayout>

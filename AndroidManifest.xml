@@ -117,6 +117,12 @@
             android:screenOrientation="landscape"
             android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
+         <activity
+            android:name=".QuickMenuActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="landscape"
+            android:theme="@android:style/Theme.NoTitleBar" >
+        </activity>
 
         <service
             android:name=".NotificationTableService"

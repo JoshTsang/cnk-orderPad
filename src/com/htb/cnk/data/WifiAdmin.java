@@ -240,8 +240,4 @@ public class WifiAdmin {
 	// Log.e("WifiPreference", "enableNetwork returned " + b);
 	// }
 
-	private WifiManager getSystemService(String wifiService) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 }
