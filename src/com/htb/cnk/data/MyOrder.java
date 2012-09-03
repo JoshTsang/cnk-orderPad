@@ -517,6 +517,7 @@ public class MyOrder {
 		}
 		return 0;
 	}
+	
 	//TODO
 	private int minusPhoneOrderOnServer(int tableId, int quantity, int dishId) {
 		if (quantity != 0) {
@@ -539,16 +540,12 @@ public class MyOrder {
 			showDelProcessDlg = mDelDlgActivity.getClass().getMethod("showDeletePhoneOrderProcessDlg", new Class[0]);
 			showDelProcessDlg.invoke(mDelDlgActivity, new Object[0]);
 		} catch (NoSuchMethodException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

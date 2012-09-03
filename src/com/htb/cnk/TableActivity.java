@@ -665,12 +665,8 @@ public class TableActivity extends BaseActivity {
 		@Override
 		public void onClick(View v) {
 			Intent intent = new Intent();
-			intent.setAction("android.intent.action.VIEW");
-			Uri content_url = Uri.parse(getResources().getString(
-					R.string.manageUri));
-			intent.setData(content_url);
-			// intent.setClassName("com.android.browser","com.android.browser.BrowserActivity");
-			startActivity(intent);
+			intent.setClass(TableActivity.this, ManageActivity.class);
+			TableActivity.this.startActivity(intent);
 		}
 	};
 

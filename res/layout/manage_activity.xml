@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" 
+     android:orientation="vertical"
+     android:layout_width="fill_parent" 
+     android:layout_height="fill_parent" 
+     android:layout_weight="1.0" 
+   	 android:background="#F8E9C1"
+     > 
+	<LinearLayout android:id="@+id/menubarTop"
+	    android:layout_width="match_parent"
+	    android:layout_height="50dip"
+	    android:background="@drawable/statistics_titlebar"
+	    android:orientation="horizontal" >
+		    <Button android:id="@+id/back"
+		        android:layout_width="200dip"
+		    	android:layout_height="40dip"
+		    	android:textColor="#F9E8BB"
+		    	android:textSize="35dip"
+		    	android:text="@string/back"
+		    	android:background="#00000000"/>
+		    <Button android:id="@+id/backup"
+		        android:layout_width="200dip"
+		    	android:layout_height="40dip"
+		    	android:textColor="#F9E8BB"
+		    	android:textSize="35dip"
+		    	android:text="@string/backup"
+		    	android:background="#00000000"/>
+		    <Button android:id="@+id/restore"
+		        android:layout_width="200dip"
+		    	android:layout_height="40dip"
+		    	android:textColor="#F9E8BB"
+		    	android:textSize="35dip"
+		    	android:text="@string/restore"
+		    	android:background="#00000000"/>
+		    <Button android:id="@+id/management"
+		        android:layout_width="200dip"
+		    	android:layout_height="40dip"
+		    	android:textColor="#F9E8BB"
+		    	android:textSize="35dip"
+		    	android:text="@string/menuMangement"
+		    	android:background="#00000000"/>
+    </LinearLayout>
+	<LinearLayout 
+	    android:layout_width="match_parent"
+	    android:layout_height="fill_parent"
+	    android:layout_below="@id/menubarTop"
+		android:layout_marginTop="60dp"
+		android:layout_marginLeft="30dp"
+	    android:orientation="vertical">
+		    <LinearLayout 
+			    android:layout_width="match_parent"
+			    android:layout_height="wrap_content"
+			    android:orientation="horizontal">
+			    <TextView 
+			    	android:layout_width="wrap_content"
+		    		android:layout_height="wrap_content"
+		    		android:text="@string/menuBackupTime"
+		    		android:textSize="40dp"
+		    		android:textColor="#4D2412" />
+		    	<TextView android:id="@+id/menuBackupTime" 
+			    	android:layout_width="wrap_content"
+		    		android:layout_height="wrap_content"
+		    		android:textSize="40dp"
+		    		android:textColor="#4D2412"/>
+			</LinearLayout>
+			<LinearLayout 
+			    android:layout_width="match_parent"
+			    android:layout_height="wrap_content"
+			    android:orientation="horizontal">
+			    <TextView 
+			    	android:layout_width="wrap_content"
+		    		android:layout_height="wrap_content"
+		    		android:text="@string/menuPicBackupTime"
+		    		android:textSize="40dp"
+		    		android:textColor="#4D2412" />
+		    	<TextView android:id="@+id/menuPicBackupTime" 
+			    	android:layout_width="wrap_content"
+		    		android:layout_height="wrap_content"
+		    		android:textSize="40dp"
+		    		android:textColor="#4D2412"/>
+			</LinearLayout>
+			<LinearLayout 
+			    android:layout_width="match_parent"
+			    android:layout_height="wrap_content"
+			    android:orientation="horizontal">
+			    <TextView 
+			    	android:layout_width="wrap_content"
+		    		android:layout_height="wrap_content"
+		    		android:text="@string/salesBackupTime"
+		    		android:textSize="40dp"
+		    		android:textColor="#4D2412" />
+		    	<TextView android:id="@+id/salesBackupTime" 
+			    	android:layout_width="wrap_content"
+		    		android:layout_height="wrap_content"
+		    		android:textSize="40dp"
+		    		android:textColor="#4D2412"/>
+			</LinearLayout>
+	</LinearLayout>
+
+	<LinearLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="50dip"
+	    android:layout_alignParentBottom="true"
+	    android:background="@drawable/statistics_titlebar"
+	    android:orientation="horizontal" >
+		    <Button android:id="@+id/updateMenu"
+		        android:layout_width="200dip"
+		    	android:layout_height="40dip"
+		    	android:textColor="#F9E8BB"
+		    	android:textSize="35dip"
+		    	android:text="@string/updateMenu"
+		    	android:background="#00000000"/>
+		    <Button android:id="@+id/statistics"
+		        android:layout_width="200dip"
+		    	android:layout_height="40dip"
+		    	android:textColor="#F9E8BB"
+		    	android:textSize="35dip"
+		    	android:text="@string/statistics"
+		    	android:background="#00000000"/>
+		    <Button android:id="@+id/btn7"
+		        android:layout_width="200dip"
+		    	android:layout_height="40dip"
+		    	android:textColor="#F9E8BB"
+		    	android:textSize="35dip"
+		    	android:background="#00000000"/>
+		    <Button android:id="@+id/btn8"
+		        android:layout_width="200dip"
+		    	android:layout_height="40dip"
+		    	android:textColor="#F9E8BB"
+		    	android:textSize="35dip"
+		    	android:background="#00000000"/>
+	   </LinearLayout>
+</RelativeLayout>

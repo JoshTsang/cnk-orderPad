@@ -12,6 +12,8 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
@@ -200,6 +202,9 @@ public class UpdateMenuActivity extends BaseActivity {
 	
 	private int downloadHugePic() {
 		int ret;
+		Date date = new Date();
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String time = df.format(date);
 		int count = 0;
 		try {
 			mCnkDbHelper = new CnkDbHelper(UpdateMenuActivity.this,
@@ -213,7 +218,7 @@ public class UpdateMenuActivity extends BaseActivity {
 			while (dishes.moveToNext()) {
 				String picName = dishes.getString(0);
 				if (picName != null && !"".equals(picName) && !"null".equals(picName)) {
-					ret = downloadPic(Server.IMG_PATH+ picName, "hdpi_" + picName);
+					ret = downloadPic(Server.IMG_PATH+ picName, picName);
 					if (ret < 0) {
 						count++;
 						if (count >= 10) {
@@ -230,6 +235,13 @@ public class UpdateMenuActivity extends BaseActivity {
             e.printStackTrace();
 			return ErrorNum.DB_BROKEN;
 		}
+		SharedPreferences sharedPre = UpdateMenuActivity.this.getSharedPreferences(
+				"userInfo",
+				Context.MODE_PRIVATE);
+		Editor editor = sharedPre.edit();
+		editor.putString("menuPicBackupTime", time);
+		editor.commit();
+		
 		if(count > 0) {
 			return ErrorNum.DOWNLOAD_PIC_FAILED;
 		}

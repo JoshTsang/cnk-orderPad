@@ -1,7 +1,6 @@
 package com.htb.cnk;
 
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
@@ -21,8 +20,6 @@ import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.lib.OrderBaseActivity;
 
 public class DelOrderActivity extends OrderBaseActivity {
-
-
 	private final int CLEANALL = -1;
 	private static int ARERTDIALOG = 0;
 	private MyOrderAdapter mMyOrderAdapter;

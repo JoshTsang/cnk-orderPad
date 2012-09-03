@@ -50,6 +50,8 @@ public class MenuActivity extends BaseActivity {
 
 	private final int DO_NOTHING = 0;
 	private final int FINISH_ACTIVITY = 1;
+	private final int SHOW_PROGRESS_DLG = 2;
+	
 	private ListView mCategoriesLst;
 	private ListView mDishesLst;
 	private Button mBackBtn;
@@ -150,7 +152,7 @@ public class MenuActivity extends BaseActivity {
 	private FileInputStream getPic(String name) {
 		FileInputStream isBigPic = null;
 		try {
-			isBigPic = openFileInput("hdpi_" + name);
+			isBigPic = openFileInput(name);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -160,12 +162,10 @@ public class MenuActivity extends BaseActivity {
 	private FileInputStream getThumbnail(String name) {
 		FileInputStream inStream = null;
 		try {
-			// TODO usehdpi cause no ldpi pic available
 			if (name == null || "".equals(name) || "null".equals(name)) {
 				return null;
 			}
-			Log.d("fileName", "hdpi_" + name);
-			inStream = openFileInput("hdpi_" + name);
+			inStream = openFileInput(name);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			return null;
@@ -266,8 +266,9 @@ public class MenuActivity extends BaseActivity {
 	}
 
 	// TODO Define
+
 	public void showDeletePhoneOrderProcessDlg() {
-		minushandler.sendEmptyMessage(2);
+		minushandler.sendEmptyMessage(SHOW_PROGRESS_DLG);
 	}
 
 	private void showGuide() {
