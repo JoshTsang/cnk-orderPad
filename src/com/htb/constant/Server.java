@@ -21,7 +21,7 @@ public class Server {
 	public final static String UPDATE_TABLE_STATUS = PHP_DIR + "updateTableStatus.php";
 	public final static String CLEAN_TABLE= PHP_DIR + "cleanTable.php";
 	public final static String GET_PWD = PHP_DIR + "getPwd.php";
-	public final static String STATISTICS_PRINT = PHP_DIR + "statistics.php";
+	public final static String STATISTICS_PRINT = PHP_DIR + "printSalesData.php";
 	public final static String MENU_VERSION = PHP_DIR + "version.php";
 	public final static String GET_PERMINSSION = PHP_DIR + "getPerminssion.php";
 	public final static String GET_GETPHONEORDER = PHP_DIR +"getPhoneOrder.php";

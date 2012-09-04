@@ -41,6 +41,7 @@ import com.htb.constant.Server;
  * 
  */
 public class Http {
+	final static String TAG = "Http";
 	private static int mErrno;
 	
 	public static String get(String page, String param) {
@@ -189,9 +190,9 @@ public class Http {
 				return null;
 			}
 		} else {
-		    	mErrno = -statusCode;
-		    	Log.d("HTTP ERR", Integer.toString(mErrno));
-				return null;
+	    	mErrno = -statusCode;
+	    	Log.e(TAG, Integer.toString(mErrno) + ",url:" + url);
+			return null;
 		}
 	}
 		

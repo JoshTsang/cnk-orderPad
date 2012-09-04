@@ -35,6 +35,7 @@ import com.htb.constant.Server;
  *
  */
 public class Statistics {
+	final String TAG = "statistics";
 	class SalesRow {
 		int did;
 		String dName;
@@ -160,12 +161,15 @@ public class Statistics {
 	
 	public int print(Calendar start, Calendar end) {
 		JSONObject salesData = new JSONObject();
+		int ret;
 		
 		if (mSalesData.size() <= 0) {
 			return -1;
 		}
 		
-		if (Http.getPrinterStatus(Server.PRINTER_CONTENT_TYPE_STATISTICS) < 0) {
+		ret = Http.getPrinterStatus(Server.PRINTER_CONTENT_TYPE_STATISTICS);
+		if (ret < 0) {
+			Log.e(TAG, "get PrinterStatus failed:" + ret);
 			return -1;
 		}
 		try {
