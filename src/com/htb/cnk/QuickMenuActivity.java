@@ -207,12 +207,7 @@ public class QuickMenuActivity extends BaseActivity {
 			}
 		};
 		mDishesLst.setAdapter(mDishLstAdapter);
-		View emptyView = getLayoutInflater().inflate(R.layout.empty_list, null);
-
-		((ViewGroup) mDishesLst.getParent()).addView(emptyView,
-				new LayoutParams(LayoutParams.WRAP_CONTENT,
-						LayoutParams.WRAP_CONTENT));
-		mDishesLst.setEmptyView(emptyView);
+		
 		mDishLstAdapter.notifyDataSetChanged();
 	}
 
