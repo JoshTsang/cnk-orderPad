@@ -90,7 +90,6 @@ public class QuickMenuActivity extends BaseActivity {
 
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
-		// TODO Auto-generated method stub
 		if (event.getAction() == MotionEvent.ACTION_DOWN) {
 			if (QuickMenuActivity.this.getCurrentFocus() != null) {
 				if (QuickMenuActivity.this.getCurrentFocus().getWindowToken() != null) {
@@ -451,19 +450,6 @@ public class QuickMenuActivity extends BaseActivity {
 
 	private TextWatcher watcher = new TextWatcher() {
 		private String temp;
-
-		@Override
-		public void afterTextChanged(Editable s) {
-			Log.d("afterTextChanged", "afterTextChanged");
-		
-		}
-
-		@Override
-		public void beforeTextChanged(CharSequence s, int start, int count,
-				int after) {
-			// TODO Auto-generated method stub
-		}
-
 		@Override
 		public void onTextChanged(CharSequence s, int start, int before,
 				int count) {
@@ -475,6 +461,15 @@ public class QuickMenuActivity extends BaseActivity {
 				BUTTON_TEXT_CHANGED = 0;
 			}
 			mDishLstAdapter.notifyDataSetChanged();
+		}
+		@Override
+		public void afterTextChanged(Editable arg0) {
+			
+		}
+		@Override
+		public void beforeTextChanged(CharSequence s, int start, int count,
+				int after) {
+			
 		}
 
 	};

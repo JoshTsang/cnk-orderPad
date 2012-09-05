@@ -40,7 +40,7 @@ public class UserData {
 		if(userPwd == null){
 			return PWD_NETWORK_ERR;
 		}
-		
+		Log.d("pwd", "userPwd:"+userPwd);
 		String userPerminssion = Http.get(Server.GET_PERMINSSION, "UNAME="+ UserData.mName);
 		if (userPerminssion == null){
 			return PWD_NETWORK_ERR;

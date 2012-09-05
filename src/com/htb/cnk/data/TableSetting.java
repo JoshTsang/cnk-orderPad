@@ -10,14 +10,19 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.Context;
 import android.util.Log;
 
+import com.htb.cnk.lib.ErrorPHP;
 import com.htb.cnk.lib.Http;
 import com.htb.constant.Server;
 
 public class TableSetting implements Serializable {
 
 	private static final long serialVersionUID = 1L;
+	private ErrorPHP mError = new ErrorPHP();
+	private MyOrder mOrder;
+	private final String TAG = "tableAtivity";
 
 	public class TableSettingItem {
 		protected int mStatus;
@@ -41,8 +46,8 @@ public class TableSetting implements Serializable {
 		public int getId() {
 			return mId;
 		}
-		
-		public String getName(){
+
+		public String getName() {
 			return mName;
 		}
 	}
@@ -64,33 +69,34 @@ public class TableSetting implements Serializable {
 	public int getStatus(int index) {
 		return mTableSettings.get(index).getStatus();
 	}
-	
-	public int getStatusTableId(int index){
+
+	public int getStatusTableId(int index) {
 		int i;
-		for(i = 0;i< mTableSettings.size()-1;i++){
-			if(index == mTableSettings.get(i).getId()){
+		for (i = 0; i < mTableSettings.size() - 1; i++) {
+			if (index == mTableSettings.get(i).getId()) {
 				break;
 			}
 		}
 		return mTableSettings.get(i).getStatus();
 	}
-	
+
 	public int getId(int index) {
 		return mTableSettings.get(index).getId();
 	}
 
-	public String getName(int index){
+	public String getName(int index) {
 		return mTableSettings.get(index).getName();
 	}
-	
+
 	public void setStatus(int index, int n) {
 		mTableSettings.get(index).setStatus(n);
 	}
 
 	public int getTableStatusFromServer() {
 		String tableStatusPkg = Http.get(Server.GET_TABLE_STATUS, "");
-	//	Log.d("tableStatusPkg", tableStatusPkg);
-		if(tableStatusPkg == null || "null".equals(tableStatusPkg) || "".equals(tableStatusPkg)){
+		if (tableStatusPkg == null || "null".equals(tableStatusPkg)
+				|| "".equals(tableStatusPkg)) {
+			Log.e("getTableStatusFromServer", tableStatusPkg);
 			return -1;
 		}
 		try {
@@ -113,25 +119,45 @@ public class TableSetting implements Serializable {
 		}
 		return -1;
 	}
-	
+
 	public int getItemTableStatus(int tableId) {
-		String tableStatusPkg = Http.get(Server.GET_ITEM_TABLE_STATUS, "TSI=" + tableId);
-		if(tableStatusPkg == null){
+		String tableStatusPkg = Http.get(Server.GET_ITEM_TABLE_STATUS, "TSI="
+				+ tableId);
+		if (tableStatusPkg == null) {
 			return -1;
 		}
-		return Integer.parseInt(tableStatusPkg);
+
+		int start = tableStatusPkg.indexOf("[");
+		int end = tableStatusPkg.indexOf("]");
+
+		if ((start < 0) || (end < 0)) {
+			Log.e("getItemTableStatus", tableStatusPkg);
+			return -1;
+		}
+		
+		String tableStatus = tableStatusPkg.subSequence(start + 1, end)
+				.toString();
+		if (tableStatus.length() <= 0) {
+			Log.e("getItemTableStatus_tableStatus", tableStatus);
+			return -1;
+		}
+		return Integer.parseInt(tableStatus);
 	}
-	
+
 	public int updateStatus(int tableId, int status) {
 		String tableStatusPkg = Http.get(Server.UPDATE_TABLE_STATUS, "TID="
 				+ tableId + "&TST=" + status);
-		if ("\n".equals(tableStatusPkg)) {
+		if (mError.getErrorStr(tableStatusPkg,"updateStatus") < 0) {
+			return -1;
+		}
+		if (mError.getSucc().equals("true")) {
 			return 0;
 		}
+		Log.e("TableSetting_updateStatus", mError.getErroe());
 		return -1;
 	}
-	
-	public int cleanTalble(int tableId){
+
+	public int cleanTalble(int tableId) {
 		JSONObject order = new JSONObject();
 		Date date = new Date();
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -142,11 +168,66 @@ public class TableSetting implements Serializable {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		Log.d("JSON", order.toString());
-		String tableCleanPkg = Http.post(Server.CLEAN_TABLE,order.toString() );
-		if("".equals(tableCleanPkg)){
+
+		String tableCleanPkg = Http.post(Server.CLEAN_TABLE, order.toString());
+		if (mError.getErrorStr(tableCleanPkg,"cleanTalble") < 0) {
+			return -1;
+		}
+		if (mError.getSucc().equals("true")) {
 			return 0;
 		}
+		Log.e("TableSetting_cleanTable", mError.getErroe());
+		return -1;
+	}
+
+	public int changeTable(int srcTId, int destTId, Context context) {
+		if (mOrder == null) {
+			mOrder = new MyOrder(context);
+		}
+		int ret = mOrder.getOrderFromServer(srcTId);
+//		if (ret < 0) {
+//			Log.e("TableSetting_changeTable_JR", ":11");
+//			return -1;
+//		}
+
+		JSONObject order = new JSONObject();
+		Date date = new Date();
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String time = df.format(date);
+		if (mOrder.count() <= 0) {
+			return -1;
+		}
+		try {
+			order.put("tableId", Info.getTableId());
+			order.put("timestamp", time);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+
+		JSONArray dishes = new JSONArray();
+		try {
+
+			for (int i = 0; i < mOrder.count(); i++) {
+				JSONObject dish = new JSONObject();
+				dish.put("dishId", mOrder.getDishId(i));
+				dish.put("name", mOrder.getName(i));
+				dish.put("price", mOrder.getPrice(i));
+				dish.put("quan", mOrder.getQuantity(i));
+				dishes.put(dish);
+			}
+			order.put("order", dishes);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		String tableChangePkg = Http.post(Server.CHANGE_TABLE + "?srcTID="
+				+ srcTId + "&destTID=" + destTId, order.toString());
+		if (mError.getErrorStr(tableChangePkg,"changeTable") < 0) {
+			return -1;
+		}
+		if ("true".equals(mError.getSucc())) {
+			return 0;
+		}
+		Log.e("TableSetting_changeTable", mError.getErroe());
 		return -1;
 	}
 

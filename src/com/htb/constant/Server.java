@@ -33,6 +33,8 @@ public class Server {
 	public final static String CLEANNOTIFICATION = PHP_DIR + "cleanNotification.php";
 	public final static String UPDATE_PHONE_ORDER = PHP_DIR + "updatePhoneOrder.php";
 	public final static String GET_ITEM_TABLE_STATUS = PHP_DIR + "getItemTableStatus.php";
+	public final static String CHANGE_TABLE = PHP_DIR + "changeTable.php";
+	public final static String UPDATE_TABLE_ORDER = PHP_DIR + "updateTableOrder";
 	/* Database */
 	public final static String DB_DIR = "db/";
 	public final static String DB_MENU = DB_DIR + "menu.db";

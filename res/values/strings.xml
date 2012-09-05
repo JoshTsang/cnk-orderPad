@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <string name="app_name">菜脑壳点菜系统</string>
     <string name="menu">菜 谱</string>
     <string name="ordered">查 单</string>
@@ -40,21 +41,24 @@
     <string name="backup">备份</string>
     <string name="restore">恢复</string>
     <string name="queryId">选择桌号</string>
-	<string name="userWarning">用户名密码不正确</string>
-	<string name="tableNotSet">还未设定桌号</string>
-	<string name="tableWarning">请查看数据库桌号设定好没有</string>
-	<string name="queryOrder">已点的菜</string>
-	<string name="manageUri">http://www.cainaoke.com/manage/index.php</string>
-	<string name="phoneOrder">手机点的菜</string>
-	<string name="claenNotificaion">亲：还不快点，客人都着急啦！</string>
-	<string name="phoneAdd">加菜</string>
-	<string name="refresh">刷新</string>
-	<string name="logout">注销</string>
-	<string name="combineTable">并台</string>
-	<string name="delPhoneWarning">亲：你手机没有点菜哦</string>
-	<string name="phoneWarning">网络连接不上</string>
-	<string name= "cleanAllWarning">亲：已经删除完了，不要再删了！</string>
-	<string name="menuBackupTime">菜谱数据备份时间：</string>
-	<string name="menuPicBackupTime">菜谱图片备份时间：</string>
-	<string name="salesBackupTime">销售数据备份时间：</string>
+    <string name="userWarning">用户名密码不正确</string>
+    <string name="tableNotSet">还未设定桌号</string>
+    <string name="tableWarning">请查看数据库桌号设定好没有</string>
+    <string name="queryOrder">已点的菜</string>
+    <string name="manageUri">http://www.cainaoke.com/manage/index.php</string>
+    <string name="phoneOrder">手机点的菜</string>
+    <string name="claenNotificaion">亲：还不快点，客人都着急啦！</string>
+    <string name="phoneAdd">加菜</string>
+    <string name="refresh">刷新</string>
+    <string name="logout">注销</string>
+    <string name="combineTable">并台</string>
+    <string name="delPhoneWarning">亲：你手机没有点菜哦</string>
+    <string name="phoneWarning">网络连接不上</string>
+    <string name="cleanAllWarning">亲：已经删除完了，不要再删了！</string>
+    <string name="menuBackupTime">菜谱数据备份时间：</string>
+    <string name="menuPicBackupTime">菜谱图片备份时间：</string>
+    <string name="salesBackupTime">销售数据备份时间：</string>
+    <string name="changeTIdWarning">转台不成功，请检查是否已经开台</string>
+    <string name="changeTId">转台成功</string>
+
 </resources>

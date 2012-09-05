@@ -128,7 +128,6 @@ public class Dishes {
 		if (dishStatusPkg == null) {
 			return ErrorNum.GET_SOLDOUT_ITEM_FAILED;
 		}
-		Log.d("DISHES", dishStatusPkg);
 		int start = dishStatusPkg.indexOf("[");
 		int end = dishStatusPkg.indexOf("]");
 		if ((start < 0) || (end < 0)) {
