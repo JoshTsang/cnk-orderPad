@@ -8,7 +8,6 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.htb.cnk.MyOrderActivity;
 import com.htb.cnk.R;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder;

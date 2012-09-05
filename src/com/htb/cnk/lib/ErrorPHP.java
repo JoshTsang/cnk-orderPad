@@ -8,33 +8,33 @@ import android.util.Log;
 
 public class ErrorPHP implements Serializable{
 	private static final long serialVersionUID = 2L;
-	private String mSucc;
-	private String mError;
+	private static String mSucc;
+	private static String mError;
 	
-	public boolean isSucc(String errorStr,String errorName) {
+	public static boolean isSucc(String responsePkg,String errorTAG) {
 		
 		try {
-			JSONObject errorString = new JSONObject(errorStr);
+			JSONObject errorString = new JSONObject(responsePkg);
 			String succ = errorString.getString("succ");
 			if(succ.equals("true")){
-				this.mSucc = succ;
+				mSucc = succ;
 				return true;
 			}else {
-				this.mSucc = "flase";
-				this.mError = errorStr;
+				mSucc = "flase";
+				mError = responsePkg;
 			}
 		} catch (Exception e) {
 			
 		}
-		Log.e(errorName, errorStr);
+		Log.e(errorTAG, responsePkg);
 		return false;
 	}
 
-	public String getSucc(){
-		return this.mSucc;
+	public static String getSucc(){
+		return mSucc;
 	}
 	
-	public String getErroe(){
-		return this.mError;
+	public static String getErroe(){
+		return mError;
 	}
 }

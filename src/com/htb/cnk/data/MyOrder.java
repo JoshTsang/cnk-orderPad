@@ -29,8 +29,6 @@ public class MyOrder {
 	private final static int MODE_PAD = 0;
 	private final static int MODE_PHONE = 1;
 
-	private ErrorPHP mError = new ErrorPHP();
-
 	public class OrderedDish {
 		Dish dish;
 		int padQuantity;
@@ -316,7 +314,7 @@ public class MyOrder {
 		}
 		Log.d("order", order.toString());
 		String response = Http.post(Server.SUBMIT_ORDER, order.toString());
-		if (!mError.isSucc(response, "submit")) {
+		if (!ErrorPHP.isSucc(response, "submit")) {
 			return -1;
 		} else {
 			return 0;
@@ -397,14 +395,14 @@ public class MyOrder {
 	public int cleanServerPhoneOrder(int tableId) {
 		String phoneOrderPkg = Http.get(Server.DELETE_PHONEORDER, "TID="
 				+ tableId);
-		if (!mError.isSucc(phoneOrderPkg, "cleanServerPhoneOrder")) {
+		if (!ErrorPHP.isSucc(phoneOrderPkg, "cleanServerPhoneOrder")) {
 			Log.e("updateStatus", "JSONSTR_ERROR");
 			return -1;
 		}
-		if (mError.getSucc() == "true") {
+		if (ErrorPHP.getSucc() == "true") {
 			return 0;
 		}
-		Log.e("cleanServerPhoneOrder", mError.getErroe());
+		Log.e("cleanServerPhoneOrder", ErrorPHP.getErroe());
 		return -1;
 	}
 
@@ -520,14 +518,14 @@ public class MyOrder {
 		showServerDelProgress();
 		String phoneOrderedPkg = Http.get(Server.DELETE_PHONEORDER, "TID="
 				+ tableId + "&DID=" + dishId);
-		if (!mError.isSucc(phoneOrderedPkg, "delPhoneOrderedDish")) {
+		if (!ErrorPHP.isSucc(phoneOrderedPkg, "delPhoneOrderedDish")) {
 			return -1;
 		}
-		if (mError.getSucc().equals("true")) {
+		if (ErrorPHP.getSucc().equals("true")) {
 			remove(dishId);
 			return 0;
 		}
-		Log.e("delPhoneOrderedDish", mError.getErroe());
+		Log.e("delPhoneOrderedDish", ErrorPHP.getErroe());
 		return -1;
 	}
 
@@ -536,8 +534,11 @@ public class MyOrder {
 				+ "&DID=" + dishId);
 		if (dishStatusPkg == null) {
 			return -1;
+		} else if (ErrorPHP.isSucc(dishStatusPkg, TAG)) {
+			return 0;
+		} else {
+			return -1;
 		}
-		return 0;
 	}
 
 	// TODO
@@ -547,13 +548,13 @@ public class MyOrder {
 			String phoneOrderPkg = Http.get(Server.UPDATE_PHONE_ORDER, "DID="
 					+ dishId + "&DNUM=" + quantity + "&TID=" + tableId);
 
-			if (!mError.isSucc(phoneOrderPkg, "minusPhoneOrderOnServer")) {
+			if (!ErrorPHP.isSucc(phoneOrderPkg, "minusPhoneOrderOnServer")) {
 				return -1;
 			}
-			if (mError.getSucc().equals("true")) {
+			if (ErrorPHP.getSucc().equals("true")) {
 				return 0;
 			}
-			Log.e("minusPhoneOrderOnServer", mError.getErroe());
+			Log.e("minusPhoneOrderOnServer", ErrorPHP.getErroe());
 			return -1;
 		} else {
 			return delPhoneOrderedDish(tableId, dishId);

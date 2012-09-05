@@ -3,8 +3,6 @@ package com.htb.cnk;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
-import org.apache.commons.net.ftp.parser.MLSxEntryParser;
-
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -27,7 +25,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
