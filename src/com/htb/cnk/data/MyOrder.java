@@ -452,7 +452,7 @@ public class MyOrder {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-
+		Log.d("response", order.toString());
 		String response = Http.post(
 				Server.UPDATE_TABLE_ORDER + "?TID=" + Info.getTableId() + "&DID="
 						+ mOrder.get(position).dish.getId(), order.toString());
