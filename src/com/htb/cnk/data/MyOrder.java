@@ -21,6 +21,7 @@ import com.htb.cnk.lib.Http;
 import com.htb.constant.Server;
 
 public class MyOrder {
+	final String TAG = "MyOrder";
 	public final static int ERR_GET_PHONE_ORDER_FAILED = -10;
 	public final static int RET_NULL_PHONE_ORDER = 1;
 	public final static int RET_MINUS_SUCC = -2;
@@ -315,16 +316,14 @@ public class MyOrder {
 		}
 		Log.d("order", order.toString());
 		String response = Http.post(Server.SUBMIT_ORDER, order.toString());
-		if (mError.getErrorStr(response, "submit") < 0) {
+		if (!mError.isSucc(response, "submit")) {
 			return -1;
-		}
-		if (mError.getSucc().equals("true")) {
+		} else {
 			return 0;
 		}
-		Log.e("submit", mError.getErroe());
-		return -1;
 	}
 
+	//TODO log failure
 	public int getOrderFromServer(int tableId) {
 		String response = Http.get(Server.GET_MYORDER, "TID=" + tableId);
 		if ("null".equals(response)) {
@@ -398,7 +397,7 @@ public class MyOrder {
 	public int cleanServerPhoneOrder(int tableId) {
 		String phoneOrderPkg = Http.get(Server.DELETE_PHONEORDER, "TID="
 				+ tableId);
-		if (mError.getErrorStr(phoneOrderPkg, "cleanServerPhoneOrder") < 0) {
+		if (!mError.isSucc(phoneOrderPkg, "cleanServerPhoneOrder")) {
 			Log.e("updateStatus", "JSONSTR_ERROR");
 			return -1;
 		}
@@ -521,7 +520,7 @@ public class MyOrder {
 		showServerDelProgress();
 		String phoneOrderedPkg = Http.get(Server.DELETE_PHONEORDER, "TID="
 				+ tableId + "&DID=" + dishId);
-		if (mError.getErrorStr(phoneOrderedPkg, "delPhoneOrderedDish") < 0) {
+		if (!mError.isSucc(phoneOrderedPkg, "delPhoneOrderedDish")) {
 			return -1;
 		}
 		if (mError.getSucc().equals("true")) {
@@ -547,7 +546,8 @@ public class MyOrder {
 			showServerDelProgress();
 			String phoneOrderPkg = Http.get(Server.UPDATE_PHONE_ORDER, "DID="
 					+ dishId + "&DNUM=" + quantity + "&TID=" + tableId);
-			if (mError.getErrorStr(phoneOrderPkg, "minusPhoneOrderOnServer") < 0) {
+
+			if (!mError.isSucc(phoneOrderPkg, "minusPhoneOrderOnServer")) {
 				return -1;
 			}
 			if (mError.getSucc().equals("true")) {

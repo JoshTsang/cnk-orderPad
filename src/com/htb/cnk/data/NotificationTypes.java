@@ -22,6 +22,7 @@ public class NotificationTypes {
 		return notificationTypes.get(0).get(index);
 	}
 	
+	//TODO handle err
 	public int getNotifiycationsType() {
 		String notificationTypePkg = Http.get(Server.GET_NOTIFICATIONTYPES,
 				null);
