@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -18,6 +19,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.text.InputFilter;
+import android.text.method.DigitsKeyListener;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -26,8 +29,10 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.SimpleAdapter;
+import android.widget.Toast;
 
 import com.htb.cnk.NotificationTableService.MyBinder;
 import com.htb.cnk.data.Info;
@@ -158,7 +163,6 @@ public class TableActivity extends BaseActivity {
 
 		@Override
 		public void onServiceDisconnected(ComponentName name) {
-			// TODO Auto-generated method stub
 
 		}
 	};
@@ -253,6 +257,48 @@ public class TableActivity extends BaseActivity {
 				});
 
 		return mAlertDialog;
+	}
+
+	private Dialog cleanDialog() {
+		final CharSequence[] cleanitems = { "清台", "转台", "删除菜", "添加菜", "查看菜" };
+		Dialog cleanDialog = new AlertDialog.Builder(TableActivity.this)
+				.setTitle("选择功能")
+				.setItems(cleanitems, new DialogInterface.OnClickListener() {
+	
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						Intent intent = new Intent();
+						switch (which) {
+						case 0:
+							final AlertDialog.Builder mAlertDialog = cleanTableDialog();
+							mAlertDialog.show();
+							break;
+						case 1:
+							final AlertDialog.Builder mChangeDialog = changeTableDialog();
+							mChangeDialog.show();
+							break;
+						case 2:
+							intent.setClass(TableActivity.this,
+									DelOrderActivity.class);
+							TableActivity.this.startActivity(intent);
+							break;
+						case 3:
+							intent.setClass(TableActivity.this,
+									MenuActivity.class);
+							Info.setMode(Info.WORK_MODE_WAITER);
+							TableActivity.this.startActivity(intent);
+							break;
+						case 4:
+							intent.setClass(TableActivity.this,
+									QueryOrderActivity.class);
+							TableActivity.this.startActivity(intent);
+							break;
+						default:
+							break;
+						}
+					}
+				}).create();
+		return cleanDialog;
 	}
 
 	private AlertDialog.Builder cleanTableDialog() {
@@ -399,42 +445,45 @@ public class TableActivity extends BaseActivity {
 		return addPhoneDialog;
 	}
 
-	private Dialog cleanDialog() {
-		final CharSequence[] cleanitems = { "清台", "删除菜", "添加菜", "查看菜" };
-		Dialog cleanDialog = new AlertDialog.Builder(TableActivity.this)
-				.setTitle("选择功能")
-				.setItems(cleanitems, new DialogInterface.OnClickListener() {
+	protected Builder changeTableDialog() {
+		final EditText changeTableText = new EditText(this);
+		changeTableText.setKeyListener(new DigitsKeyListener(false, true));
+		changeTableText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(3)});
+		final AlertDialog.Builder mAlertDialog = new AlertDialog.Builder(
+				TableActivity.this);
+		mAlertDialog.setTitle("请输入桌号");
+		mAlertDialog.setIcon(R.drawable.ic_launcher);
+		mAlertDialog.setCancelable(false);
+		mAlertDialog.setView(changeTableText);
+		mAlertDialog.setPositiveButton("确定",
+				new DialogInterface.OnClickListener() {
 
 					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						Intent intent = new Intent();
-						switch (which) {
-						case 0:
-							final AlertDialog.Builder mAlertDialog = cleanTableDialog();
-							mAlertDialog.show();
-							break;
-						case 1:
-							intent.setClass(TableActivity.this,
-									DelOrderActivity.class);
-							TableActivity.this.startActivity(intent);
-							break;
-						case 2:
-							intent.setClass(TableActivity.this,
-									MenuActivity.class);
-							Info.setMode(Info.WORK_MODE_WAITER);
-							TableActivity.this.startActivity(intent);
-							break;
-						case 3:
-							intent.setClass(TableActivity.this,
-									QueryOrderActivity.class);
-							TableActivity.this.startActivity(intent);
-							break;
-						default:
-							break;
+					public void onClick(DialogInterface dialog, int i) {
+						String changeTId;
+						changeTId = changeTableText.getEditableText()
+								.toString();
+						int destId = Integer.parseInt(changeTId);
+						if (mSettings.getStatusTableId(destId) == 0 && destId <= mSettings.size()) {
+							changeTable(Integer.parseInt(changeTId));
+						} else {
+							Toast.makeText(
+									getApplicationContext(),
+									getResources().getString(
+											R.string.changeTIdWarning),
+									Toast.LENGTH_SHORT).show();
 						}
 					}
-				}).create();
-		return cleanDialog;
+				});
+		mAlertDialog.setNegativeButton("取消",
+				new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int i) {
+						dialog.cancel();
+					}
+				});
+		return mAlertDialog;
 	}
 
 	private Handler tableHandle = new Handler() {
@@ -460,6 +509,25 @@ public class TableActivity extends BaseActivity {
 				}
 			}
 		}
+	};
+
+	private Handler changeTIdHandle = new Handler() {
+		public void handleMessage(Message msg) {
+			if (msg.what < 0) {
+				Toast.makeText(
+						getApplicationContext(),
+						getResources().getString(
+								R.string.changeTIdWarning),
+						Toast.LENGTH_SHORT).show();
+			} else {
+				binder.start();
+				Toast.makeText(
+						getApplicationContext(),
+						getResources().getString(
+								R.string.changeTId),
+						Toast.LENGTH_SHORT).show();
+				}
+			}
 	};
 
 	private void setTableInfos() {
@@ -562,24 +630,11 @@ public class TableActivity extends BaseActivity {
 				try {
 					Message msg = new Message();
 					int ret;
-					ret = mSettings.updateStatus(Info.getTableId(), 0);
-					if (ret < 0) {
-						tableHandle.sendEmptyMessage(ret);
-						return;
-					}
-
-					ret = mMyOrder.cleanServerPhoneOrder(Info.getTableId());
-					if (ret < 0) {
-						tableHandle.sendEmptyMessage(ret);
-						return;
-					}
-
 					ret = mSettings.cleanTalble(Info.getTableId());
 					if (ret < 0) {
 						tableHandle.sendEmptyMessage(ret);
 						return;
 					}
-
 					ret = mNotificaion.getNotifiycations();
 					ringtoneHandler.sendEmptyMessage(ret);
 					ret = mSettings.getTableStatusFromServer();
@@ -651,7 +706,7 @@ public class TableActivity extends BaseActivity {
 
 		@Override
 		public void onClick(View v) {
-			
+
 		}
 	};
 
@@ -674,6 +729,21 @@ public class TableActivity extends BaseActivity {
 		}
 
 	};
+
+	private void changeTable(final int destTId) {
+		new Thread() {
+			public void run() {
+				try {
+					int ret = mSettings.changeTable(Info.getTableId(), destTId,TableActivity.this);
+					Log.d("DEL", "ret" + ret);
+					changeTIdHandle.sendEmptyMessage(ret);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}.start();
+
+	}
 
 	public class MyReceiver extends BroadcastReceiver {
 

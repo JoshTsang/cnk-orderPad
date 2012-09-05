@@ -29,7 +29,6 @@ public class NotificationTypes {
 		if (notificationTypePkg == null || "".equals("notificationTypePkg")) {
 			return -1;
 		}
-		Log.d("notificationTypePkg", notificationTypePkg);
 		try {
 			JSONArray tableList = new JSONArray(notificationTypePkg);
 			int length = tableList.length();
