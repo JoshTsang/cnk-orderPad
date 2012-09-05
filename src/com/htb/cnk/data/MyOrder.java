@@ -316,14 +316,11 @@ public class MyOrder {
 		}
 		Log.d("order", order.toString());
 		String response = Http.post(Server.SUBMIT_ORDER, order.toString());
-		if (mError.getErrorStr(response, "submit") < 0) {
+		if (!mError.isSucc(response, "submit")) {
 			return -1;
-		}
-		if (mError.getSucc().equals("true")) {
+		} else {
 			return 0;
 		}
-		Log.e("submit", mError.getErroe());
-		return -1;
 	}
 
 	//TODO log failure
@@ -400,7 +397,7 @@ public class MyOrder {
 	public int cleanServerPhoneOrder(int tableId) {
 		String phoneOrderPkg = Http.get(Server.DELETE_PHONEORDER, "TID="
 				+ tableId);
-		if (mError.getErrorStr(phoneOrderPkg, "cleanServerPhoneOrder") < 0) {
+		if (!mError.isSucc(phoneOrderPkg, "cleanServerPhoneOrder")) {
 			Log.e("updateStatus", "JSONSTR_ERROR");
 			return -1;
 		}
@@ -523,7 +520,7 @@ public class MyOrder {
 		showServerDelProgress();
 		String phoneOrderedPkg = Http.get(Server.DELETE_PHONEORDER, "TID="
 				+ tableId + "&DID=" + dishId);
-		if (mError.getErrorStr(phoneOrderedPkg, "delPhoneOrderedDish") < 0) {
+		if (!mError.isSucc(phoneOrderedPkg, "delPhoneOrderedDish")) {
 			return -1;
 		}
 		if (mError.getSucc().equals("true")) {
@@ -550,7 +547,7 @@ public class MyOrder {
 			String phoneOrderPkg = Http.get(Server.UPDATE_PHONE_ORDER, "DID="
 					+ dishId + "&DNUM=" + quantity + "&TID=" + tableId);
 
-			if (mError.getErrorStr(phoneOrderPkg, "minusPhoneOrderOnServer") < 0) {
+			if (!mError.isSucc(phoneOrderPkg, "minusPhoneOrderOnServer")) {
 				return -1;
 			}
 			if (mError.getSucc().equals("true")) {

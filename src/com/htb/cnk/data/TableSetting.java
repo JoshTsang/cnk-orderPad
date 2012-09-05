@@ -147,7 +147,7 @@ public class TableSetting implements Serializable {
 	public int updateStatus(int tableId, int status) {
 		String tableStatusPkg = Http.get(Server.UPDATE_TABLE_STATUS, "TID="
 				+ tableId + "&TST=" + status);
-		if (mError.getErrorStr(tableStatusPkg,"updateStatus") < 0) {
+		if (!mError.isSucc(tableStatusPkg,"updateStatus")) {
 			return -1;
 		}
 		if (mError.getSucc().equals("true")) {
@@ -170,7 +170,7 @@ public class TableSetting implements Serializable {
 		}
 
 		String tableCleanPkg = Http.post(Server.CLEAN_TABLE, order.toString());
-		if (mError.getErrorStr(tableCleanPkg,"cleanTalble") < 0) {
+		if (!mError.isSucc(tableCleanPkg,"cleanTalble")) {
 			return -1;
 		}
 		if (mError.getSucc().equals("true")) {
@@ -221,7 +221,7 @@ public class TableSetting implements Serializable {
 		}
 		String tableChangePkg = Http.post(Server.CHANGE_TABLE + "?srcTID="
 				+ srcTId + "&destTID=" + destTId, order.toString());
-		if (mError.getErrorStr(tableChangePkg,"changeTable") < 0) {
+		if (!mError.isSucc(tableChangePkg,"changeTable")) {
 			return -1;
 		}
 		if ("true".equals(mError.getSucc())) {

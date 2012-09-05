@@ -11,14 +11,14 @@ public class ErrorPHP implements Serializable{
 	private String mSucc;
 	private String mError;
 	
-	public int getErrorStr(String errorStr,String errorName) {
+	public boolean isSucc(String errorStr,String errorName) {
 		
 		try {
 			JSONObject errorString = new JSONObject(errorStr);
 			String succ = errorString.getString("succ");
 			if(succ.equals("true")){
 				this.mSucc = succ;
-				return 0;
+				return true;
 			}else {
 				this.mSucc = "flase";
 				this.mError = errorStr;
@@ -27,7 +27,7 @@ public class ErrorPHP implements Serializable{
 			
 		}
 		Log.e(errorName, errorStr);
-		return -1;
+		return false;
 	}
 
 	public String getSucc(){
