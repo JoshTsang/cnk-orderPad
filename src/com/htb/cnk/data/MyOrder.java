@@ -20,6 +20,7 @@ import com.htb.cnk.lib.Http;
 import com.htb.constant.Server;
 
 public class MyOrder {
+	final String TAG = "MyOrder";
 	public final static int ERR_GET_PHONE_ORDER_FAILED = -10;
 	public final static int RET_NULL_PHONE_ORDER = 1;
 	public final static int RET_MINUS_SUCC = -2;
@@ -306,6 +307,7 @@ public class MyOrder {
 		}
 	}
 
+	//TODO log failure
 	public int getOrderFromServer(int tableId) {
 		String response = Http.get(Server.GET_MYORDER, "TID=" + tableId);
 		Log.d("resp", response);
@@ -524,7 +526,7 @@ public class MyOrder {
 			showServerDelProgress();
 			String phoneOrderPkg = Http.get(Server.UPDATE_PHONE_ORDER, "DID="
 					+ dishId + "&DNUM=" + quantity + "&TID=" + tableId);
-			Log.d("resp", "resp:" + phoneOrderPkg);
+			
 			if (phoneOrderPkg == null || !"\n".equals(phoneOrderPkg)) {
 				return -1;
 			}
