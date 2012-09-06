@@ -57,7 +57,7 @@ public class Cnk_orderPadActivity extends BaseActivity {
 
 	private String mUrl;
 	private WifiAdmin mWifiAdmin;
-	private Thread wifiLockNodifyThread;
+	//private Thread wifiLockNodifyThread;
 	private String mUpdateAkpDir;
 	private Handler handler = new Handler();
 	private Version version;

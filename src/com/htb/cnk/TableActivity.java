@@ -185,6 +185,7 @@ public class TableActivity extends BaseActivity {
 		}
 	}
 
+	//TODO define 
 	class ItemClickListener implements OnItemClickListener {
 
 		public void onItemClick(AdapterView<?> arg0,// The AdapterView where the
@@ -496,6 +497,9 @@ public class TableActivity extends BaseActivity {
 				switch (msg.what) {
 				case UPDATE_TABLE_INFOS:
 					setTableInfos();
+					if (mSettings.hasPendedPhoneOrder()) {
+						ringtoneHandler.sendEmptyMessage(1);
+					}
 					break;
 				case DISABLE_GRIDVIEW:
 					gridview.setOnItemClickListener(null);
@@ -605,7 +609,6 @@ public class TableActivity extends BaseActivity {
 	private Handler ringtoneHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			if (msg.what > 0) {
-				Log.d("ringtone", "play");
 				mRingtone.play();
 			}
 		}

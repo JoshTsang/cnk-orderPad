@@ -19,9 +19,10 @@ import com.htb.constant.Server;
 
 public class TableSetting implements Serializable {
 
+	private final String TAG = "tableAtivity";
 	private static final long serialVersionUID = 1L;
 	private MyOrder mOrder;
-	private final String TAG = "tableAtivity";
+	boolean phoneOrderPending;
 
 	public class TableSettingItem {
 		protected int mStatus;
@@ -91,6 +92,7 @@ public class TableSetting implements Serializable {
 		mTableSettings.get(index).setStatus(n);
 	}
 
+	//TODO define
 	public int getTableStatusFromServer() {
 		String tableStatusPkg = Http.get(Server.GET_TABLE_STATUS, "");
 		if (tableStatusPkg == null || "null".equals(tableStatusPkg)
@@ -103,11 +105,15 @@ public class TableSetting implements Serializable {
 			int length = tableList.length();
 			TableSettingItem asItem;
 			mTableSettings.clear();
+			phoneOrderPending = false;
 			for (int i = 0; i < length; i++) {// 遍历JSONArray
 				JSONObject item = tableList.getJSONObject(i);
 				int id = item.getInt("id");
 				String name = item.getString("name");
 				int status = item.getInt("status");
+				if (status == 50 || status == 51) {
+					phoneOrderPending = true;
+				}
 				asItem = new TableSettingItem(status, name, id);
 				add(asItem);
 			}
@@ -119,6 +125,9 @@ public class TableSetting implements Serializable {
 		return -1;
 	}
 
+	public boolean hasPendedPhoneOrder() {
+		return phoneOrderPending;
+	}
 	public int getItemTableStatus(int tableId) {
 		String tableStatusPkg = Http.get(Server.GET_ITEM_TABLE_STATUS, "TSI="
 				+ tableId);
