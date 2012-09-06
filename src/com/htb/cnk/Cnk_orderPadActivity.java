@@ -57,14 +57,14 @@ public class Cnk_orderPadActivity extends BaseActivity {
 
 	private String mUrl;
 	private WifiAdmin mWifiAdmin;
-	//private Thread wifiLockNodifyThread;
+	// private Thread wifiLockNodifyThread;
 	private String mUpdateAkpDir;
 	private Handler handler = new Handler();
 	private Version version;
 	private static int ARERTDIALOG = 0;
 	private AlertDialog mNetWrorkcancel;
 	private AlertDialog.Builder mNetWrorkAlertDialog;
-	
+
 	@Override
 	protected void onResume() {
 		if (ARERTDIALOG == 1) {
@@ -72,6 +72,7 @@ public class Cnk_orderPadActivity extends BaseActivity {
 			ARERTDIALOG = 0;
 		}
 		initWifi();
+		syncWithServer();
 		super.onResume();
 	}
 
@@ -88,10 +89,8 @@ public class Cnk_orderPadActivity extends BaseActivity {
 		mWifiAdmin = new WifiAdmin(Cnk_orderPadActivity.this);
 		mpDialog = new ProgressDialog(Cnk_orderPadActivity.this);
 		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-		mpDialog.setTitle("请稍等");
 		mpDialog.setIndeterminate(false);
 		mpDialog.setCancelable(false);
-		syncWithServer();
 		mNetWrorkAlertDialog = wifiDialog();
 	}
 
@@ -125,8 +124,8 @@ public class Cnk_orderPadActivity extends BaseActivity {
 		mpDialog.setIndeterminate(false);
 		mpDialog.setCancelable(false);
 		mpDialog.show();
-		mUpdateAkpDir = Environment.getDataDirectory() + "/data/" +
-				this.getPackageName() + "/files/";
+		mUpdateAkpDir = Environment.getDataDirectory() + "/data/"
+				+ this.getPackageName() + "/files/";
 		new Thread() {
 			public void run() {
 				if (getServerVerCode()) {
@@ -189,21 +188,27 @@ public class Cnk_orderPadActivity extends BaseActivity {
 			} else if (msg.what == DOWNLOAD_NEW_APP) {
 				mpDialog.setMessage("请稍候, 正在更新软件...");
 				return;
-			} else if(msg.what == DO_UPGRADE) {
-				new AlertDialog.Builder(Cnk_orderPadActivity.this).setTitle("更新")
-				.setMessage("新版本软件已下载，点击确定升级")
-				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+			} else if (msg.what == DO_UPGRADE) {
+				new AlertDialog.Builder(Cnk_orderPadActivity.this)
+						.setTitle("更新")
+						.setMessage("新版本软件已下载，点击确定升级")
+						.setPositiveButton("确定",
+								new DialogInterface.OnClickListener() {
 
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						Intent intent = new Intent(Intent.ACTION_VIEW);
-						intent.setDataAndType(Uri.fromFile(new File(mUpdateAkpDir,
-								version.UPDATE_SAVENAME)),
-								"application/vnd.android.package-archive");
-						startActivity(intent);
-					}
-				}).show();
-				
+									@Override
+									public void onClick(DialogInterface dialog,
+											int which) {
+										Intent intent = new Intent(
+												Intent.ACTION_VIEW);
+										intent.setDataAndType(
+												Uri.fromFile(new File(
+														mUpdateAkpDir,
+														version.UPDATE_SAVENAME)),
+												"application/vnd.android.package-archive");
+										startActivity(intent);
+									}
+								}).show();
+
 			}
 			mpDialog.cancel();
 		}
@@ -214,7 +219,7 @@ public class Cnk_orderPadActivity extends BaseActivity {
 				|| mWifiAdmin.checkNetCardState() == 1) {
 			ARERTDIALOG = 1;
 			mNetWrorkcancel = wifiDialog().show();
-			
+
 		} else {
 			mpDialog.cancel();
 		}
@@ -248,6 +253,7 @@ public class Cnk_orderPadActivity extends BaseActivity {
 
 		return mAlertDialog;
 	}
+
 	private boolean getServerVerCode() {
 		String response = Http.get(Server.APK_VERSION, null);
 		if (response == null || "".equals(response)) {
@@ -255,12 +261,11 @@ public class Cnk_orderPadActivity extends BaseActivity {
 			return false;
 		} else {
 			try {
-				Log.d(TAG, "res:" + response);
 				JSONObject versionInfo = new JSONObject(response);
 				String versionString = versionInfo.getString("ver");
-				Log.d(TAG, "ver:" + versionString);
+				Log.i(TAG, "ver:" + versionString);
 				String[] ver = versionString.split("\\.");
-				int major =  Integer.parseInt(ver[0]);
+				int major = Integer.parseInt(ver[0]);
 				int minor = Integer.parseInt(ver[1]);
 				int build = Integer.parseInt(ver[2]);
 				if (version.isUpdateNeed(major, minor, build)) {
@@ -271,12 +276,12 @@ public class Cnk_orderPadActivity extends BaseActivity {
 					return false;
 				}
 			} catch (Exception e) {
+				Log.e(TAG, "APK ver response:" + response);
 				e.printStackTrace();
 			}
 		}
 		return false;
 	}
-
 
 	private void doNewVersionUpdate() {
 		handlerSync.sendEmptyMessage(DOWNLOAD_NEW_APP);
@@ -286,24 +291,26 @@ public class Cnk_orderPadActivity extends BaseActivity {
 	void downFile(final String url) {
 		new Thread() {
 			public void run() {
-				Log.d("update", "download thread:" + url);
+				Log.i(TAG, "download new version apk:" + url);
 				HttpParams httpParameters1 = new BasicHttpParams();
-				
-				HttpConnectionParams.setConnectionTimeout(httpParameters1, 10 * 1000);
+
+				HttpConnectionParams.setConnectionTimeout(httpParameters1,
+						10 * 1000);
 				HttpConnectionParams.setSoTimeout(httpParameters1, 10 * 1000);
 				HttpClient client = new DefaultHttpClient(httpParameters1);
-				
+
 				try {
 					HttpGet get = new HttpGet(url);
 					HttpResponse response;
 					response = client.execute(get);
 					HttpEntity entity = response.getEntity();
 					long length = entity.getContentLength();
-					Log.d("update apk", "size: " + length);
+					Log.i(TAG, "update apk, size: " + length);
 					InputStream is = entity.getContent();
 					FileOutputStream fileOutputStream = null;
 					if (is != null) {
-						fileOutputStream = openFileOutput(version.UPDATE_SAVENAME, MODE_WORLD_READABLE);
+						fileOutputStream = openFileOutput(
+								version.UPDATE_SAVENAME, MODE_WORLD_READABLE);
 
 						byte[] buf = new byte[1024];
 						int ch = -1;
@@ -318,7 +325,7 @@ public class Cnk_orderPadActivity extends BaseActivity {
 					if (fileOutputStream != null) {
 						fileOutputStream.close();
 					}
-					Log.d("update", "apk ready");
+					Log.i(TAG, "download apk done");
 					down();
 				} catch (ClientProtocolException e) {
 					e.printStackTrace();
@@ -346,7 +353,6 @@ public class Cnk_orderPadActivity extends BaseActivity {
 
 	private Handler errHandler = new Handler() {
 		public void handleMessage(Message msg) {
-			Log.e("fetch Data failed", "errno: " + msg.what);
 			if (msg.what < 0) {
 				mpDialog.cancel();
 				Log.e("fetch Data failed", "errno: " + msg.what);
@@ -363,7 +369,7 @@ public class Cnk_orderPadActivity extends BaseActivity {
 
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						
+
 					}
 				}).show();
 
@@ -372,7 +378,7 @@ public class Cnk_orderPadActivity extends BaseActivity {
 	void update() {
 		handlerSync.sendEmptyMessage(DO_UPGRADE);
 	}
-	
+
 	class wifiConnect implements Runnable {
 		public void run() {
 			try {

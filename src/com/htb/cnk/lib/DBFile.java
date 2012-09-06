@@ -54,7 +54,6 @@ public class DBFile {
             Log.i(TAG, "copy db to db dir:success");
             return 0;
         } catch (Exception e) {
-            // TODO: handle exception
             e.printStackTrace();
             Log.e(TAG, "copy db to db dir:fail");
             return -1;
@@ -78,7 +77,6 @@ public class DBFile {
             Log.i(TAG, "backup:success");
             return 0;
         } catch (Exception e) {
-            // TODO: handle exception
             e.printStackTrace();
             Log.e(TAG, "backup:fail");
             return -1;

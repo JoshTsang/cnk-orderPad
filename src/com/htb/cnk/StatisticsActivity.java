@@ -41,6 +41,7 @@ public class StatisticsActivity extends BaseActivity {
 	private final String TAG = "StatisticsActivity";
 	public final static int QUERY_BY_TIME = 0;
 	public final static int QUERY_TODAY = 1;
+	
 	private Button mBackBtn;
 	private Button mQueryTodayBtn;
 	private Button mQueryByTimeBtn;
@@ -109,10 +110,9 @@ public class StatisticsActivity extends BaseActivity {
 	private void downloadDB() {
 		mpDialog = new ProgressDialog(StatisticsActivity.this);
 		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-		mpDialog.setMessage("正在加载销售数据...");
 		mpDialog.setIndeterminate(false);
 		mpDialog.setCancelable(false);
-		mpDialog.show();
+		showProgressDlg("正在加载销售数据...");
 		new Thread() {
 			public void run() {
 				try {
@@ -134,6 +134,10 @@ public class StatisticsActivity extends BaseActivity {
 					return;
 				}
 				int start = respond.indexOf("[") + 1;
+				if (start != 1) {
+					handler.sendEmptyMessage(ErrorNum.GET_LATEST_STATISTICS_FAILED);
+					return ;
+				}
 				int end = respond.indexOf("]");
 				mLatestStatistics = respond.substring(start, end);
 				handler.sendEmptyMessage(0);
@@ -212,15 +216,7 @@ public class StatisticsActivity extends BaseActivity {
 	}
 
 	private void DateTimeNotSetAlert(String err) {
-		new AlertDialog.Builder(StatisticsActivity.this).setTitle("请注意")
-				.setMessage(err)
-				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						downloadDB();
-					}
-				}).show();
+		popUpDlg("请注意", err, false);
 	}
 
 	private void updateLatestStatistics() {
@@ -278,18 +274,6 @@ public class StatisticsActivity extends BaseActivity {
 		}
 	};
 
-	private void dbErrAlert() {
-		new AlertDialog.Builder(StatisticsActivity.this).setTitle("错误")
-				.setMessage("销售数据出错,需从新下载!")
-				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-
-					}
-				}).show();
-	}
-
 	private OnClickListener queryTodayClicked = new OnClickListener() {
 
 		@Override
@@ -306,7 +290,7 @@ public class StatisticsActivity extends BaseActivity {
 			
 			int ret = mStatistics.perpareResult(mStart, mEnd);
 			if (ret < 0) {
-				dbErrAlert();
+				popUpDlg("错误", "销售数据出错,需从新下载!", true);
 				return;
 			}
 			updateData(mStart, mEnd);
@@ -321,7 +305,7 @@ public class StatisticsActivity extends BaseActivity {
 			if (isDateTimeSet()) {
 				int ret = mStatistics.perpareResult(mStartSet, mEndSet);
 				if (ret < 0) {
-					dbErrAlert();
+					popUpDlg("错误", "销售数据出错,需从新下载!", true);
 					return;
 				}
 				updateData(mStartSet, mEndSet);
@@ -339,8 +323,7 @@ public class StatisticsActivity extends BaseActivity {
 						Toast.LENGTH_LONG).show();
 				return;
 			}
-			mpDialog.setMessage("正在上传打印信息...");
-			mpDialog.show();
+			showProgressDlg("正在上传打印信息...");
 			new Thread() {
 				public void run() {
 					int ret = mStatistics.print(mStart, mEnd);
@@ -358,8 +341,7 @@ public class StatisticsActivity extends BaseActivity {
 
 		@Override
 		public void onClick(View v) {
-			mpDialog.setMessage("请稍等...");
-			mpDialog.show();
+			showProgressDlg("请稍等...");
 			DatePickerDialog date = new DatePickerDialog(
 					StatisticsActivity.this, startDateListener,
 					mStart.get(Calendar.YEAR), mStart.get(Calendar.MONTH),
@@ -374,8 +356,7 @@ public class StatisticsActivity extends BaseActivity {
 
 		@Override
 		public void onClick(View v) {
-			mpDialog.setMessage("请稍等...");
-			mpDialog.show();
+			showProgressDlg("请稍等...");
 			TimePickerDialog time = new TimePickerDialog(
 					StatisticsActivity.this, startTimeListener,
 					mStart.get(Calendar.HOUR_OF_DAY),
@@ -390,8 +371,7 @@ public class StatisticsActivity extends BaseActivity {
 
 		@Override
 		public void onClick(View v) {
-			mpDialog.setMessage("请稍等...");
-			mpDialog.show();
+			showProgressDlg("请稍等...");
 			DatePickerDialog date = new DatePickerDialog(
 					StatisticsActivity.this, endDateListener,
 					mEnd.get(Calendar.YEAR), mEnd.get(Calendar.MONTH),
@@ -406,8 +386,7 @@ public class StatisticsActivity extends BaseActivity {
 
 		@Override
 		public void onClick(View v) {
-			mpDialog.setMessage("请稍等...");
-			mpDialog.show();
+			showProgressDlg("请稍等...");
 			TimePickerDialog time = new TimePickerDialog(
 					StatisticsActivity.this, endTimeListener,
 					mEnd.get(Calendar.HOUR_OF_DAY), mEnd.get(Calendar.MINUTE),
@@ -417,6 +396,11 @@ public class StatisticsActivity extends BaseActivity {
 			mpDialog.cancel();
 		}
 	};
+
+	public void showProgressDlg(String msg) {
+		mpDialog.setMessage(msg);
+		mpDialog.show();
+	}
 
 	private DatePickerDialog.OnDateSetListener startDateListener = new DatePickerDialog.OnDateSetListener() {
 
@@ -458,53 +442,45 @@ public class StatisticsActivity extends BaseActivity {
 
 	private Handler handler = new Handler() {
 		public void handleMessage(Message msg) {
+			mpDialog.cancel();
 			if (msg.what < 0) {
-				mpDialog.cancel();
-				new AlertDialog.Builder(StatisticsActivity.this)
-						.setTitle("错误")
-						.setMessage("下载销售数据失败,错误码:" + msg.what)
-						.setPositiveButton("确定",
-								new DialogInterface.OnClickListener() {
-
-									@Override
-									public void onClick(DialogInterface dialog,
-											int which) {
-										finish();
-									}
-								}).show();
-			} else {
-				mpDialog.cancel();
+				switch (msg.what) {
+				case ErrorNum.DOWNLOAD_DB_FAILED:
+					popUpDlg("错误", "下载销售数据失败,错误码:" + msg.what, true);
+					break;
+				case ErrorNum.GET_LATEST_STATISTICS_FAILED:
+					break;
+				default:
+					Log.e(TAG, "unknow error num");
+				}	
 			}
 		}
 	};
+	
+	private void popUpDlg(String title, String msg, final boolean finishActivity) {
+		new AlertDialog.Builder(StatisticsActivity.this)
+		.setTitle(title)
+		.setMessage(msg)
+		.setPositiveButton("确定",
+				new DialogInterface.OnClickListener() {
 
+					@Override
+					public void onClick(DialogInterface dialog,
+							int which) {
+						if (finishActivity) {
+							finish();
+						}
+					}
+				}).show();
+	}
+	
 	private Handler handlerPrint = new Handler() {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
 			if (msg.what < 0) {
-				new AlertDialog.Builder(StatisticsActivity.this)
-						.setTitle("错误")
-						.setMessage("打印出现错误,请检查打印机" + msg.what)
-						.setPositiveButton("确定",
-								new DialogInterface.OnClickListener() {
-
-									@Override
-									public void onClick(DialogInterface dialog,
-											int which) {
-									}
-								}).show();
+				popUpDlg("错误", "打印出现错误,请检查打印机" + msg.what, false);
 			} else {
-				new AlertDialog.Builder(StatisticsActivity.this)
-				.setTitle("完成")
-				.setMessage("打印完成")
-				.setPositiveButton("确定",
-						new DialogInterface.OnClickListener() {
-
-							@Override
-							public void onClick(DialogInterface dialog,
-									int which) {
-							}
-						}).show();
+				popUpDlg("完成", "打印完成", false);
 			}
 		}
 	};

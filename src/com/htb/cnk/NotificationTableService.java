@@ -43,7 +43,6 @@ public class NotificationTableService extends Service {
 		}
 	};
 
-	//TODO handle err
 	class tableThread implements Runnable {
 		public void run() {
 			try {
