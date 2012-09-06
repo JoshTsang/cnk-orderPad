@@ -314,14 +314,14 @@ public class MyOrder {
 		}
 		Log.d("order", order.toString());
 		String response = Http.post(Server.SUBMIT_ORDER, order.toString());
-		if (!ErrorPHP.isSucc(response, "submit")) {
+		if (!ErrorPHP.isSucc(response, TAG)) {
 			return -1;
-		} else {
-			return 0;
 		}
+		return 0;
+
 	}
 
-	//TODO log failure
+	// TODO log failure
 	public int getOrderFromServer(int tableId) {
 		String response = Http.get(Server.GET_MYORDER, "TID=" + tableId);
 		if ("null".equals(response)) {
@@ -395,15 +395,10 @@ public class MyOrder {
 	public int cleanServerPhoneOrder(int tableId) {
 		String phoneOrderPkg = Http.get(Server.DELETE_PHONEORDER, "TID="
 				+ tableId);
-		if (!ErrorPHP.isSucc(phoneOrderPkg, "cleanServerPhoneOrder")) {
-			Log.e("updateStatus", "JSONSTR_ERROR");
+		if (!ErrorPHP.isSucc(phoneOrderPkg, TAG)) {
 			return -1;
 		}
-		if (ErrorPHP.getSucc() == "true") {
-			return 0;
-		}
-		Log.e("cleanServerPhoneOrder", ErrorPHP.getErroe());
-		return -1;
+		return 0;
 	}
 
 	public int submitDelDish(int position, int quan) {
@@ -449,15 +444,13 @@ public class MyOrder {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-
 		String response = Http.post(
-				Server.UPDATE_TABLE_ORDER + "?TID=" + Info.getTableId() + "&DID="
-						+ mOrder.get(position).dish.getId(), order.toString());
-		Log.e("submitDelDish", response);
-//		if (mError.getErrorStr(response, "submitDelDish") < 0) {
-//			return -1;
-//		}
-		
+				Server.UPDATE_TABLE_ORDER + "?TID=" + Info.getTableId()
+						+ "&DID=" + mOrder.get(position).dish.getId(),
+				order.toString());
+		 if (!ErrorPHP.isSucc(response, TAG)) {
+		 return -1;
+		 }
 		return 0;
 
 	}
@@ -518,15 +511,12 @@ public class MyOrder {
 		showServerDelProgress();
 		String phoneOrderedPkg = Http.get(Server.DELETE_PHONEORDER, "TID="
 				+ tableId + "&DID=" + dishId);
-		if (!ErrorPHP.isSucc(phoneOrderedPkg, "delPhoneOrderedDish")) {
+		if (!ErrorPHP.isSucc(phoneOrderedPkg, TAG)) {
 			return -1;
 		}
-		if (ErrorPHP.getSucc().equals("true")) {
-			remove(dishId);
-			return 0;
-		}
-		Log.e("delPhoneOrderedDish", ErrorPHP.getErroe());
-		return -1;
+		remove(dishId);
+		return 0;
+
 	}
 
 	private int updateServerServedDish(int tableId, int dishId) {
@@ -541,21 +531,16 @@ public class MyOrder {
 		}
 	}
 
-	// TODO
 	private int minusPhoneOrderOnServer(int tableId, int quantity, int dishId) {
 		if (quantity != 0) {
 			showServerDelProgress();
 			String phoneOrderPkg = Http.get(Server.UPDATE_PHONE_ORDER, "DID="
 					+ dishId + "&DNUM=" + quantity + "&TID=" + tableId);
 
-			if (!ErrorPHP.isSucc(phoneOrderPkg, "minusPhoneOrderOnServer")) {
+			if (!ErrorPHP.isSucc(phoneOrderPkg, TAG)) {
 				return -1;
 			}
-			if (ErrorPHP.getSucc().equals("true")) {
-				return 0;
-			}
-			Log.e("minusPhoneOrderOnServer", ErrorPHP.getErroe());
-			return -1;
+			return 0;
 		} else {
 			return delPhoneOrderedDish(tableId, dishId);
 		}

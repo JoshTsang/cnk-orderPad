@@ -85,6 +85,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 						.setText(Integer.toString(dishDetail.getQuantity()));
 
 				delBtn.setTag(position);
+				delBtn.setText("-1");
 				delBtn.setOnClickListener(delClicked);
 
 				return convertView;
@@ -115,7 +116,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 						delDishHandler.sendEmptyMessage(ret);
 						return;
 					}
-					mMyOrder.removeItem(position);
+					mMyOrder.minus(position, 1);
 					msg.what = ret;
 					delDishHandler.sendMessage(msg);
 				} catch (Exception e) {

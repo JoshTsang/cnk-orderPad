@@ -132,6 +132,7 @@ public class TableSetting implements Serializable {
 		String tableStatusPkg = Http.get(Server.GET_ITEM_TABLE_STATUS, "TSI="
 				+ tableId);
 		if (tableStatusPkg == null) {
+			Log.e(TAG, "getItemTableStatus:tableStatusPkg is null");
 			return -1;
 		}
 
@@ -139,14 +140,14 @@ public class TableSetting implements Serializable {
 		int end = tableStatusPkg.indexOf("]");
 
 		if ((start < 0) || (end < 0)) {
-			Log.e("getItemTableStatus", tableStatusPkg);
+			Log.e(TAG, "getItemTableStatus:tableStatusPkg is "+tableStatusPkg);
 			return -1;
 		}
-		
+
 		String tableStatus = tableStatusPkg.subSequence(start + 1, end)
 				.toString();
 		if (tableStatus.length() <= 0) {
-			Log.e("getItemTableStatus_tableStatus", tableStatus);
+			Log.e(TAG, "getItemTableStatus:tableStatusPkg length  < 0");
 			return -1;
 		}
 		return Integer.parseInt(tableStatus);
@@ -155,14 +156,10 @@ public class TableSetting implements Serializable {
 	public int updateStatus(int tableId, int status) {
 		String tableStatusPkg = Http.get(Server.UPDATE_TABLE_STATUS, "TID="
 				+ tableId + "&TST=" + status);
-		if (!ErrorPHP.isSucc(tableStatusPkg,"updateStatus")) {
+		if (!ErrorPHP.isSucc(tableStatusPkg, TAG)) {
 			return -1;
 		}
-		if (ErrorPHP.getSucc().equals("true")) {
-			return 0;
-		}
-		Log.e("TableSetting_updateStatus", ErrorPHP.getErroe());
-		return -1;
+		return 0;
 	}
 
 	public int cleanTalble(int tableId) {
@@ -178,33 +175,22 @@ public class TableSetting implements Serializable {
 		}
 
 		String tableCleanPkg = Http.post(Server.CLEAN_TABLE, order.toString());
-		if (!ErrorPHP.isSucc(tableCleanPkg,"cleanTalble")) {
+		if (!ErrorPHP.isSucc(tableCleanPkg, TAG)) {
 			return -1;
 		}
-		if (ErrorPHP.getSucc().equals("true")) {
-			return 0;
-		}
-		Log.e("TableSetting_cleanTable", ErrorPHP.getErroe());
-		return -1;
+		return 0;
 	}
 
 	public int changeTable(int srcTId, int destTId, Context context) {
 		if (mOrder == null) {
 			mOrder = new MyOrder(context);
 		}
-		int ret = mOrder.getOrderFromServer(srcTId);
-//		if (ret < 0) {
-//			Log.e("TableSetting_changeTable_JR", ":11");
-//			return -1;
-//		}
+		mOrder.getOrderFromServer(srcTId);
 
 		JSONObject order = new JSONObject();
 		Date date = new Date();
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String time = df.format(date);
-		if (mOrder.count() <= 0) {
-			return -1;
-		}
 		try {
 			order.put("tableId", Info.getTableId());
 			order.put("timestamp", time);
@@ -214,7 +200,6 @@ public class TableSetting implements Serializable {
 
 		JSONArray dishes = new JSONArray();
 		try {
-
 			for (int i = 0; i < mOrder.count(); i++) {
 				JSONObject dish = new JSONObject();
 				dish.put("dishId", mOrder.getDishId(i));
@@ -229,14 +214,10 @@ public class TableSetting implements Serializable {
 		}
 		String tableChangePkg = Http.post(Server.CHANGE_TABLE + "?srcTID="
 				+ srcTId + "&destTID=" + destTId, order.toString());
-		if (!ErrorPHP.isSucc(tableChangePkg,"changeTable")) {
+		if (!ErrorPHP.isSucc(tableChangePkg, TAG)) {
 			return -1;
 		}
-		if ("true".equals(ErrorPHP.getSucc())) {
-			return 0;
-		}
-		Log.e("TableSetting_changeTable", ErrorPHP.getErroe());
-		return -1;
+		return 0;
 	}
 
 }
