@@ -8,7 +8,6 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.ClipData.Item;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -78,7 +77,6 @@ public class MenuActivity extends BaseActivity {
 
 		mpDialog = new ProgressDialog(MenuActivity.this);
 		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-		// mpDialog.setTitle("请稍等");
 		mpDialog.setIndeterminate(false);
 		mpDialog.setCancelable(false);
 
@@ -265,8 +263,6 @@ public class MenuActivity extends BaseActivity {
 		updateOrderedDishCount();
 		mDishLstAdapter.notifyDataSetChanged();
 	}
-
-	// TODO Define
 
 	public void showDeletePhoneOrderProcessDlg() {
 		minushandler.sendEmptyMessage(SHOW_PROGRESS_DLG);

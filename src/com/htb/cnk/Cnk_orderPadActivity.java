@@ -64,8 +64,9 @@ public class Cnk_orderPadActivity extends BaseActivity {
 	
 	@Override
 	protected void onResume() {
-		initWifi();
 		super.onResume();
+		initWifi();
+		syncWithServer();
 	}
 
 	@Override
@@ -81,10 +82,8 @@ public class Cnk_orderPadActivity extends BaseActivity {
 		mWifiAdmin = new WifiAdmin(Cnk_orderPadActivity.this);
 		mpDialog = new ProgressDialog(Cnk_orderPadActivity.this);
 		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-		mpDialog.setTitle("请稍等");
 		mpDialog.setIndeterminate(false);
 		mpDialog.setCancelable(false);
-		syncWithServer();
 	}
 
 	private void findViews() {
