@@ -244,10 +244,9 @@ public class Cnk_orderPadActivity extends BaseActivity {
 			return false;
 		} else {
 			try {
-				Log.d(TAG, "res:" + response);
 				JSONObject versionInfo = new JSONObject(response);
 				String versionString = versionInfo.getString("ver");
-				Log.d(TAG, "ver:" + versionString);
+				Log.i(TAG, "ver:" + versionString);
 				String[] ver = versionString.split("\\.");
 				int major =  Integer.parseInt(ver[0]);
 				int minor = Integer.parseInt(ver[1]);
@@ -260,6 +259,7 @@ public class Cnk_orderPadActivity extends BaseActivity {
 					return false;
 				}
 			} catch (Exception e) {
+				Log.e(TAG, "APK ver response:" + response);
 				e.printStackTrace();
 			}
 		}
@@ -275,7 +275,7 @@ public class Cnk_orderPadActivity extends BaseActivity {
 	void downFile(final String url) {
 		new Thread() {
 			public void run() {
-				Log.d("update", "download thread:" + url);
+				Log.i(TAG, "download new version apk:" + url);
 				HttpParams httpParameters1 = new BasicHttpParams();
 				
 				HttpConnectionParams.setConnectionTimeout(httpParameters1, 10 * 1000);
@@ -288,7 +288,7 @@ public class Cnk_orderPadActivity extends BaseActivity {
 					response = client.execute(get);
 					HttpEntity entity = response.getEntity();
 					long length = entity.getContentLength();
-					Log.d("update apk", "size: " + length);
+					Log.i(TAG, "update apk, size: " + length);
 					InputStream is = entity.getContent();
 					FileOutputStream fileOutputStream = null;
 					if (is != null) {
@@ -307,7 +307,7 @@ public class Cnk_orderPadActivity extends BaseActivity {
 					if (fileOutputStream != null) {
 						fileOutputStream.close();
 					}
-					Log.d("update", "apk ready");
+					Log.i(TAG, "download apk done");
 					down();
 				} catch (ClientProtocolException e) {
 					e.printStackTrace();
@@ -335,7 +335,6 @@ public class Cnk_orderPadActivity extends BaseActivity {
 
 	private Handler errHandler = new Handler() {
 		public void handleMessage(Message msg) {
-			Log.e("fetch Data failed", "errno: " + msg.what);
 			if (msg.what < 0) {
 				mpDialog.cancel();
 				Log.e("fetch Data failed", "errno: " + msg.what);

@@ -1,5 +1,6 @@
 package com.htb.cnk;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,6 +16,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -144,7 +146,7 @@ public class TableActivity extends BaseActivity {
 	private void setClickListeners() {
 		mTableClicked = new ItemClickListener();
 		mBackBtn.setOnClickListener(backClicked);
-		mUpdateBtn.setOnClickListener(updateClicked);
+		mUpdateBtn.setOnClickListener(combineClicked);
 		mStatisticsBtn.setOnClickListener(logoutClicked);
 		mManageBtn.setOnClickListener(manageClicked);
 	}
@@ -701,11 +703,19 @@ public class TableActivity extends BaseActivity {
 		}
 	};
 
-	private OnClickListener updateClicked = new OnClickListener() {
+	private OnClickListener combineClicked = new OnClickListener() {
 
 		@Override
 		public void onClick(View v) {
+			new AlertDialog.Builder(TableActivity.this).setTitle("提示")
+			.setMessage("该版本未提供该功能")
+			.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					
+				}
+			}).show();
 		}
 	};
 
@@ -734,7 +744,6 @@ public class TableActivity extends BaseActivity {
 			public void run() {
 				try {
 					int ret = mSettings.changeTable(Info.getTableId(), destTId,TableActivity.this);
-					Log.d("DEL", "ret" + ret);
 					changeTIdHandle.sendEmptyMessage(ret);
 				} catch (Exception e) {
 					e.printStackTrace();
