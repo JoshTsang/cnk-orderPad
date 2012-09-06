@@ -266,8 +266,6 @@ public class MenuActivity extends BaseActivity {
 		mDishLstAdapter.notifyDataSetChanged();
 	}
 
-	// TODO Define
-
 	public void showDeletePhoneOrderProcessDlg() {
 		minushandler.sendEmptyMessage(SHOW_PROGRESS_DLG);
 	}
