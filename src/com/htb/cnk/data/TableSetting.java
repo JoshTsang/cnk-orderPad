@@ -20,7 +20,6 @@ import com.htb.constant.Server;
 public class TableSetting implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	private ErrorPHP mError = new ErrorPHP();
 	private MyOrder mOrder;
 	private final String TAG = "tableAtivity";
 
@@ -147,13 +146,13 @@ public class TableSetting implements Serializable {
 	public int updateStatus(int tableId, int status) {
 		String tableStatusPkg = Http.get(Server.UPDATE_TABLE_STATUS, "TID="
 				+ tableId + "&TST=" + status);
-		if (!mError.isSucc(tableStatusPkg,"updateStatus")) {
+		if (!ErrorPHP.isSucc(tableStatusPkg,"updateStatus")) {
 			return -1;
 		}
-		if (mError.getSucc().equals("true")) {
+		if (ErrorPHP.getSucc().equals("true")) {
 			return 0;
 		}
-		Log.e("TableSetting_updateStatus", mError.getErroe());
+		Log.e("TableSetting_updateStatus", ErrorPHP.getErroe());
 		return -1;
 	}
 
@@ -170,13 +169,13 @@ public class TableSetting implements Serializable {
 		}
 
 		String tableCleanPkg = Http.post(Server.CLEAN_TABLE, order.toString());
-		if (!mError.isSucc(tableCleanPkg,"cleanTalble")) {
+		if (!ErrorPHP.isSucc(tableCleanPkg,"cleanTalble")) {
 			return -1;
 		}
-		if (mError.getSucc().equals("true")) {
+		if (ErrorPHP.getSucc().equals("true")) {
 			return 0;
 		}
-		Log.e("TableSetting_cleanTable", mError.getErroe());
+		Log.e("TableSetting_cleanTable", ErrorPHP.getErroe());
 		return -1;
 	}
 
@@ -221,13 +220,13 @@ public class TableSetting implements Serializable {
 		}
 		String tableChangePkg = Http.post(Server.CHANGE_TABLE + "?srcTID="
 				+ srcTId + "&destTID=" + destTId, order.toString());
-		if (!mError.isSucc(tableChangePkg,"changeTable")) {
+		if (!ErrorPHP.isSucc(tableChangePkg,"changeTable")) {
 			return -1;
 		}
-		if ("true".equals(mError.getSucc())) {
+		if ("true".equals(ErrorPHP.getSucc())) {
 			return 0;
 		}
-		Log.e("TableSetting_changeTable", mError.getErroe());
+		Log.e("TableSetting_changeTable", ErrorPHP.getErroe());
 		return -1;
 	}
 
