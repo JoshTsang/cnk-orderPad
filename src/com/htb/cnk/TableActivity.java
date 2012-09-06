@@ -74,27 +74,23 @@ public class TableActivity extends BaseActivity {
 
 	@Override
 	protected void onDestroy() {
-		Log.d("onDestroy", "onDestroy");
 		unregisterReceiver(mReceiver);
 		super.onDestroy();
 	}
 
 	@Override
 	protected void onStop() {
-		Log.d("onStop", "onStop");
 		super.onStop();
 	}
 
 	@Override
 	protected void onPause() {
-		Log.d("onPause", "onPause");
 		super.onPause();
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
-		Log.d("onResume", "onResume");
 		if (ARERTDIALOG == 1) {
 			mNetWrorkcancel.cancel();
 			ARERTDIALOG = 0;

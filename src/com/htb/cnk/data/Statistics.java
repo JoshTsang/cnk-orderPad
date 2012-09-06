@@ -97,7 +97,7 @@ public class Statistics {
         	        	return ErrorNum.DOWNLOAD_DB_FAILED;
         	        }
         	    } else {
-        	    	Log.d("ftp reply", ftpClient.getReplyString());
+        	    	Log.e(TAG, "ftp reply" + ftpClient.getReplyString());
         	    	return ErrorNum.DOWNLOAD_DB_FAILED;
         	    }
         	} catch (SocketException e) {
@@ -138,7 +138,7 @@ public class Statistics {
 		mSalesData.clear();
 		mTotalAmount = 0;
 		try {
-			Log.d("statictics timestamp", "start:" + startDT + " end:" + endDT);
+			//Log.d("statictics timestamp", "start:" + startDT + " end:" + endDT);
 			Cursor resultSet = mDbSales.query(CnkDbHelper.SALES_DATA, new String[] {"dish_id",
 					  "sum(price*quantity)",
 					  "sum(quantity)"},
@@ -198,12 +198,12 @@ public class Statistics {
  
 		String response = Http.post(Server.STATISTICS_PRINT, salesData.toString());
 		if (response == null) {
-			Log.d("Respond", "die/ok");
+			Log.e(TAG, "Respond:die/ok");
 			return -1;
 		} else if ("".equals(response)) {
-			Log.d("Respond",response);
+			//Log.e("Respond",response);
 		} else { 
-			Log.d("Respond",response);
+			Log.e(TAG, "Respond:" + response);
 			return -1;
 		}
 		return 0;

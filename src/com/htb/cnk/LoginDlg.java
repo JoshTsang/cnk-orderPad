@@ -20,6 +20,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 public class LoginDlg {
+	private final String TAG = "LoginDlg";
 	public final static int ACTION_SUBMIT = 10;
 	private Context mActivity;
 	private Class<?> mDestActivity;
@@ -155,7 +156,7 @@ public class LoginDlg {
 							Toast.LENGTH_LONG).show();
 					break;
 				default:
-					Log.e("LoginDlg", "unknown err msg");
+					Log.e(TAG, "unknown err msg");
 				}
 				
 			} else {
