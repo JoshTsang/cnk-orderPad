@@ -18,6 +18,7 @@ import com.htb.cnk.data.CnkDbHelper;
  *
  */
 public class DBFile {
+	private final String TAG = "DBFile";
 	private Context mContext;
 	private CnkDbHelper mDbHelper;
 	private String mDbName;
@@ -50,12 +51,12 @@ public class DBFile {
         File backup = new File(exportDir, dbFile.getName());
         try {
             fileCopy(backup, dbFile);
-            Log.d("copy db to db dir", "success");
+            Log.i(TAG, "copy db to db dir:success");
             return 0;
         } catch (Exception e) {
             // TODO: handle exception
             e.printStackTrace();
-            Log.d("copy db to db dir", "fail");
+            Log.e(TAG, "copy db to db dir:fail");
             return -1;
         }
         
@@ -74,12 +75,12 @@ public class DBFile {
         File backup = new File(exportDir, name);
         try {
             fileCopy(dbFile, backup);
-            Log.d("backup", "success");
+            Log.i(TAG, "backup:success");
             return 0;
         } catch (Exception e) {
             // TODO: handle exception
             e.printStackTrace();
-            Log.d("backup", "fail");
+            Log.e(TAG, "backup:fail");
             return -1;
         }
 	}

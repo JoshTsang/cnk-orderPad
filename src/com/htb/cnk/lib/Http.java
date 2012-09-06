@@ -120,7 +120,6 @@ public class Http {
             DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
             DataInputStream dis = new DataInputStream(socket.getInputStream());
             dos.writeBytes("\020\004\004");
-            Log.d("printer", "cmd send");
             dis.read(buffer);
             socket.close();
             if (buffer[0] == 18) {

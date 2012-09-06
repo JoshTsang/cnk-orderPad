@@ -82,13 +82,11 @@ public class NotificationTableService extends Service {
 
 	@Override
 	public void onCreate() {
-		Log.d("service", "onCreate");
 		super.onCreate();
 	}
 
 	@Override
 	public void onStart(Intent intent, int startId) {
-		Log.d("service", "onStart");
 		objHandler.postDelayed(mTasks, 1);
 		super.onStart(intent, startId);
 	}
