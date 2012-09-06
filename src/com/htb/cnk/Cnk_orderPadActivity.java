@@ -57,7 +57,6 @@ public class Cnk_orderPadActivity extends BaseActivity {
 
 	private String mUrl;
 	private WifiAdmin mWifiAdmin;
-	// private Thread wifiLockNodifyThread;
 	private String mUpdateAkpDir;
 	private Handler handler = new Handler();
 	private Version version;
@@ -319,7 +318,6 @@ public class Cnk_orderPadActivity extends BaseActivity {
 							if (length > 0) {
 							}
 						}
-
 					}
 					fileOutputStream.flush();
 					if (fileOutputStream != null) {
@@ -402,8 +400,8 @@ public class Cnk_orderPadActivity extends BaseActivity {
 				ARERTDIALOG = 1;
 				mNetWrorkcancel = wifiDialog().show();
 			} else {
-				Toast.makeText(Cnk_orderPadActivity.this, "当前wifi状态已经连接", 1)
-						.show();
+				Toast.makeText(Cnk_orderPadActivity.this, "当前wifi状态已经连接", 
+						Toast.LENGTH_SHORT).show();
 			}
 		}
 	};

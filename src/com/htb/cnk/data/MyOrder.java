@@ -358,6 +358,7 @@ public class MyOrder {
 		String response = Http.get(Server.GET_GETPHONEORDER, "TID=" + tableId);
 		Log.d("resp", "Phone:" + response);
 		if (response == null) {
+			Log.e(TAG, "getPhoneOrderFromServer.timeOut");
 			return -1;
 		} else if ("null".equals(response)) {
 			return RET_NULL_PHONE_ORDER;
@@ -367,7 +368,6 @@ public class MyOrder {
 			JSONArray tableList = new JSONArray(response);
 			int length = tableList.length();
 			phoneClear();
-
 			for (int i = 0; i < length; i++) {
 				JSONObject item = tableList.getJSONObject(i);
 				int quantity = item.getInt("quantity");
@@ -379,8 +379,8 @@ public class MyOrder {
 				addOrder(mDish, quantity, tableId, 1, MODE_PHONE);
 			}
 			return 0;
-
 		} catch (Exception e) {
+			Log.e(TAG,response);
 			e.printStackTrace();
 		}
 
@@ -525,9 +525,7 @@ public class MyOrder {
 	private int updateServerServedDish(int tableId, int dishId) {
 		String dishStatusPkg = Http.get(Server.SERVE_ORDER, "TID=" + tableId
 				+ "&DID=" + dishId);
-		if (dishStatusPkg == null) {
-			return -1;
-		} else if (ErrorPHP.isSucc(dishStatusPkg, TAG)) {
+		if (ErrorPHP.isSucc(dishStatusPkg, TAG)) {
 			return 0;
 		} else {
 			return -1;

@@ -293,4 +293,10 @@ public class DelOrderActivity extends OrderBaseActivity {
 		return mAlertDialog;
 	}
 
+	@Override
+	public void finish() {
+		mMyOrder.clear();
+		super.finish();
+	}
+	
 }

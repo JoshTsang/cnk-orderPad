@@ -493,14 +493,12 @@ public class TableActivity extends BaseActivity {
 			mpDialog.cancel();
 
 			if (msg.what < 0) {
-				Log.d("wsg", msg.what+":::");
 				if (ARERTDIALOG == 1) {
 					mNetWrorkcancel.cancel();
 				}
 				ARERTDIALOG = 1;
 				mNetWrorkcancel = mNetWrorkAlertDialog.show();
 			} else {
-				Log.d("wsg", msg.what+":aaa:::");
 				switch (msg.what) {
 				case UPDATE_TABLE_INFOS:
 					setTableInfos();

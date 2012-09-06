@@ -12,6 +12,9 @@ public class ErrorPHP implements Serializable{
 	private static String mError;
 	
 	public static boolean isSucc(String responsePkg,String errorTAG) {
+		if(responsePkg == null){
+			Log.e(errorTAG, errorTAG+".timeOut");
+		}
 		try {
 			JSONObject errorString = new JSONObject(responsePkg);
 			String succ = errorString.getString("succ");
