@@ -69,7 +69,7 @@ public class TableActivity extends BaseActivity {
 	private int mRingtoneMsg;
 	private MyReceiver mReceiver;
 	private NotificationTableService.MyBinder binder;
-	private boolean binderFlag = false;
+	private boolean binderFlag;
 	private Intent intent;
 
 	@Override
@@ -186,7 +186,7 @@ public class TableActivity extends BaseActivity {
 		}
 	}
 
-	//TODO define 
+	// TODO define
 	class ItemClickListener implements OnItemClickListener {
 
 		public void onItemClick(AdapterView<?> arg0,// The AdapterView where the
@@ -262,7 +262,7 @@ public class TableActivity extends BaseActivity {
 		Dialog cleanDialog = new AlertDialog.Builder(TableActivity.this)
 				.setTitle("选择功能")
 				.setItems(cleanitems, new DialogInterface.OnClickListener() {
-	
+
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						Intent intent = new Intent();
@@ -364,7 +364,7 @@ public class TableActivity extends BaseActivity {
 						Intent intent = new Intent();
 						if (Info.getMenu() == Info.ORDER_QUCIK_MENU) {
 							intent.setClass(TableActivity.this,
-									QuickMenuActivity.class); 
+									QuickMenuActivity.class);
 							TableActivity.this.startActivity(intent);
 						} else {
 							switch (which) {
@@ -446,7 +446,8 @@ public class TableActivity extends BaseActivity {
 	protected Builder changeTableDialog() {
 		final EditText changeTableText = new EditText(this);
 		changeTableText.setKeyListener(new DigitsKeyListener(false, true));
-		changeTableText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(3)});
+		changeTableText
+				.setFilters(new InputFilter[] { new InputFilter.LengthFilter(3) });
 		final AlertDialog.Builder mAlertDialog = new AlertDialog.Builder(
 				TableActivity.this);
 		mAlertDialog.setTitle("请输入桌号");
@@ -462,7 +463,8 @@ public class TableActivity extends BaseActivity {
 						changeTId = changeTableText.getEditableText()
 								.toString();
 						int destId = Integer.parseInt(changeTId);
-						if (mSettings.getStatusTableId(destId) == 0 && destId <= mSettings.size()) {
+						if (mSettings.getStatusTableId(destId) == 0
+								&& destId <= mSettings.size()) {
 							changeTable(Integer.parseInt(changeTId));
 						} else {
 							Toast.makeText(
@@ -489,12 +491,14 @@ public class TableActivity extends BaseActivity {
 			mpDialog.cancel();
 
 			if (msg.what < 0) {
+				Log.d("wsg", msg.what+":::");
 				if (ARERTDIALOG == 1) {
 					mNetWrorkcancel.cancel();
 				}
 				ARERTDIALOG = 1;
 				mNetWrorkcancel = mNetWrorkAlertDialog.show();
 			} else {
+				Log.d("wsg", msg.what+":aaa:::");
 				switch (msg.what) {
 				case UPDATE_TABLE_INFOS:
 					setTableInfos();
@@ -514,21 +518,21 @@ public class TableActivity extends BaseActivity {
 
 	private Handler changeTIdHandle = new Handler() {
 		public void handleMessage(Message msg) {
-			if (msg.what < 0) {
-				Toast.makeText(
-						getApplicationContext(),
-						getResources().getString(
-								R.string.changeTIdWarning),
+			if (msg.what == -2) {
+				Toast.makeText(getApplicationContext(),
+						getResources().getString(R.string.changeTIdWarning),
 						Toast.LENGTH_SHORT).show();
+			} else if (msg.what == -1) {
+				ARERTDIALOG = 1;
+				mNetWrorkAlertDialog.setMessage("转台失败，请检查连接网络重试");
+				mNetWrorkcancel = mNetWrorkAlertDialog.show();
 			} else {
 				binder.start();
-				Toast.makeText(
-						getApplicationContext(),
-						getResources().getString(
-								R.string.changeTId),
+				Toast.makeText(getApplicationContext(),
+						getResources().getString(R.string.changeTId),
 						Toast.LENGTH_SHORT).show();
-				}
 			}
+		}
 	};
 
 	private void setTableInfos() {
@@ -734,7 +738,8 @@ public class TableActivity extends BaseActivity {
 		new Thread() {
 			public void run() {
 				try {
-					int ret = mSettings.changeTable(Info.getTableId(), destTId,TableActivity.this);
+					int ret = mSettings.changeTable(Info.getTableId(), destTId,
+							TableActivity.this);
 					Log.d("DEL", "ret" + ret);
 					changeTIdHandle.sendEmptyMessage(ret);
 				} catch (Exception e) {

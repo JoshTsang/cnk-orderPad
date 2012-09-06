@@ -1,5 +1,7 @@
 package com.htb.cnk;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -12,27 +14,43 @@ import android.view.View.OnClickListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.htb.cnk.DelOrderActivity.getOrderThread;
 import com.htb.cnk.adapter.MyOrderAdapter;
 import com.htb.cnk.data.Info;
+import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.data.MyOrder.OrderedDish;
 import com.htb.cnk.lib.OrderBaseActivity;
 
 public class QueryOrderActivity extends OrderBaseActivity {
+	
 	private MyOrderAdapter mMyOrderAdapter;
-
+	private static int ARERTDIALOG = 0;
+	private AlertDialog mNetWrorkcancel;
+	private AlertDialog.Builder mNetWrorkAlertDialog;
+	
+	
+	@Override
+	protected void onResume() {
+		if (ARERTDIALOG == 1) {
+			mNetWrorkcancel.cancel();
+			ARERTDIALOG = 0;
+		}
+		showProgressDlg("正在获取菜品。。。");
+		new Thread(new queryThread()).start();
+		super.onResume();
+	}
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setQueryViews();
-		showProgressDlg("请稍候...");
-		new Thread(new queryThread()).start();
+		mNetWrorkAlertDialog = networkDialog();
 	}
 
 	private void setQueryViews() {
 		mSubmitBtn.setText("上菜");
 		mLeftBtn.setVisibility(View.GONE);
 		mRefreshBtn.setVisibility(View.GONE);
-		
 		mSubmitBtn.setOnClickListener(submitClicked);
 	}
 
@@ -55,7 +73,7 @@ public class QueryOrderActivity extends OrderBaseActivity {
 						.findViewById(R.id.dishQuantity);
 
 				dishName.setText(dishDetail.getName());
-				
+
 				dishPrice.setText(Double.toString(dishDetail.getPrice())
 						+ " 元/份");
 				dishQuantity
@@ -77,19 +95,23 @@ public class QueryOrderActivity extends OrderBaseActivity {
 		mMyOrderLst.setAdapter(mMyOrderAdapter);
 	}
 
-
 	Handler queryHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
-			if (msg.what < 0) {
+			if (msg.what == -2) {
 				Toast.makeText(getApplicationContext(),
 						getResources().getString(R.string.delWarning),
 						Toast.LENGTH_SHORT).show();
+			} else if (msg.what == -1) {
+				ARERTDIALOG = 1;
+				mNetWrorkAlertDialog.setMessage("查询菜品失败，请检查连接网络重试");
+				mNetWrorkcancel = mNetWrorkAlertDialog.show();
 			} else {
 				setAdapter();
 				mMyOrderAdapter.notifyDataSetChanged();
 				updateTabelInfos();
 			}
+			
 		}
 	};
 
@@ -104,21 +126,52 @@ public class QueryOrderActivity extends OrderBaseActivity {
 		}
 	}
 	
+	private AlertDialog.Builder networkDialog() {
+		final AlertDialog.Builder mAlertDialog = new AlertDialog.Builder(
+				QueryOrderActivity.this);
+		mAlertDialog.setTitle("错误");// 设置对话框标题
+		mAlertDialog.setMessage("网络连接失败，请检查网络后重试");// 设置对话框内容
+		mAlertDialog.setCancelable(false);
+		mAlertDialog.setPositiveButton("重试",
+				new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int i) {
+						ARERTDIALOG = 0;
+						showProgressDlg("正在连接服务器...");
+						new Thread(new queryThread()).start();
+					}
+				});
+		mAlertDialog.setNegativeButton("退出",
+				new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int i) {
+						finish();
+						ARERTDIALOG = 0;
+					}
+				});
+
+		return mAlertDialog;
+	}
+	
+
 	@Override
 	public void finish() {
 		mMyOrder.clear();
 		super.finish();
 	}
-	
+
 	private OnClickListener submitClicked = new OnClickListener() {
 
 		@Override
 		public void onClick(View arg0) {
-				Intent intent = new Intent();
-				intent.setClass(QueryOrderActivity.this, ServeOrderActivity.class);
-				startActivity(intent);
-				finish();
+			Intent intent = new Intent();
+			intent.setClass(QueryOrderActivity.this, ServeOrderActivity.class);
+			startActivity(intent);
+			finish();
 		}
 
 	};
+	
 }

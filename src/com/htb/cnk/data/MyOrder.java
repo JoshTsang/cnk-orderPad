@@ -325,8 +325,10 @@ public class MyOrder {
 	public int getOrderFromServer(int tableId) {
 		String response = Http.get(Server.GET_MYORDER, "TID=" + tableId);
 		if ("null".equals(response)) {
+			Log.w(TAG, "getOrderFromServer.null");
 			return -2;
 		} else if (response == null) {
+			Log.e(TAG, "getOrderFromServer.timeOut");
 			return -1;
 		}
 		try {
@@ -345,6 +347,7 @@ public class MyOrder {
 			}
 			return 0;
 		} catch (Exception e) {
+			Log.e(TAG, response);
 			e.printStackTrace();
 		}
 		return -1;

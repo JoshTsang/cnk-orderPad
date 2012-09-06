@@ -92,12 +92,11 @@ public class TableSetting implements Serializable {
 		mTableSettings.get(index).setStatus(n);
 	}
 
-	//TODO define
+	// TODO define
 	public int getTableStatusFromServer() {
 		String tableStatusPkg = Http.get(Server.GET_TABLE_STATUS, "");
-		if (tableStatusPkg == null || "null".equals(tableStatusPkg)
-				|| "".equals(tableStatusPkg)) {
-			Log.e("getTableStatusFromServer", tableStatusPkg);
+		if (tableStatusPkg == null) {
+			Log.e(TAG, "getTableStatusFromServer.timeout");
 			return -1;
 		}
 		try {
@@ -119,7 +118,7 @@ public class TableSetting implements Serializable {
 			}
 			return 0;
 		} catch (Exception e) {
-			Log.w("getTableStatus.php", tableStatusPkg);
+			Log.e(TAG, tableStatusPkg);
 			e.printStackTrace();
 		}
 		return -1;
@@ -128,6 +127,7 @@ public class TableSetting implements Serializable {
 	public boolean hasPendedPhoneOrder() {
 		return phoneOrderPending;
 	}
+
 	public int getItemTableStatus(int tableId) {
 		String tableStatusPkg = Http.get(Server.GET_ITEM_TABLE_STATUS, "TSI="
 				+ tableId);
@@ -140,7 +140,7 @@ public class TableSetting implements Serializable {
 		int end = tableStatusPkg.indexOf("]");
 
 		if ((start < 0) || (end < 0)) {
-			Log.e(TAG, "getItemTableStatus:tableStatusPkg is "+tableStatusPkg);
+			Log.e(TAG, "getItemTableStatus:tableStatusPkg is " + tableStatusPkg);
 			return -1;
 		}
 
@@ -184,9 +184,14 @@ public class TableSetting implements Serializable {
 	public int changeTable(int srcTId, int destTId, Context context) {
 		if (mOrder == null) {
 			mOrder = new MyOrder(context);
+		} else {
+			mOrder.clear();
 		}
-		mOrder.getOrderFromServer(srcTId);
-
+		int ret = mOrder.getOrderFromServer(srcTId);
+		if (ret == -1) {
+			Log.e(TAG, "mOrder.getOrderFromServer.timeout");
+			return ret;
+		}
 		JSONObject order = new JSONObject();
 		Date date = new Date();
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

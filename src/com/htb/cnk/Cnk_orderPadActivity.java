@@ -61,9 +61,16 @@ public class Cnk_orderPadActivity extends BaseActivity {
 	private String mUpdateAkpDir;
 	private Handler handler = new Handler();
 	private Version version;
+	private static int ARERTDIALOG = 0;
+	private AlertDialog mNetWrorkcancel;
+	private AlertDialog.Builder mNetWrorkAlertDialog;
 	
 	@Override
 	protected void onResume() {
+		if (ARERTDIALOG == 1) {
+			mNetWrorkcancel.cancel();
+			ARERTDIALOG = 0;
+		}
 		initWifi();
 		super.onResume();
 	}
@@ -85,6 +92,7 @@ public class Cnk_orderPadActivity extends BaseActivity {
 		mpDialog.setIndeterminate(false);
 		mpDialog.setCancelable(false);
 		syncWithServer();
+		mNetWrorkAlertDialog = wifiDialog();
 	}
 
 	private void findViews() {
@@ -204,7 +212,9 @@ public class Cnk_orderPadActivity extends BaseActivity {
 	public void initWifi() {
 		if (mWifiAdmin.checkNetCardState() == 0
 				|| mWifiAdmin.checkNetCardState() == 1) {
-			wifiDialog().show();
+			ARERTDIALOG = 1;
+			mNetWrorkcancel = wifiDialog().show();
+			
 		} else {
 			mpDialog.cancel();
 		}
@@ -383,7 +393,8 @@ public class Cnk_orderPadActivity extends BaseActivity {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
 			if (msg.what < 0) {
-				wifiDialog();
+				ARERTDIALOG = 1;
+				mNetWrorkcancel = wifiDialog().show();
 			} else {
 				Toast.makeText(Cnk_orderPadActivity.this, "当前wifi状态已经连接", 1)
 						.show();
