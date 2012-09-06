@@ -85,6 +85,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 						.setText(Integer.toString(dishDetail.getQuantity()));
 
 				delBtn.setTag(position);
+				delBtn.setText("-1");
 				delBtn.setOnClickListener(delClicked);
 
 				return convertView;
