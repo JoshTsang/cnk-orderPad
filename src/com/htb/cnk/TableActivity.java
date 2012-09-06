@@ -74,6 +74,7 @@ public class TableActivity extends BaseActivity {
 
 	@Override
 	protected void onDestroy() {
+		unbindService(conn);
 		unregisterReceiver(mReceiver);
 		super.onDestroy();
 	}
@@ -363,7 +364,7 @@ public class TableActivity extends BaseActivity {
 						Intent intent = new Intent();
 						if (Info.getMenu() == Info.ORDER_QUCIK_MENU) {
 							intent.setClass(TableActivity.this,
-									QuickMenuActivity.class);
+									QuickMenuActivity.class); 
 							TableActivity.this.startActivity(intent);
 						} else {
 							switch (which) {
