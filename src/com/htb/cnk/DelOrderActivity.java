@@ -250,14 +250,13 @@ public class DelOrderActivity extends OrderBaseActivity {
 					cleanAllHandler.sendEmptyMessage(-2);
 					return;
 				}
-				//TODO fix
-				int result = mMyOrder.submitDelDish(-1,1);
-				int ret = mSettings.cleanTalble(Info.getTableId());
-				if (ret < 0 || result < 0) {
+				int result = mMyOrder.submitDelDish(-1,0);
+//				int ret = mSettings.cleanTalble(Info.getTableId());
+				if (result < 0) {
 					cleanAllHandler.sendEmptyMessage(-1);
 					return;
 				}
-				cleanAllHandler.sendEmptyMessage(ret);
+				cleanAllHandler.sendEmptyMessage(result);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

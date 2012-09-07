@@ -29,6 +29,8 @@ public class MyOrder {
 	private final static int MODE_PAD = 0;
 	private final static int MODE_PHONE = 1;
 
+	private final static int TIME_OUT = -1;
+
 	public class OrderedDish {
 		Dish dish;
 		int padQuantity;
@@ -329,7 +331,7 @@ public class MyOrder {
 			return -2;
 		} else if (response == null) {
 			Log.e(TAG, "getOrderFromServer.timeOut");
-			return -1;
+			return TIME_OUT;
 		}
 		try {
 			JSONArray tableList = new JSONArray(response);
@@ -359,7 +361,7 @@ public class MyOrder {
 		Log.d("resp", "Phone:" + response);
 		if (response == null) {
 			Log.e(TAG, "getPhoneOrderFromServer.timeOut");
-			return -1;
+			return TIME_OUT;
 		} else if ("null".equals(response)) {
 			return RET_NULL_PHONE_ORDER;
 		}
@@ -380,7 +382,7 @@ public class MyOrder {
 			}
 			return 0;
 		} catch (Exception e) {
-			Log.e(TAG,response);
+			Log.e(TAG, response);
 			e.printStackTrace();
 		}
 
@@ -405,6 +407,7 @@ public class MyOrder {
 	}
 
 	public int submitDelDish(int position, int quan) {
+		String response;
 		JSONObject order = new JSONObject();
 		Date date = new Date();
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -447,13 +450,17 @@ public class MyOrder {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		String response = Http.post(
-				Server.UPDATE_TABLE_ORDER + "?TID=" + Info.getTableId()
-						+ "&DID=" + mOrder.get(position).dish.getId(),
-				order.toString());
-		 if (!ErrorPHP.isSucc(response, TAG)) {
-		 return -1;
-		 }
+		if (position == -1) {
+			response = Http.post(Server.DEL_ORDER, order.toString());
+		} else {
+			response = Http.post(
+					Server.UPDATE_TABLE_ORDER + "?TID=" + Info.getTableId()
+							+ "&DID=" + mOrder.get(position).dish.getId(),
+					order.toString());
+		}
+		if (!ErrorPHP.isSucc(response, TAG)) {
+			return -1;
+		}
 		return 0;
 
 	}

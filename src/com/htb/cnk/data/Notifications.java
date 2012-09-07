@@ -12,6 +12,8 @@ import com.htb.cnk.lib.Http;
 import com.htb.constant.Server;
 
 public class Notifications {
+	private static final int TIME_OUT = -1;
+
 	public class NotificationItem {
 		protected String mType[];
 		protected int mId;
@@ -28,11 +30,12 @@ public class Notifications {
 		public String[] getTypeAll() {
 			return mType;
 		}
-		
-		public String getType(int index){
+
+		public String getType(int index) {
 			return mType[index];
 		}
 	}
+
 	static List<NotificationItem> notifications = new ArrayList<NotificationItem>();
 
 	public Notifications() {
@@ -44,14 +47,15 @@ public class Notifications {
 	}
 
 	public int size() {
-		return notifications.size()-1;
+		return notifications.size() - 1;
 	}
-	
-	public void clear(){
+
+	public void clear() {
 		notifications.clear();
 	}
+
 	public int getId(int index) {
-		if(index >= notifications.size()){
+		if (index >= notifications.size()) {
 			return -1;
 		}
 		return notifications.get(index).getId();
@@ -59,25 +63,25 @@ public class Notifications {
 
 	public String[] getTypeAll(int index) {
 		int i;
-		
-		for(i = 0;i< notifications.size()-1;i++){
-			if(index == notifications.get(i).getId()){
+
+		for (i = 0; i < notifications.size() - 1; i++) {
+			if (index == notifications.get(i).getId()) {
 				break;
 			}
 		}
 		return notifications.get(i).getTypeAll();
 	}
-	
-	public String getType(int notification,int type){
+
+	public String getType(int notification, int type) {
 		return notifications.get(notification).getType(type);
 	}
 
 	public int getNotifiycations() {
 		String notificationPkg = Http.get(Server.GET_NOTIFICATION, null);
-	//	Log.d("notificationPkg", notificationPkg);
+		// Log.d("notificationPkg", notificationPkg);
 		if (notificationPkg == null || "".equals(notificationPkg)) {
-			return -1;
-		} else if("null".equals(notificationPkg)){
+			return TIME_OUT;
+		} else if ("null".equals(notificationPkg)) {
 			notifications.clear();
 			return 0;
 		}
@@ -90,14 +94,14 @@ public class Notifications {
 			for (int i = 0; i < length; i++) {// 遍历JSONArray
 				JSONObject item = tableList.getJSONObject(i);
 				int id = item.getInt("tid");
-				String notifications = item
-						.getString("notifications");
-				String types = notifications.substring(1, notifications.indexOf(']'));
-				String typesTemp[] = null; 
-				typesTemp= types.split(",");
-				asItem = new NotificationItem(id,typesTemp);
+				String notifications = item.getString("notifications");
+				String types = notifications.substring(1,
+						notifications.indexOf(']'));
+				String typesTemp[] = null;
+				typesTemp = types.split(",");
+				asItem = new NotificationItem(id, typesTemp);
 				setting.add(asItem);
-				Log.d("settings", "settings:"+asItem.getId());
+				Log.d("settings", "settings:" + asItem.getId());
 			}
 			return 1;
 		} catch (Exception e) {
@@ -108,20 +112,21 @@ public class Notifications {
 		return -1;
 	}
 
-	public List <String> getNotifiycationsType(int index){
+	public List<String> getNotifiycationsType(int index) {
 		Notifications setting = new Notifications();
 		String types[] = setting.getTypeAll(index);
-		List <String> temp = new ArrayList<String>();
-		for(int i = 0; i < types.length;i++){
-			temp.add(NotificationTypes.getName(Integer.parseInt(types[i]))) ;
+		List<String> temp = new ArrayList<String>();
+		for (int i = 0; i < types.length; i++) {
+			temp.add(NotificationTypes.getName(Integer.parseInt(types[i])));
 		}
 		return temp;
 	}
-	
-	public int cleanNotifications(int index){
-		String notificationPkg = Http.get(Server.CLEANNOTIFICATION, "TID=" + index);
+
+	public int cleanNotifications(int index) {
+		String notificationPkg = Http.get(Server.CLEANNOTIFICATION, "TID="
+				+ index);
 		if (notificationPkg == null) {
-			return -1;
+			return TIME_OUT;
 		}
 		return 0;
 	}

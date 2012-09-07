@@ -50,7 +50,7 @@ public class MenuActivity extends BaseActivity {
 	private final int DO_NOTHING = 0;
 	private final int FINISH_ACTIVITY = 1;
 	private final int SHOW_PROGRESS_DLG = 2;
-	
+
 	private ListView mCategoriesLst;
 	private ListView mDishesLst;
 	private Button mBackBtn;
@@ -105,7 +105,7 @@ public class MenuActivity extends BaseActivity {
 		mSettingsBtn.setText("快捷");
 	}
 
-	private View getMenuView(int position, View convertView) {
+	public View getMenuView(int position, View convertView) {
 		ItemViewHolder viewHolder;
 		Dish dishDetail = mDishes.getDish(position);
 
@@ -126,7 +126,7 @@ public class MenuActivity extends BaseActivity {
 		return convertView;
 	}
 
-	private View getFastOrderMenu(int position, View convertView) {
+	public View getFastOrderMenu(int position, View convertView) {
 		ItemViewHolder viewHolder;
 		Dish dishDetail = mDishes.getDish(position);
 
@@ -147,7 +147,7 @@ public class MenuActivity extends BaseActivity {
 		return convertView;
 	}
 
-	private FileInputStream getPic(String name) {
+	public FileInputStream getPic(String name) {
 		FileInputStream isBigPic = null;
 		try {
 			isBigPic = openFileInput(name);
@@ -157,7 +157,7 @@ public class MenuActivity extends BaseActivity {
 		return isBigPic;
 	}
 
-	private FileInputStream getThumbnail(String name) {
+	public FileInputStream getThumbnail(String name) {
 		FileInputStream inStream = null;
 		try {
 			if (name == null || "".equals(name) || "null".equals(name)) {
@@ -171,7 +171,7 @@ public class MenuActivity extends BaseActivity {
 		return inStream;
 	}
 
-	private void setListData() {
+	public void setListData() {
 		if (mCategories.count() <= 0) {
 			errorAccurDlg("菜谱数据损坏,请更新菜谱!", FINISH_ACTIVITY);
 			Log.e(TAG, "menu data base is broken");
@@ -186,7 +186,7 @@ public class MenuActivity extends BaseActivity {
 		mCategoriesLst.setAdapter(new CategoryListAdapter(this, mCategories));
 	}
 
-	private void setDishes() {
+	public void setDishes() {
 		mDishLstAdapter = new DishListAdapter(this, mDishes) {
 			@Override
 			public View getView(int position, View convertView, ViewGroup arg2) {
@@ -212,7 +212,7 @@ public class MenuActivity extends BaseActivity {
 		updateDishes(0);
 	}
 
-	private void setThumbnail(int position, ImageButton dishPic,
+	public void setThumbnail(int position, ImageButton dishPic,
 			FileInputStream inStream) {
 		Bitmap photo = BitmapFactory.decodeStream(inStream);
 		Drawable drawable = new BitmapDrawable(photo);
@@ -228,11 +228,11 @@ public class MenuActivity extends BaseActivity {
 		mCategoriesLst.setOnItemClickListener(CategoryListClicked);
 	}
 
-	private void updateOrderedDishCount() {
+	public void updateOrderedDishCount() {
 		mOrderedDishCount.setText(Integer.toString(mMyOrder.totalQuantity()));
 	}
 
-	private void updateDishes(final int position) {
+	public void updateDishes(final int position) {
 		mDishes.clear();
 		mDishLstAdapter.notifyDataSetChanged();
 		// new Thread() {
@@ -248,7 +248,7 @@ public class MenuActivity extends BaseActivity {
 		mDishLstAdapter.notifyDataSetChanged();
 	}
 
-	private void updateDishQuantity(final int position, final int quantity) {
+	public void updateDishQuantity(final int position, final int quantity) {
 		if (quantity < 0) {
 			new Thread() {
 				public void run() {
@@ -268,7 +268,7 @@ public class MenuActivity extends BaseActivity {
 		minushandler.sendEmptyMessage(SHOW_PROGRESS_DLG);
 	}
 
-	private void showGuide() {
+	public void showGuide() {
 		final Dialog dialog = new Dialog(MenuActivity.this,
 				R.style.FULLTANCStyle);
 
@@ -285,7 +285,7 @@ public class MenuActivity extends BaseActivity {
 		dialog.show();
 	}
 
-	private void errorAccurDlg(String msg, final int action) {
+	public void errorAccurDlg(String msg, final int action) {
 		new AlertDialog.Builder(MenuActivity.this).setTitle("错误")
 				.setMessage(msg)
 				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
@@ -433,7 +433,7 @@ public class MenuActivity extends BaseActivity {
 		}
 	};
 
-	class ItemViewHolder {
+	public class ItemViewHolder {
 		public final static int ITEM_FASTORDER_VIEW = 1;
 		public final static int ITEM_ORDER_VIEW = 2;
 		ImageButton dishPic;

@@ -26,7 +26,7 @@ public class NotificationTypes {
 	public int getNotifiycationsType() {
 		String notificationTypePkg = Http.get(Server.GET_NOTIFICATIONTYPES,
 				null);
-		if (notificationTypePkg == null || "".equals("notificationTypePkg")) {
+		if (notificationTypePkg == null || "".equals(notificationTypePkg)) {
 			return -1;
 		}
 		try {
@@ -42,7 +42,7 @@ public class NotificationTypes {
 			notificationTypes.add(map);
 			return 0;
 		} catch (Exception e) {
-			Log.d("getNotificationTypes.php", notificationTypePkg);
+			Log.e("getNotificationTypes.php", notificationTypePkg);
 			e.printStackTrace();
 		}
 

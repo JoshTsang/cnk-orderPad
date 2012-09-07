@@ -18,7 +18,7 @@ import com.htb.cnk.lib.Http;
 import com.htb.constant.Server;
 
 public class TableSetting implements Serializable {
-
+	private static final int TIME_OUT = -1;
 	private final String TAG = "tableAtivity";
 	private static final long serialVersionUID = 1L;
 	private MyOrder mOrder;
@@ -97,7 +97,7 @@ public class TableSetting implements Serializable {
 		String tableStatusPkg = Http.get(Server.GET_TABLE_STATUS, "");
 		if (tableStatusPkg == null) {
 			Log.e(TAG, "getTableStatusFromServer.timeout");
-			return -1;
+			return TIME_OUT;
 		}
 		try {
 			JSONArray tableList = new JSONArray(tableStatusPkg);
@@ -133,7 +133,7 @@ public class TableSetting implements Serializable {
 				+ tableId);
 		if (tableStatusPkg == null) {
 			Log.e(TAG, "getItemTableStatus:tableStatusPkg is null");
-			return -1;
+			return TIME_OUT;
 		}
 
 		int start = tableStatusPkg.indexOf("[");
@@ -190,7 +190,7 @@ public class TableSetting implements Serializable {
 		int ret = mOrder.getOrderFromServer(srcTId);
 		if (ret == -1) {
 			Log.e(TAG, "mOrder.getOrderFromServer.timeout");
-			return ret;
+			return TIME_OUT;
 		}
 		JSONObject order = new JSONObject();
 		Date date = new Date();
