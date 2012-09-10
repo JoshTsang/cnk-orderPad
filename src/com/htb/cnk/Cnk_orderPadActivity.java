@@ -28,6 +28,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
@@ -409,6 +410,35 @@ public class Cnk_orderPadActivity extends BaseActivity {
 	private void startLock() {
 		mWifiAdmin.creatWifiLock();
 		mWifiAdmin.acquireWifiLock();
+	}
+	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_BACK) {
+			new AlertDialog.Builder(Cnk_orderPadActivity.this)
+			.setTitle("注意")
+			.setCancelable(false)
+			.setMessage("确认退出菜脑壳点菜系统？")
+			.setPositiveButton("确定",
+					new DialogInterface.OnClickListener() {
+
+						@Override
+						public void onClick(DialogInterface dialog,
+								int which) {
+							finish();
+						}
+					})
+			.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+
+				@Override
+				public void onClick(DialogInterface dialog,
+						int which) {
+				}
+			}).show();
+			return true;
+		} else {
+			return super.onKeyDown(keyCode, event);
+		}
 	}
 
 }
