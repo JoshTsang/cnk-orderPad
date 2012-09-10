@@ -50,7 +50,7 @@
     <string name="claenNotificaion">亲：还不快点，客人都着急啦！</string>
     <string name="phoneAdd">加菜</string>
     <string name="refresh">刷新</string>
-    <string name="logout">注销</string>
+    <string name="logout">交班</string>
     <string name="combineTable">并台</string>
     <string name="delPhoneWarning">亲：你手机没有点菜哦</string>
     <string name="phoneWarning">网络连接不上</string>

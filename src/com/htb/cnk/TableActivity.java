@@ -735,9 +735,29 @@ public class TableActivity extends BaseActivity {
 	private OnClickListener logoutClicked = new OnClickListener() {
 		@Override
 		public void onClick(View v) {
-			Info.setMode(Info.WORK_MODE_CUSTOMER);
-			Info.setTableId(-1);
-			finish();
+			new AlertDialog.Builder(TableActivity.this)
+			.setTitle("注意")
+			.setCancelable(false)
+			.setMessage("确认交班？")
+			.setPositiveButton("确定",
+					new DialogInterface.OnClickListener() {
+
+						@Override
+						public void onClick(DialogInterface dialog,
+								int which) {
+							Info.setMode(Info.WORK_MODE_CUSTOMER);
+							Info.setTableId(-1);
+							finish();
+						}
+					})
+			.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+
+				@Override
+				public void onClick(DialogInterface dialog,
+						int which) {
+				}
+			})
+			.show();
 		}
 
 	};
