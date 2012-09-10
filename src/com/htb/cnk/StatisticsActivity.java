@@ -54,6 +54,7 @@ public class StatisticsActivity extends BaseActivity {
 	private TextView mStartTime;
 	private TextView mEndDate;
 	private TextView mEndTime;
+	private TextView mTableUsage;
 	private TextView mTotalAmount;
 	private ListView mSalesData;
 	ProgressDialog mpDialog;
@@ -94,6 +95,7 @@ public class StatisticsActivity extends BaseActivity {
 		mEndTime = (TextView) findViewById(R.id.endTime);
 		mTotalAmount = (TextView) findViewById(R.id.totalAmount);
 		mSalesData = (ListView) findViewById(R.id.salesData);
+		mTableUsage = (TextView) findViewById(R.id.tableUsage);
 	}
 
 	private void setClickListener() {
@@ -262,6 +264,7 @@ public class StatisticsActivity extends BaseActivity {
 		mStartTime.setText(time.format(start.getTime()));
 		mEndDate.setText(date.format(end.getTime()));
 		mEndTime.setText(time.format(end.getTime()));
+		mTableUsage.setText(Integer.toString(mStatistics.getTableUsage()));
 		mTotalAmount.setText(Double.toString(mStatistics.getTotalAmount()));
 		mStatisticsAdapter.notifyDataSetChanged();
 	}
