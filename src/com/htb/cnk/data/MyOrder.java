@@ -261,7 +261,6 @@ public class MyOrder {
 	public void talbeClear() {
 		if (count() > 0 && getTableId() != Info.getTableId()) {
 			mOrder.clear();
-			Log.d("talbeClear", "clear");
 		}
 	}
 
@@ -290,6 +289,7 @@ public class MyOrder {
 		}
 
 		try {
+			order.put("waiter", UserData.getUserName());
 			order.put("tableId", Info.getTableId());
 			order.put("tableName", Info.getTableName());
 			order.put("timestamp", time);
@@ -416,6 +416,7 @@ public class MyOrder {
 			return -1;
 		}
 		try {
+			order.put("waiter", UserData.getUserName());
 			order.put("tableId", Info.getTableId());
 			order.put("tableName", Info.getTableName());
 			order.put("timestamp", time);

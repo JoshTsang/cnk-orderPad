@@ -181,7 +181,7 @@ public class TableSetting implements Serializable {
 		return 0;
 	}
 
-	public int changeTable(int srcTId, int destTId, Context context) {
+	public int changeTable(int srcTId, int destTId, String destName, Context context) {
 		if (mOrder == null) {
 			mOrder = new MyOrder(context);
 		} else {
@@ -197,7 +197,9 @@ public class TableSetting implements Serializable {
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String time = df.format(date);
 		try {
-			order.put("tableId", Info.getTableId());
+			order.put("waiter", UserData.getUserName());
+			order.put("tableName", destName);
+			order.put("tableId", destTId);
 			order.put("timestamp", time);
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -225,4 +227,50 @@ public class TableSetting implements Serializable {
 		return 0;
 	}
 
+	public int copyTable(int srcTId, int destTId, Context context) {
+		if (mOrder == null) {
+			mOrder = new MyOrder(context);
+		} else {
+			mOrder.clear();
+		}
+		int ret = mOrder.getOrderFromServer(srcTId);
+		if (ret == -1) {
+			Log.e(TAG, "mOrder.getOrderFromServer.timeout");
+			return TIME_OUT;
+		}
+		JSONObject order = new JSONObject();
+		Date date = new Date();
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String time = df.format(date);
+		try {
+			order.put("waiter", UserData.getUserName());
+			order.put("tableId", destTId);
+			order.put("tableName", Info.getTableName());
+			order.put("timestamp", time);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+
+		JSONArray dishes = new JSONArray();
+		try {
+			for (int i = 0; i < mOrder.count(); i++) {
+				JSONObject dish = new JSONObject();
+				dish.put("dishId", mOrder.getDishId(i));
+				dish.put("name", mOrder.getName(i));
+				dish.put("price", mOrder.getPrice(i));
+				dish.put("quan", mOrder.getQuantity(i));
+				dishes.put(dish);
+			}
+			order.put("order", dishes);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		String tablecopyPkg = Http.post(Server.COPY_TABLE + "?srcTID="
+				+ srcTId + "&destTID=" + destTId, order.toString());
+		if (!ErrorPHP.isSucc(tablecopyPkg, TAG)) {
+			return -2;
+		}
+		return 0;
+	}
+	
 }

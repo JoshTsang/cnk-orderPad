@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.util.Log;
 
 import com.htb.cnk.data.Notifications;
 import com.htb.cnk.data.TableSetting;
@@ -48,7 +47,7 @@ public class NotificationTableService extends Service {
 			try {
 				tableHandle.sendEmptyMessage(DISABLE_GRIDVIEW);
 				int ret = mNotificaion.getNotifiycations();
-				ringtoneHandler.sendEmptyMessage(ret);
+				intent.putExtra("ringtoneMessage", ret);
 				ret = mSettings.getTableStatusFromServer();
 				if (ret < 0) {
 					tableHandle.sendEmptyMessage(ret);
@@ -62,12 +61,6 @@ public class NotificationTableService extends Service {
 		}
 	}
 
-	private Handler ringtoneHandler = new Handler() {
-		public void handleMessage(Message msg) {
-			intent.putExtra("ringtoneMessage", msg.what);
-			sendBroadcast(intent);
-		}
-	};
 
 	private Handler tableHandle = new Handler() {
 		public void handleMessage(Message msg) {

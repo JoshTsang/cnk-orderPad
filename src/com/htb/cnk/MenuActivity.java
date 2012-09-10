@@ -102,7 +102,6 @@ public class MenuActivity extends BaseActivity {
 		mDishesLst = (ListView) findViewById(R.id.dishes);
 		mDishLstTitle = (TextView) findViewById(R.id.category);
 		mOrderedDishCount = (TextView) findViewById(R.id.orderedCount);
-		mSettingsBtn.setText("快捷");
 	}
 
 	public View getMenuView(int position, View convertView) {
@@ -127,6 +126,7 @@ public class MenuActivity extends BaseActivity {
 	}
 
 	public View getFastOrderMenu(int position, View convertView) {
+		mSettingsBtn.setText("快捷");
 		ItemViewHolder viewHolder;
 		Dish dishDetail = mDishes.getDish(position);
 

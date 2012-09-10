@@ -25,7 +25,6 @@
 		    	android:layout_height="45dip"
 		    	android:background="#00000000"/>
 	        <Button android:id="@+id/settings_btn"
-	            android:text="@string/settings"
  	            android:textColor="#F9E8BB"
 	        	android:textSize="35dip"
 	        	android:gravity="center"

@@ -67,10 +67,10 @@ public class QuickOrder {
 
 	public int queryDish(String orderName) {
 		int ret = 0;
-		char[] tempName = orderName.toCharArray();// 字符串拆分成字符
+		orderName= orderName.trim();
+		char[] tempName = orderName.toCharArray(); 
 		String retName = "";
 		mDishes.clear();
-		// 字符合并成字符串
 		for (int i = 0; i < tempName.length; i++) {
 			if (i == tempName.length - 1) {
 				retName += tempName[i] + "[\\s\\S]*";

@@ -60,5 +60,7 @@
     <string name="salesBackupTime">销售数据备份时间：</string>
     <string name="changeTIdWarning">转台不成功，请检查是否已经开台</string>
     <string name="changeTId">转台成功</string>
+    <string name="copyTIdwarning">复制不成功，请检查是否已经点菜</string>
+    <string name="copyTId">复制成功</string>
 
 </resources>

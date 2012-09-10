@@ -52,20 +52,20 @@ public class QuickMenuActivity extends BaseActivity {
 	private Button mMyOrderBtn;
 	private EditText mEditQucik;
 	private TextView mOrderedDishCount;
+	private TextView mTextQucik;
 	private Dishes mDishes;
 	private DishListAdapter mDishLstAdapter;
 	private MyOrder mMyOrder;
 	private QuickOrder mQuickOrder;
 	private ProgressDialog mpDialog;
 	private InputMethodManager imm;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.quick_activity);
 		mMyOrder = new MyOrder(QuickMenuActivity.this);
 		mQuickOrder = new QuickOrder(this);
-		Log.d("onCreate", "a");
 		mQuickOrder.setQucik();
 		mDishes = new Dishes(this);
 		findViews();
@@ -78,7 +78,7 @@ public class QuickMenuActivity extends BaseActivity {
 		mpDialog.setCancelable(false);
 
 		imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-		
+
 		if (Info.isNewCustomer() && Info.getMode() == Info.WORK_MODE_CUSTOMER) {
 			showGuide();
 		}
@@ -102,6 +102,8 @@ public class QuickMenuActivity extends BaseActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+		mEditQucik.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+		imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
 		if (mDishLstAdapter != null) {
 			mDishLstAdapter.notifyDataSetChanged();
 		}
@@ -115,6 +117,7 @@ public class QuickMenuActivity extends BaseActivity {
 		mEditQucik = (EditText) findViewById(R.id.edit_quick);
 		mOrderedDishCount = (TextView) findViewById(R.id.orderedCount);
 		mSettingsBtn.setText("普通");
+		mTextQucik = (TextView) findViewById(R.id.text_quick);
 	}
 
 	private View getMenuView(int position, View convertView) {
@@ -203,7 +206,7 @@ public class QuickMenuActivity extends BaseActivity {
 			}
 		};
 		mDishesLst.setAdapter(mDishLstAdapter);
-		
+
 		mDishLstAdapter.notifyDataSetChanged();
 	}
 
@@ -447,26 +450,30 @@ public class QuickMenuActivity extends BaseActivity {
 
 	private TextWatcher watcher = new TextWatcher() {
 		private String temp;
+
 		@Override
 		public void onTextChanged(CharSequence s, int start, int before,
 				int count) {
 			temp = s.toString();
+			mTextQucik.setText(s.toString());
 			mQuickOrder.queryDish(temp);
-			if(BUTTON_TEXT_CHANGED == 0){
+			if (BUTTON_TEXT_CHANGED == 0) {
 				mDishes.addAll(mQuickOrder.getListDish());
-			}else{
+			} else {
 				BUTTON_TEXT_CHANGED = 0;
 			}
 			mDishLstAdapter.notifyDataSetChanged();
 		}
+
 		@Override
 		public void afterTextChanged(Editable arg0) {
-			
+
 		}
+
 		@Override
 		public void beforeTextChanged(CharSequence s, int start, int count,
 				int after) {
-			
+
 		}
 
 	};
