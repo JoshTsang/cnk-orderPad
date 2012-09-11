@@ -86,6 +86,7 @@ public class MyOrder {
 	protected SQLiteDatabase mDb;
 	private Context mDelDlgActivity;
 	protected static List<OrderedDish> mOrder = new ArrayList<OrderedDish>();
+	protected int persons;
 
 	public MyOrder(Context context) {
 		mCnkDbHelper = new CnkDbHelper(context, CnkDbHelper.DATABASE_NAME,
@@ -94,6 +95,14 @@ public class MyOrder {
 		mDelDlgActivity = context;
 	}
 
+	public void setPersons(int persons) {
+		this.persons = persons;
+	}
+	
+	public int getPersons() {
+		return persons;
+	}
+	
 	public int addOrder(Dish dish, int quantity, int tableId, int status,
 			int type) {
 		for (OrderedDish item : mOrder) {
@@ -291,6 +300,7 @@ public class MyOrder {
 		try {
 			order.put("waiter", UserData.getUserName());
 			order.put("tableId", Info.getTableId());
+			order.put("persons", persons);
 			order.put("tableName", Info.getTableName());
 			order.put("timestamp", time);
 		} catch (JSONException e) {

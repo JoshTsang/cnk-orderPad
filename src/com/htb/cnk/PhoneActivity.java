@@ -23,70 +23,44 @@ import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.MyOrder.OrderedDish;
 import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.lib.BaseActivity;
+import com.htb.cnk.lib.OrderBaseActivity;
 import com.htb.constant.ErrorNum;
 
 /**
  * @author josh
  * 
  */
-public class PhoneActivity extends BaseActivity {
-
-	private Button mBackBtn;
-	private Button mLeftBtn;
-	private Button mSubmitBtn;
-	private Button mRefresh;
-	private TextView mTableNumTxt;
-	private TextView mDishCountTxt;
-	private TextView mTotalPriceTxt;
-	private ListView mMyOrderLst;
-	private MyOrder mMyOrder;
+public class PhoneActivity extends OrderBaseActivity {
 	private MyOrderAdapter mMyOrderAdapter;
-	private ProgressDialog mpDialog;
-	private TableSetting mSettings = new TableSetting();
-
+	
 	@Override
 	protected void onResume() {
 		super.onResume();
-		Log.d("onResume", "onResume");
-		mpDialog.setMessage("正在更新数据，请稍等");
-		mpDialog.show();
-		updateTabelInfos();
+		showProgressDlg("正在更新数据，请稍等");
+		updatePhoneOrderInfos();
 	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.myorder_activity);
-		mMyOrder = new MyOrder(PhoneActivity.this);
-		mpDialog = new ProgressDialog(PhoneActivity.this);
-		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-		//mpDialog.setTitle("请稍等");
-		mpDialog.setIndeterminate(false);
-		mpDialog.setCancelable(false);
-		findViews();
-		setClickListener();
-		fillData();
+		setPhoneOrderClickListener();
+		fillPhoneOrderData();
+		mSubmitHandler = handler;
 	}
 
 	public void showDeletePhoneOrderProcessDlg() {
 		delPhoneOrderhandler.sendEmptyMessage(2);
 	}
-	
-	private void findViews() {
-		mBackBtn = (Button) findViewById(R.id.back_btn);
-		mLeftBtn = (Button) findViewById(R.id.left_btn);
-		mSubmitBtn = (Button) findViewById(R.id.submit);
-		mTableNumTxt = (TextView) findViewById(R.id.tableNum);
-		mDishCountTxt = (TextView) findViewById(R.id.dishCount);
-		mTotalPriceTxt = (TextView) findViewById(R.id.totalPrice);
-		mMyOrderLst = (ListView) findViewById(R.id.myOrderList);
-		mRefresh = (Button) findViewById(R.id.refresh);
+
+	private void setPhoneOrderClickListener() {
+		mBackBtn.setOnClickListener(backBtnClicked);
+		mLeftBtn.setOnClickListener(leftBtnClicked);
+		mRefreshBtn.setOnClickListener(refreshBtnClicked);
 	}
 
-	private void fillData() {
+	private void fillPhoneOrderData() {
 		mLeftBtn.setText(R.string.phoneAdd);
 		mTableNumTxt.setText(Info.getTableName());
-		mRefresh.setOnClickListener(refreshBtnClicked);
 		mMyOrderAdapter = getMyOrderAdapterInstance();
 	}
 
@@ -155,12 +129,6 @@ public class PhoneActivity extends BaseActivity {
 		};
 	}
 
-	private void setClickListener() {
-		mBackBtn.setOnClickListener(backBtnClicked);
-		mSubmitBtn.setOnClickListener(submitBtnClicked);
-		mLeftBtn.setOnClickListener(leftBtnClicked);
-	}
-
 	Handler queryHandler = new Handler() {
 		public void handleMessage(Message msg) {
 
@@ -188,11 +156,7 @@ public class PhoneActivity extends BaseActivity {
 			}
 
 			mMyOrderAdapter.notifyDataSetChanged();
-			mDishCountTxt.setText(Integer.toString(mMyOrder.totalQuantity())
-					+ " 道菜");
-			mTotalPriceTxt.setText(Double.toString(mMyOrder.getTotalPrice())
-					+ " 元");
-			mpDialog.cancel();
+			updateTabelInfos();
 		}
 	};
 
@@ -221,21 +185,14 @@ public class PhoneActivity extends BaseActivity {
 
 		} else {
 			mMyOrder.add(position, quantity);
-			updatedSummary();
+			mMyOrderAdapter.notifyDataSetChanged();
+			updateTabelInfos();
 		}
 
 		
 	}
-
-	private void updatedSummary() {
-		mMyOrderAdapter.notifyDataSetChanged();
-		mDishCountTxt.setText(Integer.toString(mMyOrder.totalQuantity())
-				+ " 道菜");
-		mTotalPriceTxt
-				.setText(Double.toString(mMyOrder.getTotalPrice()) + " 元");
-	}
 	
-	private void updateTabelInfos() {
+	private void updatePhoneOrderInfos() {
 		new Thread(new queryThread()).start();
 	}
 
@@ -259,34 +216,6 @@ public class PhoneActivity extends BaseActivity {
 						updateDishQuantity(position, -quantity);
 					}
 				}).setNegativeButton("取消", null).show();
-	}
-
-	private void submitThread() {
-		mpDialog.setMessage("正在提交订单...");
-		mpDialog.show();
-		new Thread() {
-			public void run() {
-				int ret = mMyOrder.submit();
-				if (ret < 0) {
-					handler.sendEmptyMessage(-1);
-					return;
-				}
-				int result = mSettings.getItemTableStatus(Info.getTableId());
-				if (result < 0) {
-					handler.sendEmptyMessage(-1);
-					return;
-				} else if (result >= 50) {
-					mSettings.updateStatus(Info.getTableId(), 1);
-				}
-				ret = mMyOrder.cleanServerPhoneOrder(Info.getTableId());
-				if (ret < 0) {
-					handler.sendEmptyMessage(-1);
-					return;
-				}
-				handler.sendEmptyMessage(0);
-
-			}
-		}.start();
 	}
 
 	private OnClickListener backBtnClicked = new OnClickListener() {
@@ -330,31 +259,6 @@ public class PhoneActivity extends BaseActivity {
 			updateDishQuantity(position, 5);
 		}
 	};
-	
-	
-
-	private OnClickListener submitBtnClicked = new OnClickListener() {
-
-		@Override
-		public void onClick(View v) {
-			if (mMyOrder.count() <= 0) {
-				new AlertDialog.Builder(PhoneActivity.this)
-						.setTitle("请注意")
-						.setMessage("您还没有点任何东西")
-						.setPositiveButton("确定",
-								new DialogInterface.OnClickListener() {
-
-									@Override
-									public void onClick(DialogInterface dialog,
-											int which) {
-
-									}
-								}).show();
-				return;
-			}
-			submitThread();
-		}
-	};
 
 	private OnClickListener leftBtnClicked = new OnClickListener() {
 
@@ -371,11 +275,11 @@ public class PhoneActivity extends BaseActivity {
 
 		@Override
 		public void onClick(View v) {
-			mpDialog.setMessage("正在更新数据，请稍等");
-			mpDialog.show();
-			updateTabelInfos();
+			showProgressDlg("正在更新数据，请稍等");
+			updatePhoneOrderInfos();
 		}
 	};
+	
 	private Handler handler = new Handler() {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
@@ -428,11 +332,11 @@ public class PhoneActivity extends BaseActivity {
 			} else {
 				switch (msg.what) {
 				case 0:
-					updatedSummary();
+					mMyOrderAdapter.notifyDataSetChanged();
+					updateTabelInfos();
 					break;
 				default:
-					mpDialog.setMessage("正在删除...");
-					mpDialog.show();
+					showProgressDlg("正在删除...");
 				}
 			}
 		}
