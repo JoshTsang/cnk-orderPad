@@ -16,9 +16,11 @@ import android.widget.TextView;
 
 import com.htb.cnk.adapter.MyOrderAdapter;
 import com.htb.cnk.data.Info;
+import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.data.MyOrder.OrderedDish;
 import com.htb.cnk.lib.OrderBaseActivity;
 import com.htb.constant.ErrorNum;
+import com.htb.constant.Table;
 
 /**
  * @author josh
@@ -26,7 +28,7 @@ import com.htb.constant.ErrorNum;
  */
 public class MyOrderActivity extends OrderBaseActivity {
 	private MyOrderAdapter mMyOrderAdapter;
-
+	private TableSetting mSettings = new TableSetting();
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -142,7 +144,7 @@ public class MyOrderActivity extends OrderBaseActivity {
 			minusDishQuantity(position, 5);
 		}
 	};
-	
+
 	Handler handler = new Handler() {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
@@ -157,6 +159,24 @@ public class MyOrderActivity extends OrderBaseActivity {
 						.setMessage(errMsg).setPositiveButton("确定", null)
 						.show();
 			} else {
+				new Thread() {
+					public void run() {
+						try {
+							int result = mSettings
+									.getItemTableStatus(Info.getTableId());
+							if (result < 0) {
+								handler.sendEmptyMessage(result);
+							} else if (result >= Table.PHONE_STATUS) {
+								mSettings.updateStatus(Info.getTableId(), result);
+							} else {
+								mSettings.updateStatus(Info.getTableId(), 1);
+							}
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				}.start();
+				
 				new AlertDialog.Builder(MyOrderActivity.this)
 						.setCancelable(false)
 						.setTitle("提示")

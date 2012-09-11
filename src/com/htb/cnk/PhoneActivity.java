@@ -1,30 +1,27 @@
 package com.htb.cnk;
 
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.htb.cnk.adapter.MyOrderAdapter;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder;
-import com.htb.cnk.data.MyOrder.OrderedDish;
 import com.htb.cnk.data.TableSetting;
-import com.htb.cnk.lib.BaseActivity;
+import com.htb.cnk.data.MyOrder.OrderedDish;
 import com.htb.cnk.lib.OrderBaseActivity;
 import com.htb.constant.ErrorNum;
+import com.htb.constant.Table;
 
 /**
  * @author josh
@@ -32,6 +29,7 @@ import com.htb.constant.ErrorNum;
  */
 public class PhoneActivity extends OrderBaseActivity {
 	private MyOrderAdapter mMyOrderAdapter;
+	private TableSetting mSettings = new TableSetting();
 	
 	@Override
 	protected void onResume() {
@@ -71,7 +69,7 @@ public class PhoneActivity extends OrderBaseActivity {
 			public View getView(int position, View convertView, ViewGroup arg2) {
 				viewHolder1 holder1;
 				OrderedDish dishDetail = mMyOrder.getOrderedDish(position);
-				
+
 				if (convertView == null) {
 					convertView = LayoutInflater.from(PhoneActivity.this)
 							.inflate(R.layout.item_ordereddish, null);
@@ -95,7 +93,7 @@ public class PhoneActivity extends OrderBaseActivity {
 				} else {
 					holder1 = (viewHolder1) convertView.getTag();
 				}
-				
+
 				holder1.dishName.setText(dishDetail.getName());
 				holder1.dishPrice
 						.setText(Double.toString(dishDetail.getPrice())
@@ -173,7 +171,8 @@ public class PhoneActivity extends OrderBaseActivity {
 		}
 
 	}
-
+	
+	
 	private void updateDishQuantity(final int position, final int quantity) {
 		if (quantity < 0) {
 			new Thread() {
@@ -189,9 +188,8 @@ public class PhoneActivity extends OrderBaseActivity {
 			updateTabelInfos();
 		}
 
-		
 	}
-	
+
 	private void updatePhoneOrderInfos() {
 		new Thread(new queryThread()).start();
 	}
@@ -233,7 +231,7 @@ public class PhoneActivity extends OrderBaseActivity {
 			minusDishQuantity(position, 1);
 		}
 	};
-	
+
 	private OnClickListener minus5Clicked = new OnClickListener() {
 
 		public void onClick(View v) {
@@ -241,21 +239,19 @@ public class PhoneActivity extends OrderBaseActivity {
 			minusDishQuantity(position, 5);
 		}
 	};
-	
+
 	private OnClickListener plusClicked = new OnClickListener() {
 
 		public void onClick(View v) {
-			final int position = Integer.parseInt(v.getTag()
-					.toString());
+			final int position = Integer.parseInt(v.getTag().toString());
 			updateDishQuantity(position, 1);
 		}
 	};
-	
+
 	private OnClickListener plus5Clicked = new OnClickListener() {
 
 		public void onClick(View v) {
-			final int position = Integer.parseInt(v.getTag()
-					.toString());
+			final int position = Integer.parseInt(v.getTag().toString());
 			updateDishQuantity(position, 5);
 		}
 	};
@@ -279,7 +275,7 @@ public class PhoneActivity extends OrderBaseActivity {
 			updatePhoneOrderInfos();
 		}
 	};
-	
+
 	private Handler handler = new Handler() {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
@@ -295,6 +291,24 @@ public class PhoneActivity extends OrderBaseActivity {
 						.setMessage(errMsg).setPositiveButton("确定", null)
 						.show();
 			} else {
+				new Thread() {
+					public void run() {
+						try {
+							int result = mSettings
+									.getItemTableStatus(Info.getTableId());
+							if (result < 0) {
+								handler.sendEmptyMessage(result);
+							} else if (result >= Table.PHONE_STATUS) {
+								mSettings.updateStatus(Info.getTableId(), result
+										- Table.PHONE_STATUS);
+							} else {
+								mSettings.updateStatus(Info.getTableId(), 1);
+							}
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				}.start();
 				new AlertDialog.Builder(PhoneActivity.this)
 						.setCancelable(false)
 						.setTitle("提示")

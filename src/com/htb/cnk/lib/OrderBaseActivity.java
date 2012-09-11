@@ -17,14 +17,16 @@ import android.widget.TextView;
 import com.htb.cnk.LoginDlg;
 import com.htb.cnk.MyOrderActivity;
 import com.htb.cnk.R;
+import com.htb.cnk.TableActivity;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.lib.BaseActivity;
+import com.htb.constant.Table;
 
 /**
  * @author josh
- *
+ * 
  */
 public class OrderBaseActivity extends BaseActivity {
 	protected Button mBackBtn;
@@ -38,14 +40,13 @@ public class OrderBaseActivity extends BaseActivity {
 	protected MyOrder mMyOrder;
 	protected ProgressDialog mpDialog;
 	protected Handler mSubmitHandler;
-	private TableSetting mSettings = new TableSetting();
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.myorder_activity);
 		mMyOrder = new MyOrder(OrderBaseActivity.this);
-		mpDialog = new ProgressDialog(OrderBaseActivity.this);  
+		mpDialog = new ProgressDialog(OrderBaseActivity.this);
 		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 		mpDialog.setIndeterminate(false);
 		mpDialog.setCancelable(false);
@@ -76,37 +77,29 @@ public class OrderBaseActivity extends BaseActivity {
 	}
 
 	protected void updateTabelInfos() {
-		mDishCountTxt.setText(Integer.toString(mMyOrder.totalQuantity()) + " 道菜");
-		mTotalPriceTxt.setText(Double.toString(mMyOrder.getTotalPrice()) + " 元");
+		mDishCountTxt.setText(Integer.toString(mMyOrder.totalQuantity())
+				+ " 道菜");
+		mTotalPriceTxt
+				.setText(Double.toString(mMyOrder.getTotalPrice()) + " 元");
 	}
 
 	protected void showProgressDlg(String msg) {
 		mpDialog.setMessage(msg);
 		mpDialog.show();
 	}
-	
+
 	private void customerSubmitOrderDlg() {
-		new AlertDialog.Builder(OrderBaseActivity.this)
-				.setTitle("提交订单")
+		new AlertDialog.Builder(OrderBaseActivity.this).setTitle("提交订单")
 				.setMessage("呼叫服务员确认订单")
 				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						LoginDlg loginDlg = new LoginDlg(OrderBaseActivity.this,
-								LoginDlg.ACTION_SUBMIT);
+						LoginDlg loginDlg = new LoginDlg(
+								OrderBaseActivity.this, LoginDlg.ACTION_SUBMIT);
 						loginDlg.show();
 					}
-				})
-				.setNegativeButton("继续点菜",
-						new DialogInterface.OnClickListener() {
-
-							@Override
-							public void onClick(DialogInterface dialog,
-									int which) {
-
-							}
-						}).show();
+				}).setNegativeButton("继续点菜", null).show();
 	}
 
 	public void submitOrder() {
@@ -114,22 +107,11 @@ public class OrderBaseActivity extends BaseActivity {
 		new Thread() {
 			public void run() {
 				int ret = mMyOrder.submit();
-				if (ret < 0) {
-					mSubmitHandler.sendEmptyMessage(ret);
-				} else {
-					int result = mSettings
-							.getItemTableStatus(Info.getTableId());
-					if (result >= 50) {
-						mSettings.updateStatus(Info.getTableId(), result);
-					} else {
-						mSettings.updateStatus(Info.getTableId(), 1);
-					}
-					mSubmitHandler.sendEmptyMessage(0);
+				mSubmitHandler.sendEmptyMessage(ret);
 				}
-			}
 		}.start();
 	}
-	
+
 	protected void showSetPersonsDlg() {
 		final EditText changeTableText = new EditText(OrderBaseActivity.this);
 		changeTableText.setKeyListener(new DigitsKeyListener(false, true));
@@ -147,16 +129,15 @@ public class OrderBaseActivity extends BaseActivity {
 					@Override
 					public void onClick(DialogInterface dialog, int i) {
 						String persons;
-						persons = changeTableText.getEditableText()
-								.toString();
+						persons = changeTableText.getEditableText().toString();
 						if (persons.equals("")) {
 							new AlertDialog.Builder(OrderBaseActivity.this)
-							.setCancelable(false).setTitle("注意")
-							.setMessage("人数不能为空").setPositiveButton("确定", null)
-							.show();
+									.setCancelable(false).setTitle("注意")
+									.setMessage("人数不能为空")
+									.setPositiveButton("确定", null).show();
 							return;
 						}
-						
+
 						int personCount = Integer.parseInt(persons);
 						if (personCount > 0) {
 							mMyOrder.setPersons(personCount);
@@ -167,48 +148,32 @@ public class OrderBaseActivity extends BaseActivity {
 							}
 						} else {
 							new AlertDialog.Builder(OrderBaseActivity.this)
-							.setCancelable(false).setTitle("注意")
-							.setMessage("人数不合法").setPositiveButton("确定", null)
-							.show();
+									.setCancelable(false).setTitle("注意")
+									.setMessage("人数不合法")
+									.setPositiveButton("确定", null).show();
 						}
 
 					}
 				});
-		personSettingDlg.setNegativeButton("取消",
-				new DialogInterface.OnClickListener() {
-
-					@Override
-					public void onClick(DialogInterface dialog, int i) {
-						dialog.cancel();
-					}
-				});
+		personSettingDlg.setNegativeButton("取消", null);
 		personSettingDlg.show();
 	}
-	
+
 	private OnClickListener submitBtnClicked = new OnClickListener() {
 
 		@Override
 		public void onClick(View v) {
 			if (mMyOrder.count() <= 0) {
-				new AlertDialog.Builder(OrderBaseActivity.this)
-						.setTitle("请注意")
-						.setMessage("您还没有点任何东西")
-						.setPositiveButton("确定",
-								new DialogInterface.OnClickListener() {
-
-									@Override
-									public void onClick(DialogInterface dialog,
-											int which) {
-
-									}
-								}).show();
+				new AlertDialog.Builder(OrderBaseActivity.this).setTitle("请注意")
+						.setMessage("您还没有点任何东西").setPositiveButton("确定", null)
+						.show();
 				return;
 			}
-			
+
 			showSetPersonsDlg();
 		}
 	};
-	
+
 	private OnClickListener backBtnClicked = new OnClickListener() {
 
 		@Override
