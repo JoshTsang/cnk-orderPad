@@ -31,11 +31,9 @@ public class QuickMenuActivity extends MenuBaseActivity {
 		super.onCreate(savedInstanceState);
 		mQuickOrder = new QuickOrder(QuickMenuActivity.this);
 		mQuickOrder.setQucik();
-		
 		findQuickMenuViews();
 		setQuickMenuClickListener();
 		setListData();
-
 		imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 	}
 

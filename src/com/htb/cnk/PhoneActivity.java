@@ -30,7 +30,7 @@ import com.htb.constant.Table;
 public class PhoneActivity extends OrderBaseActivity {
 	private MyOrderAdapter mMyOrderAdapter;
 	private TableSetting mSettings = new TableSetting();
-	
+
 	@Override
 	protected void onResume() {
 		super.onResume();
@@ -171,8 +171,7 @@ public class PhoneActivity extends OrderBaseActivity {
 		}
 
 	}
-	
-	
+
 	private void updateDishQuantity(final int position, final int quantity) {
 		if (quantity < 0) {
 			new Thread() {
@@ -294,15 +293,22 @@ public class PhoneActivity extends OrderBaseActivity {
 				new Thread() {
 					public void run() {
 						try {
-							int result = mSettings
-									.getItemTableStatus(Info.getTableId());
+							int result = mSettings.getItemTableStatus(Info
+									.getTableId());
 							if (result < 0) {
-								handler.sendEmptyMessage(result);
+								queryHandler.sendEmptyMessage(result);
+								return;
 							} else if (result >= Table.PHONE_STATUS) {
-								mSettings.updateStatus(Info.getTableId(), result
-										- Table.PHONE_STATUS);
+								mSettings.updateStatus(Info.getTableId(),
+										result - Table.PHONE_STATUS);
 							} else {
 								mSettings.updateStatus(Info.getTableId(), 1);
+							}
+							int ret = mMyOrder.cleanServerPhoneOrder(Info
+									.getTableId());
+							if (ret < 0) {
+								queryHandler.sendEmptyMessage(ret);
+								return;
 							}
 						} catch (Exception e) {
 							e.printStackTrace();
