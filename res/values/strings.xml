@@ -63,4 +63,6 @@
     <string name="copyTIdwarning">复制不成功，请检查是否已经点菜</string>
     <string name="copyTId">复制成功</string>
 	<string name="tableUsage">服务桌数：</string>
+	 <string name="combineTIdWarning">合并不成功，请检查是否已经开台</string>
+    <string name="combineTId">合并成功</string>
 </resources>

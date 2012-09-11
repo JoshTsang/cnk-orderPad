@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import android.R.integer;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.Dialog;
@@ -21,6 +22,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.text.InputFilter;
 import android.text.method.DigitsKeyListener;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -69,6 +71,7 @@ public class TableActivity extends BaseActivity {
 	private NotificationTableService.MyBinder binder;
 	private boolean binderFlag;
 	private Intent intent;
+	private List<Integer> selectedTable = new ArrayList<Integer>();
 
 	@Override
 	protected void onDestroy() {
@@ -496,26 +499,25 @@ public class TableActivity extends BaseActivity {
 				});
 		return mAlertDialog;
 	}
-	
+
 	protected Builder copyTableDialog() {
-		final EditText changeTableText = new EditText(this);
-		changeTableText.setKeyListener(new DigitsKeyListener(false, true));
-		changeTableText
+		final EditText copyTableText = new EditText(this);
+		copyTableText.setKeyListener(new DigitsKeyListener(false, true));
+		copyTableText
 				.setFilters(new InputFilter[] { new InputFilter.LengthFilter(3) });
 		final AlertDialog.Builder mAlertDialog = new AlertDialog.Builder(
 				TableActivity.this);
 		mAlertDialog.setTitle("请输入桌号");
 		mAlertDialog.setIcon(R.drawable.ic_launcher);
 		mAlertDialog.setCancelable(false);
-		mAlertDialog.setView(changeTableText);
+		mAlertDialog.setView(copyTableText);
 		mAlertDialog.setPositiveButton("确定",
 				new DialogInterface.OnClickListener() {
 
 					@Override
 					public void onClick(DialogInterface dialog, int i) {
 						String changeTId;
-						changeTId = changeTableText.getEditableText()
-								.toString();
+						changeTId = copyTableText.getEditableText().toString();
 						if (changeTId.equals("")) {
 							Toast.makeText(getApplicationContext(), "请输入桌号!",
 									Toast.LENGTH_SHORT).show();
@@ -546,7 +548,80 @@ public class TableActivity extends BaseActivity {
 				});
 		return mAlertDialog;
 	}
-	
+
+	protected Builder combineDialog() {
+		final EditText combineTableText = new EditText(this);
+		combineTableText.setKeyListener(new DigitsKeyListener(false, true));
+		combineTableText
+				.setFilters(new InputFilter[] { new InputFilter.LengthFilter(3) });
+		final List <String> tableName = mSettings.getCombineName();
+		final List<Integer> tableId = mSettings.getCombineId();
+		final int size = mSettings.size();
+		final boolean selected[] = new boolean[size];
+		final AlertDialog.Builder mAlertDialog = new AlertDialog.Builder(
+				TableActivity.this);
+		mAlertDialog.setTitle("请选择合并桌号");
+		mAlertDialog.setIcon(R.drawable.ic_launcher);
+		mAlertDialog.setCancelable(false);
+		mAlertDialog.setMultiChoiceItems((String[])tableName.toArray(new String[0]), null,
+				new DialogInterface.OnMultiChoiceClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialogInterface,
+							int which, boolean isChecked) {
+						selected[which] = isChecked;
+					}
+				});
+		DialogInterface.OnClickListener btnListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialogInterface, int which) {
+				selectedTable.clear();
+				for (int i = 0; i < selected.length; i++) {
+					if (selected[i] == true) {
+						selectedTable.add(tableId.get(i));
+					}
+				}
+				combineTable(selectedTable,tableName);
+//				new AlertDialog.Builder(TableActivity.this)
+//						.setTitle("请输入")
+//						.setIcon(android.R.drawable.ic_dialog_info)
+//						.setView(combineTableText)
+//						.setPositiveButton("确定",
+//								new DialogInterface.OnClickListener() {
+//
+//									@Override
+//									public void onClick(DialogInterface dialog,
+//											int i) {
+//										String changeTId;
+//										changeTId = combineTableText
+//												.getEditableText().toString();
+//										if (changeTId.equals("")) {
+//											Toast.makeText(
+//													getApplicationContext(),
+//													"请输入桌号!",
+//													Toast.LENGTH_SHORT).show();
+//										} else if (Integer.parseInt(changeTId) > 0
+//												&& Integer.parseInt(changeTId) <= mSettings
+//														.size())
+//												 {
+//											
+//										} else {
+//											Toast.makeText(
+//													getApplicationContext(),
+//													getResources()
+//															.getString(
+//																	R.string.copyTIdwarning),
+//													Toast.LENGTH_SHORT).show();
+//										}
+//									}
+//								}).setNegativeButton("取消", null).show();
+
+			}
+		};
+
+		mAlertDialog.setPositiveButton("确认", btnListener);
+		return mAlertDialog;
+	}
 
 	private Handler tableHandle = new Handler() {
 		public void handleMessage(Message msg) {
@@ -609,6 +684,25 @@ public class TableActivity extends BaseActivity {
 				binder.start();
 				Toast.makeText(getApplicationContext(),
 						getResources().getString(R.string.copyTId),
+						Toast.LENGTH_SHORT).show();
+			}
+		}
+	};
+	
+	private Handler combineTIdHandle = new Handler() {
+		public void handleMessage(Message msg) {
+			if (msg.what == -2) {
+				Toast.makeText(getApplicationContext(),
+						getResources().getString(R.string.combineTIdWarning),
+						Toast.LENGTH_SHORT).show();
+			} else if (msg.what == -1) {
+				ARERTDIALOG = 1;
+				mNetWrorkAlertDialog.setMessage("合并出错，请检查连接网络重试");
+				mNetWrorkcancel = mNetWrorkAlertDialog.show();
+			} else {
+				binder.start();
+				Toast.makeText(getApplicationContext(),
+						getResources().getString(R.string.combineTId),
 						Toast.LENGTH_SHORT).show();
 			}
 		}
@@ -703,7 +797,7 @@ public class TableActivity extends BaseActivity {
 			mpDialog.cancel();
 			if (msg.what < 0) {
 				// Todo network failure warning
-			}else{
+			} else {
 				binder.start();
 			}
 		}
@@ -791,18 +885,8 @@ public class TableActivity extends BaseActivity {
 
 		@Override
 		public void onClick(View v) {
-			new AlertDialog.Builder(TableActivity.this)
-					.setTitle("提示")
-					.setMessage("该版本未提供该功能")
-					.setPositiveButton("确定",
-							new DialogInterface.OnClickListener() {
-
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
-
-								}
-							}).show();
+			final AlertDialog.Builder mChangeDialog = combineDialog();
+			mChangeDialog.show();
 		}
 	};
 
@@ -820,28 +904,28 @@ public class TableActivity extends BaseActivity {
 		@Override
 		public void onClick(View v) {
 			new AlertDialog.Builder(TableActivity.this)
-			.setTitle("注意")
-			.setCancelable(false)
-			.setMessage("确认交班？")
-			.setPositiveButton("确定",
-					new DialogInterface.OnClickListener() {
+					.setTitle("注意")
+					.setCancelable(false)
+					.setMessage("确认交班？")
+					.setPositiveButton("确定",
+							new DialogInterface.OnClickListener() {
 
-						@Override
-						public void onClick(DialogInterface dialog,
-								int which) {
-							Info.setMode(Info.WORK_MODE_CUSTOMER);
-							Info.setTableId(-1);
-							finish();
-						}
-					})
-			.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+									Info.setMode(Info.WORK_MODE_CUSTOMER);
+									Info.setTableId(-1);
+									finish();
+								}
+							})
+					.setNegativeButton("取消",
+							new DialogInterface.OnClickListener() {
 
-				@Override
-				public void onClick(DialogInterface dialog,
-						int which) {
-				}
-			})
-			.show();
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+								}
+							}).show();
 		}
 
 	};
@@ -851,7 +935,8 @@ public class TableActivity extends BaseActivity {
 			public void run() {
 				try {
 					int ret = mSettings.changeTable(Info.getTableId(), destTId,
-							mSettings.getName(Info.getTableId()-1),TableActivity.this);
+							mSettings.getName(Info.getTableId() - 1),
+							TableActivity.this);
 					changeTIdHandle.sendEmptyMessage(ret);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -859,15 +944,29 @@ public class TableActivity extends BaseActivity {
 			}
 		}.start();
 	}
-	
-	private void copyTable(final int destIId){
-		new Thread(){
-			public void run(){
-				try{
-					int ret = mSettings.copyTable(destIId,Info.getTableId(),
+
+	private void copyTable(final int destIId) {
+		new Thread() {
+			public void run() {
+				try {
+					int ret = mSettings.copyTable(destIId, Info.getTableId(),
 							TableActivity.this);
 					copyTIdHandle.sendEmptyMessage(ret);
-				} catch(Exception e){
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}.start();
+	}
+
+	private void combineTable(final List<Integer> destIId, final List<String> tableName) {
+		new Thread() {
+			public void run() {
+				try {
+					int ret = mSettings.combineTable(destIId,tableName,
+							 TableActivity.this);
+					combineTIdHandle.sendEmptyMessage(ret);
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}

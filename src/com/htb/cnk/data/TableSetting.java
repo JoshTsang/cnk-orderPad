@@ -10,9 +10,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.R.integer;
 import android.content.Context;
 import android.util.Log;
 
+import com.htb.cnk.data.MyOrder.OrderedDish;
 import com.htb.cnk.lib.ErrorPHP;
 import com.htb.cnk.lib.Http;
 import com.htb.constant.Server;
@@ -86,6 +88,51 @@ public class TableSetting implements Serializable {
 
 	public String getName(int index) {
 		return mTableSettings.get(index).getName();
+	}
+
+	public String[] getNameAll() {
+		String tableName[] = new String[mTableSettings.size()];
+		int i = 0;
+		for (TableSettingItem item : mTableSettings) {
+			tableName[i] = item.getName();
+			i++;
+		}
+		return tableName;
+	}
+
+	public int[] getIdAll() {
+		int tableId[] = new int[mTableSettings.size()];
+		int i = 0;
+		for (TableSettingItem item : mTableSettings) {
+			tableId[i] = item.getId();
+			i++;
+		}
+		return tableId;
+	}
+
+	// TODO
+	public List<String> getCombineName() {
+		List<String> tableName = new ArrayList<String>();
+		int i = 0;
+		for (TableSettingItem item : mTableSettings) {
+			if (item.getStatus() == 1) {
+				tableName.add(item.getName());
+			}
+			i++;
+		}
+		return tableName;
+	}
+
+	public List<Integer> getCombineId() {
+		List<Integer> tableId = new ArrayList<Integer>();
+		int i = 0;
+		for (TableSettingItem item : mTableSettings) {
+			if (item.getStatus() == 1) {
+				tableId.add(item.getId());
+			}
+			i++;
+		}
+		return tableId;
 	}
 
 	public void setStatus(int index, int n) {
@@ -181,7 +228,8 @@ public class TableSetting implements Serializable {
 		return 0;
 	}
 
-	public int changeTable(int srcTId, int destTId, String destName, Context context) {
+	public int changeTable(int srcTId, int destTId, String destName,
+			Context context) {
 		if (mOrder == null) {
 			mOrder = new MyOrder(context);
 		} else {
@@ -196,29 +244,7 @@ public class TableSetting implements Serializable {
 		Date date = new Date();
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String time = df.format(date);
-		try {
-			order.put("waiter", UserData.getUserName());
-			order.put("tableName", destName);
-			order.put("tableId", destTId);
-			order.put("timestamp", time);
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-
-		JSONArray dishes = new JSONArray();
-		try {
-			for (int i = 0; i < mOrder.count(); i++) {
-				JSONObject dish = new JSONObject();
-				dish.put("dishId", mOrder.getDishId(i));
-				dish.put("name", mOrder.getName(i));
-				dish.put("price", mOrder.getPrice(i));
-				dish.put("quan", mOrder.getQuantity(i));
-				dishes.put(dish);
-			}
-			order.put("order", dishes);
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
+		orderJson(destTId, order, destName, time);
 		String tableChangePkg = Http.post(Server.CHANGE_TABLE + "?srcTID="
 				+ srcTId + "&destTID=" + destTId, order.toString());
 		if (!ErrorPHP.isSucc(tableChangePkg, TAG)) {
@@ -242,10 +268,52 @@ public class TableSetting implements Serializable {
 		Date date = new Date();
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String time = df.format(date);
+		orderJson(destTId, order, Info.getTableName(), time);
+		String tablecopyPkg = Http.post(Server.COPY_TABLE + "?srcTID=" + srcTId
+				+ "&destTID=" + destTId, order.toString());
+		if (!ErrorPHP.isSucc(tablecopyPkg, TAG)) {
+			return -2;
+		}
+		return 0;
+	}
+
+	public int combineTable(List<Integer> srcTId,List<String> tableName, Context context) {
+		JSONArray orderAll = new JSONArray();
+		int i = 0;
+		for (Integer item : srcTId) {
+			if (mOrder == null) {
+				mOrder = new MyOrder(context);
+			} else {
+				mOrder.clear();
+			}
+			int ret = mOrder.getOrderFromServer(item.intValue());
+			if (ret == -1) {
+				Log.e(TAG, "mOrder.getOrderFromServer.timeout");
+				return TIME_OUT;
+			}
+			JSONObject order = new JSONObject();
+			Date date = new Date();
+			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			String time = df.format(date);
+			orderJson(item, order, tableName.get(i), time);
+			orderAll.put(order.toString());
+			i++;
+		}
+		Log.d(TAG, orderAll.toString());
+		String tablecombinePkg = Http.post(Server.COMBINE_TABLE,
+				orderAll.toString());
+		if (!ErrorPHP.isSucc(tablecombinePkg, TAG)) {
+			return -2;
+		}
+		return 0;
+	}
+
+	private void orderJson(int destTId, JSONObject order, String tableName,
+			String time) {
 		try {
 			order.put("waiter", UserData.getUserName());
 			order.put("tableId", destTId);
-			order.put("tableName", Info.getTableName());
+			order.put("tableName", tableName);
 			order.put("timestamp", time);
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -265,12 +333,6 @@ public class TableSetting implements Serializable {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		String tablecopyPkg = Http.post(Server.COPY_TABLE + "?srcTID="
-				+ srcTId + "&destTID=" + destTId, order.toString());
-		if (!ErrorPHP.isSucc(tablecopyPkg, TAG)) {
-			return -2;
-		}
-		return 0;
 	}
-	
+
 }
