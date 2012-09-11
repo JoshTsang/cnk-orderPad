@@ -4,7 +4,9 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -110,29 +112,17 @@ public class TableSetting implements Serializable {
 		return tableId;
 	}
 
-	// TODO
-	public List<String> getCombineName() {
-		List<String> tableName = new ArrayList<String>();
-		int i = 0;
+	public ArrayList<HashMap<String,Object>> getCombine() {
+		ArrayList<HashMap<String,Object>> combine = new ArrayList<HashMap<String,Object>>();
 		for (TableSettingItem item : mTableSettings) {
 			if (item.getStatus() == 1) {
-				tableName.add(item.getName());
+				HashMap<String,Object> map = new HashMap<String, Object>();
+				map.put("name", item.getName());
+				map.put("id", item.getId());
+				combine.add(map);
 			}
-			i++;
 		}
-		return tableName;
-	}
-
-	public List<Integer> getCombineId() {
-		List<Integer> tableId = new ArrayList<Integer>();
-		int i = 0;
-		for (TableSettingItem item : mTableSettings) {
-			if (item.getStatus() == 1) {
-				tableId.add(item.getId());
-			}
-			i++;
-		}
-		return tableId;
+		return combine;
 	}
 
 	public void setStatus(int index, int n) {
