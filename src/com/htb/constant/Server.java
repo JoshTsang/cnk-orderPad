@@ -16,6 +16,7 @@ public class Server {
 	public final static String SUBMIT_ORDER = PHP_DIR + "submitOrder.php";
 	public final static String LATEST_STATISTICS = PHP_DIR + "latestStatistics.php";
 	public final static String GET_MYORDER = PHP_DIR + "getToDelOrder.php";
+	public final static String GET_PERSONS = PHP_DIR + "getPersons.php";
 	public final static String DEL_ORDER = PHP_DIR + "DelOrder.php";
 	public final static String GET_TABLE_STATUS = PHP_DIR + "getTableStatus.php";
 	public final static String UPDATE_TABLE_STATUS = PHP_DIR + "updateTableStatus.php";

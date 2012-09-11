@@ -332,7 +332,33 @@ public class MyOrder {
 		return 0;
 
 	}
-
+	
+	public int getPersonsFromServer(int tableId) {
+		String response = Http.get(Server.GET_PERSONS, "TID=" + tableId);
+		if ("null".equals(response)) {
+			Log.w(TAG, "getPersonsFromServer.null");
+			return -2;
+		} else if (response == null) {
+			Log.e(TAG, "getPersonsFromServer.timeOut");
+			return TIME_OUT;
+		}
+		try {
+			int start = response.indexOf('[');
+			int end = response.indexOf(']');
+			if (start < 0 || end < 0 || (end-start) > 4) {
+				return -1;
+			} else {
+				String persons = response.substring(start + 1, end);
+				return Integer.valueOf(persons);
+			}
+			
+		} catch (Exception e) {
+			Log.e(TAG, response);
+			e.printStackTrace();
+		}
+		return -1;
+	}
+	
 	// TODO log failure
 	public int getOrderFromServer(int tableId) {
 		String response = Http.get(Server.GET_MYORDER, "TID=" + tableId);
