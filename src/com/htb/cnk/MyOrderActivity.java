@@ -17,7 +17,6 @@ import android.widget.TextView;
 import com.htb.cnk.adapter.MyOrderAdapter;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder.OrderedDish;
-import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.lib.OrderBaseActivity;
 import com.htb.constant.ErrorNum;
 
@@ -27,7 +26,6 @@ import com.htb.constant.ErrorNum;
  */
 public class MyOrderActivity extends OrderBaseActivity {
 	private MyOrderAdapter mMyOrderAdapter;
-	private TableSetting mSettings = new TableSetting();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +33,7 @@ public class MyOrderActivity extends OrderBaseActivity {
 		setOrderViews();
 		fillOrderData();
 		setOrderClickListener();
+		mSubmitHandler = handler;
 	}
 
 	private void setOrderViews() {
@@ -70,7 +69,6 @@ public class MyOrderActivity extends OrderBaseActivity {
 	}
 
 	private void setOrderClickListener() {
-		mSubmitBtn.setOnClickListener(submitBtnClicked);
 		mBackBtn.setOnClickListener(backClicked);
 	}
 
@@ -83,28 +81,6 @@ public class MyOrderActivity extends OrderBaseActivity {
 
 		mMyOrderAdapter.notifyDataSetChanged();
 		updateTabelInfos();
-	}
-
-	public void submitOrder() {
-		showProgressDlg("正在提交订单...");
-		new Thread() {
-			public void run() {
-				int ret = mMyOrder.submit();
-				if (ret < 0) {
-					handler.sendEmptyMessage(ret);
-				} else {
-					int result = mSettings
-							.getItemTableStatus(Info.getTableId());
-					if (result >= 50) {
-						mSettings.updateStatus(Info.getTableId(), result);
-					} else {
-						mSettings.updateStatus(Info.getTableId(), 1);
-					}
-					handler.sendEmptyMessage(0);
-				}
-				mpDialog.cancel();
-			}
-		}.start();
 	}
 
 	private void minusDishQuantity(final int position, final int quantity) {
@@ -138,30 +114,6 @@ public class MyOrderActivity extends OrderBaseActivity {
 		}
 	}
 
-	private void customerSubmitOrderDlg() {
-		new AlertDialog.Builder(MyOrderActivity.this)
-				.setTitle("提交订单")
-				.setMessage("呼叫服务员确认订单")
-				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						LoginDlg loginDlg = new LoginDlg(MyOrderActivity.this,
-								LoginDlg.ACTION_SUBMIT);
-						loginDlg.show();
-					}
-				})
-				.setNegativeButton("继续点菜",
-						new DialogInterface.OnClickListener() {
-
-							@Override
-							public void onClick(DialogInterface dialog,
-									int which) {
-
-							}
-						}).show();
-	}
-
 	private OnClickListener backClicked = new OnClickListener() {
 		public void onClick(View v) {
 			Intent intent = new Intent();
@@ -190,36 +142,8 @@ public class MyOrderActivity extends OrderBaseActivity {
 			minusDishQuantity(position, 5);
 		}
 	};
-
-	private OnClickListener submitBtnClicked = new OnClickListener() {
-
-		@Override
-		public void onClick(View v) {
-			if (mMyOrder.count() <= 0) {
-				new AlertDialog.Builder(MyOrderActivity.this)
-						.setTitle("请注意")
-						.setMessage("您还没有点任何东西")
-						.setPositiveButton("确定",
-								new DialogInterface.OnClickListener() {
-
-									@Override
-									public void onClick(DialogInterface dialog,
-											int which) {
-
-									}
-								}).show();
-				return;
-			}
-
-			if (Info.getMode() == Info.WORK_MODE_CUSTOMER) {
-				customerSubmitOrderDlg();
-			} else {
-				submitOrder();
-			}
-		}
-	};
-
-	private Handler handler = new Handler() {
+	
+	Handler handler = new Handler() {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
 			if (msg.what < 0) {
