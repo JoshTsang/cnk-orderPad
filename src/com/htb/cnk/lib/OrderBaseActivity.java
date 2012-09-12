@@ -2,6 +2,7 @@ package com.htb.cnk.lib;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
@@ -9,6 +10,7 @@ import android.text.InputFilter;
 import android.text.method.DigitsKeyListener;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -40,6 +42,7 @@ public class OrderBaseActivity extends BaseActivity {
 	protected MyOrder mMyOrder;
 	protected ProgressDialog mpDialog;
 	protected Handler mSubmitHandler;
+	protected int persons;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +56,21 @@ public class OrderBaseActivity extends BaseActivity {
 		findViews();
 		fillData();
 		setClickListener();
+		
+		getPersons();
+	}
+
+	public void getPersons() {
+		new Thread() {
+			public void run() {
+				int ret = mMyOrder.getPersonsFromServer(Info.getTableId());
+				if (ret < 0) {
+					persons = 0;
+				} else {
+					persons = ret;
+				}
+			}
+		}.start();
 	}
 
 	private void findViews() {
@@ -117,6 +135,9 @@ public class OrderBaseActivity extends BaseActivity {
 		changeTableText.setKeyListener(new DigitsKeyListener(false, true));
 		changeTableText
 				.setFilters(new InputFilter[] { new InputFilter.LengthFilter(3) });
+		if (persons > 0) {
+			changeTableText.setText(Integer.toString(persons));
+		}
 		final AlertDialog.Builder personSettingDlg = new AlertDialog.Builder(
 				OrderBaseActivity.this);
 		personSettingDlg.setTitle("请输入人数");
