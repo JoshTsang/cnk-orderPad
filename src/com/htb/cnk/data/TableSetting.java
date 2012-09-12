@@ -6,17 +6,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.R.integer;
 import android.content.Context;
 import android.util.Log;
 
-import com.htb.cnk.data.MyOrder.OrderedDish;
 import com.htb.cnk.lib.ErrorPHP;
 import com.htb.cnk.lib.Http;
 import com.htb.constant.Server;
@@ -84,11 +81,38 @@ public class TableSetting implements Serializable {
 		return mTableSettings.get(i).getStatus();
 	}
 
-	public int getId(int index) {
+	public int getIdIndex(int index) {
 		return mTableSettings.get(index).getId();
 	}
 
-	public String getName(int index) {
+	public int getId(int tableId) {
+		for (TableSettingItem item : mTableSettings) {
+			if (item.getId() == tableId) {
+				return item.getId();
+			}
+		}
+		return -1;
+	}
+
+	public int getId(String tableName) {
+		for (TableSettingItem item : mTableSettings) {
+			if (item.getName().equals(tableName)) {
+				return item.getId();
+			}
+		}
+		return -1;
+	}
+
+	public String getName(int tableId) {
+		for (TableSettingItem item : mTableSettings) {
+			if (item.getId() == tableId) {
+				return item.getName();
+			}
+		}
+		return null;
+	}
+
+	public String getNameIndex(int index) {
 		return mTableSettings.get(index).getName();
 	}
 
@@ -112,11 +136,11 @@ public class TableSetting implements Serializable {
 		return tableId;
 	}
 
-	public ArrayList<HashMap<String,Object>> getCombine() {
-		ArrayList<HashMap<String,Object>> combine = new ArrayList<HashMap<String,Object>>();
+	public ArrayList<HashMap<String, Object>> getCombine() {
+		ArrayList<HashMap<String, Object>> combine = new ArrayList<HashMap<String, Object>>();
 		for (TableSettingItem item : mTableSettings) {
 			if (item.getStatus() == 1) {
-				HashMap<String,Object> map = new HashMap<String, Object>();
+				HashMap<String, Object> map = new HashMap<String, Object>();
 				map.put("name", item.getName());
 				map.put("id", item.getId());
 				combine.add(map);
@@ -218,8 +242,8 @@ public class TableSetting implements Serializable {
 		return 0;
 	}
 
-	public int changeTable(int srcTId, int destTId, String destName,
-			Context context) {
+	public int changeTable(Context context, int srcTId, int destTId,
+			String srcName, int persons) {
 		if (mOrder == null) {
 			mOrder = new MyOrder(context);
 		} else {
@@ -234,7 +258,7 @@ public class TableSetting implements Serializable {
 		Date date = new Date();
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String time = df.format(date);
-		orderJson(destTId, order, destName, time);
+		orderJson(destTId, order, srcName, time,persons);
 		String tableChangePkg = Http.post(Server.CHANGE_TABLE + "?srcTID="
 				+ srcTId + "&destTID=" + destTId, order.toString());
 		if (!ErrorPHP.isSucc(tableChangePkg, TAG)) {
@@ -243,7 +267,7 @@ public class TableSetting implements Serializable {
 		return 0;
 	}
 
-	public int copyTable(int srcTId, int destTId, Context context) {
+	public int copyTable(Context context, int srcTId, int destTId, int persons) {
 		if (mOrder == null) {
 			mOrder = new MyOrder(context);
 		} else {
@@ -258,7 +282,8 @@ public class TableSetting implements Serializable {
 		Date date = new Date();
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String time = df.format(date);
-		orderJson(destTId, order, Info.getTableName(), time);
+		orderJson(destTId, order, Info.getTableName(), time,persons);
+		Log.d(TAG, order.toString());
 		String tablecopyPkg = Http.post(Server.COPY_TABLE + "?srcTID=" + srcTId
 				+ "&destTID=" + destTId, order.toString());
 		if (!ErrorPHP.isSucc(tablecopyPkg, TAG)) {
@@ -267,7 +292,8 @@ public class TableSetting implements Serializable {
 		return 0;
 	}
 
-	public int combineTable(List<Integer> srcTId,List<String> tableName, Context context) {
+	public int combineTable(Context context, List<Integer> srcTId,
+			List<String> tableName) {
 		JSONArray orderAll = new JSONArray();
 		int i = 0;
 		for (Integer item : srcTId) {
@@ -285,7 +311,7 @@ public class TableSetting implements Serializable {
 			Date date = new Date();
 			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			String time = df.format(date);
-			orderJson(item, order, tableName.get(i), time);
+			orderJson(item, order, tableName.get(i), time,0);
 			orderAll.put(order.toString());
 			i++;
 		}
@@ -299,10 +325,11 @@ public class TableSetting implements Serializable {
 	}
 
 	private void orderJson(int destTId, JSONObject order, String tableName,
-			String time) {
+			String time,int persons) {
 		try {
 			order.put("waiter", UserData.getUserName());
 			order.put("tableId", destTId);
+			order.put("persons", persons);
 			order.put("tableName", tableName);
 			order.put("timestamp", time);
 		} catch (JSONException e) {

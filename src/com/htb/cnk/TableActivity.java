@@ -21,8 +21,10 @@ import android.os.IBinder;
 import android.os.Message;
 import android.text.InputFilter;
 import android.text.method.DigitsKeyListener;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
@@ -55,7 +57,7 @@ public class TableActivity extends BaseActivity {
 	private GridView gridview;
 	private ProgressDialog mpDialog;
 	private SimpleAdapter mImageItems;
-	private ItemClickListener mTableClicked;
+	private tableItemClickListener mTableClicked;
 	private ArrayList<HashMap<String, Object>> lstImageItem = new ArrayList<HashMap<String, Object>>();
 	private Notifications mNotificaion = new Notifications();
 	private NotificationTypes mNotificationType = new NotificationTypes();
@@ -107,6 +109,7 @@ public class TableActivity extends BaseActivity {
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setContentView(R.layout.table_activity);
 		mMyOrder = new MyOrder(TableActivity.this);
+		mSettings = new TableSetting();
 		mRingtone = new Ringtone(TableActivity.this);
 		findViews();
 		setClickListeners();
@@ -117,8 +120,6 @@ public class TableActivity extends BaseActivity {
 		mpDialog.setCancelable(false);
 		mNetWrorkAlertDialog = networkDialog();
 		Info.setMode(Info.WORK_MODE_WAITER);
-		new Thread(new getNotificationType()).start();
-
 		intent = new Intent(TableActivity.this, NotificationTableService.class);
 		startService(intent);
 		bindService(intent, conn, Context.BIND_AUTO_CREATE);
@@ -126,6 +127,8 @@ public class TableActivity extends BaseActivity {
 		IntentFilter filter = new IntentFilter(
 				NotificationTableService.SERVICE_IDENTIFIER);
 		registerReceiver(mReceiver, filter);
+		new Thread(new getNotificationType()).start();
+
 	}
 
 	public void showProgressDlg(String msg) {
@@ -142,7 +145,7 @@ public class TableActivity extends BaseActivity {
 	}
 
 	private void setClickListeners() {
-		mTableClicked = new ItemClickListener();
+		mTableClicked = new tableItemClickListener();
 		mBackBtn.setOnClickListener(backClicked);
 		mUpdateBtn.setOnClickListener(combineClicked);
 		mStatisticsBtn.setOnClickListener(logoutClicked);
@@ -164,7 +167,7 @@ public class TableActivity extends BaseActivity {
 	};
 
 	// TODO define
-	class ItemClickListener implements OnItemClickListener {
+	class tableItemClickListener implements OnItemClickListener {
 
 		public void onItemClick(AdapterView<?> arg0,// The AdapterView where the
 													// click happened
@@ -173,10 +176,14 @@ public class TableActivity extends BaseActivity {
 				long arg3// The row id of the item that was clicked
 		) {
 
-			Info.setTableName(mSettings.getName(arg2));
-			Info.setTableId(mSettings.getId(arg2));
+			Info.setTableName(mSettings.getNameIndex(arg2));
+			Info.setTableId(mSettings.getIdIndex(arg2));
 			int status = mSettings.getStatus(arg2);
 			switch (status) {
+			case 0:
+				AlertDialog.Builder addDialog = addDialog();
+				addDialog.show();
+				break;
 			case 1:
 				Dialog cleanDialog = cleanDialog();
 				cleanDialog.show();
@@ -194,8 +201,6 @@ public class TableActivity extends BaseActivity {
 				notificationDialog.show();
 				break;
 			default:
-				AlertDialog.Builder addDialog = addDialog();
-				addDialog.show();
 				break;
 			}
 			mImageItems.notifyDataSetChanged();
@@ -391,27 +396,29 @@ public class TableActivity extends BaseActivity {
 	}
 
 	protected Builder changeTableDialog() {
-		final EditText changeTableText = new EditText(this);
-		changeTableText.setKeyListener(new DigitsKeyListener(false, true));
-		changeTableText
-				.setFilters(new InputFilter[] { new InputFilter.LengthFilter(3) });
+		LayoutInflater inflater = getLayoutInflater();
+		View layout = inflater.inflate(R.layout.dialog,
+				(ViewGroup) findViewById(R.id.dialog));
+		final EditText tableIdEdit = (EditText) layout
+				.findViewById(R.id.tableIdEdit);
+		final EditText personsEdit = (EditText) layout
+				.findViewById(R.id.personsEdit);
 		final AlertDialog.Builder changeTableAlertDialog = alertDialogBuilder(false);
-		changeTableAlertDialog.setTitle("请输入桌号");
-		changeTableAlertDialog.setView(changeTableText);
+		changeTableAlertDialog.setTitle("请输入");
+		changeTableAlertDialog.setView(layout);
 		changeTableAlertDialog.setPositiveButton("确定",
 				new DialogInterface.OnClickListener() {
 
 					@Override
 					public void onClick(DialogInterface dialog, int i) {
-						String changeTId;
-						changeTId = changeTableText.getEditableText()
-								.toString();
-						if (changeTId.equals("")) {
-							Toast.makeText(getApplicationContext(), "请输入桌号!",
-									Toast.LENGTH_SHORT).show();
+						String changeTId = tableIdEdit.getText().toString();
+						String changePersons = personsEdit.getText().toString();
+						if (changeTId.equals("") || changePersons.equals("")) {
+							Toast.makeText(getApplicationContext(),
+									"请输入桌号或者人数!", Toast.LENGTH_SHORT).show();
 						} else if (isBoundaryLegal(changeTId)) {
-							changeTable(mSettings.getId(Integer
-									.parseInt(changeTId) - 1));
+							changeTable(mSettings.getId(changeTId),
+									Integer.parseInt(changePersons));
 						} else {
 							Toast.makeText(
 									getApplicationContext(),
@@ -419,15 +426,15 @@ public class TableActivity extends BaseActivity {
 											R.string.changeTIdWarning),
 									Toast.LENGTH_SHORT).show();
 						}
-
 					}
 
 					private boolean isBoundaryLegal(String changeTId) {
 						int tId = Integer.parseInt(changeTId);
-						return tId > 0
-								&& tId <= mSettings.size()
+						return tId >= Integer.parseInt(mSettings.getNameIndex(0))
+								&& tId <= Integer.parseInt(mSettings
+										.getNameIndex(mSettings.size() - 1))
 								&& mSettings.getStatusTableId(mSettings
-										.getId(tId - 1)) == Table.NORMAL_TABLE_STAUTS;
+										.getId(changeTId)) == Table.NORMAL_TABLE_STAUTS;
 					}
 				});
 		changeTableAlertDialog.setNegativeButton("取消", null);
@@ -435,26 +442,29 @@ public class TableActivity extends BaseActivity {
 	}
 
 	protected Builder copyTableDialog() {
-		final EditText copyTableText = new EditText(this);
-		copyTableText.setKeyListener(new DigitsKeyListener(false, true));
-		copyTableText
-				.setFilters(new InputFilter[] { new InputFilter.LengthFilter(3) });
+		LayoutInflater inflater = getLayoutInflater();
+		View layout = inflater.inflate(R.layout.dialog,
+				(ViewGroup) findViewById(R.id.dialog));
+		final EditText tableId = (EditText) layout
+				.findViewById(R.id.tableIdEdit);
+		final EditText persons = (EditText) layout
+				.findViewById(R.id.personsEdit);
 		final AlertDialog.Builder copyTableAlertDialog = alertDialogBuilder(false);
-		copyTableAlertDialog.setTitle("请输入桌号");
-		copyTableAlertDialog.setView(copyTableText);
+		copyTableAlertDialog.setTitle("请输入");
+		copyTableAlertDialog.setView(layout);
 		copyTableAlertDialog.setPositiveButton("确定",
 				new DialogInterface.OnClickListener() {
 
 					@Override
 					public void onClick(DialogInterface dialog, int i) {
-						String changeTId;
-						changeTId = copyTableText.getEditableText().toString();
-						if (changeTId.equals("")) {
-							Toast.makeText(getApplicationContext(), "请输入桌号!",
-									Toast.LENGTH_SHORT).show();
+						String changeTId = tableId.getText().toString();
+						String changePersons = persons.getText().toString();
+						if (changeTId.equals("") || changePersons.equals("")) {
+							Toast.makeText(getApplicationContext(),
+									"请输入桌号或者人数!", Toast.LENGTH_SHORT).show();
 						} else if (isBoundaryLegal(changeTId)) {
-							copyTable(mSettings.getId(Integer
-									.parseInt(changeTId) - 1));
+							copyTable(mSettings.getId(changeTId),
+									Integer.parseInt(changePersons));
 						} else {
 							Toast.makeText(
 									getApplicationContext(),
@@ -462,15 +472,15 @@ public class TableActivity extends BaseActivity {
 											R.string.copyTIdwarning),
 									Toast.LENGTH_SHORT).show();
 						}
-
 					}
 
 					private boolean isBoundaryLegal(String changeTId) {
 						int tId = Integer.parseInt(changeTId);
-						return tId > 0
-								&& tId <= mSettings.size()
+						return tId >=  Integer.parseInt(mSettings.getNameIndex(0))
+								&& tId <= Integer.parseInt(mSettings
+										.getNameIndex(mSettings.size() - 1))
 								&& mSettings.getStatusTableId(mSettings
-										.getId(tId - 1)) == Table.OPEN_TABLE_STATUS;
+										.getId(changeTId)) == Table.OPEN_TABLE_STATUS;
 					}
 				});
 		copyTableAlertDialog.setNegativeButton("取消", null);
@@ -593,7 +603,7 @@ public class TableActivity extends BaseActivity {
 						getResources().getString(R.string.copyTId),
 						Toast.LENGTH_SHORT).show();
 			}
-		}
+		} 
 	};
 
 	private Handler combineTIdHandle = new Handler() {
@@ -620,7 +630,7 @@ public class TableActivity extends BaseActivity {
 			for (int i = 0, n = 0; i < mSettings.size(); i++) {
 				int status = mSettings.getStatus(i);
 				if (status < Table.NOTIFICATION_STATUS
-						&& mNotificaion.getId(n) == mSettings.getId(i)) {
+						&& mNotificaion.getId(n) == mSettings.getIdIndex(i)) {
 					status = status + Table.NOTIFICATION_STATUS;
 					n++;
 				}
@@ -630,7 +640,7 @@ public class TableActivity extends BaseActivity {
 			for (int i = 0, n = 0; i < mSettings.size(); i++) {
 				int status = mSettings.getStatus(i);
 				if (status < Table.NOTIFICATION_STATUS
-						&& mNotificaion.getId(n) == mSettings.getId(i)) {
+						&& mNotificaion.getId(n) == mSettings.getIdIndex(i)) {
 					status = status + Table.NOTIFICATION_STATUS;
 					n++;
 				}
@@ -653,7 +663,7 @@ public class TableActivity extends BaseActivity {
 		HashMap<String, Object> map;
 		if (lstImageItem.size() <= position) {
 			map = new HashMap<String, Object>();
-			map.put("ItemText", "第" + mSettings.getName(position) + "桌");
+			map.put("ItemText", "第" + mSettings.getNameIndex(position) + "桌");
 		} else {
 			map = lstImageItem.get(position);
 		}
@@ -802,13 +812,13 @@ public class TableActivity extends BaseActivity {
 		}
 	}
 
-	private void changeTable(final int destTId) {
+	private void changeTable(final int destTId, final int persons) {
 		new Thread() {
 			public void run() {
 				try {
-					int ret = mSettings.changeTable(Info.getTableId(), destTId,
-							mSettings.getName(Info.getTableId() - 1),
-							TableActivity.this);
+					int ret = mSettings.changeTable(TableActivity.this,
+							Info.getTableId(), destTId,
+							mSettings.getName(Info.getTableId()), persons);
 					changeTIdHandle.sendEmptyMessage(ret);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -817,12 +827,12 @@ public class TableActivity extends BaseActivity {
 		}.start();
 	}
 
-	private void copyTable(final int destIId) {
+	private void copyTable(final int srcIId, final int persons) {
 		new Thread() {
 			public void run() {
 				try {
-					int ret = mSettings.copyTable(destIId, Info.getTableId(),
-							TableActivity.this);
+					int ret = mSettings.copyTable(TableActivity.this, srcIId,
+							Info.getTableId(), persons);
 					copyTIdHandle.sendEmptyMessage(ret);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -836,8 +846,8 @@ public class TableActivity extends BaseActivity {
 		new Thread() {
 			public void run() {
 				try {
-					int ret = mSettings.combineTable(destIId, tableName,
-							TableActivity.this);
+					int ret = mSettings.combineTable(TableActivity.this,
+							destIId, tableName);
 					combineTIdHandle.sendEmptyMessage(ret);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -900,7 +910,7 @@ public class TableActivity extends BaseActivity {
 		public void onReceive(Context context, Intent intent) {
 			Bundle bundle = intent.getExtras();
 			mRingtoneMsg = bundle.getInt("ringtoneMessage");
-			mTableMsg = bundle.getInt("tableMessage"); 
+			mTableMsg = bundle.getInt("tableMessage");
 			mSettings = (TableSetting) bundle
 					.getSerializable(NotificationTableService.SER_KEY);
 			tableHandle.sendEmptyMessage(mTableMsg);

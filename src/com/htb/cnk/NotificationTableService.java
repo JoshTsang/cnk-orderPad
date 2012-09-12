@@ -64,7 +64,6 @@ public class NotificationTableService extends Service {
 
 	private Handler tableHandle = new Handler() {
 		public void handleMessage(Message msg) {
-			// 发送特定action的广播
 			intent.putExtra("tableMessage", msg.what);
 			bundle.putSerializable(SER_KEY, mSettings);
 			intent.putExtras(bundle);
