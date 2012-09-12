@@ -817,8 +817,8 @@ public class TableActivity extends BaseActivity {
 			public void run() {
 				try {
 					int ret = mSettings.changeTable(TableActivity.this,
-							Info.getTableId(), destTId,
-							mSettings.getName(Info.getTableId()), persons);
+							Info.getTableId(), destTId, mSettings.getName(Info.getTableId()),
+							mSettings.getName(destTId), persons);
 					changeTIdHandle.sendEmptyMessage(ret);
 				} catch (Exception e) {
 					e.printStackTrace();

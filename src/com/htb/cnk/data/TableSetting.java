@@ -242,8 +242,8 @@ public class TableSetting implements Serializable {
 		return 0;
 	}
 
-	public int changeTable(Context context, int srcTId, int destTId,
-			String srcName, int persons) {
+	public int changeTable(Context context, int srcTId, int destTId, String srcName,
+			String destName, int persons) {
 		if (mOrder == null) {
 			mOrder = new MyOrder(context);
 		} else {
@@ -258,7 +258,7 @@ public class TableSetting implements Serializable {
 		Date date = new Date();
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String time = df.format(date);
-		orderJson(destTId, order, srcName, time,persons);
+		orderJson(destTId, order, srcName + "->" + destName, time,persons);
 		String tableChangePkg = Http.post(Server.CHANGE_TABLE + "?srcTID="
 				+ srcTId + "&destTID=" + destTId, order.toString());
 		if (!ErrorPHP.isSucc(tableChangePkg, TAG)) {
