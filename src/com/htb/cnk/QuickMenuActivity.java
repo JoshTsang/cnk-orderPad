@@ -85,7 +85,6 @@ public class QuickMenuActivity extends MenuBaseActivity {
 			}
 		};
 		mDishesLst.setAdapter(mDishLstAdapter);
-
 		mDishLstAdapter.notifyDataSetChanged();
 	}
 
@@ -141,13 +140,11 @@ public class QuickMenuActivity extends MenuBaseActivity {
 
 		@Override
 		public void afterTextChanged(Editable arg0) {
-
 		}
 
 		@Override
 		public void beforeTextChanged(CharSequence s, int start, int count,
 				int after) {
-
 		}
 
 	};

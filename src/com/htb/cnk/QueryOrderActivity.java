@@ -155,7 +155,6 @@ public class QueryOrderActivity extends OrderBaseActivity {
 		return mAlertDialog;
 	}
 	
-
 	@Override
 	public void finish() {
 		mMyOrder.clear();

@@ -77,7 +77,7 @@ public class TableActivity extends BaseActivity {
 	protected void onDestroy() {
 		unbindService(conn);
 		unregisterReceiver(mReceiver);
-		super.onDestroy();
+		super.onDestroy(); 
 	}
 
 	@Override
@@ -108,25 +108,30 @@ public class TableActivity extends BaseActivity {
 		this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setContentView(R.layout.table_activity);
+
 		mMyOrder = new MyOrder(TableActivity.this);
 		mSettings = new TableSetting();
 		mRingtone = new Ringtone(TableActivity.this);
-		findViews();
-		setClickListeners();
 		mpDialog = new ProgressDialog(TableActivity.this);
 		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 		mpDialog.setTitle("请稍等");
 		mpDialog.setIndeterminate(false);
 		mpDialog.setCancelable(false);
+
+		findViews();
+		setClickListeners();
+
 		mNetWrorkAlertDialog = networkDialog();
 		Info.setMode(Info.WORK_MODE_WAITER);
 		intent = new Intent(TableActivity.this, NotificationTableService.class);
 		startService(intent);
+
 		bindService(intent, conn, Context.BIND_AUTO_CREATE);
 		mReceiver = new MyReceiver();
 		IntentFilter filter = new IntentFilter(
 				NotificationTableService.SERVICE_IDENTIFIER);
 		registerReceiver(mReceiver, filter);
+
 		new Thread(new getNotificationType()).start();
 
 	}
@@ -179,6 +184,11 @@ public class TableActivity extends BaseActivity {
 			Info.setTableName(mSettings.getNameIndex(arg2));
 			Info.setTableId(mSettings.getIdIndex(arg2));
 			int status = mSettings.getStatus(arg2);
+			tableItemChioceDialog(arg2, status);
+			mImageItems.notifyDataSetChanged();
+		}
+
+		private void tableItemChioceDialog(int arg2, int status) {
 			switch (status) {
 			case 0:
 				AlertDialog.Builder addDialog = addDialog();
@@ -203,8 +213,6 @@ public class TableActivity extends BaseActivity {
 			default:
 				break;
 			}
-			mImageItems.notifyDataSetChanged();
-
 		}
 	}
 
@@ -245,6 +253,10 @@ public class TableActivity extends BaseActivity {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						Intent intent = new Intent();
+						cleanChioceMode(which, intent);
+					}
+
+					private void cleanChioceMode(int which, Intent intent) {
 						switch (which) {
 						case 0:
 							final AlertDialog.Builder mAlertDialog = cleanTableDialog();
@@ -319,6 +331,10 @@ public class TableActivity extends BaseActivity {
 					public void onClick(DialogInterface dialog, int which) {
 						mMyOrder.clear();
 						Intent intent = new Intent();
+						addDialogChoiceMode(which, intent);
+					}
+
+					private void addDialogChoiceMode(int which, Intent intent) {
 						switch (which) {
 						case 0:
 							intent.setClass(TableActivity.this,
@@ -360,6 +376,11 @@ public class TableActivity extends BaseActivity {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						Intent intent = new Intent();
+						addPhoneChoiceMode(position, which, intent);
+					}
+
+					private void addPhoneChoiceMode(final int position,
+							int which, Intent intent) {
 						switch (which) {
 						case 0:
 							intent.setClass(TableActivity.this,
@@ -396,9 +417,7 @@ public class TableActivity extends BaseActivity {
 	}
 
 	protected Builder changeTableDialog() {
-		LayoutInflater inflater = getLayoutInflater();
-		View layout = inflater.inflate(R.layout.dialog,
-				(ViewGroup) findViewById(R.id.dialog));
+		View layout = getDialogLayout();
 		final EditText tableIdEdit = (EditText) layout
 				.findViewById(R.id.tableIdEdit);
 		final EditText personsEdit = (EditText) layout
@@ -414,23 +433,19 @@ public class TableActivity extends BaseActivity {
 						String changeTId = tableIdEdit.getText().toString();
 						String changePersons = personsEdit.getText().toString();
 						if (changeTId.equals("") || changePersons.equals("")) {
-							Toast.makeText(getApplicationContext(),
-									"请输入桌号或者人数!", Toast.LENGTH_SHORT).show();
+							toastText(R.string.idAndPersonsIsNull);
 						} else if (isBoundaryLegal(changeTId)) {
 							changeTable(mSettings.getId(changeTId),
 									Integer.parseInt(changePersons));
 						} else {
-							Toast.makeText(
-									getApplicationContext(),
-									getResources().getString(
-											R.string.changeTIdWarning),
-									Toast.LENGTH_SHORT).show();
+							toastText(R.string.changeTIdWarning);
 						}
 					}
 
 					private boolean isBoundaryLegal(String changeTId) {
 						int tId = Integer.parseInt(changeTId);
-						return tId >= Integer.parseInt(mSettings.getNameIndex(0))
+						return tId >= Integer.parseInt(mSettings
+								.getNameIndex(0))
 								&& tId <= Integer.parseInt(mSettings
 										.getNameIndex(mSettings.size() - 1))
 								&& mSettings.getStatusTableId(mSettings
@@ -442,9 +457,7 @@ public class TableActivity extends BaseActivity {
 	}
 
 	protected Builder copyTableDialog() {
-		LayoutInflater inflater = getLayoutInflater();
-		View layout = inflater.inflate(R.layout.dialog,
-				(ViewGroup) findViewById(R.id.dialog));
+		View layout = getDialogLayout();
 		final EditText tableId = (EditText) layout
 				.findViewById(R.id.tableIdEdit);
 		final EditText persons = (EditText) layout
@@ -460,23 +473,19 @@ public class TableActivity extends BaseActivity {
 						String changeTId = tableId.getText().toString();
 						String changePersons = persons.getText().toString();
 						if (changeTId.equals("") || changePersons.equals("")) {
-							Toast.makeText(getApplicationContext(),
-									"请输入桌号或者人数!", Toast.LENGTH_SHORT).show();
+							toastText(R.string.idAndPersonsIsNull);
 						} else if (isBoundaryLegal(changeTId)) {
 							copyTable(mSettings.getId(changeTId),
 									Integer.parseInt(changePersons));
 						} else {
-							Toast.makeText(
-									getApplicationContext(),
-									getResources().getString(
-											R.string.copyTIdwarning),
-									Toast.LENGTH_SHORT).show();
+							toastText(R.string.copyTIdwarning);
 						}
 					}
 
 					private boolean isBoundaryLegal(String changeTId) {
 						int tId = Integer.parseInt(changeTId);
-						return tId >=  Integer.parseInt(mSettings.getNameIndex(0))
+						return tId >= Integer.parseInt(mSettings
+								.getNameIndex(0))
 								&& tId <= Integer.parseInt(mSettings
 										.getNameIndex(mSettings.size() - 1))
 								&& mSettings.getStatusTableId(mSettings
@@ -485,6 +494,13 @@ public class TableActivity extends BaseActivity {
 				});
 		copyTableAlertDialog.setNegativeButton("取消", null);
 		return copyTableAlertDialog;
+	}
+
+	private View getDialogLayout() {
+		LayoutInflater inflater = getLayoutInflater();
+		View layout = inflater.inflate(R.layout.dialog,
+				(ViewGroup) findViewById(R.id.dialog));
+		return layout;
 	}
 
 	protected Builder combineDialog() {
@@ -571,18 +587,14 @@ public class TableActivity extends BaseActivity {
 	private Handler changeTIdHandle = new Handler() {
 		public void handleMessage(Message msg) {
 			if (msg.what == -2) {
-				Toast.makeText(getApplicationContext(),
-						getResources().getString(R.string.changeTIdWarning),
-						Toast.LENGTH_SHORT).show();
+				toastText(R.string.changeTIdWarning);
 			} else if (msg.what == -1) {
 				ARERTDIALOG = 1;
 				mNetWrorkAlertDialog.setMessage("转台失败，请检查连接网络重试");
 				mNetWrorkcancel = mNetWrorkAlertDialog.show();
 			} else {
 				binder.start();
-				Toast.makeText(getApplicationContext(),
-						getResources().getString(R.string.changeTId),
-						Toast.LENGTH_SHORT).show();
+				toastText(R.string.changeTId);
 			}
 		}
 	};
@@ -590,62 +602,39 @@ public class TableActivity extends BaseActivity {
 	private Handler copyTIdHandle = new Handler() {
 		public void handleMessage(Message msg) {
 			if (msg.what == -2) {
-				Toast.makeText(getApplicationContext(),
-						getResources().getString(R.string.copyTIdwarning),
-						Toast.LENGTH_SHORT).show();
+				toastText(R.string.copyTIdwarning);
 			} else if (msg.what == -1) {
 				ARERTDIALOG = 1;
 				mNetWrorkAlertDialog.setMessage("复制失败，请检查连接网络重试");
 				mNetWrorkcancel = mNetWrorkAlertDialog.show();
 			} else {
 				binder.start();
-				Toast.makeText(getApplicationContext(),
-						getResources().getString(R.string.copyTId),
-						Toast.LENGTH_SHORT).show();
+				toastText(R.string.copyTId);
 			}
-		} 
+		}
 	};
 
 	private Handler combineTIdHandle = new Handler() {
 		public void handleMessage(Message msg) {
 			if (msg.what == -2) {
-				Toast.makeText(getApplicationContext(),
-						getResources().getString(R.string.combineTIdWarning),
-						Toast.LENGTH_SHORT).show();
+				toastText(R.string.combineTIdWarning);
 			} else if (msg.what == -1) {
 				ARERTDIALOG = 1;
 				mNetWrorkAlertDialog.setMessage("合并出错，请检查连接网络重试");
 				mNetWrorkcancel = mNetWrorkAlertDialog.show();
 			} else {
 				binder.start();
-				Toast.makeText(getApplicationContext(),
-						getResources().getString(R.string.combineTId),
-						Toast.LENGTH_SHORT).show();
+				toastText(R.string.combineTId);
 			}
 		}
 	};
 
 	private void setTableInfos() {
+
 		if (lstImageItem.size() > 0) {
-			for (int i = 0, n = 0; i < mSettings.size(); i++) {
-				int status = mSettings.getStatus(i);
-				if (status < Table.NOTIFICATION_STATUS
-						&& mNotificaion.getId(n) == mSettings.getIdIndex(i)) {
-					status = status + Table.NOTIFICATION_STATUS;
-					n++;
-				}
-				setTableIcon(i, status);
-			}
+			setStatusAndIcon();
 		} else {
-			for (int i = 0, n = 0; i < mSettings.size(); i++) {
-				int status = mSettings.getStatus(i);
-				if (status < Table.NOTIFICATION_STATUS
-						&& mNotificaion.getId(n) == mSettings.getIdIndex(i)) {
-					status = status + Table.NOTIFICATION_STATUS;
-					n++;
-				}
-				setTableIcon(i, status);
-			}
+			setStatusAndIcon();
 			mImageItems = new SimpleAdapter(TableActivity.this, lstImageItem,
 					R.layout.table_item,
 					new String[] { "imageItem", "ItemText" }, new int[] {
@@ -653,10 +642,21 @@ public class TableActivity extends BaseActivity {
 			};
 			gridview.setAdapter(mImageItems);
 		}
-
 		gridview.setVisibility(View.VISIBLE);
 		mImageItems.notifyDataSetChanged();
 		gridview.setOnItemClickListener(mTableClicked);
+	}
+
+	private void setStatusAndIcon() {
+		for (int i = 0, n = 0; i < mSettings.size(); i++) {
+			int status = mSettings.getStatus(i);
+			if (status < Table.NOTIFICATION_STATUS
+					&& mNotificaion.getId(n) == mSettings.getIdIndex(i)) {
+				status = status + Table.NOTIFICATION_STATUS;
+				n++;
+			}
+			setTableIcon(i, status);
+		}
 	}
 
 	private void setTableIcon(int position, int status) {
@@ -668,6 +668,14 @@ public class TableActivity extends BaseActivity {
 			map = lstImageItem.get(position);
 		}
 
+		imageItemSwitch(position, status, map);
+		if (lstImageItem.size() <= position) {
+			lstImageItem.add(map);
+		}
+	}
+
+	private void imageItemSwitch(int position, int status,
+			HashMap<String, Object> map) {
 		switch (status) {
 		case 0:
 			map.put("imageItem", R.drawable.table_red);
@@ -695,9 +703,6 @@ public class TableActivity extends BaseActivity {
 		default:
 			map.put("imageItem", R.drawable.table_red);
 			break;
-		}
-		if (lstImageItem.size() <= position) {
-			lstImageItem.add(map);
 		}
 	}
 
@@ -817,7 +822,8 @@ public class TableActivity extends BaseActivity {
 			public void run() {
 				try {
 					int ret = mSettings.changeTable(TableActivity.this,
-							Info.getTableId(), destTId, mSettings.getName(Info.getTableId()),
+							Info.getTableId(), destTId,
+							mSettings.getName(Info.getTableId()),
 							mSettings.getName(destTId), persons);
 					changeTIdHandle.sendEmptyMessage(ret);
 				} catch (Exception e) {
@@ -854,6 +860,11 @@ public class TableActivity extends BaseActivity {
 				}
 			}
 		}.start();
+	}
+
+	private void toastText(int r) {
+		Toast.makeText(getApplicationContext(), getResources().getString(r),
+				Toast.LENGTH_SHORT).show();
 	}
 
 	private OnClickListener backClicked = new OnClickListener() {

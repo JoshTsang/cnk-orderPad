@@ -134,18 +134,9 @@ public class PhoneActivity extends OrderBaseActivity {
 			mpDialog.cancel();
 			if (msg.what < 0) {
 				mMyOrder.phoneClear();
-				new AlertDialog.Builder(PhoneActivity.this)
-						.setTitle("请注意")
-						.setMessage("无法连接服务器")
-						.setPositiveButton("确定",
-								new DialogInterface.OnClickListener() {
-
-									@Override
-									public void onClick(DialogInterface dialog,
-											int which) {
-
-									}
-								}).show();
+				new AlertDialog.Builder(PhoneActivity.this).setTitle("请注意")
+						.setMessage("无法连接服务器").setPositiveButton("确定", null)
+						.show();
 			} else if (msg.what == MyOrder.RET_NULL_PHONE_ORDER) {
 				mMyOrder.phoneClear();
 				Toast.makeText(getApplicationContext(),
@@ -174,19 +165,22 @@ public class PhoneActivity extends OrderBaseActivity {
 
 	private void updateDishQuantity(final int position, final int quantity) {
 		if (quantity < 0) {
-			new Thread() {
-				public void run() {
-					int ret = mMyOrder.minus(position, -quantity);
-					delPhoneOrderhandler.sendEmptyMessage(ret);
-				}
-			}.start();
-
+			minusThread(position, quantity);
 		} else {
 			mMyOrder.add(position, quantity);
 			mMyOrderAdapter.notifyDataSetChanged();
 			updateTabelInfos();
 		}
 
+	}
+
+	private void minusThread(final int position, final int quantity) {
+		new Thread() {
+			public void run() {
+				int ret = mMyOrder.minus(position, -quantity);
+				delPhoneOrderhandler.sendEmptyMessage(ret);
+			}
+		}.start();
 	}
 
 	private void updatePhoneOrderInfos() {
@@ -213,6 +207,45 @@ public class PhoneActivity extends OrderBaseActivity {
 						updateDishQuantity(position, -quantity);
 					}
 				}).setNegativeButton("取消", null).show();
+	}
+
+	private void cleanThread() {
+		new Thread() {
+			public void run() {
+				try {
+					int result = mSettings
+							.getItemTableStatus(Info.getTableId());
+					if (result < 0) {
+						queryHandler.sendEmptyMessage(result);
+						return;
+					} else if (result > Table.PHONE_STATUS) {
+						mSettings.updateStatus(Info.getTableId(), result
+								- Table.PHONE_STATUS);
+					} else {
+						mSettings.updateStatus(Info.getTableId(), 1);
+					}
+					int ret = mMyOrder.cleanServerPhoneOrder(Info.getTableId());
+					if (ret < 0) {
+						queryHandler.sendEmptyMessage(ret);
+						return;
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}.start();
+	}
+
+	private void phoneWarningDialog() {
+		new AlertDialog.Builder(PhoneActivity.this).setCancelable(false)
+				.setTitle("提示").setMessage("订单已提交")
+				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						finish();
+					}
+				}).show();
 	}
 
 	private OnClickListener backBtnClicked = new OnClickListener() {
@@ -290,44 +323,8 @@ public class PhoneActivity extends OrderBaseActivity {
 						.setMessage(errMsg).setPositiveButton("确定", null)
 						.show();
 			} else {
-				new Thread() {
-					public void run() {
-						try {
-							int result = mSettings.getItemTableStatus(Info
-									.getTableId());
-							if (result < 0) {
-								queryHandler.sendEmptyMessage(result);
-								return;
-							} else if (result >= Table.PHONE_STATUS) {
-								mSettings.updateStatus(Info.getTableId(),
-										result - Table.PHONE_STATUS);
-							} else {
-								mSettings.updateStatus(Info.getTableId(), 1);
-							}
-							int ret = mMyOrder.cleanServerPhoneOrder(Info
-									.getTableId());
-							if (ret < 0) {
-								queryHandler.sendEmptyMessage(ret);
-								return;
-							}
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-					}
-				}.start();
-				new AlertDialog.Builder(PhoneActivity.this)
-						.setCancelable(false)
-						.setTitle("提示")
-						.setMessage("订单已提交")
-						.setPositiveButton("确定",
-								new DialogInterface.OnClickListener() {
-
-									@Override
-									public void onClick(DialogInterface dialog,
-											int which) {
-										finish();
-									}
-								}).show();
+				cleanThread();
+				phoneWarningDialog();
 			}
 		}
 	};
@@ -337,18 +334,9 @@ public class PhoneActivity extends OrderBaseActivity {
 			mpDialog.cancel();
 			if (msg.what < 0) {
 				new AlertDialog.Builder(PhoneActivity.this)
-						.setCancelable(false)
-						.setTitle("出错了")
-						.setMessage("删除失败")
-						.setPositiveButton("确定",
-								new DialogInterface.OnClickListener() {
-
-									@Override
-									public void onClick(DialogInterface dialog,
-											int which) {
-
-									}
-								}).show();
+						.setCancelable(false).setTitle("出错了")
+						.setMessage("删除失败").setPositiveButton("确定", null)
+						.show();
 			} else {
 				switch (msg.what) {
 				case 0:

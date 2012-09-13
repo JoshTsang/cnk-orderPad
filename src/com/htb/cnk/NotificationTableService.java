@@ -20,7 +20,7 @@ public class NotificationTableService extends Service {
 	private final int UPDATE_TABLE_INFOS = 5;
 	private Intent intent = new Intent(SERVICE_IDENTIFIER);
 	private Bundle bundle = new Bundle();
-	private Handler objHandler = new Handler();
+	private static Handler objHandler = new Handler();
 	public static final String SERVICE_IDENTIFIER = "cainaoke.service";
 	public final static String SER_KEY = "cainaoke.ser";
 	private MyBinder myBinder = new MyBinder();
@@ -61,7 +61,6 @@ public class NotificationTableService extends Service {
 		}
 	}
 
-
 	private Handler tableHandle = new Handler() {
 		public void handleMessage(Message msg) {
 			intent.putExtra("tableMessage", msg.what);
@@ -78,8 +77,8 @@ public class NotificationTableService extends Service {
 
 	@Override
 	public void onStart(Intent intent, int startId) {
-		objHandler.postDelayed(mTasks, 1);
 		super.onStart(intent, startId);
+		objHandler.postDelayed(mTasks, 1);
 	}
 
 	@Override

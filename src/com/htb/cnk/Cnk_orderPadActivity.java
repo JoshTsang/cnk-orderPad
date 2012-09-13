@@ -91,7 +91,7 @@ public class Cnk_orderPadActivity extends BaseActivity {
 		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 		mpDialog.setIndeterminate(false);
 		mpDialog.setCancelable(false);
-		mNetWrorkAlertDialog = wifiDialog();
+		setmNetWrorkAlertDialog(wifiDialog());
 	}
 
 	private void findViews() {
@@ -439,6 +439,14 @@ public class Cnk_orderPadActivity extends BaseActivity {
 		} else {
 			return super.onKeyDown(keyCode, event);
 		}
+	}
+
+	public AlertDialog.Builder getmNetWrorkAlertDialog() {
+		return mNetWrorkAlertDialog;
+	}
+
+	public void setmNetWrorkAlertDialog(AlertDialog.Builder mNetWrorkAlertDialog) {
+		this.mNetWrorkAlertDialog = mNetWrorkAlertDialog;
 	}
 
 }
