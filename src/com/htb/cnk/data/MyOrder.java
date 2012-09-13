@@ -57,6 +57,10 @@ public class MyOrder {
 			return dish.getName();
 		}
 
+		public int getServedQuantity() {
+			return status;
+		}
+		
 		public int getQuantity() {
 			return padQuantity + phoneQuantity;
 		}
@@ -73,8 +77,8 @@ public class MyOrder {
 			return status;
 		}
 
-		public void setStatus(int status) {
-			this.status = status;
+		public void addStatus(int add) {
+			this.status += add;
 		}
 
 		public int getTableId() {
@@ -109,6 +113,7 @@ public class MyOrder {
 			if (item.dish.getId() == dish.getId()) {
 				if (type == MODE_PAD) {
 					item.padQuantity += quantity;
+					item.status += status;
 				} else if (type == MODE_PHONE) {
 					item.phoneQuantity += quantity;
 				}
@@ -153,18 +158,6 @@ public class MyOrder {
 
 	public int count() {
 		return mOrder.size();
-	}
-
-	public int countServed() {
-		int count = 0;
-
-		for (OrderedDish item : mOrder) {
-			if (item.status == 2) {
-				count++;
-			}
-		}
-
-		return count;
 	}
 
 	public int totalQuantity() {
@@ -218,13 +211,13 @@ public class MyOrder {
 		return mOrder.get(index).getTableId();
 	}
 
-	public int setDishStatus(int index, int status) {
+	public int setDishStatus(int index) {
 		int ret = updateServerServedDish(Info.getTableId(), mOrder.get(index)
 				.getDishId());
 		if (ret < 0) {
 			return ret;
 		} else {
-			mOrder.get(index).setStatus(status);
+			mOrder.get(index).addStatus(1);
 		}
 		return 0;
 	}
@@ -410,11 +403,12 @@ public class MyOrder {
 				JSONObject item = tableList.getJSONObject(i);
 				int quantity = item.getInt("quantity");
 				int dishId = item.getInt("dish_id");
+				int status = item.getInt("status");
 				Cursor cur = getDishNameAndPriceFromDB(dishId);
 				String name = cur.getString(0);
 				double dishPrice = cur.getDouble(1);
 				Dish mDish = new Dish(dishId, name, dishPrice, null);
-				addOrder(mDish, quantity, tableId, 1, MODE_PHONE);
+				addOrder(mDish, quantity, tableId, status, MODE_PHONE);
 			}
 			return 0;
 		} catch (Exception e) {
