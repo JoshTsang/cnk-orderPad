@@ -51,7 +51,6 @@ public class DelOrderActivity extends OrderBaseActivity {
 	}
 
 	private void fillDelData() {
-		mMyOrder.setNullServing();
 		mMyOrderAdapter = new MyOrderAdapter(this, mMyOrder) {
 			@Override
 			public View getView(int position, View convertView, ViewGroup arg2) {
@@ -190,6 +189,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 				ARERTDIALOG = 1;
 				mNetWrorkcancel = mNetWrorkAlertDialog.show();
 			} else {
+				mMyOrder.setNullServing();
 				fillDelData();
 				mMyOrderAdapter.notifyDataSetChanged();
 			}
