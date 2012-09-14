@@ -48,7 +48,7 @@ import com.htb.constant.Table;
 public class TableActivity extends BaseActivity {
 	private final int UPDATE_TABLE_INFOS = 5;
 	private final int DISABLE_GRIDVIEW = 10;
-	private static int ARERTDIALOG = 0;
+	private int ARERTDIALOG = 0;
 	private TableSetting mSettings;
 	private Button mBackBtn;
 	private Button mUpdateBtn;

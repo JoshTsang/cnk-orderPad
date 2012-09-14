@@ -20,7 +20,7 @@ import com.htb.cnk.lib.OrderBaseActivity;
 
 public class DelOrderActivity extends OrderBaseActivity {
 	private final int CLEANALL = -1;
-	private static int ARERTDIALOG = 0;
+	private int ARERTDIALOG = 0;
 	private MyOrderAdapter mMyOrderAdapter;
 	private AlertDialog mNetWrorkcancel;
 	private AlertDialog.Builder mNetWrorkAlertDialog;
@@ -51,7 +51,6 @@ public class DelOrderActivity extends OrderBaseActivity {
 	}
 
 	private void fillDelData() {
-		mMyOrder.setNullServing();
 		mMyOrderAdapter = new MyOrderAdapter(this, mMyOrder) {
 			@Override
 			public View getView(int position, View convertView, ViewGroup arg2) {
@@ -190,6 +189,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 				ARERTDIALOG = 1;
 				mNetWrorkcancel = mNetWrorkAlertDialog.show();
 			} else {
+				mMyOrder.setNullServing();
 				fillDelData();
 				mMyOrderAdapter.notifyDataSetChanged();
 			}
@@ -207,7 +207,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 				fillDelData();
 				mMyOrderAdapter.notifyDataSetChanged();
 			}
-		}
+		} 
 	};
 
 	Handler cleanAllHandler = new Handler() {

@@ -492,6 +492,7 @@ public class MyOrder {
 			e.printStackTrace();
 		}
 		if (position == -1) {
+			Log.d(TAG, order.toString());
 			response = Http.post(Server.DEL_ORDER, order.toString());
 		} else {
 			response = Http.post(
