@@ -61,6 +61,7 @@ public class QueryOrderActivity extends OrderBaseActivity {
 				TextView dishName;
 				TextView dishPrice;
 				TextView dishQuantity;
+				TextView dishServedQuantity;
 				if (convertView == null) {
 					convertView = LayoutInflater.from(QueryOrderActivity.this)
 							.inflate(R.layout.item_queryorder, null);
@@ -69,6 +70,8 @@ public class QueryOrderActivity extends OrderBaseActivity {
 
 				dishName = (TextView) convertView.findViewById(R.id.dishName);
 				dishPrice = (TextView) convertView.findViewById(R.id.dishPrice);
+				dishServedQuantity = (TextView) convertView
+						.findViewById(R.id.dishServedQuantity);
 				dishQuantity = (TextView) convertView
 						.findViewById(R.id.dishQuantity);
 
@@ -78,16 +81,19 @@ public class QueryOrderActivity extends OrderBaseActivity {
 						+ " 元/份");
 				dishQuantity
 						.setText(Integer.toString(dishDetail.getQuantity()));
-				if (dishDetail.getStatus() == 2) {
+				dishServedQuantity.setText(Integer.toString(dishDetail.getServedQuantity()));
+				if ((dishDetail.getQuantity()-dishDetail.getServedQuantity()) <= 0) {
 					int color = Color.rgb(255, 0, 0);
 					dishName.setTextColor(color);
 					dishPrice.setTextColor(color);
 					dishQuantity.setTextColor(color);
+					dishServedQuantity.setTextColor(color);
 				} else {
 					int color = Color.rgb(0, 0, 0);
 					dishName.setTextColor(color);
 					dishPrice.setTextColor(color);
 					dishQuantity.setTextColor(color);
+					dishServedQuantity.setTextColor(color);
 				}
 				return convertView;
 			}

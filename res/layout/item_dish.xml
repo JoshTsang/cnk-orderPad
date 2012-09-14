@@ -6,6 +6,7 @@
     android:paddingTop="8dip"
     android:paddingLeft="8dip"
     android:orientation="horizontal"
+	android:descendantFocusability="blocksDescendants"
     android:layout_centerInParent="true" >
     <ImageButton android:id="@+id/pic"
         android:layout_width="80dip"

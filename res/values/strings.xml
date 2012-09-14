@@ -68,4 +68,5 @@
     <string name="tableId">桌号</string>
     <string name="persons">人数</string>
 	<string name="idAndPersonsIsNull">请输入桌号或者人数!</string>
+    <string name="slash">/</string>
 </resources>

@@ -593,7 +593,7 @@ public class TableActivity extends BaseActivity {
 				mNetWrorkAlertDialog.setMessage("转台失败，请检查连接网络重试");
 				mNetWrorkcancel = mNetWrorkAlertDialog.show();
 			} else {
-				binder.start();
+				binderStart();
 				toastText(R.string.changeTId);
 			}
 		}
@@ -608,7 +608,7 @@ public class TableActivity extends BaseActivity {
 				mNetWrorkAlertDialog.setMessage("复制失败，请检查连接网络重试");
 				mNetWrorkcancel = mNetWrorkAlertDialog.show();
 			} else {
-				binder.start();
+				binderStart();
 				toastText(R.string.copyTId);
 			}
 		}
@@ -623,7 +623,7 @@ public class TableActivity extends BaseActivity {
 				mNetWrorkAlertDialog.setMessage("合并出错，请检查连接网络重试");
 				mNetWrorkcancel = mNetWrorkAlertDialog.show();
 			} else {
-				binder.start();
+				binderStart();
 				toastText(R.string.combineTId);
 			}
 		}
@@ -720,7 +720,7 @@ public class TableActivity extends BaseActivity {
 			if (msg.what < 0) {
 				// Todo network failure warning
 			} else {
-				binder.start();
+				binderStart();
 			}
 		}
 	};

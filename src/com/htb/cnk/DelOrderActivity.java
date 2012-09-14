@@ -51,11 +51,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 	}
 
 	private void fillDelData() {
-		mTableNumTxt.setText(Info.getTableName());
-		mDishCountTxt.setText(Integer.toString(mMyOrder.totalQuantity())
-				+ " 道菜");
-		mTotalPriceTxt
-				.setText(Double.toString(mMyOrder.getTotalPrice()) + " 元");
+		mMyOrder.setNullServing();
 		mMyOrderAdapter = new MyOrderAdapter(this, mMyOrder) {
 			@Override
 			public View getView(int position, View convertView, ViewGroup arg2) {
@@ -89,7 +85,11 @@ public class DelOrderActivity extends OrderBaseActivity {
 				return convertView;
 			}
 		};
-
+		mTableNumTxt.setText(Info.getTableName());
+		mDishCountTxt.setText(Integer.toString(mMyOrder.totalQuantity())
+				+ " 道菜");
+		mTotalPriceTxt
+				.setText(Double.toString(mMyOrder.getTotalPrice()) + " 元");
 		mMyOrderLst.setAdapter(mMyOrderAdapter);
 
 	}

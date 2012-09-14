@@ -30,8 +30,10 @@ public class ServeOrderActivity extends OrderBaseActivity {
 		
 		void setup() {
 			map.clear();
+			OrderedDish dishDetail;
 			for (int i=0; i<mMyOrder.count(); i++) {
-				if (mMyOrder.getDishStatus(i) != 2) {
+				dishDetail = mMyOrder.getOrderedDish(i);
+				if ((dishDetail.getQuantity()-dishDetail.getServedQuantity()) > 0) {
 					map.add(i);	
 				}
 			}
@@ -74,6 +76,8 @@ public class ServeOrderActivity extends OrderBaseActivity {
 				TextView dishName;
 				TextView dishPrice;
 				TextView dishQuantity;
+				TextView dishServedQuantity;
+				
 				if (convertView == null) {
 					convertView = LayoutInflater.from(ServeOrderActivity.this)
 							.inflate(R.layout.item_queryorder, null);
@@ -84,10 +88,13 @@ public class ServeOrderActivity extends OrderBaseActivity {
 				dishPrice = (TextView) convertView.findViewById(R.id.dishPrice);
 				dishQuantity = (TextView) convertView
 						.findViewById(R.id.dishQuantity);
-
+				dishServedQuantity = (TextView) convertView
+						.findViewById(R.id.dishServedQuantity);
+				
 				dishName.setText(dishDetail.getName());
 				dishPrice.setText(Double.toString(dishDetail.getPrice())
 						+ " 元/份");
+				dishServedQuantity.setText(Integer.toString(dishDetail.getServedQuantity()));
 				dishQuantity
 						.setText(Integer.toString(dishDetail.getQuantity()));
 
@@ -106,7 +113,7 @@ public class ServeOrderActivity extends OrderBaseActivity {
 			showProgressDlg("更新服务器状态...");
 			new Thread() {
 				public void run() {
-					int ret = mMyOrder.setDishStatus(postionToIndex.getIndex(position), 2);
+					int ret = mMyOrder.setDishStatus(postionToIndex.getIndex(position));
 					markServedHandle.sendEmptyMessage(ret);
 				}
 			}.start();

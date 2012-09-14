@@ -19,6 +19,8 @@ import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -28,10 +30,6 @@ import android.widget.Toast;
 
 import com.htb.cnk.MyOrderActivity;
 import com.htb.cnk.R;
-import com.htb.cnk.R.drawable;
-import com.htb.cnk.R.id;
-import com.htb.cnk.R.layout;
-import com.htb.cnk.R.style;
 import com.htb.cnk.adapter.DishListAdapter;
 import com.htb.cnk.data.Categories;
 import com.htb.cnk.data.Dish;
@@ -178,6 +176,7 @@ public class MenuBaseActivity extends BaseActivity {
 
 	protected void setClickListener() {
 		mMyOrderBtn.setOnClickListener(myOrderBtnClicked);
+		mDishesLst.setOnItemClickListener(itemClicked);
 	}
 
 	public void updateOrderedDishCount() {
@@ -270,6 +269,17 @@ public class MenuBaseActivity extends BaseActivity {
 		}
 	};
 	
+	protected OnItemClickListener itemClicked = new OnItemClickListener() {
+
+		@Override
+		public void onItemClick(AdapterView<?> arg0, View arg1, int position,
+				long arg3) {
+			mMyOrder.add(mDishes.getDish(position), 1, Info.getTableId(), 0);
+			updateOrderedDishCount();
+			mDishLstAdapter.notifyDataSetChanged();
+		}
+		
+	};
 	private Handler minushandler = new Handler() {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();

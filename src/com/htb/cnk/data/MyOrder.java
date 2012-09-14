@@ -57,6 +57,10 @@ public class MyOrder {
 			return dish.getName();
 		}
 
+		public int getServedQuantity() {
+			return status;
+		}
+
 		public int getQuantity() {
 			return padQuantity + phoneQuantity;
 		}
@@ -73,8 +77,8 @@ public class MyOrder {
 			return status;
 		}
 
-		public void setStatus(int status) {
-			this.status = status;
+		public void addStatus(int add) {
+			this.status += add;
 		}
 
 		public int getTableId() {
@@ -98,17 +102,18 @@ public class MyOrder {
 	public void setPersons(int persons) {
 		this.persons = persons;
 	}
-	
+
 	public int getPersons() {
 		return persons;
 	}
-	
+
 	public int addOrder(Dish dish, int quantity, int tableId, int status,
 			int type) {
 		for (OrderedDish item : mOrder) {
 			if (item.dish.getId() == dish.getId()) {
 				if (type == MODE_PAD) {
 					item.padQuantity += quantity;
+					item.status += status;
 				} else if (type == MODE_PHONE) {
 					item.phoneQuantity += quantity;
 				}
@@ -153,18 +158,6 @@ public class MyOrder {
 
 	public int count() {
 		return mOrder.size();
-	}
-
-	public int countServed() {
-		int count = 0;
-
-		for (OrderedDish item : mOrder) {
-			if (item.status == 2) {
-				count++;
-			}
-		}
-
-		return count;
 	}
 
 	public int totalQuantity() {
@@ -218,13 +211,13 @@ public class MyOrder {
 		return mOrder.get(index).getTableId();
 	}
 
-	public int setDishStatus(int index, int status) {
+	public int setDishStatus(int index) {
 		int ret = updateServerServedDish(Info.getTableId(), mOrder.get(index)
 				.getDishId());
 		if (ret < 0) {
 			return ret;
 		} else {
-			mOrder.get(index).setStatus(status);
+			mOrder.get(index).addStatus(1);
 		}
 		return 0;
 	}
@@ -332,7 +325,18 @@ public class MyOrder {
 		return 0;
 
 	}
-	
+
+	public void setNullServing() {
+		for (int i = 0; i < mOrder.size(); i++) {
+			OrderedDish item = (OrderedDish) mOrder.get(i);
+			mOrder.get(i).padQuantity = item.getQuantity() - item.status;
+			if (mOrder.get(i).padQuantity == 0) {
+				mOrder.remove(i);
+				i--;
+			}
+		}
+	}
+
 	public int getPersonsFromServer(int tableId) {
 		String response = Http.get(Server.GET_PERSONS, "TID=" + tableId);
 		if ("null".equals(response)) {
@@ -345,21 +349,20 @@ public class MyOrder {
 		try {
 			int start = response.indexOf('[');
 			int end = response.indexOf(']');
-			if (start < 0 || end < 0 || (end-start) > 4) {
+			if (start < 0 || end < 0 || (end - start) > 4) {
 				return -1;
 			} else {
 				String persons = response.substring(start + 1, end);
 				return Integer.valueOf(persons);
 			}
-			
+
 		} catch (Exception e) {
 			Log.e(TAG, response);
 			e.printStackTrace();
 		}
 		return -1;
 	}
-	
-	// TODO log failure
+
 	public int getOrderFromServer(int tableId) {
 		String response = Http.get(Server.GET_MYORDER, "TID=" + tableId);
 		if ("null".equals(response)) {
@@ -410,11 +413,12 @@ public class MyOrder {
 				JSONObject item = tableList.getJSONObject(i);
 				int quantity = item.getInt("quantity");
 				int dishId = item.getInt("dish_id");
+//				int status = item.getInt("status");
 				Cursor cur = getDishNameAndPriceFromDB(dishId);
 				String name = cur.getString(0);
 				double dishPrice = cur.getDouble(1);
 				Dish mDish = new Dish(dishId, name, dishPrice, null);
-				addOrder(mDish, quantity, tableId, 1, MODE_PHONE);
+				addOrder(mDish, quantity, tableId, 0, MODE_PHONE);
 			}
 			return 0;
 		} catch (Exception e) {

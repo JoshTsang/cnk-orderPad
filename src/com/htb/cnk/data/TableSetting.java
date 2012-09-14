@@ -20,7 +20,7 @@ import com.htb.constant.Server;
 
 public class TableSetting implements Serializable {
 	private static final int TIME_OUT = -1;
-	private final String TAG = "tableAtivity";
+	private final String TAG = "tableSetting";
 	private static final long serialVersionUID = 1L;
 	private MyOrder mOrder;
 	boolean phoneOrderPending;
