@@ -44,6 +44,7 @@ import com.htb.cnk.data.Setting;
 import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.lib.BaseActivity;
 import com.htb.cnk.lib.Ringtone;
+import com.htb.constant.ErrorNum;
 import com.htb.constant.Table;
 
 public class TableActivity extends BaseActivity {
@@ -414,7 +415,7 @@ public class TableActivity extends BaseActivity {
 	protected Builder changeTableDialog() {
 		final AlertDialog.Builder changeTableAlertDialog = alertDialogBuilder(false);
 		final EditText tableIdEdit;
-		final EditText personsEdit ;
+		final EditText personsEdit;
 		View layout = getDialogLayout();
 		personsEdit = (EditText) layout.findViewById(R.id.personsEdit);
 		if (Setting.enabledPersons()) {
@@ -433,7 +434,7 @@ public class TableActivity extends BaseActivity {
 						String changePersons;
 						if (Setting.enabledPersons()) {
 							changePersons = personsEdit.getText().toString();
-						} else{
+						} else {
 							changePersons = "0";
 						}
 						String changeTId = tableIdEdit.getText().toString();
@@ -580,6 +581,11 @@ public class TableActivity extends BaseActivity {
 				ARERTDIALOG = 1;
 				mNetWrorkAlertDialog.setMessage("转台失败，请检查连接网络重试");
 				mNetWrorkcancel = mNetWrorkAlertDialog.show();
+			} else if (msg.what == ErrorNum.PRINTER_ERR_CONNECT_TIMEOUT
+					|| msg.what == ErrorNum.PRINTER_ERR_NO_PAPER) {
+				String errMsg = "退菜订单失败";
+				Toast.makeText(getApplicationContext(), errMsg,
+						Toast.LENGTH_SHORT).show();
 			} else {
 				binderStart();
 				toastText(R.string.changeTId);
@@ -596,7 +602,7 @@ public class TableActivity extends BaseActivity {
 				mNetWrorkAlertDialog.setMessage("复制失败，请检查连接网络重试");
 				mNetWrorkcancel = mNetWrorkAlertDialog.show();
 			} else {
-				intent.setClass(TableActivity.this, MenuActivity.class);
+				intent.setClass(TableActivity.this, MyOrderActivity.class);
 				Info.setMode(Info.WORK_MODE_WAITER);
 				TableActivity.this.startActivity(intent);
 			}

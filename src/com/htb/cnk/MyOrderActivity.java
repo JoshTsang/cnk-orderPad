@@ -149,58 +149,43 @@ public class MyOrderActivity extends OrderBaseActivity {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
 			if (msg.what < 0) {
-				String errMsg = "提交订单失败";
-				if (msg.what == ErrorNum.PRINTER_ERR_CONNECT_TIMEOUT
-						|| msg.what == ErrorNum.PRINTER_ERR_NO_PAPER) {
-					errMsg += ":无法连接打印机或打印机缺纸";
-				}
-				new AlertDialog.Builder(MyOrderActivity.this)
-						.setCancelable(false).setTitle("出错了")
-						.setMessage(errMsg).setPositiveButton("确定", null)
-						.show();
+				errMsg(msg);
 			} else {
-				new Thread() {
-					public void run() {
-						try {
-							int result = mSettings
-									.getItemTableStatus(Info.getTableId());
-							if (result < 0) {
-								handler.sendEmptyMessage(result);
-							} else if (result >= Table.PHONE_STATUS) {
-								mSettings.updateStatus(Info.getTableId(), result);
-							} else {
-								mSettings.updateStatus(Info.getTableId(), 1);
-							}
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-					}
-				}.start();
-				
-				new AlertDialog.Builder(MyOrderActivity.this)
-						.setCancelable(false)
-						.setTitle("提示")
-						.setMessage("订单已提交")
-						.setPositiveButton("确定",
-								new DialogInterface.OnClickListener() {
-
-									@Override
-									public void onClick(DialogInterface dialog,
-											int which) {
-										mMyOrder.clear();
-										mMyOrderAdapter.notifyDataSetChanged();
-										finish();
-										if (Info.getMode() == Info.WORK_MODE_CUSTOMER) {
-											Info.setMode(Info.WORK_MODE_WAITER);
-											Intent intent = new Intent();
-											intent.setClass(
-													MyOrderActivity.this,
-													TableActivity.class);
-											startActivity(intent);
-										}
-									}
-								}).show();
+				getItemStatus();
+				submitSucceed();
 			}
+		}
+
+		private void getItemStatus() {
+			new Thread() {
+				public void run() {
+					try {
+						int result = mSettings
+								.getItemTableStatus(Info.getTableId());
+						if (result < 0) {
+							handler.sendEmptyMessage(result);
+						} else if (result >= Table.PHONE_STATUS) {
+							mSettings.updateStatus(Info.getTableId(), result);
+						} else {
+							mSettings.updateStatus(Info.getTableId(), 1);
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}.start();
+		}
+
+		private void errMsg(Message msg) {
+			String errMsg = "提交订单失败";
+			if (msg.what == ErrorNum.PRINTER_ERR_CONNECT_TIMEOUT
+					|| msg.what == ErrorNum.PRINTER_ERR_NO_PAPER) {
+				errMsg += ":无法连接打印机或打印机缺纸";
+			}
+			new AlertDialog.Builder(MyOrderActivity.this)
+					.setCancelable(false).setTitle("出错了")
+					.setMessage(errMsg).setPositiveButton("确定", null)
+					.show();
 		}
 	};
 
@@ -211,6 +196,32 @@ public class MyOrderActivity extends OrderBaseActivity {
 		intent.setClass(MyOrderActivity.this, MenuActivity.class);
 		startActivity(intent);
 		return ret;
+	}
+
+	private void submitSucceed() {
+		new AlertDialog.Builder(MyOrderActivity.this)
+				.setCancelable(false)
+				.setTitle("提示")
+				.setMessage("订单已提交")
+				.setPositiveButton("确定",
+						new DialogInterface.OnClickListener() {
+
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+								mMyOrder.clear();
+								mMyOrderAdapter.notifyDataSetChanged();
+								finish();
+								if (Info.getMode() == Info.WORK_MODE_CUSTOMER) {
+									Info.setMode(Info.WORK_MODE_WAITER);
+									Intent intent = new Intent();
+									intent.setClass(
+											MyOrderActivity.this,
+											TableActivity.class);
+									startActivity(intent);
+								}
+							}
+						}).show();
 	}
 
 	class ItemViewHolder {

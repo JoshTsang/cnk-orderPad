@@ -243,6 +243,12 @@ public class TableSetting implements Serializable {
 			Log.e(TAG, "mOrder.getOrderFromServer.timeout");
 			return TIME_OUT;
 		}
+		
+		ret = Http.getPrinterStatus(Server.PRINTER_CONTENT_TYPE_ORDER);
+		if (ret < 0) {
+			return ret;
+		}
+		
 		JSONObject order = new JSONObject();
 		String time = getCurrentTime();
 		orderJson(destTId, order, srcName + "->" + destName, time, persons);
