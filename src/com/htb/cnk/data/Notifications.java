@@ -38,10 +38,6 @@ public class Notifications {
 
 	static List<NotificationItem> notifications = new ArrayList<NotificationItem>();
 
-	public Notifications() {
-
-	}
-
 	private void add(NotificationItem item) {
 		notifications.add(item);
 	}
@@ -63,7 +59,6 @@ public class Notifications {
 
 	public String[] getTypeAll(int index) {
 		int i;
-
 		for (i = 0; i < notifications.size() - 1; i++) {
 			if (index == notifications.get(i).getId()) {
 				break;
@@ -78,7 +73,6 @@ public class Notifications {
 
 	public int getNotifiycations() {
 		String notificationPkg = Http.get(Server.GET_NOTIFICATION, null);
-		// Log.d("notificationPkg", notificationPkg);
 		if (notificationPkg == null || "".equals(notificationPkg)) {
 			return TIME_OUT;
 		} else if ("null".equals(notificationPkg)) {
@@ -91,7 +85,7 @@ public class Notifications {
 			NotificationItem asItem;
 			notifications.clear();
 			Notifications setting = new Notifications();
-			for (int i = 0; i < length; i++) {// 遍历JSONArray
+			for (int i = 0; i < length; i++) {
 				JSONObject item = tableList.getJSONObject(i);
 				int id = item.getInt("tid");
 				String notifications = item.getString("notifications");

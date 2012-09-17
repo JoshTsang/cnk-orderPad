@@ -20,7 +20,7 @@ import com.htb.constant.Server;
 
 public class TableSetting implements Serializable {
 	private static final int TIME_OUT = -1;
-	private final String TAG = "tableAtivity";
+	private final String TAG = "tableSetting";
 	private static final long serialVersionUID = 1L;
 	private MyOrder mOrder;
 	boolean phoneOrderPending;
@@ -55,10 +55,6 @@ public class TableSetting implements Serializable {
 
 	private static List<TableSettingItem> mTableSettings = new ArrayList<TableSettingItem>();
 
-	public TableSetting() {
-
-	}
-
 	public void add(TableSettingItem item) {
 		mTableSettings.add(item);
 	}
@@ -71,10 +67,10 @@ public class TableSetting implements Serializable {
 		return mTableSettings.get(index).getStatus();
 	}
 
-	public int getStatusTableId(int index) {
+	public int getStatusTableId(int tableId) {
 		int i;
 		for (i = 0; i < mTableSettings.size() - 1; i++) {
-			if (index == mTableSettings.get(i).getId()) {
+			if (tableId == mTableSettings.get(i).getId()) {
 				break;
 			}
 		}
@@ -225,9 +221,7 @@ public class TableSetting implements Serializable {
 
 	public int cleanTalble(int tableId) {
 		JSONObject order = new JSONObject();
-		Date date = new Date();
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		String time = df.format(date);
+		String time = getCurrentTime();
 		try {
 			order.put("timestamp", time);
 			order.put("TID", tableId);
@@ -242,47 +236,33 @@ public class TableSetting implements Serializable {
 		return 0;
 	}
 
-	public int changeTable(Context context, int srcTId, int destTId, String srcName,
-			String destName, int persons) {
-		if (mOrder == null) {
-			mOrder = new MyOrder(context);
-		} else {
-			mOrder.clear();
-		}
-		int ret = mOrder.getOrderFromServer(srcTId);
+	public int changeTable(Context context, int srcTId, int destTId,
+			String srcName, String destName, int persons) {
+		int ret = getOrderFromServer(context, srcTId);
 		if (ret == -1) {
 			Log.e(TAG, "mOrder.getOrderFromServer.timeout");
 			return TIME_OUT;
 		}
 		JSONObject order = new JSONObject();
-		Date date = new Date();
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		String time = df.format(date);
-		orderJson(destTId, order, srcName + "->" + destName, time,persons);
+		String time = getCurrentTime();
+		orderJson(destTId, order, srcName + "->" + destName, time, persons);
 		String tableChangePkg = Http.post(Server.CHANGE_TABLE + "?srcTID="
 				+ srcTId + "&destTID=" + destTId, order.toString());
 		if (!ErrorPHP.isSucc(tableChangePkg, TAG)) {
-			return -1;
+			return -2;
 		}
 		return 0;
 	}
 
 	public int copyTable(Context context, int srcTId, int destTId, int persons) {
-		if (mOrder == null) {
-			mOrder = new MyOrder(context);
-		} else {
-			mOrder.clear();
-		}
-		int ret = mOrder.getOrderFromServer(srcTId);
+		int ret = getOrderFromServer(context, srcTId);
 		if (ret == -1) {
 			Log.e(TAG, "mOrder.getOrderFromServer.timeout");
 			return TIME_OUT;
 		}
 		JSONObject order = new JSONObject();
-		Date date = new Date();
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		String time = df.format(date);
-		orderJson(destTId, order, Info.getTableName(), time,persons);
+		String time = getCurrentTime();
+		orderJson(destTId, order, Info.getTableName(), time, persons);
 		Log.d(TAG, order.toString());
 		String tablecopyPkg = Http.post(Server.COPY_TABLE + "?srcTID=" + srcTId
 				+ "&destTID=" + destTId, order.toString());
@@ -297,21 +277,14 @@ public class TableSetting implements Serializable {
 		JSONArray orderAll = new JSONArray();
 		int i = 0;
 		for (Integer item : srcTId) {
-			if (mOrder == null) {
-				mOrder = new MyOrder(context);
-			} else {
-				mOrder.clear();
-			}
-			int ret = mOrder.getOrderFromServer(item.intValue());
+			int ret = getOrderFromServer(context, item.intValue());
 			if (ret == -1) {
 				Log.e(TAG, "mOrder.getOrderFromServer.timeout");
 				return TIME_OUT;
 			}
 			JSONObject order = new JSONObject();
-			Date date = new Date();
-			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			String time = df.format(date);
-			orderJson(item, order, tableName.get(i), time,0);
+			String time = getCurrentTime();
+			orderJson(item, order, tableName.get(i), time, 0);
 			orderAll.put(order.toString());
 			i++;
 		}
@@ -324,8 +297,15 @@ public class TableSetting implements Serializable {
 		return 0;
 	}
 
+	private String getCurrentTime() {
+		Date date = new Date();
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String time = df.format(date);
+		return time;
+	}
+
 	private void orderJson(int destTId, JSONObject order, String tableName,
-			String time,int persons) {
+			String time, int persons) {
 		try {
 			order.put("waiter", UserData.getUserName());
 			order.put("tableId", destTId);
@@ -351,5 +331,15 @@ public class TableSetting implements Serializable {
 			e.printStackTrace();
 		}
 	}
-
+	
+	private int getOrderFromServer(Context context, int srcTId) {
+		if (mOrder == null) {
+			mOrder = new MyOrder(context);
+		} else {
+			mOrder.clear();
+		}
+		int ret = mOrder.getOrderFromServer(srcTId);
+		return ret;
+	}
+	
 }

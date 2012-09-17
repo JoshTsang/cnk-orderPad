@@ -60,7 +60,7 @@ public class MyOrder {
 		public int getServedQuantity() {
 			return status;
 		}
-		
+
 		public int getQuantity() {
 			return padQuantity + phoneQuantity;
 		}
@@ -102,11 +102,11 @@ public class MyOrder {
 	public void setPersons(int persons) {
 		this.persons = persons;
 	}
-	
+
 	public int getPersons() {
 		return persons;
 	}
-	
+
 	public int addOrder(Dish dish, int quantity, int tableId, int status,
 			int type) {
 		for (OrderedDish item : mOrder) {
@@ -325,7 +325,18 @@ public class MyOrder {
 		return 0;
 
 	}
-	
+
+	public void setNullServing() {
+		for (int i = 0; i < mOrder.size(); i++) {
+			OrderedDish item = (OrderedDish) mOrder.get(i);
+			mOrder.get(i).padQuantity = item.getQuantity() - item.status;
+			if (mOrder.get(i).padQuantity == 0) {
+				mOrder.remove(i);
+				i--;
+			}
+		}
+	}
+
 	public int getPersonsFromServer(int tableId) {
 		String response = Http.get(Server.GET_PERSONS, "TID=" + tableId);
 		if ("null".equals(response)) {
@@ -338,21 +349,20 @@ public class MyOrder {
 		try {
 			int start = response.indexOf('[');
 			int end = response.indexOf(']');
-			if (start < 0 || end < 0 || (end-start) > 4) {
+			if (start < 0 || end < 0 || (end - start) > 4) {
 				return -1;
 			} else {
 				String persons = response.substring(start + 1, end);
 				return Integer.valueOf(persons);
 			}
-			
+
 		} catch (Exception e) {
 			Log.e(TAG, response);
 			e.printStackTrace();
 		}
 		return -1;
 	}
-	
-	// TODO log failure
+
 	public int getOrderFromServer(int tableId) {
 		String response = Http.get(Server.GET_MYORDER, "TID=" + tableId);
 		if ("null".equals(response)) {
@@ -404,6 +414,7 @@ public class MyOrder {
 				int quantity = item.getInt("quantity");
 				int dishId = item.getInt("dish_id");
 				//int status = item.getInt("status");
+
 				Cursor cur = getDishNameAndPriceFromDB(dishId);
 				String name = cur.getString(0);
 				double dishPrice = cur.getDouble(1);
@@ -482,6 +493,7 @@ public class MyOrder {
 			e.printStackTrace();
 		}
 		if (position == -1) {
+			Log.d(TAG, order.toString());
 			response = Http.post(Server.DEL_ORDER, order.toString());
 		} else {
 			response = Http.post(

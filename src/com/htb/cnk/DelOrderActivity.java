@@ -16,14 +16,12 @@ import android.widget.Toast;
 import com.htb.cnk.adapter.MyOrderAdapter;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder.OrderedDish;
-import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.lib.OrderBaseActivity;
 
 public class DelOrderActivity extends OrderBaseActivity {
 	private final int CLEANALL = -1;
-	private static int ARERTDIALOG = 0;
+	private int ARERTDIALOG = 0;
 	private MyOrderAdapter mMyOrderAdapter;
-	private TableSetting mSettings = new TableSetting();
 	private AlertDialog mNetWrorkcancel;
 	private AlertDialog.Builder mNetWrorkAlertDialog;
 	
@@ -53,11 +51,6 @@ public class DelOrderActivity extends OrderBaseActivity {
 	}
 
 	private void fillDelData() {
-		mTableNumTxt.setText(Info.getTableName());
-		mDishCountTxt.setText(Integer.toString(mMyOrder.totalQuantity())
-				+ " 道菜");
-		mTotalPriceTxt
-				.setText(Double.toString(mMyOrder.getTotalPrice()) + " 元");
 		mMyOrderAdapter = new MyOrderAdapter(this, mMyOrder) {
 			@Override
 			public View getView(int position, View convertView, ViewGroup arg2) {
@@ -91,7 +84,11 @@ public class DelOrderActivity extends OrderBaseActivity {
 				return convertView;
 			}
 		};
-
+		mTableNumTxt.setText(Info.getTableName());
+		mDishCountTxt.setText(Integer.toString(mMyOrder.totalQuantity())
+				+ " 道菜");
+		mTotalPriceTxt
+				.setText(Double.toString(mMyOrder.getTotalPrice()) + " 元");
 		mMyOrderLst.setAdapter(mMyOrderAdapter);
 
 	}
@@ -192,6 +189,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 				ARERTDIALOG = 1;
 				mNetWrorkcancel = mNetWrorkAlertDialog.show();
 			} else {
+				mMyOrder.setNullServing();
 				fillDelData();
 				mMyOrderAdapter.notifyDataSetChanged();
 			}
@@ -209,7 +207,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 				fillDelData();
 				mMyOrderAdapter.notifyDataSetChanged();
 			}
-		}
+		} 
 	};
 
 	Handler cleanAllHandler = new Handler() {
