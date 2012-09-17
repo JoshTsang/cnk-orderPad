@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -15,8 +16,10 @@ import android.widget.Toast;
 
 import com.htb.cnk.adapter.MyOrderAdapter;
 import com.htb.cnk.data.Info;
+import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.MyOrder.OrderedDish;
 import com.htb.cnk.lib.OrderBaseActivity;
+import com.htb.constant.ErrorNum;
 
 public class DelOrderActivity extends OrderBaseActivity {
 	private final int CLEANALL = -1;
@@ -24,7 +27,8 @@ public class DelOrderActivity extends OrderBaseActivity {
 	private MyOrderAdapter mMyOrderAdapter;
 	private AlertDialog mNetWrorkcancel;
 	private AlertDialog.Builder mNetWrorkAlertDialog;
-	
+	private final int UPDATE_ORDER_QUAN = 1;
+	private final int DEL_ORDER_QUAN = 0;
 	@Override
 	protected void onResume() {
 		if (ARERTDIALOG == 1) {
@@ -106,15 +110,13 @@ public class DelOrderActivity extends OrderBaseActivity {
 		new Thread() {
 			public void run() {
 				try {
-					Message msg = new Message();
-					int ret = mMyOrder.submitDelDish(position,1);
+					int ret = mMyOrder.submitDelDish(position,UPDATE_ORDER_QUAN);
 					if (ret < 0) {
 						delDishHandler.sendEmptyMessage(ret);
 						return;
 					}
 					mMyOrder.minus(position, 1);
-					msg.what = ret;
-					delDishHandler.sendMessage(msg);
+					delDishHandler.sendEmptyMessage(ret);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -126,9 +128,9 @@ public class DelOrderActivity extends OrderBaseActivity {
 	private void delDishAlert(final int position) {
 		String messages ;
 		if(position == CLEANALL){
-			messages = "确认删除所有菜品";
+			messages = "确认退掉所有菜品";
 		}else {
-			messages = "确认删除" + mMyOrder.getOrderedDish(position).getName();
+			messages = "确认退菜：" + mMyOrder.getOrderedDish(position).getName();
 		}
 		new AlertDialog.Builder(DelOrderActivity.this)
 				.setTitle("请注意")
@@ -139,10 +141,10 @@ public class DelOrderActivity extends OrderBaseActivity {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						if (position == CLEANALL) {
-							showProgressDlg("正在删除所有菜品");
+							showProgressDlg("正在推掉所有菜品");
 							new Thread(new cleanAllThread()).start();
 						} else {
-							showProgressDlg("正在删除菜品");
+							showProgressDlg("正在推掉菜品");
 							delDish(position);
 						}
 					}
@@ -200,9 +202,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
 			if (msg.what < 0) {
-				ARERTDIALOG = 1;
-				mNetWrorkAlertDialog.setMessage("删除菜品失败，请检查连接网络重试");
-				mNetWrorkcancel = mNetWrorkAlertDialog.show();
+				delHanderError(msg);
 			} else {
 				fillDelData();
 				mMyOrderAdapter.notifyDataSetChanged();
@@ -213,14 +213,8 @@ public class DelOrderActivity extends OrderBaseActivity {
 	Handler cleanAllHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
-			if (msg.what == -2) {
-				Toast.makeText(getApplicationContext(),
-						getResources().getString(R.string.cleanAllWarning),
-						Toast.LENGTH_SHORT).show();
-			} else if (msg.what == -1) {
-				ARERTDIALOG = 1;
-				mNetWrorkAlertDialog.setMessage("删除菜品失败，请检查连接网络重试");
-				mNetWrorkcancel = mNetWrorkAlertDialog.show();
+			if (msg.what < 0) {
+				delHanderError(msg);
 			} else {
 				mMyOrder.clear();
 				fillDelData();
@@ -247,10 +241,10 @@ public class DelOrderActivity extends OrderBaseActivity {
 					cleanAllHandler.sendEmptyMessage(-2);
 					return;
 				}
-				int result = mMyOrder.submitDelDish(-1,0);
-//				int ret = mSettings.cleanTalble(Info.getTableId());
+				int result = mMyOrder.submitDelDish(MyOrder.DEL_ALL_ORDER,DEL_ORDER_QUAN);
+//				int ret = mSettings.cleanTalble(Info.getTableId()); 
 				if (result < 0) {
-					cleanAllHandler.sendEmptyMessage(-1);
+					cleanAllHandler.sendEmptyMessage(result);
 					return;
 				}
 				cleanAllHandler.sendEmptyMessage(result);
@@ -293,6 +287,17 @@ public class DelOrderActivity extends OrderBaseActivity {
 	public void finish() {
 		mMyOrder.clear();
 		super.finish();
+	}
+
+	private void delHanderError(Message msg) {
+		String errMsg = "退菜订单失败";
+		if (msg.what == ErrorNum.PRINTER_ERR_CONNECT_TIMEOUT
+				|| msg.what == ErrorNum.PRINTER_ERR_NO_PAPER) {
+			errMsg += ":无法连接打印机或打印机缺纸";
+		}
+		ARERTDIALOG = 1;
+		mNetWrorkAlertDialog.setMessage(errMsg+",请检查连接网络重试");
+		mNetWrorkcancel = mNetWrorkAlertDialog.show();
 	}
 	
 }

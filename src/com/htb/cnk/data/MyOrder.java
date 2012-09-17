@@ -25,10 +25,11 @@ public class MyOrder {
 	public final static int ERR_GET_PHONE_ORDER_FAILED = -10;
 	public final static int RET_NULL_PHONE_ORDER = 1;
 	public final static int RET_MINUS_SUCC = -2;
-
+	public final static int DEL_ALL_ORDER = -1;
+	public final static int UPDATE_ORDER = 0;
+	
 	private final static int MODE_PAD = 0;
 	private final static int MODE_PHONE = 1;
-
 	private final static int TIME_OUT = -1;
 
 	public class OrderedDish {
@@ -413,7 +414,7 @@ public class MyOrder {
 				JSONObject item = tableList.getJSONObject(i);
 				int quantity = item.getInt("quantity");
 				int dishId = item.getInt("dish_id");
-				//int status = item.getInt("status");
+				// int status = item.getInt("status");
 
 				Cursor cur = getDishNameAndPriceFromDB(dishId);
 				String name = cur.getString(0);
@@ -456,6 +457,10 @@ public class MyOrder {
 		if (mOrder.size() <= 0) {
 			return -1;
 		}
+		int ret = Http.getPrinterStatus(Server.PRINTER_CONTENT_TYPE_ORDER);
+		if (ret < 0) {
+			return ret;
+		}
 		try {
 			order.put("waiter", UserData.getUserName());
 			order.put("tableId", Info.getTableId());
@@ -468,7 +473,7 @@ public class MyOrder {
 		JSONArray dishes = new JSONArray();
 		try {
 
-			if (position == -1) {
+			if (position == DEL_ALL_ORDER) {
 				for (int i = 0; i < mOrder.size(); i++) {
 					JSONObject dish = new JSONObject();
 					dish.put("dishId", mOrder.get(i).dish.getId());
@@ -492,8 +497,7 @@ public class MyOrder {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		if (position == -1) {
-			Log.d(TAG, order.toString());
+		if (position == DEL_ALL_ORDER) {
 			response = Http.post(Server.DEL_ORDER, order.toString());
 		} else {
 			response = Http.post(
@@ -501,8 +505,9 @@ public class MyOrder {
 							+ "&DID=" + mOrder.get(position).dish.getId(),
 					order.toString());
 		}
+
 		if (!ErrorPHP.isSucc(response, TAG)) {
-			return -1;
+			return -2;
 		}
 		return 0;
 

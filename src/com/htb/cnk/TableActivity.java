@@ -244,7 +244,7 @@ public class TableActivity extends BaseActivity {
 	}
 
 	private Dialog cleanDialog() {
-		final CharSequence[] cleanitems = { "清台", "转台", "删除菜", "添加菜", "查看菜" };
+		final CharSequence[] cleanitems = { "清台", "转台", "退菜", "添加菜", "查看菜" };
 		Dialog cleanDialog = alertDialogBuilder(true).setTitle("选择功能")
 				.setItems(cleanitems, new DialogInterface.OnClickListener() {
 
