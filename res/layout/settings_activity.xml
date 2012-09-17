@@ -46,7 +46,7 @@
 		    android:layout_height="wrap_content"
     		android:textSize="30dip"
     		android:textColor="#4D2412"
-		    android:text="人数"/>
+		    android:text="人数："/>
 	    <Switch android:id="@+id/persons"
 	        	android:layout_width="wrap_content"
 	        	android:layout_height="wrap_content"
@@ -57,8 +57,20 @@
 		    android:layout_height="wrap_content"
     		android:textSize="30dip"
     		android:textColor="#4D2412"
-		    android:text="提示音"/>
+		    android:text="提示音："/>
 	    <Switch android:id="@+id/ringtone"
+	        	android:layout_width="wrap_content"
+	        	android:layout_height="wrap_content"
+	        	android:textOn="开"
+	        	android:textOff="关" 
+	    />
+	    <TextView android:id="@+id/pwdCheckTxt" 
+	        android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+    		android:textSize="30dip"
+    		android:textColor="#4D2412"
+		    android:text="密码验证："/>
+	    <Switch android:id="@+id/pwdCheck"
 	        	android:layout_width="wrap_content"
 	        	android:layout_height="wrap_content"
 	        	android:textOn="开"
