@@ -403,12 +403,12 @@ public class MyOrder {
 				JSONObject item = tableList.getJSONObject(i);
 				int quantity = item.getInt("quantity");
 				int dishId = item.getInt("dish_id");
-				int status = item.getInt("status");
+				//int status = item.getInt("status");
 				Cursor cur = getDishNameAndPriceFromDB(dishId);
 				String name = cur.getString(0);
 				double dishPrice = cur.getDouble(1);
 				Dish mDish = new Dish(dishId, name, dishPrice, null);
-				addOrder(mDish, quantity, tableId, status, MODE_PHONE);
+				addOrder(mDish, quantity, tableId, 0, MODE_PHONE);
 			}
 			return 0;
 		} catch (Exception e) {
