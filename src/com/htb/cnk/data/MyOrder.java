@@ -326,7 +326,7 @@ public class MyOrder {
 
 	}
 
-	public void setNullServing() {
+	public void nullServing() {
 		for (int i = 0; i < mOrder.size(); i++) {
 			OrderedDish item = (OrderedDish) mOrder.get(i);
 			mOrder.get(i).padQuantity = item.getQuantity() - item.status;

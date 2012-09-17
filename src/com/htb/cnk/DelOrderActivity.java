@@ -189,7 +189,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 				ARERTDIALOG = 1;
 				mNetWrorkcancel = mNetWrorkAlertDialog.show();
 			} else {
-				mMyOrder.setNullServing();
+				mMyOrder.nullServing();
 				fillDelData();
 				mMyOrderAdapter.notifyDataSetChanged();
 			}

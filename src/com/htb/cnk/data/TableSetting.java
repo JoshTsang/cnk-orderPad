@@ -332,7 +332,7 @@ public class TableSetting implements Serializable {
 		}
 	}
 	
-	private int getOrderFromServer(Context context, int srcTId) {
+	public int getOrderFromServer(Context context, int srcTId) {
 		if (mOrder == null) {
 			mOrder = new MyOrder(context);
 		} else {
