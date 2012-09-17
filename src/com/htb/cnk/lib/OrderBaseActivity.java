@@ -22,6 +22,7 @@ import com.htb.cnk.R;
 import com.htb.cnk.TableActivity;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder;
+import com.htb.cnk.data.Setting;
 import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.lib.BaseActivity;
 import com.htb.constant.Table;
@@ -190,8 +191,16 @@ public class OrderBaseActivity extends BaseActivity {
 						.show();
 				return;
 			}
-
-			showSetPersonsDlg();
+			if (Setting.enabledPersons()) {
+				showSetPersonsDlg();
+			} else {
+				mMyOrder.setPersons(0);
+				if (Info.getMode() == Info.WORK_MODE_CUSTOMER) {
+					customerSubmitOrderDlg();
+				} else {
+					submitOrder();
+				}
+			}
 		}
 	};
 

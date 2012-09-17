@@ -36,6 +36,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.htb.cnk.data.Info;
+import com.htb.cnk.data.Setting;
 import com.htb.cnk.data.Version;
 import com.htb.cnk.data.WifiAdmin;
 import com.htb.cnk.lib.BaseActivity;
@@ -63,6 +64,7 @@ public class Cnk_orderPadActivity extends BaseActivity {
 	private Version version;
 	private static int ARERTDIALOG = 0;
 	private AlertDialog mNetWrorkcancel;
+	private Setting mAppSetting;
 	private AlertDialog.Builder mNetWrorkAlertDialog;
 
 	@Override
@@ -88,6 +90,7 @@ public class Cnk_orderPadActivity extends BaseActivity {
 		Info.setTableId(-1);
 		mWifiAdmin = new WifiAdmin(Cnk_orderPadActivity.this);
 		mpDialog = new ProgressDialog(Cnk_orderPadActivity.this);
+		mAppSetting = new Setting(Cnk_orderPadActivity.this);
 		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 		mpDialog.setIndeterminate(false);
 		mpDialog.setCancelable(false);

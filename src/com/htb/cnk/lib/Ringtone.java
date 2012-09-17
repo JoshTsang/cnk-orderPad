@@ -3,6 +3,7 @@ package com.htb.cnk.lib;
 import java.io.IOException;
 
 import com.htb.cnk.R;
+import com.htb.cnk.data.Setting;
 
 import android.content.Context;
 import android.media.MediaPlayer;
@@ -15,6 +16,9 @@ public class Ringtone {
 	}
 	
 	public void play() {
+		if (!Setting.enabledRingtong()) {
+			return ;
+		}
 		mediaPlayer.stop();
         try {
 			mediaPlayer.prepare();

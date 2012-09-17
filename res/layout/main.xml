@@ -62,7 +62,7 @@
 						android:layout_height="wrap_content"
 						android:textSize="22sp"
 						android:textColor="#FFFFFF"
-						android:text="@string/settings"/>
+						android:text="@string/services"/>
     		  	</LinearLayout>
 		</LinearLayout>
 </RelativeLayout>

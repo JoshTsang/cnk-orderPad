@@ -22,6 +22,7 @@ public class ManageActivity extends BaseActivity {
 	private Button mManageBtn;
 	private Button mBackupBtn;
 	private Button mRestoreBtn;
+	private Button mSettingBtn;
 	private TextView mMenuBackupTime;
 	private TextView mSalesBackupTime;
 	private TextView mPicBackupTime;
@@ -43,6 +44,7 @@ public class ManageActivity extends BaseActivity {
 		mUpdateBtn = (Button) findViewById(R.id.updateMenu);
 		mStatisticsBtn = (Button) findViewById(R.id.statistics);
 		mManageBtn = (Button) findViewById(R.id.management);
+		mSettingBtn = (Button) findViewById(R.id.settings);
 		
 		mMenuBackupTime = (TextView) findViewById(R.id.menuBackupTime);
 		mSalesBackupTime = (TextView) findViewById(R.id.salesBackupTime);
@@ -56,6 +58,7 @@ public class ManageActivity extends BaseActivity {
 		mUpdateBtn.setOnClickListener(updateClicked);
 		mStatisticsBtn.setOnClickListener(statisticsClicked);
 		mManageBtn.setOnClickListener(manageClicked);
+		mSettingBtn.setOnClickListener(settingClicked);
 	}
 	
 	public void fillData() {
@@ -171,4 +174,14 @@ public class ManageActivity extends BaseActivity {
 			ManageActivity.this.startActivity(intent);
 		}
 	};
+	
+	private OnClickListener settingClicked = new OnClickListener() {
+		
+		@Override
+		public void onClick(View v) {
+			Intent intent = new Intent();
+			intent.setClass(ManageActivity.this, SettingActivity.class);
+			ManageActivity.this.startActivity(intent);
+		}
+	}; 
 }

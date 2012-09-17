@@ -123,11 +123,12 @@
 		    	android:textColor="#F9E8BB"
 		    	android:textSize="35dip"
 		    	android:background="#00000000"/>
-		    <Button android:id="@+id/btn8"
+		    <Button android:id="@+id/settings"
 		        android:layout_width="200dip"
 		    	android:layout_height="40dip"
 		    	android:textColor="#F9E8BB"
 		    	android:textSize="35dip"
+		    	android:text="@string/settings"
 		    	android:background="#00000000"/>
 	   </LinearLayout>
 </RelativeLayout>

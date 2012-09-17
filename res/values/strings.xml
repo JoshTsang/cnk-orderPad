@@ -4,7 +4,7 @@
     <string name="app_name">菜脑壳点菜系统</string>
     <string name="menu">菜 谱</string>
     <string name="ordered">查 单</string>
-    <string name="settings">服务</string>
+    <string name="services">服务</string>
     <string name="back">返回</string>
     <string name="myOrder">我点的菜</string>
     <string name="plusOne">+1</string>
@@ -69,4 +69,5 @@
     <string name="persons">人数</string>
 	<string name="idAndPersonsIsNull">请输入桌号或者人数!</string>
     <string name="slash">/</string>
+    <string name="settings">设置</string>
 </resources>
