@@ -40,6 +40,7 @@ import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.NotificationTypes;
 import com.htb.cnk.data.Notifications;
+import com.htb.cnk.data.Setting;
 import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.lib.BaseActivity;
 import com.htb.cnk.lib.Ringtone;
@@ -77,7 +78,7 @@ public class TableActivity extends BaseActivity {
 	protected void onDestroy() {
 		unbindService(conn);
 		unregisterReceiver(mReceiver);
-		super.onDestroy(); 
+		super.onDestroy();
 	}
 
 	@Override
@@ -121,7 +122,7 @@ public class TableActivity extends BaseActivity {
 		setClickListeners();
 
 		mNetWrorkAlertDialog = networkDialog();
-		
+
 		Info.setMode(Info.WORK_MODE_WAITER);
 		intent = new Intent(TableActivity.this, NotificationTableService.class);
 		startService(intent);
@@ -322,7 +323,7 @@ public class TableActivity extends BaseActivity {
 	private AlertDialog.Builder addDialog() {
 		final CharSequence[] additems = { "开台-顾客模式 ", "开台-服务模式", "开台-复制模式" };
 		AlertDialog.Builder addDialog = alertDialogBuilder(true);
-		addDialog.setTitle("选择功能") 
+		addDialog.setTitle("选择功能")
 				.setItems(additems, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
@@ -411,24 +412,35 @@ public class TableActivity extends BaseActivity {
 	}
 
 	protected Builder changeTableDialog() {
-		View layout = getDialogLayout();
-		final EditText tableIdEdit = (EditText) layout
-				.findViewById(R.id.tableIdEdit);
-		final EditText personsEdit = (EditText) layout
-				.findViewById(R.id.personsEdit);
 		final AlertDialog.Builder changeTableAlertDialog = alertDialogBuilder(false);
+		final EditText tableIdEdit;
+		final EditText personsEdit ;
+		View layout = getDialogLayout();
+		personsEdit = (EditText) layout.findViewById(R.id.personsEdit);
+		if (Setting.enabledPersons()) {
+			tableIdEdit = (EditText) layout.findViewById(R.id.tableIdEdit);
+			changeTableAlertDialog.setView(layout);
+		} else {
+			tableIdEdit = editTextListener();
+			changeTableAlertDialog.setView(tableIdEdit);
+		}
 		changeTableAlertDialog.setTitle("请输入");
-		changeTableAlertDialog.setView(layout);
 		changeTableAlertDialog.setPositiveButton("确定",
 				new DialogInterface.OnClickListener() {
 
 					@Override
 					public void onClick(DialogInterface dialog, int i) {
+						String changePersons;
+						if (Setting.enabledPersons()) {
+							changePersons = personsEdit.getText().toString();
+						} else{
+							changePersons = "0";
+						}
 						String changeTId = tableIdEdit.getText().toString();
-						String changePersons = personsEdit.getText().toString();
 						if (changeTId.equals("") || changePersons.equals("")) {
 							toastText(R.string.idAndPersonsIsNull);
-						} else if (isBoundaryLegal(changeTId,Table.NORMAL_TABLE_STAUTS)) {
+						} else if (isBoundaryLegal(changeTId,
+								Table.NORMAL_TABLE_STAUTS)) {
 							changeTable(mSettings.getId(changeTId),
 									Integer.parseInt(changePersons));
 						} else {
@@ -441,10 +453,7 @@ public class TableActivity extends BaseActivity {
 	}
 
 	protected Builder copyTableDialog() {
-		final EditText copyTableText = new EditText(this);
-		copyTableText.setKeyListener(new DigitsKeyListener(false, true));
-		copyTableText
-				.setFilters(new InputFilter[] { new InputFilter.LengthFilter(3) });
+		final EditText copyTableText = editTextListener();
 		final AlertDialog.Builder copyTableAlertDialog = alertDialogBuilder(false);
 		copyTableAlertDialog.setTitle("请输入");
 		copyTableAlertDialog.setView(copyTableText);
@@ -453,10 +462,12 @@ public class TableActivity extends BaseActivity {
 
 					@Override
 					public void onClick(DialogInterface dialog, int i) {
-						String changeTId = copyTableText.getEditableText().toString();
+						String changeTId = copyTableText.getEditableText()
+								.toString();
 						if (changeTId.equals("")) {
 							toastText(R.string.idAndPersonsIsNull);
-						} else if (isBoundaryLegal(changeTId,Table.OPEN_TABLE_STATUS)) {
+						} else if (isBoundaryLegal(changeTId,
+								Table.OPEN_TABLE_STATUS)) {
 							copyTable(mSettings.getId(changeTId));
 						} else {
 							toastText(R.string.copyTIdwarning);
@@ -468,6 +479,14 @@ public class TableActivity extends BaseActivity {
 		return copyTableAlertDialog;
 	}
 
+	private EditText editTextListener() {
+		final EditText copyTableText = new EditText(this);
+		copyTableText.setKeyListener(new DigitsKeyListener(false, true));
+		copyTableText
+				.setFilters(new InputFilter[] { new InputFilter.LengthFilter(3) });
+		return copyTableText;
+	}
+
 	private View getDialogLayout() {
 		LayoutInflater inflater = getLayoutInflater();
 		View layout = inflater.inflate(R.layout.dialog,
@@ -476,10 +495,7 @@ public class TableActivity extends BaseActivity {
 	}
 
 	protected Builder combineDialog() {
-		final EditText combineTableText = new EditText(this);
-		combineTableText.setKeyListener(new DigitsKeyListener(false, true));
-		combineTableText
-				.setFilters(new InputFilter[] { new InputFilter.LengthFilter(3) });
+		final EditText combineTableText = editTextListener();
 		ArrayList<HashMap<String, Object>> combine = mSettings.getCombine();
 		final List<String> tableName = new ArrayList<String>();
 		final List<Integer> tableId = new ArrayList<Integer>();
@@ -580,8 +596,7 @@ public class TableActivity extends BaseActivity {
 				mNetWrorkAlertDialog.setMessage("复制失败，请检查连接网络重试");
 				mNetWrorkcancel = mNetWrorkAlertDialog.show();
 			} else {
-				intent.setClass(TableActivity.this,
-						MenuActivity.class);
+				intent.setClass(TableActivity.this, MenuActivity.class);
 				Info.setMode(Info.WORK_MODE_WAITER);
 				TableActivity.this.startActivity(intent);
 			}
@@ -811,7 +826,8 @@ public class TableActivity extends BaseActivity {
 		new Thread() {
 			public void run() {
 				try {
-					int ret = mSettings.getOrderFromServer(TableActivity.this,srcTId);
+					int ret = mSettings.getOrderFromServer(TableActivity.this,
+							srcTId);
 					copyTIdHandle.sendEmptyMessage(ret);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -841,27 +857,24 @@ public class TableActivity extends BaseActivity {
 	}
 
 	private boolean isNameMinimum(int tId) {
-		return tId >= Integer.parseInt(mSettings
-				.getNameIndex(0));
+		return tId >= Integer.parseInt(mSettings.getNameIndex(0));
 	}
 
 	private boolean isNameMaximum(int tId) {
-		return tId <= Integer.parseInt(mSettings
-				.getNameIndex(mSettings.size() - 1));
+		return tId <= Integer
+				.parseInt(mSettings.getNameIndex(mSettings.size() - 1));
 	}
 
-	private boolean isStatusLegal(String changeTId,int status) {
-		return mSettings.getStatusTableId(mSettings
-				.getId(changeTId)) == status;
+	private boolean isStatusLegal(String changeTId, int status) {
+		return mSettings.getStatusTableId(mSettings.getId(changeTId)) == status;
 	}
-	
-	private boolean isBoundaryLegal(String changeTId,int status) {
+
+	private boolean isBoundaryLegal(String changeTId, int status) {
 		int tId = Integer.parseInt(changeTId);
-		return isNameMinimum(tId)
-				&& isNameMaximum(tId)
-				&& isStatusLegal(changeTId,status);
+		return isNameMinimum(tId) && isNameMaximum(tId)
+				&& isStatusLegal(changeTId, status);
 	}
-	
+
 	private OnClickListener backClicked = new OnClickListener() {
 
 		@Override
