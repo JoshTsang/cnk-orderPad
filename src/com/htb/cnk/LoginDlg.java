@@ -2,6 +2,7 @@ package com.htb.cnk;
 
 import java.lang.reflect.Method;
 
+import com.htb.cnk.data.Setting;
 import com.htb.cnk.data.UserData;
 
 import android.app.AlertDialog;
@@ -45,6 +46,10 @@ public class LoginDlg {
 		String userName = sharedPre.getString("name", "");
 		EditText userNameET = (EditText) DialogView.findViewById(R.id.edit_username);
 		
+		if (!Setting.enabledPWDCheck()) {
+			login();
+			return ;
+		}
 		userNameET.setText(userName);
 		
 		AlertDialog dlg = new AlertDialog.Builder(mActivity)

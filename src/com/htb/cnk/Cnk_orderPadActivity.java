@@ -31,6 +31,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -111,6 +112,7 @@ public class Cnk_orderPadActivity extends BaseActivity {
 		mMenuTxt.setOnClickListener(menuClicked);
 		mSettingsBtn.setOnClickListener(settingsClicked);
 		mSettingsTxt.setOnClickListener(settingsClicked);
+		mVersionTxt.setOnLongClickListener(versionClicked);
 	}
 
 	private int getCurrentMenuVer() {
@@ -181,6 +183,17 @@ public class Cnk_orderPadActivity extends BaseActivity {
 
 	};
 
+	private OnLongClickListener versionClicked = new OnLongClickListener() {
+		
+		@Override
+		public boolean onLongClick(View v) {
+			Setting.enableDebug(true);
+			Intent intent = new Intent();
+			intent.setClass(Cnk_orderPadActivity.this, SettingActivity.class);
+			Cnk_orderPadActivity.this.startActivity(intent);
+			return false;
+		}
+	};
 	private Handler handlerSync = new Handler() {
 		public void handleMessage(Message msg) {
 			if (msg.what == UPDATE_MENU) {
