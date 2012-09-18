@@ -10,6 +10,7 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.Switch;
 
 import com.htb.cnk.data.Setting;
+import com.htb.cnk.data.UserData;
 import com.htb.cnk.lib.BaseActivity;
 
 public class SettingActivity extends BaseActivity {
@@ -87,6 +88,9 @@ public class SettingActivity extends BaseActivity {
 		public void onCheckedChanged(CompoundButton buttonView,
 				boolean isChecked) {
 			Setting.enablePWDCheck(isChecked);
+			if (isChecked) {
+				UserData.debugMode();
+			}
 		}
 		
 	};

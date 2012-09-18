@@ -167,6 +167,48 @@ public class Statistics {
 		return 0;
 	}
 	
+	public int perparePerformanceResult(Calendar start, Calendar end) {
+		SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat time = new SimpleDateFormat("HH:mm");
+		String startDT = date.format(start.getTime()) + " " + time.format(start.getTime());
+		Date endDate = end.getTime();
+		endDate.setMinutes(endDate.getMinutes() + 1);
+		String endDT = date.format(end.getTime()) + " " + time.format(endDate);
+		final int DID = 0;
+		final int TOTAL_AMOUNT = 1;
+		final int COUNT = 2;
+
+		conectDB();
+		mSalesData.clear();
+		mTotalAmount = 0;
+		try {
+			//Log.d("statictics timestamp", "start:" + startDT + " end:" + endDT);
+			Cursor resultSet = mDbSales.query(CnkDbHelper.SALES_DATA, new String[] {"waiter_id",
+					  "sum(price*quantity)",
+					  "sum(quantity)"},
+					  "DATETIME(timestamp)>='"+startDT +"' and DATETIME(timestamp)<='" + endDT+"'",
+					  null, "waiter_id", null, null, null);
+			while (resultSet.moveToNext()) {
+				SalesRow salesRow = new SalesRow(resultSet.getInt(DID),
+						resultSet.getInt(TOTAL_AMOUNT), resultSet.getInt(COUNT));
+				String waiterName = getWaiterName(salesRow.did);
+				salesRow.dName = waiterName;
+				mSalesData.add(salesRow);
+				
+				mTotalAmount += resultSet.getInt(TOTAL_AMOUNT);
+			}
+		} catch (Exception e) {
+			return -1;
+		}
+		
+		int ret = getTableUsage(startDT, endDT);
+		if (ret < 0) {
+			return -1;
+		} else {
+			tableUsage = ret;
+		}
+		return 0;
+	}
 	public int getTableUsage() {
 		return tableUsage;
 	}
@@ -249,6 +291,14 @@ public class Statistics {
 		return name;
 	}
 	
+	public String getWaiterName(int uid) {
+		String name = getWaiterNameFromDB(uid);
+		if (name == null) {
+			return "菜名错误";
+		}
+		return name;
+	}
+	
 	@Override
 	protected void finalize() throws Throwable {
 		mDbMenu.close();
@@ -276,6 +326,15 @@ public class Statistics {
 		return null;
 	}
 	
+	private String getWaiterNameFromDB(int id) {
+		Cursor cur = mDbMenu.query(CnkDbHelper.USER_TABLE, new String[] {CnkDbHelper.USER_NAME},
+			  	CnkDbHelper.USER_ID + "=" + id, null, null, null, null);
+	
+		if (cur.moveToNext()) {
+			return cur.getString(0);
+		}
+		return null;
+	}
 	private int getTableUsage(String startDT, String endDT) {
 		int ret = -1;
 		try {

@@ -173,7 +173,7 @@
 			    android:layout_height="wrap_content"
 			    android:orientation="horizontal" >
 	    
-				<TextView  
+				<TextView
 			    	android:layout_width="200dip"
 			   		android:layout_height="wrap_content"
 			   		android:textSize="30dip"

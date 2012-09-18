@@ -78,4 +78,11 @@ public class UserData {
 		}
 
 	}
+	
+
+	
+	public static void debugMode() {
+		mId = "1";
+		mName = "admin";
+	}
 }
