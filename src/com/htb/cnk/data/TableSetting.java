@@ -290,7 +290,8 @@ public class TableSetting implements Serializable {
 			}
 			JSONObject order = new JSONObject();
 			String time = getCurrentTime();
-			orderJson(item, order, tableName.get(i), time, 0);
+			Log.d(TAG, tableName.get(i));
+			orderJson(item, order, tableName.get(i), time, 0); 
 			orderAll.put(order.toString());
 			i++;
 		}

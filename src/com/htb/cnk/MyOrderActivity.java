@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 
 import com.htb.cnk.adapter.MyOrderAdapter;
 import com.htb.cnk.data.Info;
+import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.data.MyOrder.OrderedDish;
 import com.htb.cnk.lib.OrderBaseActivity;
@@ -29,6 +31,7 @@ import com.htb.constant.Table;
 public class MyOrderActivity extends OrderBaseActivity {
 	private MyOrderAdapter mMyOrderAdapter;
 	private TableSetting mSettings = new TableSetting();
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -36,6 +39,7 @@ public class MyOrderActivity extends OrderBaseActivity {
 		fillOrderData();
 		setOrderClickListener();
 		mSubmitHandler = handler;
+		
 	}
 
 	private void setOrderViews() {
@@ -145,6 +149,17 @@ public class MyOrderActivity extends OrderBaseActivity {
 		}
 	};
 
+	private OnClickListener flavorClicked = new OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+			Button text = (Button) v.findViewById(R.id.flavor);
+			text.setTextColor(android.graphics.Color.WHITE);
+			final int position = Integer.parseInt(v.getTag().toString());
+			final boolean selected[] = new boolean[MyOrder.mFlavor.length];
+			flavorDialog(position, selected);
+		}
+	};
 	Handler handler = new Handler() {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
@@ -160,8 +175,8 @@ public class MyOrderActivity extends OrderBaseActivity {
 			new Thread() {
 				public void run() {
 					try {
-						int result = mSettings
-								.getItemTableStatus(Info.getTableId());
+						int result = mSettings.getItemTableStatus(Info
+								.getTableId());
 						if (result < 0) {
 							handler.sendEmptyMessage(result);
 						} else if (result >= Table.PHONE_STATUS) {
@@ -182,10 +197,9 @@ public class MyOrderActivity extends OrderBaseActivity {
 					|| msg.what == ErrorNum.PRINTER_ERR_NO_PAPER) {
 				errMsg += ":无法连接打印机或打印机缺纸";
 			}
-			new AlertDialog.Builder(MyOrderActivity.this)
-					.setCancelable(false).setTitle("出错了")
-					.setMessage(errMsg).setPositiveButton("确定", null)
-					.show();
+			new AlertDialog.Builder(MyOrderActivity.this).setCancelable(false)
+					.setTitle("出错了").setMessage(errMsg)
+					.setPositiveButton("确定", null).show();
 		}
 	};
 
@@ -199,29 +213,24 @@ public class MyOrderActivity extends OrderBaseActivity {
 	}
 
 	private void submitSucceed() {
-		new AlertDialog.Builder(MyOrderActivity.this)
-				.setCancelable(false)
-				.setTitle("提示")
-				.setMessage("订单已提交")
-				.setPositiveButton("确定",
-						new DialogInterface.OnClickListener() {
+		new AlertDialog.Builder(MyOrderActivity.this).setCancelable(false)
+				.setTitle("提示").setMessage("订单已提交")
+				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 
-							@Override
-							public void onClick(DialogInterface dialog,
-									int which) {
-								mMyOrder.clear();
-								mMyOrderAdapter.notifyDataSetChanged();
-								finish();
-								if (Info.getMode() == Info.WORK_MODE_CUSTOMER) {
-									Info.setMode(Info.WORK_MODE_WAITER);
-									Intent intent = new Intent();
-									intent.setClass(
-											MyOrderActivity.this,
-											TableActivity.class);
-									startActivity(intent);
-								}
-							}
-						}).show();
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						mMyOrder.clear();
+						mMyOrderAdapter.notifyDataSetChanged();
+						finish();
+						if (Info.getMode() == Info.WORK_MODE_CUSTOMER) {
+							Info.setMode(Info.WORK_MODE_WAITER);
+							Intent intent = new Intent();
+							intent.setClass(MyOrderActivity.this,
+									TableActivity.class);
+							startActivity(intent);
+						}
+					}
+				}).show();
 	}
 
 	class ItemViewHolder {
@@ -232,6 +241,7 @@ public class MyOrderActivity extends OrderBaseActivity {
 		Button minusBtn;
 		Button plus5Btn;
 		Button minus5Btn;
+		Button flavorBtn;
 
 		public ItemViewHolder(View convertView) {
 			dishName = (TextView) convertView.findViewById(R.id.dishName);
@@ -242,6 +252,7 @@ public class MyOrderActivity extends OrderBaseActivity {
 			minusBtn = (Button) convertView.findViewById(R.id.dishMinus);
 			plus5Btn = (Button) convertView.findViewById(R.id.dishPlus5);
 			minus5Btn = (Button) convertView.findViewById(R.id.dishMinus5);
+			flavorBtn = (Button) convertView.findViewById(R.id.flavor);
 		}
 
 		public void setOnClickListener() {
@@ -263,6 +274,7 @@ public class MyOrderActivity extends OrderBaseActivity {
 			});
 			minusBtn.setOnClickListener(minusClicked);
 			minus5Btn.setOnClickListener(minus5Clicked);
+			flavorBtn.setOnClickListener(flavorClicked);
 		}
 
 		public void setTag(int position) {
@@ -270,6 +282,7 @@ public class MyOrderActivity extends OrderBaseActivity {
 			minusBtn.setTag(position);
 			plus5Btn.setTag(position);
 			minus5Btn.setTag(position);
+			flavorBtn.setTag(position);
 		}
 
 		public void fillData(OrderedDish dishDetail) {

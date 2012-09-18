@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.htb.cnk.LoginDlg;
 import com.htb.cnk.MyOrderActivity;
@@ -59,6 +60,7 @@ public class OrderBaseActivity extends BaseActivity {
 		setClickListener();
 		
 		getPersons();
+		getFLavor();
 	}
 
 	public void getPersons() {
@@ -73,7 +75,20 @@ public class OrderBaseActivity extends BaseActivity {
 			}
 		}.start();
 	}
-
+	
+	public void getFLavor(){
+		new Thread() {
+			public void run() {
+				int ret = mMyOrder.getFLavorFromServer();
+				if(ret < 0){
+					Toast.makeText(getApplicationContext(), "点菜口味数据不对，亲不要使用口味功能，请联系工程师！",
+							Toast.LENGTH_SHORT).show();
+					return;
+				}
+			}
+		}.start();
+	}
+	
 	private void findViews() {
 		mBackBtn = (Button) findViewById(R.id.back_btn);
 		mSubmitBtn = (Button) findViewById(R.id.submit);
@@ -181,6 +196,33 @@ public class OrderBaseActivity extends BaseActivity {
 		personSettingDlg.show();
 	}
 
+	public void flavorDialog(final int position, final boolean[] selected) {
+		new AlertDialog.Builder(OrderBaseActivity.this)
+				.setTitle("口味选择")
+				.setMultiChoiceItems(MyOrder.mFlavor,
+						null, new DialogInterface.OnMultiChoiceClickListener() {
+
+							@Override
+							public void onClick(DialogInterface dialogInterface,
+									int which, boolean isChecked) {
+								selected[which] = isChecked;
+							}
+						}).setPositiveButton("确定",  new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialogInterface, int which) {
+								StringBuffer flavorStrBuf = new StringBuffer();
+								for (int i = 0; i < selected.length; i++) {
+									if (selected[i] == true) {
+										flavorStrBuf.append(MyOrder.mFlavor[i] + ",");
+									}
+								}
+								String flavorStr = flavorStrBuf.toString().substring(0, flavorStrBuf.length()-1);
+								mMyOrder.setFlavor(flavorStr, position);
+							}
+						})
+				.setNegativeButton("取消", null).show();
+	}
+	
 	private OnClickListener submitBtnClicked = new OnClickListener() {
 
 		@Override
@@ -211,5 +253,6 @@ public class OrderBaseActivity extends BaseActivity {
 			OrderBaseActivity.this.finish();
 		}
 	};
+	
 
 }

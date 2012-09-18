@@ -168,7 +168,6 @@ public class TableActivity extends BaseActivity {
 
 		@Override
 		public void onServiceDisconnected(ComponentName name) {
-
 		}
 	};
 
@@ -496,7 +495,6 @@ public class TableActivity extends BaseActivity {
 	}
 
 	protected Builder combineDialog() {
-		final EditText combineTableText = editTextListener();
 		ArrayList<HashMap<String, Object>> combine = mSettings.getCombine();
 		final List<String> tableName = new ArrayList<String>();
 		final List<Integer> tableId = new ArrayList<Integer>();
@@ -504,7 +502,6 @@ public class TableActivity extends BaseActivity {
 			tableName.add(item.get("name").toString());
 			tableId.add(item.get("id").hashCode());
 		}
-
 		final int size = mSettings.size();
 		final boolean selected[] = new boolean[size];
 		final AlertDialog.Builder combineAlertDialog = alertDialogBuilder(false);

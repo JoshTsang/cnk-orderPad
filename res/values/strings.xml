@@ -70,4 +70,5 @@
 	<string name="idAndPersonsIsNull">请输入桌号或者人数!</string>
     <string name="slash">/</string>
     <string name="settings">设置</string>
+    <string name="flavor">口味</string>
 </resources>

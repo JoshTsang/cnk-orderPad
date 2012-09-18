@@ -38,7 +38,7 @@ public class Server {
 	public final static String UPDATE_TABLE_ORDER = PHP_DIR + "updateTableOrder.php";
 	public final static String COPY_TABLE = PHP_DIR + "copyTable.php";
 	public final static String COMBINE_TABLE = PHP_DIR +"combineTable.php";
-	
+	public final static String GET_FLAVOR = PHP_DIR +  "getFlavor.php";
 	/* Database */
 	public final static String DB_DIR = "db/";
 	public final static String DB_MENU = DB_DIR + "menu.db";

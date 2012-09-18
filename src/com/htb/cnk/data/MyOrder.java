@@ -27,7 +27,7 @@ public class MyOrder {
 	public final static int RET_MINUS_SUCC = -2;
 	public final static int DEL_ALL_ORDER = -1;
 	public final static int UPDATE_ORDER = 0;
-	
+
 	private final static int MODE_PAD = 0;
 	private final static int MODE_PHONE = 1;
 	private final static int TIME_OUT = -1;
@@ -38,6 +38,7 @@ public class MyOrder {
 		int phoneQuantity;
 		int status;
 		int tableId;
+		String flavor;
 
 		public OrderedDish(Dish dish, int quantity, int tableId, int status,
 				int type) {
@@ -85,6 +86,14 @@ public class MyOrder {
 		public int getTableId() {
 			return this.tableId;
 		}
+
+		public String getFlavor() {
+			return this.flavor;
+		}
+
+		public void setFlavor(String flavor) {
+			this.flavor = flavor;
+		}
 	}
 
 	private CnkDbHelper mCnkDbHelper;
@@ -92,6 +101,7 @@ public class MyOrder {
 	private Context mDelDlgActivity;
 	protected static List<OrderedDish> mOrder = new ArrayList<OrderedDish>();
 	protected int persons;
+	public static String[] mFlavor;
 
 	public MyOrder(Context context) {
 		mCnkDbHelper = new CnkDbHelper(context, CnkDbHelper.DATABASE_NAME,
@@ -223,6 +233,14 @@ public class MyOrder {
 		return 0;
 	}
 
+	public int setFlavor(String flavor, int index) {
+		if (mOrder.size() < index) {
+			return -1;
+		}
+		mOrder.get(index).setFlavor(flavor);
+		return 0 ;
+	}
+
 	public OrderedDish getOrderedDish(int position) {
 		return mOrder.get(position);
 	}
@@ -311,6 +329,7 @@ public class MyOrder {
 				dish.put(
 						"quan",
 						(mOrder.get(i).padQuantity + mOrder.get(i).phoneQuantity));
+				dish.put("flavor", mOrder.get(i).flavor);
 				dishes.put(dish);
 			}
 			order.put("order", dishes);
@@ -357,6 +376,33 @@ public class MyOrder {
 				return Integer.valueOf(persons);
 			}
 
+		} catch (Exception e) {
+			Log.e(TAG, response);
+			e.printStackTrace();
+		}
+		return -1;
+	}
+
+	public int getFLavorFromServer() {
+		String response = Http.get(Server.GET_FLAVOR, "");
+		if ("null".equals(response)) {
+			Log.w(TAG, "getPersonsFromServer.null");
+			return -2;
+		} else if (response == null) {
+			Log.e(TAG, "getPersonsFromServer.timeOut");
+			return TIME_OUT;
+		}
+		try {
+			Log.d(TAG, response);
+			int start = response.indexOf('[');
+			int end = response.indexOf(']');
+			if (start < 0 || end < 0) {
+				return -1;
+			} else {
+				String flavor = response.substring(start + 1, end);
+				mFlavor = flavor.split(",");
+				return 0;
+			}
 		} catch (Exception e) {
 			Log.e(TAG, response);
 			e.printStackTrace();
