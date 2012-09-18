@@ -255,5 +255,17 @@ public class OrderBaseActivity extends BaseActivity {
 		}
 	};
 	
+	protected OnClickListener flavorClicked = new OnClickListener() {
+	
+			@Override
+			public void onClick(View v) {
+				Button text = (Button) v.findViewById(R.id.flavor);
+				text.setTextColor(android.graphics.Color.WHITE);
+				final int position = Integer.parseInt(v.getTag().toString());
+				final boolean selected[] = new boolean[MyOrder.mFlavor.length];
+				flavorDialog(position, selected);
+			}
+		};
+	
 
 }
