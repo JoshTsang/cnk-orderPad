@@ -211,12 +211,13 @@ public class OrderBaseActivity extends BaseActivity {
 							@Override
 							public void onClick(DialogInterface dialogInterface, int which) {
 								StringBuffer flavorStrBuf = new StringBuffer();
+								String flavorStr = null;
 								for (int i = 0; i < selected.length; i++) {
 									if (selected[i] == true) {
 										flavorStrBuf.append(MyOrder.mFlavor[i] + ",");
+										flavorStr = flavorStrBuf.toString().substring(0, flavorStrBuf.length()-1);
 									}
 								}
-								String flavorStr = flavorStrBuf.toString().substring(0, flavorStrBuf.length()-1);
 								mMyOrder.setFlavor(flavorStr, position);
 							}
 						})

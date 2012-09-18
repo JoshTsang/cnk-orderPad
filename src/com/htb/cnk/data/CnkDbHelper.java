@@ -31,6 +31,9 @@ public class CnkDbHelper extends SQLiteOpenHelper {
 	public final static String TABLE_NAME = "table_name";
 	public final static String TABLE_STATUS = "status";
 	
+	public final static String USER_TABLE = "administrator";
+	public final static String USER_ID = "id";
+	public final static String USER_NAME = "username";
 	public final static String SALES_DATA = "sales_data";
 	
 	public CnkDbHelper(Context context, String name, CursorFactory factory,

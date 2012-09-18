@@ -6,12 +6,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.htb.cnk.adapter.StatisticsAdapter;
-import com.htb.cnk.data.Statistics;
 import com.htb.cnk.lib.StatisticsBaseActivity;
 
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,20 +16,25 @@ import android.view.View.OnClickListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
+public class StuffPerformanceActivity extends StatisticsBaseActivity {
 
-/**
- * @author josh
- * 
- */
-public class StatisticsActivity extends StatisticsBaseActivity {
-	final String TAG = "StatisticsActivity";
-	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-		setStatisticClickListener();
+		
+		setViews();
+		setPerClickListener();
 		setAdapter();
+	}
+
+	private void setViews() {
+		
+	}
+	
+	private void setPerClickListener() {
+		mQueryByTimeBtn.setOnClickListener(queryByTimeClicked);
+		mQueryTodayBtn.setOnClickListener(queryTodayClicked);
+		mPrintBtn.setOnClickListener(printClicked);
 	}
 	
 	private void setAdapter() {
@@ -45,7 +47,7 @@ public class StatisticsActivity extends StatisticsBaseActivity {
 				if (convertView == null) {
 					viewHolder = new ViewHolder();
 					convertView = LayoutInflater.from(
-							StatisticsActivity.this).inflate(
+							StuffPerformanceActivity.this).inflate(
 							R.layout.item_statistics, null);
 					viewHolder.dishName = (TextView) convertView
 							.findViewById(R.id.dishName);
@@ -82,12 +84,6 @@ public class StatisticsActivity extends StatisticsBaseActivity {
 		mSalesData.setAdapter(mStatisticsAdapter);
 	}
 	
-	private void setStatisticClickListener() {
-		mQueryByTimeBtn.setOnClickListener(queryByTimeClicked);
-		mQueryTodayBtn.setOnClickListener(queryTodayClicked);
-		mPrintBtn.setOnClickListener(printClicked);
-	}
-	
 	OnClickListener queryTodayClicked = new OnClickListener() {
 
 		@Override
@@ -102,7 +98,7 @@ public class StatisticsActivity extends StatisticsBaseActivity {
 			}
 			mEnd.setTimeInMillis(System.currentTimeMillis());
 			
-			int ret = mStatistics.perpareResult(mStart, mEnd);
+			int ret = mStatistics.perparePerformanceResult(mStart, mEnd);
 			if (ret < 0) {
 				popUpDlg("错误", "销售数据出错,需从新下载!", true);
 				return;
@@ -117,7 +113,7 @@ public class StatisticsActivity extends StatisticsBaseActivity {
 		@Override
 		public void onClick(View v) {
 			if (isDateTimeSet()) {
-				int ret = mStatistics.perpareResult(mStartSet, mEndSet);
+				int ret = mStatistics.perparePerformanceResult(mStartSet, mEndSet);
 				if (ret < 0) {
 					popUpDlg("错误", "销售数据出错,需从新下载!", true);
 					return;
@@ -127,7 +123,7 @@ public class StatisticsActivity extends StatisticsBaseActivity {
 			}
 		}
 	};
-
+	
 	OnClickListener printClicked = new OnClickListener() {
 
 		@Override
@@ -137,28 +133,7 @@ public class StatisticsActivity extends StatisticsBaseActivity {
 						Toast.LENGTH_LONG).show();
 				return;
 			}
-			showProgressDlg("正在上传打印信息...");
-			new Thread() {
-				public void run() {
-					int ret = mStatistics.print(mStart, mEnd);
-					handlerPrint.sendEmptyMessage(ret);
-				}
-			}.start();
-
-			if (mQueryMode == QUERY_TODAY) {
-				updateLatestStatistics();
-			}
-		}
-	};
-
-	private Handler handlerPrint = new Handler() {
-		public void handleMessage(Message msg) {
-			mpDialog.cancel();
-			if (msg.what < 0) {
-				popUpDlg("错误", "打印出现错误,请检查打印机" + msg.what, false);
-			} else {
-				popUpDlg("完成", "打印完成", false);
-			}
+			popUpDlg("提示", "暂不支持打印", false);
 		}
 	};
 }

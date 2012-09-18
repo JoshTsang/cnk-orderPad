@@ -117,11 +117,12 @@
 		    	android:textSize="35dip"
 		    	android:text="@string/statistics"
 		    	android:background="#00000000"/>
-		    <Button android:id="@+id/btn7"
+		    <Button android:id="@+id/performance"
 		        android:layout_width="200dip"
 		    	android:layout_height="40dip"
 		    	android:textColor="#F9E8BB"
 		    	android:textSize="35dip"
+		    	android:text="@string/performance"
 		    	android:background="#00000000"/>
 		    <Button android:id="@+id/settings"
 		        android:layout_width="200dip"

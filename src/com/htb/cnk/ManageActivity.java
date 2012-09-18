@@ -23,6 +23,7 @@ public class ManageActivity extends BaseActivity {
 	private Button mBackupBtn;
 	private Button mRestoreBtn;
 	private Button mSettingBtn;
+	private Button mPerformanceBtn;
 	private TextView mMenuBackupTime;
 	private TextView mSalesBackupTime;
 	private TextView mPicBackupTime;
@@ -45,6 +46,7 @@ public class ManageActivity extends BaseActivity {
 		mStatisticsBtn = (Button) findViewById(R.id.statistics);
 		mManageBtn = (Button) findViewById(R.id.management);
 		mSettingBtn = (Button) findViewById(R.id.settings);
+		mPerformanceBtn = (Button) findViewById(R.id.performance);
 		
 		mMenuBackupTime = (TextView) findViewById(R.id.menuBackupTime);
 		mSalesBackupTime = (TextView) findViewById(R.id.salesBackupTime);
@@ -59,6 +61,7 @@ public class ManageActivity extends BaseActivity {
 		mStatisticsBtn.setOnClickListener(statisticsClicked);
 		mManageBtn.setOnClickListener(manageClicked);
 		mSettingBtn.setOnClickListener(settingClicked);
+		mPerformanceBtn.setOnClickListener(performanceClicked);
 	}
 	
 	public void fillData() {
@@ -152,6 +155,15 @@ public class ManageActivity extends BaseActivity {
 		}
 	};
 
+	private OnClickListener performanceClicked = new OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+			Intent intent = new Intent();
+			intent.setClass(ManageActivity.this, StuffPerformanceActivity.class);
+			ManageActivity.this.startActivity(intent);
+		}
+	};
 	private OnClickListener manageClicked = new OnClickListener() {
 
 		@Override
