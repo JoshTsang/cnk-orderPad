@@ -9,6 +9,7 @@ public class UserData {
 	public final static int PWD_NETWORK_ERR = -1;
 	public final static int PWD_INCORRECT = -2;
 
+	static protected String mId;
 	static protected String mName;
 	static protected String mPwd;
 
@@ -31,6 +32,10 @@ public class UserData {
 
 	public static void setUserPwd(String pwd) {
 		UserData.mPwd = pwd;
+	}
+	
+	public static String getUID() {
+		return mId;
 	}
 
 	// TODO need parameter permission
@@ -60,7 +65,10 @@ public class UserData {
 			return -1;
 		}
 
-		if (userPwd.equals(UserData.mPwd)
+		String pwd[] = userPwd.split(",");
+		
+		mId = pwd[0];
+		if (pwd[1].equals(UserData.mPwd)
 				&& userPerminssionRet.equals(Integer.toString(0))) {
 			return 1;
 		} else {

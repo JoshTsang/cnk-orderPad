@@ -293,6 +293,7 @@ public class MyOrder {
 
 		try {
 			order.put("waiter", UserData.getUserName());
+			order.put("waiterId", UserData.getUID());
 			order.put("tableId", Info.getTableId());
 			order.put("persons", persons);
 			order.put("tableName", Info.getTableName());
