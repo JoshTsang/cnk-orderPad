@@ -96,7 +96,7 @@ public class ServeOrderActivity extends OrderBaseActivity {
 						+ " 元/份");
 				dishServedQuantity.setText(Integer.toString(dishDetail.getServedQuantity()));
 				dishQuantity
-						.setText(Integer.toString(dishDetail.getQuantity()));
+						.setText(mMyOrder.convertFloat(dishDetail.getQuantity()));
 
 				return convertView;
 			}

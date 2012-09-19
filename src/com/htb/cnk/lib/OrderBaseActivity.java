@@ -1,10 +1,10 @@
 package com.htb.cnk.lib;
 
+import java.text.DecimalFormat;
+
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.InputFilter;
@@ -20,10 +20,10 @@ import android.widget.Toast;
 
 import com.htb.cnk.LoginDlg;
 import com.htb.cnk.R;
+import com.htb.cnk.adapter.MyOrderAdapter;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.Setting;
-import com.htb.cnk.data.UserData;
 import com.htb.cnk.lib.BaseActivity;
 
 /**
@@ -43,6 +43,7 @@ public class OrderBaseActivity extends BaseActivity {
 	protected MyOrder mMyOrder;
 	protected ProgressDialog mpDialog;
 	protected Handler mSubmitHandler;
+	protected MyOrderAdapter mMyOrderAdapter;
 	protected int persons;
 
 	@Override
@@ -112,15 +113,63 @@ public class OrderBaseActivity extends BaseActivity {
 	}
 
 	protected void updateTabelInfos() {
+		DecimalFormat format = new DecimalFormat("#.00");
 		mDishCountTxt.setText(Integer.toString(mMyOrder.totalQuantity())
 				+ " 道菜");
 		mTotalPriceTxt
-				.setText(Double.toString(mMyOrder.getTotalPrice()) + " 元");
+				.setText(format.format(mMyOrder.getTotalPrice()) + " 元");
 	}
 
 	protected void showProgressDlg(String msg) {
 		mpDialog.setMessage(msg);
 		mpDialog.show();
+	}
+	
+	protected void showUpdateQuantityDlg(final int index) {
+		final EditText changeTableText = new EditText(OrderBaseActivity.this);
+		changeTableText.setKeyListener(new DigitsKeyListener(false, true));
+		changeTableText
+				.setFilters(new InputFilter[] { new InputFilter.LengthFilter(4) });
+		if (persons > 0) {
+			changeTableText.setText(Integer.toString(persons));
+		}
+		final AlertDialog.Builder quantitySettingDlg = new AlertDialog.Builder(
+				OrderBaseActivity.this);
+		quantitySettingDlg.setTitle("请输入数量");
+		quantitySettingDlg.setIcon(R.drawable.ic_launcher);
+		quantitySettingDlg.setCancelable(false);
+		quantitySettingDlg.setView(changeTableText);
+		quantitySettingDlg.setPositiveButton("确定",
+				new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int i) {
+						String quantity;
+						quantity = changeTableText.getEditableText().toString();
+						if (quantity.equals("")) {
+							new AlertDialog.Builder(OrderBaseActivity.this)
+									.setCancelable(false).setTitle("注意")
+									.setMessage("数量不能为空")
+									.setPositiveButton("确定", null).show();
+							return;
+						}
+
+						float quantityValue = Float.parseFloat(quantity);
+						if (quantityValue > 0) {
+							mMyOrder.updateQuantity(index, quantityValue);
+							mMyOrderAdapter.notifyDataSetChanged();
+							updateTabelInfos();
+						} else {
+							new AlertDialog.Builder(OrderBaseActivity.this)
+									.setCancelable(false).setTitle("注意")
+									.setMessage("数量不合法")
+									.setPositiveButton("确定", null).show();
+						}
+
+					}
+				});
+		quantitySettingDlg.setNegativeButton("取消", null);
+		quantitySettingDlg.show();
 	}
 
 	private void customerSubmitOrderDlg() {
@@ -256,7 +305,7 @@ public class OrderBaseActivity extends BaseActivity {
 		}
 	};
 	
-	private void showComment() {
+	protected void showComment() {
 		LayoutInflater factory = LayoutInflater.from(OrderBaseActivity.this);
 		final View DialogView = factory.inflate(R.layout.comment_dialog, null);
 		

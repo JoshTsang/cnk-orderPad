@@ -14,10 +14,8 @@ import android.view.View.OnClickListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.htb.cnk.DelOrderActivity.getOrderThread;
 import com.htb.cnk.adapter.MyOrderAdapter;
 import com.htb.cnk.data.Info;
-import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.data.MyOrder.OrderedDish;
 import com.htb.cnk.lib.OrderBaseActivity;
 
@@ -80,7 +78,7 @@ public class QueryOrderActivity extends OrderBaseActivity {
 				dishPrice.setText(Double.toString(dishDetail.getPrice())
 						+ " 元/份");
 				dishQuantity
-						.setText(Integer.toString(dishDetail.getQuantity()));
+						.setText(mMyOrder.convertFloat(dishDetail.getQuantity()));
 				dishServedQuantity.setText(Integer.toString(dishDetail.getServedQuantity()));
 				if ((dishDetail.getQuantity()-dishDetail.getServedQuantity()) <= 0) {
 					int color = Color.rgb(255, 0, 0);
@@ -88,6 +86,7 @@ public class QueryOrderActivity extends OrderBaseActivity {
 					dishPrice.setTextColor(color);
 					dishQuantity.setTextColor(color);
 					dishServedQuantity.setTextColor(color);
+					dishServedQuantity.setText(mMyOrder.convertFloat(dishDetail.getQuantity()));
 				} else {
 					int color = Color.rgb(0, 0, 0);
 					dishName.setTextColor(color);

@@ -79,7 +79,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 				dishPrice.setText(Double.toString(dishDetail.getPrice())
 						+ " 元/份");
 				dishQuantity
-						.setText(Integer.toString(dishDetail.getQuantity()));
+						.setText(mMyOrder.convertFloat(dishDetail.getQuantity()));
 
 				delBtn.setTag(position);
 				delBtn.setText("-1");
@@ -88,11 +88,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 				return convertView;
 			}
 		};
-		mTableNumTxt.setText(Info.getTableName());
-		mDishCountTxt.setText(Integer.toString(mMyOrder.totalQuantity())
-				+ " 道菜");
-		mTotalPriceTxt
-				.setText(Double.toString(mMyOrder.getTotalPrice()) + " 元");
+		updateTabelInfos();
 		mMyOrderLst.setAdapter(mMyOrderAdapter);
 
 	}

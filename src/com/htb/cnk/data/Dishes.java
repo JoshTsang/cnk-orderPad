@@ -86,7 +86,7 @@ public class Dishes {
 			while (dishes.moveToNext()) {
 				mDishes.add(new Dish(dishes.getInt(ID_COLUMN), dishes
 						.getString(NAME_COLUMN),
-						dishes.getDouble(PRICE_COLUMN), dishes
+						dishes.getFloat(PRICE_COLUMN), dishes
 								.getString(PIC_COLUMN)));
 			}
 			return 0;

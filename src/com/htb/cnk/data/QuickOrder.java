@@ -100,7 +100,7 @@ public class QuickOrder {
 				Map<String, Object> map = new HashMap<String, Object>();
 				Dish dish = new Dish(dishes.getInt(ID_COLUMN),
 						dishes.getString(NAME_COLUMN),
-						dishes.getDouble(PRICE_COLUMN),
+						dishes.getFloat(PRICE_COLUMN),
 						dishes.getString(PIC_COLUMN));
 				map.put(HanziHelper.words2Pinyin(dishes.getString(NAME_COLUMN)),
 						dish);

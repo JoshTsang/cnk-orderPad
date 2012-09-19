@@ -28,7 +28,6 @@ import com.htb.constant.Table;
  * 
  */
 public class PhoneActivity extends OrderBaseActivity {
-	private MyOrderAdapter mMyOrderAdapter;
 	private TableSetting mSettings = new TableSetting();
 
 	@Override
@@ -85,10 +84,10 @@ public class PhoneActivity extends OrderBaseActivity {
 							.findViewById(R.id.dishPlus);
 					holder1.minusBtn = (Button) convertView
 							.findViewById(R.id.dishMinus);
-					holder1.plus5Btn = (Button) convertView
-							.findViewById(R.id.dishPlus5);
-					holder1.minus5Btn = (Button) convertView
-							.findViewById(R.id.dishMinus5);
+//					holder1.plus5Btn = (Button) convertView
+//							.findViewById(R.id.dishPlus5);
+//					holder1.minus5Btn = (Button) convertView
+//							.findViewById(R.id.dishMinus5);
 					holder1.flavorBtn = (Button) convertView
 							.findViewById(R.id.flavor);
 					convertView.setTag(holder1);
@@ -100,7 +99,7 @@ public class PhoneActivity extends OrderBaseActivity {
 				holder1.dishPrice
 						.setText(Double.toString(dishDetail.getPrice())
 								+ " 元/份");
-				holder1.dishQuantity.setText(Integer.toString(dishDetail
+				holder1.dishQuantity.setText(mMyOrder.convertFloat(dishDetail
 						.getQuantity()));
 
 				holder1.plusBtn.setTag(position);
@@ -109,11 +108,11 @@ public class PhoneActivity extends OrderBaseActivity {
 				holder1.minusBtn.setTag(position);
 				holder1.minusBtn.setOnClickListener(minusClicked);
 
-				holder1.plus5Btn.setTag(position);
-				holder1.plus5Btn.setOnClickListener(plus5Clicked);
-
-				holder1.minus5Btn.setTag(position);
-				holder1.minus5Btn.setOnClickListener(minus5Clicked);
+//				holder1.plus5Btn.setTag(position);
+//				holder1.plus5Btn.setOnClickListener(plus5Clicked);
+//
+//				holder1.minus5Btn.setTag(position);
+//				holder1.minus5Btn.setOnClickListener(minus5Clicked);
 				
 				holder1.flavorBtn.setTag(position);
 				holder1.flavorBtn.setOnClickListener(flavorClicked);
@@ -126,8 +125,8 @@ public class PhoneActivity extends OrderBaseActivity {
 				TextView dishQuantity;
 				Button plusBtn;
 				Button minusBtn;
-				Button plus5Btn;
-				Button minus5Btn;
+//				Button plus5Btn;
+//				Button minus5Btn;
 				Button flavorBtn;
 			}
 		};

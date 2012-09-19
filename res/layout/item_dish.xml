@@ -24,7 +24,7 @@
 	    		android:layout_height="wrap_content"
 	    		android:includeFontPadding="false"
 	    		android:paddingRight="10dip"
-	    		android:textSize="40dip"
+	    		android:textSize="30dip"
 	    		android:textColor="#228B22" />
     	<Button android:id="@+id/dishMinus"
     	    android:layout_height="60dip"

@@ -7,10 +7,10 @@ package com.htb.cnk.data;
 public class Dish {
 	private int mId;
 	private String mName;
-	private double mPrice;
+	private float mPrice;
 	private String mPic;
 	
-	public Dish(int id, String name, double price, String pic) {
+	public Dish(int id, String name, float price, String pic) {
 		mId = id;
 		mName = name;
 		mPrice = price;

@@ -10,6 +10,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
@@ -26,8 +27,7 @@ import com.htb.constant.Table;
  * @author josh
  * 
  */
-public class MyOrderActivity extends OrderBaseActivity {
-	private MyOrderAdapter mMyOrderAdapter;
+public class MyOrderActivity extends OrderBaseActivity {	
 	private TableSetting mSettings = new TableSetting();
 
 	@Override
@@ -146,6 +146,18 @@ public class MyOrderActivity extends OrderBaseActivity {
 			minusDishQuantity(position, 5);
 		}
 	};
+	
+	private OnLongClickListener quantityClicked = new OnLongClickListener() {
+
+		@Override
+		public boolean onLongClick(View v) {
+			final int position = Integer
+					.parseInt(v.getTag().toString());
+			showUpdateQuantityDlg(position);
+			return false;
+		}
+		
+	};
 
 	Handler handler = new Handler() {
 		public void handleMessage(Message msg) {
@@ -226,8 +238,8 @@ public class MyOrderActivity extends OrderBaseActivity {
 		TextView dishQuantity;
 		Button plusBtn;
 		Button minusBtn;
-		Button plus5Btn;
-		Button minus5Btn;
+		//Button plus5Btn;
+		//Button minus5Btn;
 		Button flavorBtn;
 
 		public ItemViewHolder(View convertView) {
@@ -237,8 +249,8 @@ public class MyOrderActivity extends OrderBaseActivity {
 					.findViewById(R.id.dishQuantity);
 			plusBtn = (Button) convertView.findViewById(R.id.dishPlus);
 			minusBtn = (Button) convertView.findViewById(R.id.dishMinus);
-			plus5Btn = (Button) convertView.findViewById(R.id.dishPlus5);
-			minus5Btn = (Button) convertView.findViewById(R.id.dishMinus5);
+			//plus5Btn = (Button) convertView.findViewById(R.id.dishPlus5);
+			//minus5Btn = (Button) convertView.findViewById(R.id.dishMinus5);
 			flavorBtn = (Button) convertView.findViewById(R.id.flavor);
 		}
 
@@ -251,31 +263,33 @@ public class MyOrderActivity extends OrderBaseActivity {
 					updateDishQuantity(position, 1);
 				}
 			});
-			plus5Btn.setOnClickListener(new OnClickListener() {
-
-				public void onClick(View v) {
-					final int position = Integer
-							.parseInt(v.getTag().toString());
-					updateDishQuantity(position, 5);
-				}
-			});
+//			plus5Btn.setOnClickListener(new OnClickListener() {
+//
+//				public void onClick(View v) {
+//					final int position = Integer
+//							.parseInt(v.getTag().toString());
+//					updateDishQuantity(position, 5);
+//				}
+//			});
 			minusBtn.setOnClickListener(minusClicked);
-			minus5Btn.setOnClickListener(minus5Clicked);
+//			minus5Btn.setOnClickListener(minus5Clicked);
 			flavorBtn.setOnClickListener(flavorClicked);
+			dishQuantity.setOnLongClickListener(quantityClicked);
 		}
 
 		public void setTag(int position) {
 			plusBtn.setTag(position);
 			minusBtn.setTag(position);
-			plus5Btn.setTag(position);
-			minus5Btn.setTag(position);
+//			plus5Btn.setTag(position);
+//			minus5Btn.setTag(position);
 			flavorBtn.setTag(position);
+			dishQuantity.setTag(position);
 		}
 
 		public void fillData(OrderedDish dishDetail) {
 			dishName.setText(dishDetail.getName());
 			dishPrice.setText(Double.toString(dishDetail.getPrice()) + " 元/份");
-			dishQuantity.setText(Integer.toString(dishDetail.getQuantity()));
+			dishQuantity.setText(mMyOrder.convertFloat(dishDetail.getQuantity()));
 		}
 	}
 }

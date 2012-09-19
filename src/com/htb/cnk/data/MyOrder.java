@@ -2,6 +2,7 @@ package com.htb.cnk.data;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -34,13 +35,13 @@ public class MyOrder {
 
 	public class OrderedDish {
 		Dish dish;
-		int padQuantity;
+		float padQuantity;
 		int phoneQuantity;
 		int status;
 		int tableId;
 		String flavor;
 
-		public OrderedDish(Dish dish, int quantity, int tableId, int status,
+		public OrderedDish(Dish dish, float quantity, int tableId, int status,
 				int type) {
 			this.dish = dish;
 			this.tableId = tableId;
@@ -49,7 +50,7 @@ public class MyOrder {
 				this.padQuantity = quantity;
 				this.phoneQuantity = 0;
 			} else if (type == MODE_PHONE) {
-				this.phoneQuantity = quantity;
+				this.phoneQuantity = (int) quantity;
 				this.padQuantity = 0;
 			}
 
@@ -63,7 +64,7 @@ public class MyOrder {
 			return status;
 		}
 
-		public int getQuantity() {
+		public float getQuantity() {
 			return padQuantity + phoneQuantity;
 		}
 
@@ -119,7 +120,7 @@ public class MyOrder {
 		return persons;
 	}
 
-	public int addOrder(Dish dish, int quantity, int tableId, int status,
+	public int addOrder(Dish dish, float quantity, int tableId, int status,
 			int type) {
 		for (OrderedDish item : mOrder) {
 			if (item.dish.getId() == dish.getId()) {
@@ -136,7 +137,7 @@ public class MyOrder {
 		return 0;
 	}
 
-	public int add(Dish dish, int quantity, int tableId, int type) {
+	public int add(Dish dish, float quantity, int tableId, int type) {
 		for (OrderedDish item : mOrder) {
 			if (item.dish.getId() == dish.getId()) {
 				item.padQuantity += quantity;
@@ -148,7 +149,7 @@ public class MyOrder {
 		return 0;
 	}
 
-	public int add(int position, int quantity) {
+	public int add(int position, float quantity) {
 		mOrder.get(position).padQuantity += quantity;
 		return 0;
 	}
@@ -188,8 +189,8 @@ public class MyOrder {
 		return -1;
 	}
 
-	public double getTotalPrice() {
-		double totalPrice = 0;
+	public float getTotalPrice() {
+		float totalPrice = 0;
 
 		for (OrderedDish item : mOrder) {
 			totalPrice += (item.padQuantity + item.phoneQuantity)
@@ -211,7 +212,7 @@ public class MyOrder {
 		return mOrder.get(index).getName();
 	}
 
-	public int getQuantity(int index) {
+	public float getQuantity(int index) {
 		return mOrder.get(index).getQuantity();
 	}
 
@@ -295,7 +296,7 @@ public class MyOrder {
 		}
 	}
 
-	public int getOrderedCount(int did) {
+	public float getOrderedCount(int did) {
 		for (OrderedDish dish : mOrder) {
 			if (dish.getDishId() == did) {
 				return (dish.padQuantity + dish.phoneQuantity);
@@ -325,7 +326,9 @@ public class MyOrder {
 			order.put("tableId", Info.getTableId());
 			order.put("persons", persons);
 			order.put("tableName", Info.getTableName());
-			order.put("comment", comment);
+			if (!"".equals(comment.trim())) {
+				order.put("comment", comment);
+			}
 			order.put("timestamp", time);
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -338,9 +341,7 @@ public class MyOrder {
 				dish.put("dishId", mOrder.get(i).dish.getId());
 				dish.put("name", mOrder.get(i).dish.getName());
 				dish.put("price", mOrder.get(i).dish.getPrice());
-				dish.put(
-						"quan",
-						(mOrder.get(i).padQuantity + mOrder.get(i).phoneQuantity));
+				dish.put("quan", mOrder.get(i).getQuantity());
 				dish.put("flavor", mOrder.get(i).flavor);
 				dishes.put(dish);
 			}
@@ -434,10 +435,10 @@ public class MyOrder {
 			clear();
 			for (int i = 0; i < length; i++) {
 				JSONObject item = tableList.getJSONObject(i);
-				int quantity = item.getInt("quantity");
+				float quantity = (float) item.getDouble("quantity");
 				int dishId = item.getInt("dish_id");
 				int status = item.getInt("status");
-				double dishPrice = item.getInt("price");
+				Float dishPrice = (float) item.getDouble("price");
 				String name = getDishName(dishId);
 				Dish mDish = new Dish(dishId, name, dishPrice, null);
 				addOrder(mDish, quantity, tableId, status, MODE_PAD);
@@ -450,6 +451,22 @@ public class MyOrder {
 		return -1;
 	}
 
+	public void updateQuantity(int index, float quantity) {
+		mOrder.get(index).phoneQuantity = 0;
+		mOrder.get(index).padQuantity = quantity;
+	}
+	
+	public String convertFloat(float quantity) {
+		Log.d(TAG, "quantity:" + quantity);
+		DecimalFormat format = new DecimalFormat("#.00");
+		String quantityStr[] = format.format(quantity).split("\\.");
+		if (quantityStr[1].equals("00")) {
+			return quantityStr[0];
+		} else {
+			return quantityStr[0] + "." + quantityStr[1];
+		}
+	}
+	
 	public int getPhoneOrderFromServer(int tableId) {
 		talbeClear();
 		String response = Http.get(Server.GET_GETPHONEORDER, "TID=" + tableId);
@@ -473,7 +490,7 @@ public class MyOrder {
 
 				Cursor cur = getDishNameAndPriceFromDB(dishId);
 				String name = cur.getString(0);
-				double dishPrice = cur.getDouble(1);
+				float dishPrice = cur.getFloat(1);
 				Dish mDish = new Dish(dishId, name, dishPrice, null);
 				addOrder(mDish, quantity, tableId, 0, MODE_PHONE);
 			}
