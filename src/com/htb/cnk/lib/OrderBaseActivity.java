@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.text.InputFilter;
 import android.text.method.DigitsKeyListener;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -20,6 +21,7 @@ import com.htb.cnk.R;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.Setting;
+import com.htb.cnk.lib.BaseActivity;
 
 /**
  * @author josh
@@ -30,6 +32,7 @@ public class OrderBaseActivity extends BaseActivity {
 	protected Button mSubmitBtn;
 	protected Button mLeftBtn;
 	protected Button mRefreshBtn;
+	protected Button mComment;
 	protected TextView mTableNumTxt;
 	protected TextView mDishCountTxt;
 	protected TextView mTotalPriceTxt;
@@ -91,6 +94,7 @@ public class OrderBaseActivity extends BaseActivity {
 		mMyOrderLst = (ListView) findViewById(R.id.myOrderList);
 		mLeftBtn = (Button) findViewById(R.id.left_btn);
 		mRefreshBtn = (Button) findViewById(R.id.refresh);
+		mComment = (Button) findViewById(R.id.comment);
 	}
 
 	private void fillData() {
@@ -101,6 +105,7 @@ public class OrderBaseActivity extends BaseActivity {
 	private void setClickListener() {
 		mBackBtn.setOnClickListener(backBtnClicked);
 		mSubmitBtn.setOnClickListener(submitBtnClicked);
+		mComment.setOnClickListener(commentClicked);
 	}
 
 	protected void updateTabelInfos() {
@@ -240,6 +245,45 @@ public class OrderBaseActivity extends BaseActivity {
 		}
 	};
 
+	private OnClickListener commentClicked = new OnClickListener() {
+		
+		@Override
+		public void onClick(View v) {
+			showComment();
+		}
+	};
+	
+	private void showComment() {
+		LayoutInflater factory = LayoutInflater.from(OrderBaseActivity.this);
+		final View DialogView = factory.inflate(R.layout.comment_dialog, null);
+		
+		final EditText commentET = (EditText) DialogView.findViewById(R.id.comment);
+		
+		commentET.setText(mMyOrder.getComment());
+		
+		AlertDialog dlg = new AlertDialog.Builder(OrderBaseActivity.this)
+				.setTitle("备注")
+				.setView(DialogView)
+				.setPositiveButton("确定",
+						new DialogInterface.OnClickListener() {
+
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+								mMyOrder.setComment(commentET.getText().toString());
+							}
+						}).setNegativeButton("取消",
+						new DialogInterface.OnClickListener() {
+
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+							}
+						})
+				.setCancelable(false).create();
+		dlg.show();
+	}
+	
 	private OnClickListener backBtnClicked = new OnClickListener() {
 
 		@Override
