@@ -19,7 +19,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.text.Editable;
 import android.text.InputFilter;
+import android.text.TextWatcher;
 import android.text.method.DigitsKeyListener;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,6 +35,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.htb.cnk.NotificationTableService.MyBinder;
@@ -74,6 +77,11 @@ public class TableActivity extends BaseActivity {
 	private boolean binderFlag;
 	private Intent intent;
 	private List<Integer> selectedTable = new ArrayList<Integer>();
+	private double mIncome;
+	private double mChange;
+	private double mTotalPrice;
+	private AlertDialog.Builder mChangeDialog;
+	private List<String> tableName = new ArrayList<String>();
 
 	@Override
 	protected void onDestroy() {
@@ -144,7 +152,7 @@ public class TableActivity extends BaseActivity {
 
 	private void findViews() {
 		mBackBtn = (Button) findViewById(R.id.back);
-		mUpdateBtn = (Button) findViewById(R.id.combineTable);
+		mUpdateBtn = (Button) findViewById(R.id.checkOutTable);
 		mStatisticsBtn = (Button) findViewById(R.id.logout);
 		mManageBtn = (Button) findViewById(R.id.management);
 		gridview = (GridView) findViewById(R.id.gridview);
@@ -153,7 +161,7 @@ public class TableActivity extends BaseActivity {
 	private void setClickListeners() {
 		mTableClicked = new tableItemClickListener();
 		mBackBtn.setOnClickListener(backClicked);
-		mUpdateBtn.setOnClickListener(combineClicked);
+		mUpdateBtn.setOnClickListener(checkOutClicked);
 		mStatisticsBtn.setOnClickListener(logoutClicked);
 		mManageBtn.setOnClickListener(manageClicked);
 	}
@@ -261,8 +269,8 @@ public class TableActivity extends BaseActivity {
 							mAlertDialog.show();
 							break;
 						case 1:
-							final AlertDialog.Builder mChangeDialog = changeTableDialog();
-							mChangeDialog.show();
+							final AlertDialog.Builder ChangeDialog = changeTableDialog();
+							ChangeDialog.show();
 							break;
 						case 2:
 							intent.setClass(TableActivity.this,
@@ -353,8 +361,8 @@ public class TableActivity extends BaseActivity {
 							TableActivity.this.startActivity(intent);
 							break;
 						case 2:
-							final AlertDialog.Builder mChangeDialog = copyTableDialog();
-							mChangeDialog.show();
+							final AlertDialog.Builder ChangeDialog = copyTableDialog();
+							ChangeDialog.show();
 							break;
 						default:
 							break;
@@ -415,7 +423,7 @@ public class TableActivity extends BaseActivity {
 		final AlertDialog.Builder changeTableAlertDialog = alertDialogBuilder(false);
 		final EditText tableIdEdit;
 		final EditText personsEdit;
-		View layout = getDialogLayout();
+		View layout = getDialogLayout(R.layout.change_dialog,R.id.change);
 		personsEdit = (EditText) layout.findViewById(R.id.personsEdit);
 		if (Setting.enabledPersons()) {
 			tableIdEdit = (EditText) layout.findViewById(R.id.tableIdEdit);
@@ -487,26 +495,25 @@ public class TableActivity extends BaseActivity {
 		return copyTableText;
 	}
 
-	private View getDialogLayout() {
+	private View getDialogLayout(int layout_dialog,int id) {
 		LayoutInflater inflater = getLayoutInflater();
-		View layout = inflater.inflate(R.layout.dialog,
-				(ViewGroup) findViewById(R.id.dialog));
+		View layout = inflater.inflate(layout_dialog,
+				(ViewGroup) findViewById(id));
 		return layout;
 	}
 
-	protected Builder combineDialog() {
-		ArrayList<HashMap<String, Object>> combine = mSettings.getCombine();
-		final List<String> tableName = new ArrayList<String>();
+	protected Builder checkOutDialog() {
+		ArrayList<HashMap<String, Object>> checkOut = mSettings.getCombine();
 		final List<Integer> tableId = new ArrayList<Integer>();
-		for (HashMap<String, Object> item : combine) {
+		for (HashMap<String, Object> item : checkOut) {
 			tableName.add(item.get("name").toString());
 			tableId.add(item.get("id").hashCode());
 		}
 		final int size = mSettings.size();
 		final boolean selected[] = new boolean[size];
-		final AlertDialog.Builder combineAlertDialog = alertDialogBuilder(false);
-		combineAlertDialog.setTitle("请选择合并桌号");
-		combineAlertDialog.setMultiChoiceItems(
+		final AlertDialog.Builder checkOutAlertDialog = alertDialogBuilder(false);
+		checkOutAlertDialog.setTitle("请选择合并桌号");
+		checkOutAlertDialog.setMultiChoiceItems(
 				(String[]) tableName.toArray(new String[0]), null,
 				new DialogInterface.OnMultiChoiceClickListener() {
 
@@ -525,13 +532,75 @@ public class TableActivity extends BaseActivity {
 						selectedTable.add(tableId.get(i));
 					}
 				}
-				combineTable(selectedTable, tableName);
+				showProgressDlg("正在统计金额，请稍等");
+				getTotalPriceTable();
+
 			}
 		};
 
-		combineAlertDialog.setPositiveButton("确认", btnListener);
-		combineAlertDialog.setNegativeButton("取消", null);
-		return combineAlertDialog;
+		checkOutAlertDialog.setPositiveButton("确认", btnListener);
+		checkOutAlertDialog.setNegativeButton("取消", null);
+		return checkOutAlertDialog;
+	}
+
+	protected Builder checkOutSubmitDialog(final List<String> tableName) {
+		final AlertDialog.Builder changeTableAlertDialog = alertDialogBuilder(false);
+		View layout = getDialogLayout(R.layout.checkout_dialog,R.id.check_out);
+		TextView receivableText = (TextView) layout
+				.findViewById(R.id.receivableQuan);
+		final EditText incomeEdit = (EditText) layout
+				.findViewById(R.id.incomeEdit);
+		final TextView changeText = (TextView) layout
+				.findViewById(R.id.changeQuan);
+		TextWatcher watcher = new TextWatcher() {
+			String tempStr;
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before,
+					int count) {
+				tempStr = s.toString();
+			}
+
+			@Override
+			public void afterTextChanged(Editable arg0) {
+				if (tempStr.length() > 0) {
+					mIncome = Double.valueOf(tempStr).doubleValue();
+					mChange = mIncome - mTotalPrice;
+					if (mChange > 0) {
+						changeText.setText(String.valueOf(mChange));
+					} else {
+						changeText.setText("客户你好，你给的金额不足!");
+					}
+				}
+			}
+
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count,
+					int after) {
+			}
+
+		};
+		incomeEdit.addTextChangedListener(watcher);
+		receivableText.setText(String.valueOf(mTotalPrice));
+		changeTableAlertDialog.setView(layout);
+		changeTableAlertDialog.setTitle("请输入");
+		changeTableAlertDialog.setPositiveButton("确定",
+				new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int i) {
+						if(mChange < 0){
+							toastText("你所给金额不足，请重新结账！");
+						}
+						else{
+							checkOut(selectedTable, tableName, mTotalPrice,
+									mIncome, mChange);
+						}
+					}
+				});
+		changeTableAlertDialog.setNegativeButton("取消", null);
+
+		return changeTableAlertDialog;
 	}
 
 	private AlertDialog.Builder alertDialogBuilder(boolean cancelable) {
@@ -567,6 +636,21 @@ public class TableActivity extends BaseActivity {
 					break;
 				}
 			}
+		}
+	};
+
+	private Handler totalPriceTableHandle = new Handler() {
+		public void handleMessage(Message msg) {
+			if (msg.what < 0) {
+				ARERTDIALOG = 1;
+				mNetWrorkAlertDialog.setMessage("统计失败，请检查连接网络重试");
+				mNetWrorkcancel = mNetWrorkAlertDialog.show();
+			} else {
+				mTotalPrice = (double) msg.what;
+				mChangeDialog = checkOutSubmitDialog(tableName);
+				mChangeDialog.show();
+			}
+			mpDialog.cancel();
 		}
 	};
 
@@ -606,17 +690,17 @@ public class TableActivity extends BaseActivity {
 		}
 	};
 
-	private Handler combineTIdHandle = new Handler() {
+	private Handler checkOutHandle = new Handler() {
 		public void handleMessage(Message msg) {
 			if (msg.what == -2) {
-				toastText(R.string.combineTIdWarning);
+				toastText(R.string.checkOutWarning);
 			} else if (msg.what == -1) {
 				ARERTDIALOG = 1;
-				mNetWrorkAlertDialog.setMessage("合并出错，请检查连接网络重试");
+				mNetWrorkAlertDialog.setMessage("收银出错，请检查连接网络重试");
 				mNetWrorkcancel = mNetWrorkAlertDialog.show();
 			} else {
 				binderStart();
-				toastText(R.string.combineTId);
+				toastText(R.string.checkOutSucc);
 			}
 		}
 	};
@@ -802,11 +886,18 @@ public class TableActivity extends BaseActivity {
 		}.start();
 	}
 
-	private void binderStart() {
-		if (binderFlag) {
-			binder.start();
-			return;
-		}
+	private void getTotalPriceTable() {
+		new Thread() {
+			public void run() {
+				try {
+					double ret = mSettings.getTotalPriceTable(
+							TableActivity.this, selectedTable);
+					totalPriceTableHandle.sendEmptyMessage((int) ret);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}.start();
 	}
 
 	private void changeTable(final int destTId, final int persons) {
@@ -839,14 +930,15 @@ public class TableActivity extends BaseActivity {
 		}.start();
 	}
 
-	private void combineTable(final List<Integer> destIId,
-			final List<String> tableName) {
+	private void checkOut(final List<Integer> destIId,
+			final List<String> tableName, final Double receivable,
+			final Double income, final Double change) {
 		new Thread() {
 			public void run() {
 				try {
-					int ret = mSettings.combineTable(TableActivity.this,
-							destIId, tableName);
-					combineTIdHandle.sendEmptyMessage(ret);
+					int ret = mSettings.checkOut(TableActivity.this,
+							destIId, tableName, receivable, income, change);
+					checkOutHandle.sendEmptyMessage(ret);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -854,8 +946,19 @@ public class TableActivity extends BaseActivity {
 		}.start();
 	}
 
+	private void binderStart() {
+		if (binderFlag) {
+			binder.start();
+			return;
+		}
+	}
+	
 	private void toastText(int r) {
 		Toast.makeText(getApplicationContext(), getResources().getString(r),
+				Toast.LENGTH_SHORT).show();
+	}
+	private void toastText(String r) {
+		Toast.makeText(getApplicationContext(), r,
 				Toast.LENGTH_SHORT).show();
 	}
 
@@ -886,12 +989,12 @@ public class TableActivity extends BaseActivity {
 		}
 	};
 
-	private OnClickListener combineClicked = new OnClickListener() {
+	private OnClickListener checkOutClicked = new OnClickListener() {
 
 		@Override
 		public void onClick(View v) {
-			final AlertDialog.Builder mChangeDialog = combineDialog();
-			mChangeDialog.show();
+			final AlertDialog.Builder ChangeDialog = checkOutDialog();
+			ChangeDialog.show();
 		}
 	};
 

@@ -240,7 +240,7 @@ public class TableSetting implements Serializable {
 			String srcName, String destName, int persons) {
 		int ret = getOrderFromServer(context, srcTId);
 		if (ret == -1) {
-			Log.e(TAG, "mOrder.getOrderFromServer.timeout");
+			Log.e(TAG, "mOrder.getOrderFromServer.timeout:changeTable");
 			return TIME_OUT;
 		}
 		
@@ -263,7 +263,7 @@ public class TableSetting implements Serializable {
 	public int copyTable(Context context, int srcTId, int destTId, int persons) {
 		int ret = getOrderFromServer(context, srcTId);
 		if (ret == -1) {
-			Log.e(TAG, "mOrder.getOrderFromServer.timeout");
+			Log.e(TAG, "mOrder.getOrderFromServer.timeout:copyTable");
 			return TIME_OUT;
 		}
 		JSONObject order = new JSONObject();
@@ -278,32 +278,59 @@ public class TableSetting implements Serializable {
 		return 0;
 	}
 
-	public int combineTable(Context context, List<Integer> srcTId,
-			List<String> tableName) {
-		JSONArray orderAll = new JSONArray();
+	public int checkOut(Context context, List<Integer> srcTId,
+			List<String> tableName, Double receivable, Double income,
+			Double change) {
+		StringBuffer nameStrBuf = new StringBuffer();
+		JSONObject orderAll = new JSONObject();
+		JSONArray orderArrary = new JSONArray();
 		int i = 0;
 		for (Integer item : srcTId) {
 			int ret = getOrderFromServer(context, item.intValue());
 			if (ret == -1) {
-				Log.e(TAG, "mOrder.getOrderFromServer.timeout");
+				Log.e(TAG, "mOrder.getOrderFromServer.timeout:checkOut");
 				return TIME_OUT;
 			}
-			JSONObject order = new JSONObject();
+			JSONObject orderObject = new JSONObject();
 			String time = getCurrentTime();
-			Log.d(TAG, tableName.get(i));
-			orderJson(item, order, tableName.get(i), time, 0); 
-			orderAll.put(order.toString());
+			orderJson(item, orderObject, tableName.get(i), time, 0); 
+			nameStrBuf.append(tableName.get(i).toString() +",");
+			orderArrary.put(orderObject.toString());
 			i++;
 		}
+		String	flavorStr = nameStrBuf.toString().substring(0, nameStrBuf.length()-1);
+		try {
+			orderAll.put("waiter", UserData.getUserName());
+			orderAll.put("orderAll",orderArrary.toString());
+			orderAll.put("receivable",receivable.toString());
+			orderAll.put("income",income.toString());
+			orderAll.put("change",change.toString());
+			orderAll.put("tableName",flavorStr.toString());
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
 		Log.d(TAG, orderAll.toString());
-		String tablecombinePkg = Http.post(Server.COMBINE_TABLE,
+		String tablecheckOutPkg = Http.post(Server.CHECK_OUT,
 				orderAll.toString());
-		if (!ErrorPHP.isSucc(tablecombinePkg, TAG)) {
+		if (!ErrorPHP.isSucc(tablecheckOutPkg, TAG)) {
 			return -2;
 		}
 		return 0;
 	}
 
+	public double getTotalPriceTable(Context context,List<Integer> srcTId){
+		double totalPrice = 0;
+		for (Integer item : srcTId) {
+			int ret = getOrderFromServer(context, item.intValue());
+			if (ret == -1) {
+				Log.e(TAG, "mOrder.getOrderFromServer.timeout:getTotalPriceTable");
+				return TIME_OUT;
+			}
+			totalPrice = totalPrice + mOrder.getTotalPrice(); 
+		}
+		return totalPrice;
+	} 
+	
 	private String getCurrentTime() {
 		Date date = new Date();
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

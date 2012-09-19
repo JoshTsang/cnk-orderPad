@@ -18,7 +18,7 @@
 	    	android:textSize="35dip"
 	    	android:text="@string/back"
 	    	android:background="#00000000"/>
-	    <Button android:id="@+id/combineTable"
+	    <Button android:id="@+id/checkOutTable"
 	        android:layout_width="200dip"
 	    	android:layout_height="40dip"
 	    	android:textColor="#F9E8BB"
