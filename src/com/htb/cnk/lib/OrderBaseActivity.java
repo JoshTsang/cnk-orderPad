@@ -2,7 +2,6 @@ package com.htb.cnk.lib;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
@@ -10,7 +9,6 @@ import android.text.InputFilter;
 import android.text.method.DigitsKeyListener;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -18,15 +16,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.htb.cnk.LoginDlg;
-import com.htb.cnk.MyOrderActivity;
 import com.htb.cnk.R;
-import com.htb.cnk.TableActivity;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.Setting;
-import com.htb.cnk.data.TableSetting;
-import com.htb.cnk.lib.BaseActivity;
-import com.htb.constant.Table;
 
 /**
  * @author josh
