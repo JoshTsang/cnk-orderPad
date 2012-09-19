@@ -89,6 +89,8 @@ public class PhoneActivity extends OrderBaseActivity {
 							.findViewById(R.id.dishPlus5);
 					holder1.minus5Btn = (Button) convertView
 							.findViewById(R.id.dishMinus5);
+					holder1.flavorBtn = (Button) convertView
+							.findViewById(R.id.flavor);
 					convertView.setTag(holder1);
 				} else {
 					holder1 = (viewHolder1) convertView.getTag();
@@ -112,6 +114,9 @@ public class PhoneActivity extends OrderBaseActivity {
 
 				holder1.minus5Btn.setTag(position);
 				holder1.minus5Btn.setOnClickListener(minus5Clicked);
+				
+				holder1.flavorBtn.setTag(position);
+				holder1.flavorBtn.setOnClickListener(flavorClicked);
 				return convertView;
 			}
 
@@ -123,6 +128,7 @@ public class PhoneActivity extends OrderBaseActivity {
 				Button minusBtn;
 				Button plus5Btn;
 				Button minus5Btn;
+				Button flavorBtn;
 			}
 		};
 	}

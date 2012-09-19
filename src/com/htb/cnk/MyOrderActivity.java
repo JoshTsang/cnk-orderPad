@@ -17,7 +17,6 @@ import android.widget.TextView;
 
 import com.htb.cnk.adapter.MyOrderAdapter;
 import com.htb.cnk.data.Info;
-import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.data.MyOrder.OrderedDish;
 import com.htb.cnk.lib.OrderBaseActivity;
@@ -149,17 +148,6 @@ public class MyOrderActivity extends OrderBaseActivity {
 		}
 	};
 
-	private OnClickListener flavorClicked = new OnClickListener() {
-
-		@Override
-		public void onClick(View v) {
-			Button text = (Button) v.findViewById(R.id.flavor);
-			text.setTextColor(android.graphics.Color.WHITE);
-			final int position = Integer.parseInt(v.getTag().toString());
-			final boolean selected[] = new boolean[MyOrder.mFlavor.length];
-			flavorDialog(position, selected);
-		}
-	};
 	Handler handler = new Handler() {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();

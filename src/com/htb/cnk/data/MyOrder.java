@@ -394,16 +394,13 @@ public class MyOrder {
 			return TIME_OUT;
 		}
 		try {
-			Log.d(TAG, response);
-			int start = response.indexOf('[');
-			int end = response.indexOf(']');
-			if (start < 0 || end < 0) {
-				return -1;
-			} else {
-				String flavor = response.substring(start + 1, end);
-				mFlavor = flavor.split(",");
-				return 0;
+			JSONArray flavor = new JSONArray(response);
+			mFlavor = new String[flavor.length()];
+			int length = flavor.length();
+			for (int i = 0; i < length; i++) {
+				mFlavor[i] = flavor.getString(i);
 			}
+			return 0;
 		} catch (Exception e) {
 			Log.e(TAG, response);
 			e.printStackTrace();
