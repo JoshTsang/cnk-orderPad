@@ -73,5 +73,7 @@
     <string name="settings">设置</string>
     <string name="flavor">口味</string>
     <string name="performance">绩效</string>
+    <string name="checkOutWarning">收银不成功，请检查是否开台</string>
+    <string name="checkOutSucc">收银成功</string>
 	<string name="comment">备注</string>
 </resources>

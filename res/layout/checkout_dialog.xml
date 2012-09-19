@@ -3,9 +3,10 @@
     android:orientation="vertical"  
     android:layout_width="fill_parent"  
     android:layout_height="fill_parent"  
+    android:id="@+id/check_out"
     >  
 <TextView    
-    android:id="@+id/username"  
+    android:id="@+id/receivable"  
     android:layout_width="wrap_content"   
     android:layout_height="wrap_content"  
     android:layout_marginLeft="20dip"  
@@ -15,7 +16,7 @@
     android:textAppearance="?android:attr/textAppearanceMedium"  
     />  
 <TextView   
-    android:id="@+id/edit_username"  
+    android:id="@+id/receivableQuan"  
     android:layout_width="fill_parent"  
     android:layout_height="wrap_content"  
     android:layout_marginLeft="20dip"  
@@ -25,7 +26,7 @@
     android:textAppearance="?android:attr/textAppearanceMedium"  
 />  
 <TextView  
-    android:id="@+id/password"  
+    android:id="@+id/income"  
     android:layout_width="wrap_content"  
     android:layout_height="wrap_content"  
     android:layout_marginLeft="20dip"  
@@ -35,7 +36,7 @@
     android:textAppearance="?android:attr/textAppearanceMedium"  
 />  
 <EditText  
-    android:id="@+id/edit_password"  
+    android:id="@+id/incomeEdit"  
     android:layout_width="fill_parent"  
     android:layout_height="wrap_content"  
     android:layout_marginLeft="20dip"  
@@ -43,8 +44,28 @@
     android:scrollHorizontally="true"  
     android:autoText="false"  
     android:capitalize="none"  
+    android:inputType="number"
     android:gravity="fill_horizontal"
     android:textAppearance="?android:attr/textAppearanceMedium"  
-      
+/>  
+<TextView    
+    android:id="@+id/change"  
+    android:layout_width="wrap_content"   
+    android:layout_height="wrap_content"  
+    android:layout_marginLeft="20dip"  
+    android:layout_marginRight="20dip"  
+    android:text="找零"  
+    android:gravity="left"  
+    android:textAppearance="?android:attr/textAppearanceMedium"  
+    />  
+<TextView   
+    android:id="@+id/changeQuan"  
+    android:layout_width="fill_parent"  
+    android:layout_height="wrap_content"  
+    android:layout_marginLeft="20dip"  
+    android:layout_marginRight="20dip"  
+    android:scrollHorizontally="true"
+    android:gravity="fill_horizontal"  
+    android:textAppearance="?android:attr/textAppearanceMedium"  
 />  
 </LinearLayout> 

@@ -3,9 +3,9 @@
     android:orientation="vertical"  
     android:layout_width="fill_parent"  
     android:layout_height="fill_parent"  
-    android:id="@+id/dialog">  
+    android:id="@+id/combine">  
 <TextView    
-    android:id="@+id/tableId"  
+    android:id="@+id/receivable"  
     android:layout_width="wrap_content"   
     android:layout_height="wrap_content"  
     android:layout_marginLeft="20dip"  
@@ -13,18 +13,17 @@
     android:text="@string/tableId"
     android:gravity="left"  
     />  
-<EditText  
-    android:id="@+id/tableIdEdit"  
+<TextView  
+    android:id="@+id/receivableQuan"  
     android:layout_width="fill_parent"  
     android:layout_height="wrap_content"  
     android:layout_marginLeft="20dip"  
     android:layout_marginRight="20dip"  
     android:scrollHorizontally="true"  
     android:gravity="fill_horizontal"  
-    android:inputType="number"
 />  
 <TextView  
-    android:id="@+id/persons"  
+    android:id="@+id/income"  
     android:layout_width="wrap_content"  
     android:layout_height="wrap_content"  
     android:layout_marginLeft="20dip"  
@@ -33,7 +32,7 @@
     android:gravity="left"  
 />  
 <EditText  
-    android:id="@+id/personsEdit"  
+    android:id="@+id/incomeEdit"  
     android:layout_width="fill_parent"  
     android:layout_height="wrap_content"  
     android:layout_marginLeft="20dip"  
@@ -42,5 +41,21 @@
     android:gravity="fill_horizontal"  
     android:inputType="number"
       
+/>  
+<TextView  
+    android:id="@+id/change"  
+    android:layout_width="wrap_content"  
+    android:layout_height="wrap_content"  
+    android:layout_marginLeft="20dip"  
+    android:layout_marginRight="20dip"  
+    android:gravity="left"  
+/>  
+<TextView  
+    android:id="@+id/changeQuan"  
+    android:layout_width="fill_parent"  
+    android:layout_height="wrap_content"  
+    android:layout_marginLeft="20dip"  
+    android:layout_marginRight="20dip"  
+    android:gravity="left"  
 />  
 </LinearLayout>  
