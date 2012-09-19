@@ -1,6 +1,5 @@
 package com.htb.cnk.lib;
 
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -13,10 +12,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ListView;
@@ -24,8 +21,6 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 
 import com.htb.cnk.R;
-import com.htb.cnk.R.id;
-import com.htb.cnk.R.layout;
 import com.htb.cnk.adapter.StatisticsAdapter;
 import com.htb.cnk.data.Statistics;
 import com.htb.constant.ErrorNum;

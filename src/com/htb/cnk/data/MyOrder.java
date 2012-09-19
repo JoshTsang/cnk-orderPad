@@ -102,6 +102,7 @@ public class MyOrder {
 	protected static List<OrderedDish> mOrder = new ArrayList<OrderedDish>();
 	protected int persons;
 	public static String[] mFlavor;
+	public static String comment = "";
 
 	public MyOrder(Context context) {
 		mCnkDbHelper = new CnkDbHelper(context, CnkDbHelper.DATABASE_NAME,
@@ -221,6 +222,14 @@ public class MyOrder {
 	public int getId(int index) {
 		return mOrder.get(index).getTableId();
 	}
+	
+	public void setComment(String str) {
+		comment = str;
+	}
+	
+	public String getComment() {
+		return comment;
+	}
 
 	public int setDishStatus(int index) {
 		int ret = updateServerServedDish(Info.getTableId(), mOrder.get(index)
@@ -265,6 +274,7 @@ public class MyOrder {
 
 	public void clear() {
 		mOrder.clear();
+		comment = "";
 	}
 
 	public void phoneClear() {
@@ -315,6 +325,7 @@ public class MyOrder {
 			order.put("tableId", Info.getTableId());
 			order.put("persons", persons);
 			order.put("tableName", Info.getTableName());
+			order.put("comment", comment);
 			order.put("timestamp", time);
 		} catch (JSONException e) {
 			e.printStackTrace();

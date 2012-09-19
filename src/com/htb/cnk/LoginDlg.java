@@ -47,6 +47,7 @@ public class LoginDlg {
 		EditText userNameET = (EditText) DialogView.findViewById(R.id.edit_username);
 		
 		if (!Setting.enabledPWDCheck()) {
+			UserData.debugMode();
 			login();
 			return ;
 		}

@@ -107,6 +107,16 @@
 		        android:text="@string/refresh"
 		        android:background="@drawable/refresh"
 		     />
+		    <Button android:id="@+id/comment"
+		        android:layout_height="40dp"
+		        android:layout_width="wrap_content"
+		        android:layout_marginLeft="15dp"
+		        android:layout_alignParentRight="true"
+		        android:textSize="22sp"
+		        android:textColor="#652A25"
+		        android:text="@string/comment"
+		        android:background="@drawable/refresh"
+		     />
 	    </RelativeLayout>
 	    <ListView android:id="@+id/myOrderList"
 	        android:layout_width="fill_parent"
