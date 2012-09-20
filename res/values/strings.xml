@@ -37,7 +37,7 @@
     <string name="updateMenu">更新菜谱</string>
     <string name="statistics">统计</string>
     <string name="mangement">管理</string>
-    <string name="menuMangement">菜谱管理</string>
+    <string name="menuMangement">后台管理</string>
     <string name="backup">备份</string>
     <string name="restore">恢复</string>
     <string name="queryId">选择桌号</string>

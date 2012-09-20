@@ -47,6 +47,14 @@ public class Setting {
 		commitPerference("pwdCheck", enable);
 	}
 	
+	public static boolean enabledCleanTableAfterCheckout() {
+		return Perference.getBoolean("trigerCleanTable", false);
+	}
+	
+	public static void enableCleanTableAfterCheckout(boolean enable) {
+		commitPerference("trigerCleanTable", enable);
+	}
+	
 	private static void commitPerference(String key, boolean value) {
 		Editor editor = Perference.edit();
 		editor.putBoolean(key, value);
