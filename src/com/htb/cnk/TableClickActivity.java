@@ -335,8 +335,9 @@ public class TableClickActivity extends TableBaseActivity {
 	private Builder checkOutDialog() {
 		ArrayList<HashMap<String, Object>> checkOut = mSettings.getCombine();
 		final List<Integer> tableId = new ArrayList<Integer>();
+		final List<String> tableNameStr = new ArrayList<String>();
 		for (HashMap<String, Object> item : checkOut) {
-			tableName.add(item.get("name").toString());
+			tableNameStr.add(item.get("name").toString());
 			tableId.add(item.get("id").hashCode());
 		}
 		final int size = mSettings.size();
@@ -344,7 +345,7 @@ public class TableClickActivity extends TableBaseActivity {
 		final AlertDialog.Builder checkOutAlertDialog = alertDialogBuilder(false);
 		checkOutAlertDialog.setTitle("请选择合并桌号");
 		checkOutAlertDialog.setMultiChoiceItems(
-				(String[]) tableName.toArray(new String[0]), null,
+				(String[]) tableNameStr.toArray(new String[0]), null,
 				new DialogInterface.OnMultiChoiceClickListener() {
 
 					@Override
@@ -357,9 +358,11 @@ public class TableClickActivity extends TableBaseActivity {
 			@Override
 			public void onClick(DialogInterface dialogInterface, int which) {
 				selectedTable.clear();
+				tableName.clear();
 				for (int i = 0; i < selected.length; i++) {
 					if (selected[i] == true) {
 						selectedTable.add(tableId.get(i));
+						tableName.add(tableNameStr.get(i));
 					}
 				}
 				showProgressDlg("正在统计金额，请稍等");
@@ -373,7 +376,7 @@ public class TableClickActivity extends TableBaseActivity {
 		return checkOutAlertDialog;
 	}
 
-	protected Builder checkOutSubmitDialog(final List<String> tableName) {
+	protected Builder checkOutSubmitDialog() {
 		final AlertDialog.Builder changeTableAlertDialog = alertDialogBuilder(false);
 		View layout = getDialogLayout(R.layout.checkout_dialog, R.id.check_out);
 		TextView receivableText = (TextView) layout

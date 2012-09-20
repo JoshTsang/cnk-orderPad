@@ -62,7 +62,7 @@ public class TableActivity extends TableClickActivity {
 				mNetWrorkcancel = mNetWrorkAlertDialog.show();
 			} else {
 				mTotalPrice = (double) msg.what;
-				mChangeDialog = checkOutSubmitDialog(tableName);
+				mChangeDialog = checkOutSubmitDialog();
 				mChangeDialog.show();
 			}
 			mpDialog.cancel();
