@@ -22,6 +22,7 @@ import android.widget.TimePicker;
 
 import com.htb.cnk.R;
 import com.htb.cnk.adapter.StatisticsAdapter;
+import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.Statistics;
 import com.htb.constant.ErrorNum;
 import com.htb.constant.Server;
@@ -210,7 +211,7 @@ public class StatisticsBaseActivity extends BaseActivity {
 		mEndDate.setText(date.format(end.getTime()));
 		mEndTime.setText(time.format(end.getTime()));
 		mTableUsage.setText(Integer.toString(mStatistics.getTableUsage()));
-		mTotalAmount.setText(Double.toString(mStatistics.getTotalAmount()));
+		mTotalAmount.setText(MyOrder.convertFloat(mStatistics.getTotalAmount()));
 		mStatisticsAdapter.notifyDataSetChanged();
 	}
 
