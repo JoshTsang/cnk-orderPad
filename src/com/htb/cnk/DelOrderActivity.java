@@ -52,6 +52,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 		mSubmitBtn.setVisibility(View.GONE);
 		mLeftBtn.setText(R.string.cleanAll);
 		mRefreshBtn.setVisibility(View.GONE);
+		mComment.setVisibility(View.GONE);
 	}
 
 	private void fillDelData() {
