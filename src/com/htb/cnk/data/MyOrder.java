@@ -233,12 +233,18 @@ public class MyOrder {
 	}
 
 	public int setDishStatus(int index) {
+		int status = 0;
+		String quanStr = convertFloat(mOrder.get(index).getQuantity());
+		String quantity[] = quanStr.split("\\.");
+		if (quantity.length > 1) {
+			status = Integer.parseInt(quantity[0]) + 1;
+		}
 		int ret = updateServerServedDish(Info.getTableId(), mOrder.get(index)
-				.getDishId());
+				.getDishId(), status);
 		if (ret < 0) {
 			return ret;
 		} else {
-			mOrder.get(index).addStatus(1);
+			mOrder.get(index).addStatus(status==0?1:status);
 		}
 		return 0;
 	}
@@ -458,7 +464,7 @@ public class MyOrder {
 	
 	public String convertFloat(float quantity) {
 		Log.d(TAG, "quantity:" + quantity);
-		DecimalFormat format = new DecimalFormat("#.00");
+		DecimalFormat format = new DecimalFormat("0.00");
 		String quantityStr[] = format.format(quantity).split("\\.");
 		if (quantityStr[1].equals("00")) {
 			return quantityStr[0];
@@ -649,9 +655,9 @@ public class MyOrder {
 
 	}
 
-	private int updateServerServedDish(int tableId, int dishId) {
+	private int updateServerServedDish(int tableId, int dishId, int status) {
 		String dishStatusPkg = Http.get(Server.SERVE_ORDER, "TID=" + tableId
-				+ "&DID=" + dishId);
+				+ "&DID=" + dishId + "&STATUS=" + status);
 		if (ErrorPHP.isSucc(dishStatusPkg, TAG)) {
 			return 0;
 		} else {
