@@ -269,7 +269,6 @@ public class TableSetting implements Serializable {
 		JSONObject order = new JSONObject();
 		String time = getCurrentTime();
 		orderJson(destTId, order, Info.getTableName(), time, persons);
-		Log.d(TAG, order.toString());
 		String tablecopyPkg = Http.post(Server.COPY_TABLE + "?srcTID=" + srcTId
 				+ "&destTID=" + destTId, order.toString());
 		if (!ErrorPHP.isSucc(tablecopyPkg, TAG)) {
@@ -309,7 +308,6 @@ public class TableSetting implements Serializable {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		Log.d(TAG, orderAll.toString());
 		String tablecheckOutPkg = Http.post(Server.CHECK_OUT,
 				orderAll.toString());
 		if (!ErrorPHP.isSucc(tablecheckOutPkg, TAG)) {
