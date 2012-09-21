@@ -75,8 +75,8 @@ public class Http {
 		String printers[] = getPrinterList(contentType);
 
 		if (printers == null) {
+			Log.e(TAG, "getPrinterListFailed");
 			return ErrorNum.PRINTER_ERR_CONNECT_TIMEOUT;
-
 		}
 		for(String printerIp:printers) {
 			ret = getPrinterStatus(printerIp);
@@ -125,6 +125,7 @@ public class Http {
             if (buffer[0] == 18) {
             	return 0;
             } else {
+            	Log.e(TAG, "PRINTER_NO_PAPER:" + printerIp);
             	return ErrorNum.PRINTER_ERR_NO_PAPER;
             }
         } catch (UnknownHostException e) {

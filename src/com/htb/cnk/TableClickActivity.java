@@ -343,7 +343,7 @@ public class TableClickActivity extends TableBaseActivity {
 		final int size = mSettings.size();
 		final boolean selected[] = new boolean[size];
 		final AlertDialog.Builder checkOutAlertDialog = alertDialogBuilder(false);
-		checkOutAlertDialog.setTitle("请选择合并桌号");
+		checkOutAlertDialog.setTitle("请选择结账桌号");
 		checkOutAlertDialog.setMultiChoiceItems(
 				(String[]) tableNameStr.toArray(new String[0]), null,
 				new DialogInterface.OnMultiChoiceClickListener() {
