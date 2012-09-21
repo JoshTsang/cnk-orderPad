@@ -278,6 +278,12 @@ public class OrderBaseActivity extends BaseActivity {
 
 		@Override
 		public void onClick(View v) {
+			if (Info.getTableId() < 0) {
+				new AlertDialog.Builder(OrderBaseActivity.this).setTitle("请注意")
+				.setMessage("菜谱模式，不能提交订单！").setPositiveButton("确定", null)
+				.show();
+				return;
+			}
 			if (mMyOrder.count() <= 0) {
 				new AlertDialog.Builder(OrderBaseActivity.this).setTitle("请注意")
 						.setMessage("您还没有点任何东西").setPositiveButton("确定", null)

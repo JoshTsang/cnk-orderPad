@@ -47,6 +47,9 @@ public class QueryOrderActivity extends OrderBaseActivity {
 
 	private void setQueryViews() {
 		mSubmitBtn.setText("上菜");
+		TextView tableName = (TextView) findViewById(R.id.tableName);
+		tableName.setText("桌号/人数");
+		mTableNumTxt.setText(Info.getTableName()+"/" + persons);
 		mLeftBtn.setVisibility(View.GONE);
 		mRefreshBtn.setVisibility(View.GONE);
 		mComment.setVisibility(View.GONE);

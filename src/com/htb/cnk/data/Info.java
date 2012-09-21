@@ -30,6 +30,9 @@ public class Info {
 	}
 
 	public static String getTableName() {
+		if (mTableName == null) {
+			return "菜谱模式";
+		}
 		return mTableName;
 	}
 
