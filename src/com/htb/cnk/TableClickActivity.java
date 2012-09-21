@@ -33,7 +33,7 @@ public class TableClickActivity extends TableBaseActivity {
 
 	protected final int UPDATE_TABLE_INFOS = 5;
 	protected final int DISABLE_GRIDVIEW = 10;
-	private List<Integer> selectedTable = new ArrayList<Integer>();
+	protected List<Integer> selectedTable = new ArrayList<Integer>();
 	private double mIncome;
 	private double mChange;
 
@@ -135,7 +135,9 @@ public class TableClickActivity extends TableBaseActivity {
 					@Override
 					public void onClick(DialogInterface dialog, int i) {
 						showProgressDlg("正在清台...");
-						cleanTableThread();
+						selectedTable.clear();
+						selectedTable.add(Info.getTableId());
+						cleanTableThread(selectedTable);
 					}
 				});
 		cleanTableAlertDialog.setNegativeButton("取消", null);
@@ -150,7 +152,7 @@ public class TableClickActivity extends TableBaseActivity {
 					@Override
 					public void onClick(DialogInterface dialog, int i) {
 						showProgressDlg("正在删除手机点的菜...");
-						cleanPhoneThread(position);
+						cleanPhoneThread(position,Info.getTableId());
 						dialog.cancel();
 					}
 				});
@@ -456,24 +458,21 @@ public class TableClickActivity extends TableBaseActivity {
 		}.start();
 	}
 
-	private void cleanTableThread() {
+	protected void cleanTableThread(final List<Integer>tableId) {
 		new Thread() {
 			public void run() {
 				try {
 					Message msg = new Message();
 					int ret;
-					ret = mSettings.cleanTalble(Info.getTableId());
+					ret = mSettings.cleanTalble(tableId);
 					if (ret < 0) {
 						mTableHandler.sendEmptyMessage(ret);
 						return;
 					}
-					ret = mNotificaion.getNotifiycations();
-					mRingtoneHandler.sendEmptyMessage(ret);
-					ret = mSettings.getTableStatusFromServer();
-					if (ret < 0) {
-						mTableHandler.sendEmptyMessage(ret);
+					if(getNotifiycations() < 0)
 						return;
-					}
+					if(getTableStatusFromServer()<0)
+						return;
 					msg.what = UPDATE_TABLE_INFOS;
 					mTableHandler.sendMessage(msg);
 				} catch (Exception e) {
@@ -482,34 +481,27 @@ public class TableClickActivity extends TableBaseActivity {
 			}
 		}.start();
 	}
-
-	private void cleanPhoneThread(final int position) {
+	private void cleanPhoneThread(final int position,final int tableId) {
 		new Thread() {
 			public void run() {
 				try {
 					Message msg = new Message();
 					int ret;
-					ret = mSettings.updateStatus(Info.getTableId(),
+					ret = mSettings.updateStatus(tableId,
 							mSettings.getStatus(position) - Table.PHONE_STATUS);
 					if (ret < 0) {
 						mTableHandler.sendEmptyMessage(ret);
 						return;
-					}
-
-					ret = mMyOrder.cleanServerPhoneOrder(Info.getTableId());
-					if (ret < 0) {
-
-						mTableHandler.sendEmptyMessage(ret);
-						return;
-					}
-
-					ret = mNotificaion.getNotifiycations();
-					mRingtoneHandler.sendEmptyMessage(ret);
-					ret = mSettings.getTableStatusFromServer();
+					} 
+					ret = mMyOrder.cleanServerPhoneOrder(tableId);
 					if (ret < 0) {
 						mTableHandler.sendEmptyMessage(ret);
 						return;
 					}
+					if(getNotifiycations() < 0)
+						return;
+					if(getTableStatusFromServer()<0)
+						return;
 					msg.what = UPDATE_TABLE_INFOS;
 					mTableHandler.sendMessage(msg);
 				} catch (Exception e) {
@@ -584,7 +576,7 @@ public class TableClickActivity extends TableBaseActivity {
 				Toast.LENGTH_SHORT).show();
 	}
 
-	private void toastText(String r) {
+	protected void toastText(String r) {
 		Toast.makeText(getApplicationContext(), r, Toast.LENGTH_SHORT).show();
 	}
 
@@ -605,6 +597,20 @@ public class TableClickActivity extends TableBaseActivity {
 		int tId = Integer.parseInt(changeTId);
 		return isNameMinimum(tId) && isNameMaximum(tId)
 				&& isStatusLegal(changeTId, status);
+	}
+
+	private int getNotifiycations() {
+		int ret = mNotificaion.getNotifiycations();
+		mRingtoneHandler.sendEmptyMessage(ret);
+		return ret;
+	}
+
+	private int getTableStatusFromServer() {
+		int ret = mSettings.getTableStatusFromServer();
+		if (ret < 0) {
+			mTableHandler.sendEmptyMessage(ret);
+		}
+		return ret;
 	}
 
 	private OnClickListener checkOutClicked = new OnClickListener() {

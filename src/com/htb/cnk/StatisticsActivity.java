@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.htb.cnk.adapter.StatisticsAdapter;
+import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.Statistics;
 import com.htb.cnk.lib.StatisticsBaseActivity;
 
@@ -61,9 +62,9 @@ public class StatisticsActivity extends StatisticsBaseActivity {
 				}
 
 				viewHolder.dishName.setText(mStatistics.getName(position));
-				viewHolder.salesCount.setText(Integer.toString(mStatistics
+				viewHolder.salesCount.setText(MyOrder.convertFloat(mStatistics
 						.getQuantity(position)));
-				viewHolder.totalAmount.setText(Double.toString(mStatistics
+				viewHolder.totalAmount.setText(MyOrder.convertFloat(mStatistics
 						.getAmount(position)));
 				DecimalFormat df = new DecimalFormat("0.00");
 				double percent = (mStatistics.getAmount(position) * 100)

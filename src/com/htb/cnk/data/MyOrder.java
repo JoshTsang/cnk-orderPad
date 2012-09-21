@@ -22,7 +22,7 @@ import com.htb.cnk.lib.Http;
 import com.htb.constant.Server;
 
 public class MyOrder {
-	final String TAG = "MyOrder";
+	private final static String TAG = "MyOrder";
 	public final static int ERR_GET_PHONE_ORDER_FAILED = -10;
 	public final static int RET_NULL_PHONE_ORDER = 1;
 	public final static int RET_MINUS_SUCC = -2;
@@ -459,8 +459,8 @@ public class MyOrder {
 		mOrder.get(index).phoneQuantity = 0;
 		mOrder.get(index).padQuantity = quantity;
 	}
-
-	public String convertFloat(float quantity) {
+	
+	public static String convertFloat(float quantity) {
 		DecimalFormat format = new DecimalFormat("0.00");
 		String quantityStr[] = format.format(quantity).split("\\.");
 		if (quantityStr[1].equals("00")) {

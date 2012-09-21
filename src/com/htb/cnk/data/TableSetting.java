@@ -219,17 +219,20 @@ public class TableSetting implements Serializable {
 		return 0;
 	}
 
-	public int cleanTalble(int tableId) {
-		JSONObject order = new JSONObject();
+	public int cleanTalble(List<Integer> tableIdList) throws JSONException {
 		String time = getCurrentTime();
-		try {
-			order.put("timestamp", time);
-			order.put("TID", tableId);
-		} catch (JSONException e) {
-			e.printStackTrace();
+		JSONObject orderALL = new JSONObject();
+		JSONArray order = new JSONArray();
+		for (Integer item : tableIdList) {
+			JSONObject tId = new JSONObject();
+			tId.put("TID", item.intValue());
+			order.put(tId);
 		}
-
-		String tableCleanPkg = Http.post(Server.CLEAN_TABLE, order.toString());
+		orderALL.put("order", order);
+		orderALL.put("timestamp", time);
+		Log.d(TAG, orderALL.toString());
+		String tableCleanPkg = Http.post(Server.CLEAN_TABLE,
+				orderALL.toString());
 		if (!ErrorPHP.isSucc(tableCleanPkg, TAG)) {
 			return -1;
 		}
@@ -243,12 +246,12 @@ public class TableSetting implements Serializable {
 			Log.e(TAG, "mOrder.getOrderFromServer.timeout:changeTable");
 			return TIME_OUT;
 		}
-		
+
 		ret = Http.getPrinterStatus(Server.PRINTER_CONTENT_TYPE_ORDER);
 		if (ret < 0) {
 			return ret;
 		}
-		
+
 		JSONObject order = new JSONObject();
 		String time = getCurrentTime();
 		orderJson(destTId, order, srcName + "->" + destName, time, persons);
@@ -292,19 +295,20 @@ public class TableSetting implements Serializable {
 			}
 			JSONObject orderObject = new JSONObject();
 			String time = getCurrentTime();
-			orderJson(item, orderObject, tableName.get(i), time, 0); 
-			nameStrBuf.append(tableName.get(i).toString() +",");
+			orderJson(item, orderObject, tableName.get(i), time, 0);
+			nameStrBuf.append(tableName.get(i).toString() + ",");
 			orderArrary.put(orderObject.toString());
 			i++;
 		}
-		String	flavorStr = nameStrBuf.toString().substring(0, nameStrBuf.length()-1);
+		String flavorStr = nameStrBuf.toString().substring(0,
+				nameStrBuf.length() - 1);
 		try {
 			orderAll.put("waiter", UserData.getUserName());
-			orderAll.put("orderAll",orderArrary.toString());
-			orderAll.put("receivable",receivable.toString());
-			orderAll.put("income",income.toString());
-			orderAll.put("change",change.toString());
-			orderAll.put("tableName",flavorStr.toString());
+			orderAll.put("orderAll", orderArrary.toString());
+			orderAll.put("receivable", receivable.toString());
+			orderAll.put("income", income.toString());
+			orderAll.put("change", change.toString());
+			orderAll.put("tableName", flavorStr.toString());
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
@@ -316,19 +320,20 @@ public class TableSetting implements Serializable {
 		return 0;
 	}
 
-	public double getTotalPriceTable(Context context,List<Integer> srcTId){
+	public double getTotalPriceTable(Context context, List<Integer> srcTId) {
 		double totalPrice = 0;
 		for (Integer item : srcTId) {
 			int ret = getOrderFromServer(context, item.intValue());
 			if (ret == -1) {
-				Log.e(TAG, "mOrder.getOrderFromServer.timeout:getTotalPriceTable");
+				Log.e(TAG,
+						"mOrder.getOrderFromServer.timeout:getTotalPriceTable");
 				return TIME_OUT;
 			}
-			totalPrice = totalPrice + mOrder.getTotalPrice(); 
+			totalPrice = totalPrice + mOrder.getTotalPrice();
 		}
 		return totalPrice;
-	} 
-	
+	}
+
 	private String getCurrentTime() {
 		Date date = new Date();
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -363,7 +368,7 @@ public class TableSetting implements Serializable {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public int getOrderFromServer(Context context, int srcTId) {
 		if (mOrder == null) {
 			mOrder = new MyOrder(context);
@@ -373,5 +378,5 @@ public class TableSetting implements Serializable {
 		int ret = mOrder.getOrderFromServer(srcTId);
 		return ret;
 	}
-	
+
 }

@@ -60,6 +60,7 @@ public class ServeOrderActivity extends OrderBaseActivity {
 		mSubmitBtn.setVisibility(View.GONE);
 		mLeftBtn.setVisibility(View.GONE);
 		mRefreshBtn.setVisibility(View.GONE);
+		mComment.setVisibility(View.GONE);
 	}
 	
 	private void setAdapter() {

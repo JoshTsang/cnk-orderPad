@@ -64,6 +64,17 @@
 	        	android:textOn="开"
 	        	android:textOff="关" 
 	    />
+	    <TextView android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+    		android:textSize="30dip"
+    		android:textColor="#4D2412"
+		    android:text="结账后清台："/>
+	    <Switch android:id="@+id/cleanTableAfterCheckout"
+	        	android:layout_width="wrap_content"
+	        	android:layout_height="wrap_content"
+	        	android:textOn="开"
+	        	android:textOff="关" 
+	    />
 	    <TextView android:id="@+id/pwdCheckTxt" 
 	        android:layout_width="wrap_content"
 		    android:layout_height="wrap_content"

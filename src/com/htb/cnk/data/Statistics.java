@@ -39,10 +39,10 @@ public class Statistics {
 	class SalesRow {
 		int did;
 		String dName;
-		int quantity;
-		double salesAmount;
+		float quantity;
+		float salesAmount;
 		
-		public SalesRow(int did, int amount, int quantity) {
+		public SalesRow(int did, float amount, float quantity) {
 			this.did = did;
 			salesAmount = amount;
 			this.quantity = quantity;
@@ -56,7 +56,7 @@ public class Statistics {
 	private CnkDbHelper mCnkDbSales;
 	private SQLiteDatabase mDbSales;
 	private SQLiteDatabase mDbMenu;
-	private double mTotalAmount = 0;
+	private float mTotalAmount = 0;
 	private int tableUsage;
 	
 	
@@ -147,12 +147,12 @@ public class Statistics {
 					  null, "dish_id", null, null, null);
 			while (resultSet.moveToNext()) {
 				SalesRow salesRow = new SalesRow(resultSet.getInt(DID),
-						resultSet.getInt(TOTAL_AMOUNT), resultSet.getInt(COUNT));
+						resultSet.getFloat(TOTAL_AMOUNT), resultSet.getFloat(COUNT));
 				String dishName = getDishName(salesRow.did);
 				salesRow.dName = dishName;
 				mSalesData.add(salesRow);
 				
-				mTotalAmount += resultSet.getInt(TOTAL_AMOUNT);
+				mTotalAmount += resultSet.getFloat(TOTAL_AMOUNT);
 			}
 		} catch (Exception e) {
 			return -1;
@@ -190,12 +190,12 @@ public class Statistics {
 					  null, "waiter_id", null, null, null);
 			while (resultSet.moveToNext()) {
 				SalesRow salesRow = new SalesRow(resultSet.getInt(DID),
-						resultSet.getInt(TOTAL_AMOUNT), resultSet.getInt(COUNT));
+						resultSet.getFloat(TOTAL_AMOUNT), resultSet.getFloat(COUNT));
 				String waiterName = getWaiterName(salesRow.did);
 				salesRow.dName = waiterName;
 				mSalesData.add(salesRow);
 				
-				mTotalAmount += resultSet.getInt(TOTAL_AMOUNT);
+				mTotalAmount += resultSet.getFloat(TOTAL_AMOUNT);
 			}
 		} catch (Exception e) {
 			return -1;
@@ -267,15 +267,15 @@ public class Statistics {
 		return mSalesData.get(index).dName;
 	}
 	
-	public double getAmount(int index) {
+	public float getAmount(int index) {
 		return mSalesData.get(index).salesAmount;
 	}
 	
-	public int getQuantity(int index) {
+	public float getQuantity(int index) {
 		return mSalesData.get(index).quantity;
 	}
 	
-	public double getTotalAmount() {
+	public float getTotalAmount() {
 		return mTotalAmount;
 	}
 	

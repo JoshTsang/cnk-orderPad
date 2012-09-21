@@ -3,13 +3,15 @@ package com.htb.cnk;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.htb.cnk.data.Info;
+import com.htb.cnk.data.Setting;
 import com.htb.constant.ErrorNum;
 
 public class TableActivity extends TableClickActivity {
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -62,8 +64,12 @@ public class TableActivity extends TableClickActivity {
 				mNetWrorkcancel = mNetWrorkAlertDialog.show();
 			} else {
 				mTotalPrice = (double) msg.what;
-				mChangeDialog = checkOutSubmitDialog();
-				mChangeDialog.show();
+				if (mTotalPrice <= 0) {
+					toastText("菜品为空，请点菜！");
+				} else {
+					mChangeDialog = checkOutSubmitDialog();
+					mChangeDialog.show();
+				}
 			}
 			mpDialog.cancel();
 		}
@@ -114,8 +120,14 @@ public class TableActivity extends TableClickActivity {
 				mNetWrorkAlertDialog.setMessage("收银出错，请检查连接网络重试");
 				mNetWrorkcancel = mNetWrorkAlertDialog.show();
 			} else {
-				binderStart();
-				toastText(R.string.checkOutSucc);
+				if(Setting.enabledCleanTableAfterCheckout()){
+					Log.d("clean", "cleanTable");
+					cleanTableThread(selectedTable);
+				}else{
+					Log.d("clean", "cleanTableWarning");
+					binderStart();
+					toastText(R.string.checkOutSucc);
+				}
 			}
 		}
 	};
