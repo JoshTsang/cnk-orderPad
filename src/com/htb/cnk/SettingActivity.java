@@ -1,6 +1,7 @@
 package com.htb.cnk;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -18,7 +19,7 @@ public class SettingActivity extends BaseActivity {
 	private Switch ringtone;
 	private Switch pwdCheck;
 	private Button back;
-	
+	private Switch cleanTableAfterCheckout;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -26,7 +27,7 @@ public class SettingActivity extends BaseActivity {
 		findViews();
 		fillData();
 		setClickListener();
-	}
+	} 
 	
 	private void findViews() {
 		persons = (Switch) findViewById(R.id.persons);
@@ -39,6 +40,7 @@ public class SettingActivity extends BaseActivity {
 			checkPwdText.setVisibility(View.GONE);
 			pwdCheck.setVisibility(View.GONE);
 		}
+		cleanTableAfterCheckout = (Switch)findViewById(R.id.cleanTableAfterCheckout);
 	}
 
 	private void fillData() {
@@ -46,12 +48,14 @@ public class SettingActivity extends BaseActivity {
 		ringtone.setChecked(Setting.enabledRingtong());
 		back.setOnClickListener(backClicked);
 		pwdCheck.setChecked(Setting.enabledPWDCheck());
+		cleanTableAfterCheckout.setChecked(Setting.enabledCleanTableAfterCheckout());
 	}
 	
 	private void setClickListener() {
 		persons.setOnCheckedChangeListener(personsCheckedChange);
 		ringtone.setOnCheckedChangeListener(ringtoneCheckedChange);
 		pwdCheck.setOnCheckedChangeListener(pwdCheckedChange);
+		cleanTableAfterCheckout.setOnCheckedChangeListener(cleanTableAfterCheckoutChange);
 	}
 	
 	private OnCheckedChangeListener personsCheckedChange = new OnCheckedChangeListener() {
@@ -74,6 +78,17 @@ public class SettingActivity extends BaseActivity {
 		
 	};
 	
+	private OnCheckedChangeListener cleanTableAfterCheckoutChange = new OnCheckedChangeListener() {
+
+		@Override
+		public void onCheckedChanged(CompoundButton buttonView,
+				boolean isChecked) {
+			Log.d("clean", "cleanchange");
+			Setting.enableCleanTableAfterCheckout(isChecked);
+		}
+		
+	};
+	
 	private OnClickListener backClicked = new OnClickListener() {
 
 		@Override
@@ -92,7 +107,6 @@ public class SettingActivity extends BaseActivity {
 				UserData.debugMode();
 			}
 		}
-		
 	};
 
 	@Override

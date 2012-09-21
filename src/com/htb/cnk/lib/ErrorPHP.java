@@ -14,6 +14,7 @@ public class ErrorPHP implements Serializable{
 	public static boolean isSucc(String responsePkg,String errorTAG) {
 		if(responsePkg == null){
 			Log.e(errorTAG, errorTAG+".timeOut");
+			return false;
 		}
 		try {
 			JSONObject errorString = new JSONObject(responsePkg);

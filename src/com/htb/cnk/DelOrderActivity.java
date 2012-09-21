@@ -15,19 +15,19 @@ import android.widget.Toast;
 
 import com.htb.cnk.adapter.MyOrderAdapter;
 import com.htb.cnk.data.Info;
-import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.MyOrder.OrderedDish;
 import com.htb.cnk.lib.OrderBaseActivity;
 import com.htb.constant.ErrorNum;
 
 public class DelOrderActivity extends OrderBaseActivity {
 	private final int CLEANALL = -1;
+	private final int CLEANITEM = -2;
+	private final int UPDATE_ORDER = 0;
 	private int ARERTDIALOG = 0;
 	private MyOrderAdapter mMyOrderAdapter;
 	private AlertDialog mNetWrorkcancel;
 	private AlertDialog.Builder mNetWrorkAlertDialog;
 	private final int UPDATE_ORDER_QUAN = 1;
-	private final int DEL_ORDER_QUAN = 0;
 
 	@Override
 	protected void onResume() {
@@ -103,17 +103,16 @@ public class DelOrderActivity extends OrderBaseActivity {
 		mpDialog.show();
 	}
 
-	private void delDish(final int position) {
+	private void delDish(final int position,final float updateOrderQuan,final int type ) {
 		new Thread() {
 			public void run() {
 				try {
-					int ret = mMyOrder.submitDelDish(position,
-							UPDATE_ORDER_QUAN);
+					int ret = mMyOrder.submitDelDish(position,type);
 					if (ret < 0) {
 						delDishHandler.sendEmptyMessage(ret);
 						return;
 					}
-					mMyOrder.minus(position, 1);
+					mMyOrder.minus(position, updateOrderQuan);
 					delDishHandler.sendEmptyMessage(ret);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -137,11 +136,15 @@ public class DelOrderActivity extends OrderBaseActivity {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						if (position == CLEANALL) {
-							showProgressDlg("正在推掉所有菜品");
+							showProgressDlg("正在退掉所有菜品");
 							new Thread(new cleanAllThread()).start();
 						} else {
-							showProgressDlg("正在推掉菜品");
-							delDish(position);
+							showProgressDlg("正在退掉菜品");
+							if(mMyOrder.convertFloat(mMyOrder.getQuantity(position)).indexOf(".") == -1){
+								delDish(position,UPDATE_ORDER_QUAN,UPDATE_ORDER);
+							}else{
+								delDish(position, mMyOrder.getQuantity(position),CLEANITEM);
+							}
 						}
 					}
 				}).setNegativeButton("取消", null).show();
@@ -164,6 +167,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 
 		public void onClick(View v) {
 			final int position = Integer.parseInt(v.getTag().toString());
+			
 			delDishAlert(position);
 
 		}
@@ -235,8 +239,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 					cleanAllHandler.sendEmptyMessage(-2);
 					return;
 				}
-				int result = mMyOrder.submitDelDish(MyOrder.DEL_ALL_ORDER,
-						DEL_ORDER_QUAN);
+				int result = mMyOrder.submitDelDish(CLEANALL,CLEANALL);
 				// int ret = mSettings.cleanTalble(Info.getTableId());
 				if (result < 0) {
 					cleanAllHandler.sendEmptyMessage(result);

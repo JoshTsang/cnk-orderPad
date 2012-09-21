@@ -28,7 +28,7 @@ public class MyOrder {
 	public final static int RET_MINUS_SUCC = -2;
 	public final static int DEL_ALL_ORDER = -1;
 	public final static int UPDATE_ORDER = 0;
-
+	public final static int DEL_ITEM_ORDER = -2;
 	private final static int MODE_PAD = 0;
 	private final static int MODE_PHONE = 1;
 	private final static int TIME_OUT = -1;
@@ -160,11 +160,10 @@ public class MyOrder {
 				return minus(item, quantity);
 			}
 		}
-
 		return 0;
 	}
 
-	public int minus(int position, int quantity) {
+	public int minus(int position, float quantity) {
 		OrderedDish item = mOrder.get(position);
 		return minus(item, quantity);
 	}
@@ -223,11 +222,11 @@ public class MyOrder {
 	public int getId(int index) {
 		return mOrder.get(index).getTableId();
 	}
-	
+
 	public void setComment(String str) {
 		comment = str;
 	}
-	
+
 	public String getComment() {
 		return comment;
 	}
@@ -244,7 +243,7 @@ public class MyOrder {
 		if (ret < 0) {
 			return ret;
 		} else {
-			mOrder.get(index).addStatus(status==0?1:status);
+			mOrder.get(index).addStatus(status == 0 ? 1 : status);
 		}
 		return 0;
 	}
@@ -254,7 +253,7 @@ public class MyOrder {
 			return -1;
 		}
 		mOrder.get(index).setFlavor(flavor);
-		return 0 ;
+		return 0;
 	}
 
 	public OrderedDish getOrderedDish(int position) {
@@ -356,7 +355,6 @@ public class MyOrder {
 			e.printStackTrace();
 			return -1;
 		}
-		Log.d("order", order.toString());
 		String response = Http.post(Server.SUBMIT_ORDER, order.toString());
 		if (!ErrorPHP.isSucc(response, TAG)) {
 			return -1;
@@ -463,7 +461,6 @@ public class MyOrder {
 	}
 	
 	public static String convertFloat(float quantity) {
-		Log.d(TAG, "quantity:" + quantity);
 		DecimalFormat format = new DecimalFormat("0.00");
 		String quantityStr[] = format.format(quantity).split("\\.");
 		if (quantityStr[1].equals("00")) {
@@ -472,11 +469,10 @@ public class MyOrder {
 			return quantityStr[0] + "." + quantityStr[1];
 		}
 	}
-	
+
 	public int getPhoneOrderFromServer(int tableId) {
 		talbeClear();
 		String response = Http.get(Server.GET_GETPHONEORDER, "TID=" + tableId);
-		Log.d("resp", "Phone:" + response);
 		if (response == null) {
 			Log.e(TAG, "getPhoneOrderFromServer.timeOut");
 			return TIME_OUT;
@@ -526,7 +522,7 @@ public class MyOrder {
 		return 0;
 	}
 
-	public int submitDelDish(int position, int quan) {
+	public int submitDelDish(int position, int type) {
 		String response;
 		JSONObject order = new JSONObject();
 		Date date = new Date();
@@ -551,7 +547,7 @@ public class MyOrder {
 		JSONArray dishes = new JSONArray();
 		try {
 
-			if (position == DEL_ALL_ORDER) {
+			if (type == DEL_ALL_ORDER) {
 				for (int i = 0; i < mOrder.size(); i++) {
 					JSONObject dish = new JSONObject();
 					dish.put("dishId", mOrder.get(i).dish.getId());
@@ -575,15 +571,14 @@ public class MyOrder {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		if (position == DEL_ALL_ORDER) {
+		if (type == DEL_ALL_ORDER) {
 			response = Http.post(Server.DEL_ORDER, order.toString());
 		} else {
 			response = Http.post(
 					Server.UPDATE_TABLE_ORDER + "?TID=" + Info.getTableId()
-							+ "&DID=" + mOrder.get(position).dish.getId(),
-					order.toString());
+							+ "&DID=" + mOrder.get(position).dish.getId()
+							+ "&TYPE=" + type, order.toString());
 		}
-
 		if (!ErrorPHP.isSucc(response, TAG)) {
 			return -2;
 		}
@@ -591,7 +586,7 @@ public class MyOrder {
 
 	}
 
-	private int minus(OrderedDish item, int quantity) {
+	private int minus(OrderedDish item, float quantity) {
 		if ((item.padQuantity + item.phoneQuantity) > quantity) {
 			if (item.padQuantity > quantity) {
 				item.padQuantity -= quantity;
@@ -665,7 +660,7 @@ public class MyOrder {
 		}
 	}
 
-	private int minusPhoneOrderOnServer(int tableId, int quantity, int dishId) {
+	private int minusPhoneOrderOnServer(int tableId, float quantity, int dishId) {
 		if (quantity != 0) {
 			showServerDelProgress();
 			String phoneOrderPkg = Http.get(Server.UPDATE_PHONE_ORDER, "DID="
