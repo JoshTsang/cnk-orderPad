@@ -33,6 +33,9 @@ public class TableClickActivity extends TableBaseActivity {
 
 	protected final int UPDATE_TABLE_INFOS = 5;
 	protected final int DISABLE_GRIDVIEW = 10;
+	protected final int CHECKOUT_LIST = 1;
+	protected final int COMBINE_DIALOG = 1;
+	protected final int CHANGE_DIALOG = 2;
 	protected List<Integer> selectedTable = new ArrayList<Integer>();
 	private double mIncome;
 	private double mChange;
@@ -43,7 +46,7 @@ public class TableClickActivity extends TableBaseActivity {
 		mNetWrorkAlertDialog = networkDialog();
 		setClickListeners();
 	}
-	
+
 	protected void setClickListeners() {
 		mTableClicked = new tableItemClickListener();
 		mBackBtn.setOnClickListener(backClicked);
@@ -82,7 +85,8 @@ public class TableClickActivity extends TableBaseActivity {
 	}
 
 	private Dialog cleanDialog() {
-		final CharSequence[] cleanitems = { "清台", "转台", "退菜", "添加菜", "查看菜" };
+		final CharSequence[] cleanitems = { "清台", "转台", "并台", "退菜", "添加菜",
+				"查看菜" };
 		Dialog cleanDialog = alertDialogBuilder(true).setTitle("选择功能")
 				.setItems(cleanitems, new DialogInterface.OnClickListener() {
 
@@ -94,26 +98,27 @@ public class TableClickActivity extends TableBaseActivity {
 					private void cleanChioceMode(int which) {
 						switch (which) {
 						case 0:
-							final AlertDialog.Builder mAlertDialog = cleanTableDialog();
-							mAlertDialog.show();
+							cleanTableDialog().show();
 							break;
 						case 1:
-							final AlertDialog.Builder ChangeDialog = changeTableDialog();
-							ChangeDialog.show();
+							changeTableDialog(CHANGE_DIALOG).show();
 							break;
 						case 2:
+							changeTableDialog(COMBINE_DIALOG).show();
+							break;
+						case 3:
 							intent.setClass(TableClickActivity.this,
 									DelOrderActivity.class);
 							TableClickActivity.this.startActivity(intent);
 							break;
 
-						case 3:
+						case 4:
 							intent.setClass(TableClickActivity.this,
 									MenuActivity.class);
 							Info.setMode(Info.WORK_MODE_WAITER);
 							TableClickActivity.this.startActivity(intent);
 							break;
-						case 4:
+						case 5:
 							intent.setClass(TableClickActivity.this,
 									QueryOrderActivity.class);
 							TableClickActivity.this.startActivity(intent);
@@ -152,7 +157,7 @@ public class TableClickActivity extends TableBaseActivity {
 					@Override
 					public void onClick(DialogInterface dialog, int i) {
 						showProgressDlg("正在删除手机点的菜...");
-						cleanPhoneThread(position,Info.getTableId());
+						cleanPhoneThread(position, Info.getTableId());
 						dialog.cancel();
 					}
 				});
@@ -193,8 +198,7 @@ public class TableClickActivity extends TableBaseActivity {
 							TableClickActivity.this.startActivity(intent);
 							break;
 						case 2:
-							final AlertDialog.Builder ChangeDialog = copyTableDialog();
-							ChangeDialog.show();
+							copyTableDialog().show();
 							break;
 						default:
 							break;
@@ -207,7 +211,7 @@ public class TableClickActivity extends TableBaseActivity {
 	private AlertDialog.Builder addPhoneDialog(final int position) {
 		final CharSequence[] additems = { "查看顾客已点的菜", "取消顾客已点的菜" };
 		AlertDialog.Builder addPhoneDialog = alertDialogBuilder(true);
-		addPhoneDialog.setTitle("选择功能") 
+		addPhoneDialog.setTitle("选择功能")
 				.setItems(additems, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
@@ -223,8 +227,7 @@ public class TableClickActivity extends TableBaseActivity {
 							TableClickActivity.this.startActivity(intent);
 							break;
 						case 1:
-							final AlertDialog.Builder phoneDialog = cleanPhoneDialog(position);
-							phoneDialog.show();
+							cleanPhoneDialog(position).show();
 							break;
 						default:
 							break;
@@ -251,7 +254,7 @@ public class TableClickActivity extends TableBaseActivity {
 		return notificationDialog;
 	}
 
-	private Builder changeTableDialog() {
+	private Builder changeTableDialog(final int type) {
 		final AlertDialog.Builder changeTableAlertDialog = alertDialogBuilder(false);
 		final EditText tableIdEdit;
 		final EditText personsEdit;
@@ -271,20 +274,18 @@ public class TableClickActivity extends TableBaseActivity {
 					@Override
 					public void onClick(DialogInterface dialog, int i) {
 						String changePersons;
+
 						if (Setting.enabledPersons()) {
 							changePersons = personsEdit.getText().toString();
 						} else {
 							changePersons = "0";
 						}
+
 						String changeTId = tableIdEdit.getText().toString();
-						if (changeTId.equals("") || changePersons.equals("")) {
-							toastText(R.string.idAndPersonsIsNull);
-						} else if (isBoundaryLegal(changeTId,
-								Table.NORMAL_TABLE_STAUTS)) {
-							changeTable(mSettings.getId(changeTId),
-									Integer.parseInt(changePersons));
-						} else {
-							toastText(R.string.changeTIdWarning);
+						if (type == CHANGE_DIALOG) {
+							judgeChangeTable(changePersons, changeTId);
+						}else if(type == COMBINE_DIALOG){
+							judgeCombineTable(changePersons, changeTId);
 						}
 					}
 				});
@@ -334,7 +335,7 @@ public class TableClickActivity extends TableBaseActivity {
 		return layout;
 	}
 
-	private Builder checkOutDialog() {
+	private Builder listTableNameDialog(final int type) {
 		ArrayList<HashMap<String, Object>> checkOut = mSettings.getCombine();
 		final List<Integer> tableId = new ArrayList<Integer>();
 		final List<String> tableNameStr = new ArrayList<String>();
@@ -345,7 +346,7 @@ public class TableClickActivity extends TableBaseActivity {
 		final int size = mSettings.size();
 		final boolean selected[] = new boolean[size];
 		final AlertDialog.Builder checkOutAlertDialog = alertDialogBuilder(false);
-		checkOutAlertDialog.setTitle("请选择合并桌号");
+		checkOutAlertDialog.setTitle("请选择桌号");
 		checkOutAlertDialog.setMultiChoiceItems(
 				(String[]) tableNameStr.toArray(new String[0]), null,
 				new DialogInterface.OnMultiChoiceClickListener() {
@@ -367,8 +368,10 @@ public class TableClickActivity extends TableBaseActivity {
 						tableName.add(tableNameStr.get(i));
 					}
 				}
-				showProgressDlg("正在统计金额，请稍等");
-				getTotalPriceTable();
+				if (type == CHECKOUT_LIST) {
+					showProgressDlg("正在统计金额，请稍等");
+					getTotalPriceTable();
+				}
 
 			}
 		};
@@ -401,11 +404,7 @@ public class TableClickActivity extends TableBaseActivity {
 				if (tempStr.length() > 0) {
 					mIncome = Double.valueOf(tempStr).doubleValue();
 					mChange = mIncome - mTotalPrice;
-					if (mChange > 0) {
-						changeText.setText(String.valueOf(mChange));
-					} else {
-						changeText.setText("客户你好，你给的金额不足!");
-					}
+					changeText.setText(String.valueOf(mChange));
 				}
 			}
 
@@ -424,12 +423,8 @@ public class TableClickActivity extends TableBaseActivity {
 
 					@Override
 					public void onClick(DialogInterface dialog, int i) {
-						if (mChange < 0) {
-							toastText("你所给金额不足，请重新结账！");
-						} else {
-							checkOut(selectedTable, tableName, mTotalPrice,
-									mIncome, mChange);
-						}
+						checkOut(selectedTable, tableName, mTotalPrice,
+								mIncome, mChange);
 					}
 				});
 		changeTableAlertDialog.setNegativeButton("取消", null);
@@ -458,7 +453,7 @@ public class TableClickActivity extends TableBaseActivity {
 		}.start();
 	}
 
-	protected void cleanTableThread(final List<Integer>tableId) {
+	protected void cleanTableThread(final List<Integer> tableId) {
 		new Thread() {
 			public void run() {
 				try {
@@ -469,9 +464,9 @@ public class TableClickActivity extends TableBaseActivity {
 						mTableHandler.sendEmptyMessage(ret);
 						return;
 					}
-					if(getNotifiycations() < 0)
+					if (getNotifiycations() < 0)
 						return;
-					if(getTableStatusFromServer()<0)
+					if (getTableStatusFromServer() < 0)
 						return;
 					msg.what = UPDATE_TABLE_INFOS;
 					mTableHandler.sendMessage(msg);
@@ -481,7 +476,8 @@ public class TableClickActivity extends TableBaseActivity {
 			}
 		}.start();
 	}
-	private void cleanPhoneThread(final int position,final int tableId) {
+
+	private void cleanPhoneThread(final int position, final int tableId) {
 		new Thread() {
 			public void run() {
 				try {
@@ -492,15 +488,15 @@ public class TableClickActivity extends TableBaseActivity {
 					if (ret < 0) {
 						mTableHandler.sendEmptyMessage(ret);
 						return;
-					} 
+					}
 					ret = mMyOrder.cleanServerPhoneOrder(tableId);
 					if (ret < 0) {
 						mTableHandler.sendEmptyMessage(ret);
 						return;
 					}
-					if(getNotifiycations() < 0)
+					if (getNotifiycations() < 0)
 						return;
-					if(getTableStatusFromServer()<0)
+					if (getTableStatusFromServer() < 0)
 						return;
 					msg.what = UPDATE_TABLE_INFOS;
 					mTableHandler.sendMessage(msg);
@@ -518,6 +514,22 @@ public class TableClickActivity extends TableBaseActivity {
 					double ret = mSettings.getTotalPriceTable(
 							TableClickActivity.this, selectedTable);
 					mTotalPriceTableHandler.sendEmptyMessage((int) ret);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}.start();
+	}
+
+	private void combineTable(final int destTId, final int persons) {
+		new Thread() {
+			public void run() {
+				try {
+					int ret = mSettings.combineTable(TableClickActivity.this,
+							Info.getTableId(), destTId,
+							mSettings.getName(Info.getTableId()),
+							mSettings.getName(destTId), persons);
+					mCombineTIdHandler.sendEmptyMessage(ret);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -613,15 +625,38 @@ public class TableClickActivity extends TableBaseActivity {
 		return ret;
 	}
 
+	private void judgeChangeTable(String changePersons, String changeTId)
+			throws NumberFormatException {
+		if (changeTId.equals("") || changePersons.equals("")) {
+			toastText(R.string.idAndPersonsIsNull);
+		} else if (isBoundaryLegal(changeTId, Table.NORMAL_TABLE_STAUTS)) {
+			changeTable(mSettings.getId(changeTId),
+					Integer.parseInt(changePersons));
+		} else {
+			toastText(R.string.changeTIdWarning);
+		}
+	}
+	
+	private void judgeCombineTable(String changePersons, String changeTId)
+			throws NumberFormatException {
+		if (changeTId.equals("") || changePersons.equals("")) {
+			toastText(R.string.idAndPersonsIsNull);
+		} else if (isBoundaryLegal(changeTId, Table.OPEN_TABLE_STATUS)) {
+			combineTable(mSettings.getId(changeTId),
+					Integer.parseInt(changePersons));
+		} else {
+			toastText(R.string.combineTIdWarning);
+		}
+	}
+
 	private OnClickListener checkOutClicked = new OnClickListener() {
 
 		@Override
 		public void onClick(View v) {
-			final AlertDialog.Builder ChangeDialog = checkOutDialog();
-			ChangeDialog.show();
+			listTableNameDialog(CHECKOUT_LIST).show();
 		}
 	};
-	
+
 	private OnClickListener manageClicked = new OnClickListener() {
 
 		@Override
@@ -631,7 +666,7 @@ public class TableClickActivity extends TableBaseActivity {
 			TableClickActivity.this.startActivity(intent);
 		}
 	};
-	
+
 	private OnClickListener backClicked = new OnClickListener() {
 
 		@Override
@@ -639,7 +674,7 @@ public class TableClickActivity extends TableBaseActivity {
 			TableClickActivity.this.finish();
 		}
 	};
-	
+
 	private OnClickListener logoutClicked = new OnClickListener() {
 		@Override
 		public void onClick(View v) {
@@ -679,24 +714,20 @@ public class TableClickActivity extends TableBaseActivity {
 		private void tableItemChioceDialog(int arg2, int status) {
 			switch (status) {
 			case 0:
-				AlertDialog.Builder addDialog = addDialog();
-				addDialog.show();
+				addDialog().show();
 				break;
 			case 1:
-				Dialog cleanDialog = cleanDialog();
-				cleanDialog.show();
+				cleanDialog().show();
 				break;
 			case 50:
 			case 51:
-				AlertDialog.Builder addPhoneDilog = addPhoneDialog(arg2);
-				addPhoneDilog.show();
+				addPhoneDialog(arg2).show();
 				break;
 			case 100:
 			case 101:
 			case 150:
 			case 151:
-				AlertDialog.Builder notificationDialog = notificationDialog();
-				notificationDialog.show();
+				notificationDialog().show();
 				break;
 			default:
 				break;

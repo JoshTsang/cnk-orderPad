@@ -64,6 +64,7 @@ public class TableBaseActivity extends BaseActivity {
 	protected Handler mRingtoneHandler;
 	protected Handler mTotalPriceTableHandler;
 	protected Handler mChangeTIdHandler;
+	protected Handler mCombineTIdHandler;
 	protected Handler mCopyTIdHandler;
 	protected Handler mCheckOutHandler;
 	protected Button mBackBtn;
