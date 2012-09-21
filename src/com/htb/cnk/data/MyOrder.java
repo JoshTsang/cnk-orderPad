@@ -387,6 +387,7 @@ public class MyOrder {
 			int start = response.indexOf('[');
 			int end = response.indexOf(']');
 			if (start < 0 || end < 0 || (end - start) > 4) {
+				Log.e(TAG, "getPersons failed:" + response);
 				return -1;
 			} else {
 				String persons = response.substring(start + 1, end);

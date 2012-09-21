@@ -55,12 +55,13 @@ public class OrderBaseActivity extends BaseActivity {
 		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 		mpDialog.setIndeterminate(false);
 		mpDialog.setCancelable(false);
+		getPersons();
+		getFLavor();
+		
 		findViews();
 		fillData();
 		setClickListener();
 		
-		getPersons();
-		getFLavor();
 	}
 
 	public void getPersons() {
