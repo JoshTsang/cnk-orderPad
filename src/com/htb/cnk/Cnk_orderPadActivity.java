@@ -151,17 +151,10 @@ public class Cnk_orderPadActivity extends BaseActivity {
 
 		@Override
 		public void onClick(View arg0) {
-			if (Info.getTableId() < 0
-					|| Info.getMode() != Info.WORK_MODE_CUSTOMER) {
-				Toast.makeText(getApplicationContext(),
-						getResources().getString(R.string.tableNotSet),
-						Toast.LENGTH_SHORT).show();
-			} else {
-				Intent intent = new Intent();
-				intent.setClass(Cnk_orderPadActivity.this, MenuActivity.class);
-				Info.setMode(Info.WORK_MODE_CUSTOMER);
-				startActivity(intent);
-			}
+			Intent intent = new Intent();
+			intent.setClass(Cnk_orderPadActivity.this, MenuActivity.class);
+			Info.setMode(Info.WORK_MODE_CUSTOMER);
+			startActivity(intent);
 		}
 
 	};

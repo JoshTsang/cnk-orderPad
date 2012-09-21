@@ -321,8 +321,6 @@ public class TableSetting implements Serializable {
 
 	public int combineTable(Context context, int srcTId, int destTId,
 			String srcName, String destName, int persons) throws JSONException {
-		int srcPersons;
-		int destPersons;
 		int ret = getOrderFromServer(context, srcTId);
 		if (ret == -1) {
 			Log.e(TAG, "mOrder.getOrderFromServer.timeout:combineTable");
@@ -333,16 +331,10 @@ public class TableSetting implements Serializable {
 		if (ret < 0) {
 			return ret;
 		}
-		if (persons == 0
-				&& (srcPersons = mOrder.getPersonsFromServer(srcTId)) >= 0
-				&& (destPersons = mOrder.getPersonsFromServer(destTId)) >= 0) {
-			persons = srcPersons
-					+ destPersons;
-		}
 		JSONObject order = new JSONObject();
 		String time = getCurrentTime();
 		orderJson(destTId, order, srcName + "->" + destName, time, persons);
-		String tablecombinePkg = Http.post(Server.CHANGE_TABLE + "?srcTID="
+		String tablecombinePkg = Http.post(Server.COMBINE_TABLE + "?srcTID="
 				+ srcTId + "&destTID=" + destTId, order.toString());
 		if (!ErrorPHP.isSucc(tablecombinePkg, TAG)) {
 			return -2;
