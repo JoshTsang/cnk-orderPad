@@ -19,6 +19,7 @@ import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.data.MyOrder.OrderedDish;
+import com.htb.cnk.data.TableSetting.TableSettingItem;
 import com.htb.cnk.lib.OrderBaseActivity;
 import com.htb.constant.ErrorNum;
 import com.htb.constant.Table;
@@ -28,7 +29,6 @@ import com.htb.constant.Table;
  * 
  */
 public class PhoneActivity extends OrderBaseActivity {
-	private TableSetting mSettings = new TableSetting();
 
 	@Override
 	protected void onResume() {
@@ -84,10 +84,6 @@ public class PhoneActivity extends OrderBaseActivity {
 							.findViewById(R.id.dishPlus);
 					holder1.minusBtn = (Button) convertView
 							.findViewById(R.id.dishMinus);
-//					holder1.plus5Btn = (Button) convertView
-//							.findViewById(R.id.dishPlus5);
-//					holder1.minus5Btn = (Button) convertView
-//							.findViewById(R.id.dishMinus5);
 					holder1.flavorBtn = (Button) convertView
 							.findViewById(R.id.flavor);
 					convertView.setTag(holder1);
@@ -99,7 +95,7 @@ public class PhoneActivity extends OrderBaseActivity {
 				holder1.dishPrice
 						.setText(Double.toString(dishDetail.getPrice())
 								+ " 元/份");
-				holder1.dishQuantity.setText(mMyOrder.convertFloat(dishDetail
+				holder1.dishQuantity.setText(MyOrder.convertFloat(dishDetail
 						.getQuantity()));
 
 				holder1.plusBtn.setTag(position);
@@ -108,12 +104,6 @@ public class PhoneActivity extends OrderBaseActivity {
 				holder1.minusBtn.setTag(position);
 				holder1.minusBtn.setOnClickListener(minusClicked);
 
-//				holder1.plus5Btn.setTag(position);
-//				holder1.plus5Btn.setOnClickListener(plus5Clicked);
-//
-//				holder1.minus5Btn.setTag(position);
-//				holder1.minus5Btn.setOnClickListener(minus5Clicked);
-				
 				holder1.flavorBtn.setTag(position);
 				holder1.flavorBtn.setOnClickListener(flavorClicked);
 				return convertView;
@@ -125,8 +115,6 @@ public class PhoneActivity extends OrderBaseActivity {
 				TextView dishQuantity;
 				Button plusBtn;
 				Button minusBtn;
-//				Button plus5Btn;
-//				Button minus5Btn;
 				Button flavorBtn;
 			}
 		};
@@ -134,38 +122,32 @@ public class PhoneActivity extends OrderBaseActivity {
 
 	Handler queryHandler = new Handler() {
 		public void handleMessage(Message msg) {
-
 			mMyOrderLst.setAdapter(mMyOrderAdapter);
 			mpDialog.cancel();
 			if (msg.what < 0) {
 				mMyOrder.phoneClear();
-				new AlertDialog.Builder(PhoneActivity.this).setTitle("请注意")
-						.setMessage("无法连接服务器").setPositiveButton("确定", null)
-						.show();
+				queryWarningDialog();
 			} else if (msg.what == MyOrder.RET_NULL_PHONE_ORDER) {
 				mMyOrder.phoneClear();
-				Toast.makeText(getApplicationContext(),
-						getResources().getString(R.string.delPhoneWarning),
-						Toast.LENGTH_SHORT).show();
+				toastText(R.string.delPhoneWarning);
 			}
-
 			mMyOrderAdapter.notifyDataSetChanged();
 			updateTabelInfos();
 		}
 	};
-
-	class queryThread implements Runnable {
-		public void run() {
-			int ret = -1;
-			try {
-				ret = mMyOrder.getPhoneOrderFromServer(Info.getTableId());
-				queryHandler.sendEmptyMessage(ret);
-			} catch (Exception e) {
-				e.printStackTrace();
-				queryHandler.sendEmptyMessage(ret);
+	protected void queryThread() {
+		new Thread() {
+			public void run() {
+				int ret = -1;
+				try {
+					ret = mMyOrder.getPhoneOrderFromServer(Info.getTableId());
+					queryHandler.sendEmptyMessage(ret);
+				} catch (Exception e) {
+					e.printStackTrace();
+					queryHandler.sendEmptyMessage(ret);
+				}
 			}
-		}
-
+		}.start();
 	}
 
 	private void updateDishQuantity(final int position, final int quantity) {
@@ -189,7 +171,7 @@ public class PhoneActivity extends OrderBaseActivity {
 	}
 
 	private void updatePhoneOrderInfos() {
-		new Thread(new queryThread()).start();
+		queryThread();
 	}
 
 	private void minusDishQuantity(final int position, final int quantity) {
@@ -218,18 +200,12 @@ public class PhoneActivity extends OrderBaseActivity {
 		new Thread() {
 			public void run() {
 				try {
-					int result = mSettings
-							.getItemTableStatus(Info.getTableId());
-					if (result < 0) {
-						queryHandler.sendEmptyMessage(result);
+					int ret = updateStatus(Info.getTableId(),TableSetting.PHONE_ORDER); 
+					if(ret < 0){
+						queryHandler.sendEmptyMessage(ret);
 						return;
-					} else if (result > Table.PHONE_STATUS) {
-						mSettings.updateStatus(Info.getTableId(), result
-								- Table.PHONE_STATUS);
-					} else {
-						mSettings.updateStatus(Info.getTableId(), 1);
 					}
-					int ret = mMyOrder.cleanServerPhoneOrder(Info.getTableId());
+					ret = mMyOrder.cleanServerPhoneOrder(Info.getTableId());
 					if (ret < 0) {
 						queryHandler.sendEmptyMessage(ret);
 						return;
@@ -253,6 +229,25 @@ public class PhoneActivity extends OrderBaseActivity {
 				}).show();
 	}
 
+	/**
+	 * 
+	 */
+	private void queryWarningDialog() {
+		new AlertDialog.Builder(PhoneActivity.this).setTitle("请注意")
+				.setMessage("无法连接服务器").setPositiveButton("确定", null)
+				.show();
+	}
+
+	/**
+	 * @param errMsg
+	 */
+	private void errMsgDialog(String errMsg) {
+		new AlertDialog.Builder(PhoneActivity.this)
+				.setCancelable(false).setTitle("出错了")
+				.setMessage(errMsg).setPositiveButton("确定", null)
+				.show();
+	}
+
 	private OnClickListener backBtnClicked = new OnClickListener() {
 
 		@Override
@@ -269,27 +264,11 @@ public class PhoneActivity extends OrderBaseActivity {
 		}
 	};
 
-	private OnClickListener minus5Clicked = new OnClickListener() {
-
-		public void onClick(View v) {
-			final int position = Integer.parseInt(v.getTag().toString());
-			minusDishQuantity(position, 5);
-		}
-	};
-
 	private OnClickListener plusClicked = new OnClickListener() {
 
 		public void onClick(View v) {
 			final int position = Integer.parseInt(v.getTag().toString());
 			updateDishQuantity(position, 1);
-		}
-	};
-
-	private OnClickListener plus5Clicked = new OnClickListener() {
-
-		public void onClick(View v) {
-			final int position = Integer.parseInt(v.getTag().toString());
-			updateDishQuantity(position, 5);
 		}
 	};
 
@@ -319,14 +298,10 @@ public class PhoneActivity extends OrderBaseActivity {
 			if (msg.what < 0) {
 				// TODO combine MyOrder
 				String errMsg = "提交订单失败";
-				if (msg.what == ErrorNum.PRINTER_ERR_CONNECT_TIMEOUT
-						|| msg.what == ErrorNum.PRINTER_ERR_NO_PAPER) {
+				if (isPrinterError(msg)) {
 					errMsg += ":无法连接打印机或打印机缺纸";
 				}
-				new AlertDialog.Builder(PhoneActivity.this)
-						.setCancelable(false).setTitle("出错了")
-						.setMessage(errMsg).setPositiveButton("确定", null)
-						.show();
+				errMsgDialog(errMsg);
 			} else {
 				cleanThread();
 				phoneWarningDialog();
@@ -338,10 +313,7 @@ public class PhoneActivity extends OrderBaseActivity {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
 			if (msg.what < 0) {
-				new AlertDialog.Builder(PhoneActivity.this)
-						.setCancelable(false).setTitle("出错了")
-						.setMessage("删除失败").setPositiveButton("确定", null)
-						.show();
+				errMsgDialog("删除失败");
 			} else {
 				switch (msg.what) {
 				case 0:

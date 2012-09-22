@@ -34,7 +34,7 @@ public class QueryOrderActivity extends OrderBaseActivity {
 			ARERTDIALOG = 0;
 		}
 		showProgressDlg("正在获取菜品。。。");
-		new Thread(new queryThread()).start();
+		queryThread();
 		super.onResume();
 	}
 	
@@ -125,17 +125,19 @@ public class QueryOrderActivity extends OrderBaseActivity {
 		}
 	};
 
-	class queryThread implements Runnable {
-		public void run() {
-			try {
-				int ret = mMyOrder.getOrderFromServer(Info.getTableId());
-				queryHandler.sendEmptyMessage(ret);
-			} catch (Exception e) {
-				e.printStackTrace();
+	protected void queryThread() {
+		new Thread() {
+			public void run() {
+				try {
+					int ret = mMyOrder.getOrderFromServer(Info.getTableId());
+					queryHandler.sendEmptyMessage(ret);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
-		}
+		}.start();
 	}
-	
+
 	private AlertDialog.Builder networkDialog() {
 		final AlertDialog.Builder mAlertDialog = new AlertDialog.Builder(
 				QueryOrderActivity.this);
@@ -149,7 +151,7 @@ public class QueryOrderActivity extends OrderBaseActivity {
 					public void onClick(DialogInterface dialog, int i) {
 						ARERTDIALOG = 0;
 						showProgressDlg("正在连接服务器...");
-						new Thread(new queryThread()).start();
+						queryThread();
 					}
 				});
 		mAlertDialog.setNegativeButton("退出",

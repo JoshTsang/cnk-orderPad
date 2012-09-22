@@ -3,12 +3,9 @@ package com.htb.cnk;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
-import android.widget.Toast;
 
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.Setting;
-import com.htb.constant.ErrorNum;
 
 public class TableActivity extends TableClickActivity {
 
@@ -26,18 +23,22 @@ public class TableActivity extends TableClickActivity {
 		mChangeTIdHandler = changeTIdHandler;
 		mCopyTIdHandler = copyTIdHandler;
 		mCheckOutHandler = checkOutHandler;
+		mCombineTIdHandler = combineTIdHandler;
+	}
+
+	private void netWorkDialogShow(String messages) {
+		NETWORK_ARERTDIALOG = 1;
+		mNetWrorkcancel = mNetWrorkAlertDialog.setMessage(messages).show();
 	}
 
 	Handler tableHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
-
 			if (msg.what < 0) {
-				if (ARERTDIALOG == 1) {
+				if (NETWORK_ARERTDIALOG == 1) {
 					mNetWrorkcancel.cancel();
 				}
-				ARERTDIALOG = 1;
-				mNetWrorkcancel = mNetWrorkAlertDialog.show();
+				netWorkDialogShow("网络连接失败，请检查连接网络重试！");
 			} else {
 				switch (msg.what) {
 				case UPDATE_TABLE_INFOS:
@@ -59,16 +60,13 @@ public class TableActivity extends TableClickActivity {
 	Handler totalPriceTableHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			if (msg.what < 0) {
-				ARERTDIALOG = 1;
-				mNetWrorkAlertDialog.setMessage("统计失败，请检查连接网络重试");
-				mNetWrorkcancel = mNetWrorkAlertDialog.show();
+				netWorkDialogShow("统计失败，请检查连接网络重试");
 			} else {
 				mTotalPrice = (double) msg.what;
 				if (mTotalPrice <= 0) {
 					toastText("菜品为空，请点菜！");
 				} else {
-					mChangeDialog = checkOutSubmitDialog();
-					mChangeDialog.show();
+					checkOutSubmitDialog().show();
 				}
 			}
 			mpDialog.cancel();
@@ -80,14 +78,9 @@ public class TableActivity extends TableClickActivity {
 			if (msg.what == -2) {
 				toastText(R.string.changeTIdWarning);
 			} else if (msg.what == -1) {
-				ARERTDIALOG = 1;
-				mNetWrorkAlertDialog.setMessage("转台失败，请检查连接网络重试");
-				mNetWrorkcancel = mNetWrorkAlertDialog.show();
-			} else if (msg.what == ErrorNum.PRINTER_ERR_CONNECT_TIMEOUT
-					|| msg.what == ErrorNum.PRINTER_ERR_NO_PAPER) {
-				String errMsg = "退菜订单失败";
-				Toast.makeText(getApplicationContext(), errMsg,
-						Toast.LENGTH_SHORT).show();
+				netWorkDialogShow("转台失败，请检查连接网络重试");
+			} else if (isPrinterError(msg)) {
+				toastText("退菜订单失败");
 			} else {
 				binderStart();
 				toastText(R.string.changeTId);
@@ -100,9 +93,7 @@ public class TableActivity extends TableClickActivity {
 			if (msg.what == -2) {
 				toastText(R.string.copyTIdwarning);
 			} else if (msg.what == -1) {
-				ARERTDIALOG = 1;
-				mNetWrorkAlertDialog.setMessage("复制失败，请检查连接网络重试");
-				mNetWrorkcancel = mNetWrorkAlertDialog.show();
+				netWorkDialogShow("复制失败，请检查连接网络重试");
 			} else {
 				intent.setClass(TableActivity.this, MyOrderActivity.class);
 				Info.setMode(Info.WORK_MODE_WAITER);
@@ -116,22 +107,35 @@ public class TableActivity extends TableClickActivity {
 			if (msg.what == -2) {
 				toastText(R.string.checkOutWarning);
 			} else if (msg.what == -1) {
-				ARERTDIALOG = 1;
-				mNetWrorkAlertDialog.setMessage("收银出错，请检查连接网络重试");
-				mNetWrorkcancel = mNetWrorkAlertDialog.show();
+				netWorkDialogShow("收银出错，请检查连接网络重试");
+			} else if (isPrinterError(msg)) {
+				toastText("退菜订单失败");
 			} else {
-				if(Setting.enabledCleanTableAfterCheckout()){
-					Log.d("clean", "cleanTable");
+				if (Setting.enabledCleanTableAfterCheckout()) {
 					cleanTableThread(selectedTable);
-				}else{
-					Log.d("clean", "cleanTableWarning");
+				} else {
 					binderStart();
 					toastText(R.string.checkOutSucc);
 				}
 			}
 		}
 	};
-
+	
+	Handler combineTIdHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			if (msg.what == -2) {
+				toastText(R.string.checkOutWarning);
+			} else if (msg.what == -1) {
+				netWorkDialogShow("合并出错，请检查连接网络重试");
+			} else if (isPrinterError(msg)) {
+				toastText("合并失败");
+			} else {
+				binderStart();
+				toastText(R.string.combineTId);
+			}
+		}
+	};
+	
 	Handler ringtoneHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			if (msg.what > 0) {

@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +17,7 @@ import android.widget.Toast;
 
 import com.htb.cnk.adapter.MyOrderAdapter;
 import com.htb.cnk.data.Info;
+import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.MyOrder.OrderedDish;
 import com.htb.cnk.lib.OrderBaseActivity;
 
@@ -97,7 +97,7 @@ public class ServeOrderActivity extends OrderBaseActivity {
 						+ " 元/份");
 				dishServedQuantity.setText(Integer.toString(dishDetail.getServedQuantity()));
 				dishQuantity
-						.setText(mMyOrder.convertFloat(dishDetail.getQuantity()));
+						.setText(MyOrder.convertFloat(dishDetail.getQuantity()));
 
 				return convertView;
 			}

@@ -24,6 +24,7 @@ import com.htb.cnk.adapter.MyOrderAdapter;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.Setting;
+import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.lib.BaseActivity;
 
 /**
@@ -45,12 +46,13 @@ public class OrderBaseActivity extends BaseActivity {
 	protected Handler mSubmitHandler;
 	protected MyOrderAdapter mMyOrderAdapter;
 	protected int persons;
-
+	private TableSetting mSettings;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.myorder_activity);
 		mMyOrder = new MyOrder(OrderBaseActivity.this);
+		mSettings = new TableSetting();
 		mpDialog = new ProgressDialog(OrderBaseActivity.this);
 		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 		mpDialog.setIndeterminate(false);
@@ -124,6 +126,13 @@ public class OrderBaseActivity extends BaseActivity {
 	protected void showProgressDlg(String msg) {
 		mpDialog.setMessage(msg);
 		mpDialog.show();
+	}
+	
+	/**
+	 * @return
+	 */
+	protected int updateStatus(int tableId, int orderType) {
+		return mSettings.updateStatus(Info.getTableId(),TableSetting.PHONE_ORDER);
 	}
 	
 	protected void showUpdateQuantityDlg(final int index) {
