@@ -165,23 +165,18 @@ public class MyOrderActivity extends OrderBaseActivity {
 			if (msg.what < 0) {
 				errMsg(msg);
 			} else {
-				getItemStatus();
+				updateItemStatus();
 				submitSucceed();
 			}
 		}
 
-		private void getItemStatus() {
+		private void updateItemStatus() {
 			new Thread() {
 				public void run() {
 					try {
-						int result = mSettings.getItemTableStatus(Info
-								.getTableId());
-						if (result < 0) {
-							handler.sendEmptyMessage(result);
-						} else if (result >= Table.PHONE_STATUS) {
-							mSettings.updateStatus(Info.getTableId(), result);
-						} else {
-							mSettings.updateStatus(Info.getTableId(), 1);
+						int ret = updateStatus(Info.getTableId(),TableSetting.MY_ORDER); 
+						if(ret < 0){
+							handler.sendEmptyMessage(ret);
 						}
 					} catch (Exception e) {
 						e.printStackTrace();

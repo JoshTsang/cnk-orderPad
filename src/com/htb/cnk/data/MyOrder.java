@@ -367,7 +367,7 @@ public class MyOrder {
 		for (int i = 0; i < mOrder.size(); i++) {
 			OrderedDish item = (OrderedDish) mOrder.get(i);
 			mOrder.get(i).padQuantity = item.getQuantity() - item.status;
-			if (mOrder.get(i).padQuantity == 0) {
+			if (mOrder.get(i).padQuantity <= 0) {
 				mOrder.remove(i);
 				i--;
 			}

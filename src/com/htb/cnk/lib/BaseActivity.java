@@ -2,9 +2,12 @@ package com.htb.cnk.lib;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Message;
 import android.view.KeyEvent;
 import android.view.WindowManager;
+import android.widget.Toast;
 
+import com.htb.constant.ErrorNum;
 import com.umeng.analytics.MobclickAgent;
 
 public class BaseActivity extends Activity {
@@ -50,5 +53,21 @@ public class BaseActivity extends Activity {
 		super.onPause();
 	}
 
+	/**
+	 * @param msg
+	 * @return
+	 */
+	protected boolean isPrinterError(Message msg) {
+		return msg.what == ErrorNum.PRINTER_ERR_CONNECT_TIMEOUT
+				|| msg.what == ErrorNum.PRINTER_ERR_NO_PAPER;
+	}
 
+	protected void toastText(int r) {
+		Toast.makeText(getApplicationContext(), getResources().getString(r),
+				Toast.LENGTH_SHORT).show();
+	}
+
+	protected void toastText(String r) {
+		Toast.makeText(getApplicationContext(), r, Toast.LENGTH_SHORT).show();
+	}
 }

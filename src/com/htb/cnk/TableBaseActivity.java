@@ -37,7 +37,7 @@ public class TableBaseActivity extends BaseActivity {
 
 	protected final String IMAGE_ITEM = "imageItem";
 	protected final String ITEM_TEXT = "ItemText";
-	protected int ARERTDIALOG = 0;
+	protected int NETWORK_ARERTDIALOG = 0;
 	protected TableSetting mSettings;
 	protected GridView gridview;
 	protected ProgressDialog mpDialog;
@@ -82,9 +82,9 @@ public class TableBaseActivity extends BaseActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		if (ARERTDIALOG == 1) {
+		if (NETWORK_ARERTDIALOG == 1) {
 			mNetWrorkcancel.cancel();
-			ARERTDIALOG = 0;
+			NETWORK_ARERTDIALOG = 0;
 		}
 		showProgressDlg("正在获取状态，请稍等。。。");
 		binderStart();

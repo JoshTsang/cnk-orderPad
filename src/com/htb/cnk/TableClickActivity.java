@@ -8,7 +8,6 @@ import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Message;
 import android.text.Editable;
@@ -65,7 +64,7 @@ public class TableClickActivity extends TableBaseActivity {
 					@Override
 					public void onClick(DialogInterface dialog, int i) {
 						dialog.cancel();
-						ARERTDIALOG = 0;
+						NETWORK_ARERTDIALOG = 0;
 						showProgressDlg("正在获取状态...");
 						binderStart();
 					}
@@ -75,7 +74,7 @@ public class TableClickActivity extends TableBaseActivity {
 
 					@Override
 					public void onClick(DialogInterface dialog, int i) {
-						ARERTDIALOG = 0;
+						NETWORK_ARERTDIALOG = 0;
 						dialog.cancel();
 						finish();
 					}
@@ -107,21 +106,14 @@ public class TableClickActivity extends TableBaseActivity {
 							changeTableDialog(COMBINE_DIALOG).show();
 							break;
 						case 3:
-							intent.setClass(TableClickActivity.this,
-									DelOrderActivity.class);
-							TableClickActivity.this.startActivity(intent);
+							setClassToActivity(DelOrderActivity.class);
 							break;
-
 						case 4:
-							intent.setClass(TableClickActivity.this,
-									MenuActivity.class);
 							Info.setMode(Info.WORK_MODE_WAITER);
-							TableClickActivity.this.startActivity(intent);
+							setClassToActivity(MenuActivity.class);
 							break;
 						case 5:
-							intent.setClass(TableClickActivity.this,
-									QueryOrderActivity.class);
-							TableClickActivity.this.startActivity(intent);
+							setClassToActivity(QueryOrderActivity.class);
 							break;
 						default:
 							break;
@@ -179,23 +171,18 @@ public class TableClickActivity extends TableBaseActivity {
 					private void addDialogChoiceMode(int which) {
 						switch (which) {
 						case 0:
-							intent.setClass(TableClickActivity.this,
-									MenuActivity.class);
 							Info.setMode(Info.WORK_MODE_CUSTOMER);
 							Info.setNewCustomer(true);
-							TableClickActivity.this.startActivity(intent);
+							setClassToActivity(MenuActivity.class);
 							TableClickActivity.this.finish();
 							break;
 						case 1:
 							if (Info.getMenu() == Info.ORDER_QUCIK_MENU) {
-								intent.setClass(TableClickActivity.this,
-										QuickMenuActivity.class);
+								setClassToActivity(QuickMenuActivity.class);
 							} else {
-								intent.setClass(TableClickActivity.this,
-										MenuActivity.class);
 								Info.setMode(Info.WORK_MODE_WAITER);
+								setClassToActivity(MenuActivity.class);
 							}
-							TableClickActivity.this.startActivity(intent);
 							break;
 						case 2:
 							copyTableDialog().show();
@@ -222,9 +209,7 @@ public class TableClickActivity extends TableBaseActivity {
 							int which) {
 						switch (which) {
 						case 0:
-							intent.setClass(TableClickActivity.this,
-									PhoneActivity.class);
-							TableClickActivity.this.startActivity(intent);
+							setClassToActivity(PhoneActivity.class);
 							break;
 						case 1:
 							cleanPhoneDialog(position).show();
@@ -274,14 +259,12 @@ public class TableClickActivity extends TableBaseActivity {
 					@Override
 					public void onClick(DialogInterface dialog, int i) {
 						String changePersons;
-
+						String changeTId = tableIdEdit.getText().toString();
 						if (Setting.enabledPersons()) {
 							changePersons = personsEdit.getText().toString();
 						} else {
 							changePersons = "0";
 						}
-
-						String changeTId = tableIdEdit.getText().toString();
 						if (type == CHANGE_DIALOG) {
 							judgeChangeTable(changePersons, changeTId);
 						}else if(type == COMBINE_DIALOG){
@@ -314,7 +297,6 @@ public class TableClickActivity extends TableBaseActivity {
 							toastText(R.string.copyTIdwarning);
 						}
 					}
-
 				});
 		copyTableAlertDialog.setNegativeButton("取消", null);
 		return copyTableAlertDialog;
@@ -350,7 +332,6 @@ public class TableClickActivity extends TableBaseActivity {
 		checkOutAlertDialog.setMultiChoiceItems(
 				(String[]) tableNameStr.toArray(new String[0]), null,
 				new DialogInterface.OnMultiChoiceClickListener() {
-
 					@Override
 					public void onClick(DialogInterface dialogInterface,
 							int which, boolean isChecked) {
@@ -458,8 +439,7 @@ public class TableClickActivity extends TableBaseActivity {
 			public void run() {
 				try {
 					Message msg = new Message();
-					int ret;
-					ret = mSettings.cleanTalble(tableId);
+					int ret = mSettings.cleanTalble(tableId);
 					if (ret < 0) {
 						mTableHandler.sendEmptyMessage(ret);
 						return;
@@ -482,8 +462,7 @@ public class TableClickActivity extends TableBaseActivity {
 			public void run() {
 				try {
 					Message msg = new Message();
-					int ret;
-					ret = mSettings.updateStatus(tableId,
+					int ret = mSettings.updateStatus(tableId,
 							mSettings.getStatus(position) - Table.PHONE_STATUS);
 					if (ret < 0) {
 						mTableHandler.sendEmptyMessage(ret);
@@ -582,16 +561,15 @@ public class TableClickActivity extends TableBaseActivity {
 			}
 		}.start();
 	}
-
-	protected void toastText(int r) {
-		Toast.makeText(getApplicationContext(), getResources().getString(r),
-				Toast.LENGTH_SHORT).show();
+	
+	private int getTableStatusFromServer() {
+		int ret = mSettings.getTableStatusFromServer();
+		if (ret < 0) {
+			mTableHandler.sendEmptyMessage(ret);
+		}
+		return ret;
 	}
-
-	protected void toastText(String r) {
-		Toast.makeText(getApplicationContext(), r, Toast.LENGTH_SHORT).show();
-	}
-
+	
 	private boolean isNameMinimum(int tId) {
 		return tId >= Integer.parseInt(mSettings.getNameIndex(0));
 	}
@@ -614,14 +592,6 @@ public class TableClickActivity extends TableBaseActivity {
 	private int getNotifiycations() {
 		int ret = mNotificaion.getNotifiycations();
 		mRingtoneHandler.sendEmptyMessage(ret);
-		return ret;
-	}
-
-	private int getTableStatusFromServer() {
-		int ret = mSettings.getTableStatusFromServer();
-		if (ret < 0) {
-			mTableHandler.sendEmptyMessage(ret);
-		}
 		return ret;
 	}
 
@@ -648,6 +618,15 @@ public class TableClickActivity extends TableBaseActivity {
 			toastText(R.string.combineTIdWarning);
 		}
 	}
+ 
+	/**
+	 * 
+	 */
+	private void setClassToActivity(Class<?> setClass) {
+		intent.setClass(TableClickActivity.this,
+				setClass);
+		TableClickActivity.this.startActivity(intent);
+	}
 
 	private OnClickListener checkOutClicked = new OnClickListener() {
 
@@ -661,9 +640,7 @@ public class TableClickActivity extends TableBaseActivity {
 
 		@Override
 		public void onClick(View v) {
-			Intent intent = new Intent();
-			intent.setClass(TableClickActivity.this, ManageActivity.class);
-			TableClickActivity.this.startActivity(intent);
+			setClassToActivity(ManageActivity.class);
 		}
 	};
 

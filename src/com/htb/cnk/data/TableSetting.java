@@ -17,6 +17,7 @@ import android.util.Log;
 import com.htb.cnk.lib.ErrorPHP;
 import com.htb.cnk.lib.Http;
 import com.htb.constant.Server;
+import com.htb.constant.Table;
 
 public class TableSetting implements Serializable {
 	private static final int TIME_OUT = -1;
@@ -24,7 +25,8 @@ public class TableSetting implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private MyOrder mOrder;
 	boolean phoneOrderPending;
-
+	public static final int PHONE_ORDER = 1;
+	public static final int MY_ORDER = 2;
 	public class TableSettingItem {
 		protected int mStatus;
 		protected String mName;
@@ -209,7 +211,22 @@ public class TableSetting implements Serializable {
 		return Integer.parseInt(tableStatus);
 	}
 
-	public int updateStatus(int tableId, int status) {
+	public int updateStatus(int tableId,int type) {
+		int status = getItemTableStatus(tableId);
+		if(status < 0){
+			return status;
+		}
+		if(type == PHONE_ORDER){
+			if(status > Table.PHONE_STATUS){
+				status = status - Table.PHONE_STATUS;
+			}else{
+				status = 1;
+			}
+		}else if(type == MY_ORDER){
+			if(status < Table.PHONE_STATUS){
+				status = 1;
+			}
+		}	
 		String tableStatusPkg = Http.get(Server.UPDATE_TABLE_STATUS, "TID="
 				+ tableId + "&TST=" + status);
 		if (!ErrorPHP.isSucc(tableStatusPkg, TAG)) {

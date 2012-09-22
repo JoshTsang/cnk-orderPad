@@ -11,19 +11,18 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.htb.cnk.adapter.MyOrderAdapter;
 import com.htb.cnk.data.Info;
+import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.MyOrder.OrderedDish;
 import com.htb.cnk.lib.OrderBaseActivity;
-import com.htb.constant.ErrorNum;
 
 public class DelOrderActivity extends OrderBaseActivity {
 	private final int CLEANALL = -1;
 	private final int CLEANITEM = -2;
 	private final int UPDATE_ORDER = 0;
-	private int ARERTDIALOG = 0;
+	private int NETWORK_ARERTDIALOG = 0;
 	private MyOrderAdapter mMyOrderAdapter;
 	private AlertDialog mNetWrorkcancel;
 	private AlertDialog.Builder mNetWrorkAlertDialog;
@@ -31,12 +30,12 @@ public class DelOrderActivity extends OrderBaseActivity {
 
 	@Override
 	protected void onResume() {
-		if (ARERTDIALOG == 1) {
+		if (NETWORK_ARERTDIALOG == 1) {
 			mNetWrorkcancel.cancel();
-			ARERTDIALOG = 0;
+			NETWORK_ARERTDIALOG = 0;
 		}
 		showProgressDlg("正在获取菜品。。。");
-		new Thread(new getOrderThread()).start();
+		getOrderThread();
 		super.onResume();
 	}
 
@@ -79,8 +78,8 @@ public class DelOrderActivity extends OrderBaseActivity {
 				dishName.setText(dishDetail.getName());
 				dishPrice.setText(Double.toString(dishDetail.getPrice())
 						+ " 元/份");
-				dishQuantity
-						.setText(mMyOrder.convertFloat(dishDetail.getQuantity()));
+				dishQuantity.setText(MyOrder.convertFloat(dishDetail
+						.getQuantity()));
 
 				delBtn.setTag(position);
 				delBtn.setText("-1");
@@ -103,11 +102,12 @@ public class DelOrderActivity extends OrderBaseActivity {
 		mpDialog.show();
 	}
 
-	private void delDish(final int position,final float updateOrderQuan,final int type ) {
+	private void delDish(final int position, final float updateOrderQuan,
+			final int type) {
 		new Thread() {
 			public void run() {
 				try {
-					int ret = mMyOrder.submitDelDish(position,type);
+					int ret = mMyOrder.submitDelDish(position, type);
 					if (ret < 0) {
 						delDishHandler.sendEmptyMessage(ret);
 						return;
@@ -129,6 +129,14 @@ public class DelOrderActivity extends OrderBaseActivity {
 		} else {
 			messages = "确认退菜：" + mMyOrder.getOrderedDish(position).getName();
 		}
+		delDishDialog(position, messages);
+	}
+
+	/**
+	 * @param position
+	 * @param messages
+	 */
+	protected void delDishDialog(final int position, String messages) {
 		new AlertDialog.Builder(DelOrderActivity.this).setTitle("请注意")
 				.setMessage(messages)
 				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
@@ -137,51 +145,31 @@ public class DelOrderActivity extends OrderBaseActivity {
 					public void onClick(DialogInterface dialog, int which) {
 						if (position == CLEANALL) {
 							showProgressDlg("正在退掉所有菜品");
-							new Thread(new cleanAllThread()).start();
+							cleanAllThread();
 						} else {
 							showProgressDlg("正在退掉菜品");
-							if(mMyOrder.convertFloat(mMyOrder.getQuantity(position)).indexOf(".") == -1){
-								delDish(position,UPDATE_ORDER_QUAN,UPDATE_ORDER);
-							}else{
-								delDish(position, mMyOrder.getQuantity(position),CLEANITEM);
+							if (MyOrder.convertFloat(
+									mMyOrder.getQuantity(position))
+									.indexOf(".") == -1) {
+								delDish(position, UPDATE_ORDER_QUAN,
+										UPDATE_ORDER);
+							} else {
+								delDish(position,
+										mMyOrder.getQuantity(position),
+										CLEANITEM);
 							}
 						}
 					}
 				}).setNegativeButton("取消", null).show();
-
 	}
-
-	private OnClickListener cleanBtnClicked = new OnClickListener() {
-
-		@Override
-		public void onClick(View v) {
-
-			delDishAlert(CLEANALL);
-			fillDelData();
-			mMyOrderAdapter.notifyDataSetChanged();
-
-		}
-	};
-
-	private OnClickListener delClicked = new OnClickListener() {
-
-		public void onClick(View v) {
-			final int position = Integer.parseInt(v.getTag().toString());
-			
-			delDishAlert(position);
-
-		}
-	};
 
 	Handler getOrderHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
 			if (msg.what == -2) {
-				Toast.makeText(getApplicationContext(),
-						getResources().getString(R.string.delWarning),
-						Toast.LENGTH_SHORT).show();
+				toastText(R.string.delWarning);
 			} else if (msg.what == -1) {
-				ARERTDIALOG = 1;
+				NETWORK_ARERTDIALOG = 1;
 				mNetWrorkcancel = mNetWrorkAlertDialog.show();
 			} else {
 				mMyOrder.nullServing();
@@ -208,8 +196,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 			mpDialog.cancel();
 			if (msg.what < 0) {
 				if (msg.what == -2) {
-					Toast.makeText(getApplicationContext(), "菜都上完，不能再退了",
-							Toast.LENGTH_SHORT).show();
+					toastText("菜都上完，不能再退了");
 				} else {
 					delHanderError(msg);
 				}
@@ -221,35 +208,39 @@ public class DelOrderActivity extends OrderBaseActivity {
 		}
 	};
 
-	class getOrderThread implements Runnable {
-		public void run() {
-			try {
-				int ret = mMyOrder.getOrderFromServer(Info.getTableId());
-				getOrderHandler.sendEmptyMessage(ret);
-			} catch (Exception e) {
-				e.printStackTrace();
+	protected void getOrderThread() {
+		new Thread() {
+			public void run() {
+				try {
+					int ret = mMyOrder.getOrderFromServer(Info.getTableId());
+					getOrderHandler.sendEmptyMessage(ret);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
-		}
+		}.start();
+	
 	}
 
-	class cleanAllThread implements Runnable {
-		public void run() {
-			try {
-				if (mMyOrder.count() == 0) {
-					cleanAllHandler.sendEmptyMessage(-2);
-					return;
-				}
-				int result = mMyOrder.submitDelDish(CLEANALL,CLEANALL);
-				// int ret = mSettings.cleanTalble(Info.getTableId());
-				if (result < 0) {
+	protected void cleanAllThread() {
+		new Thread() {
+			public void run() {
+				try {
+					if (mMyOrder.count() == 0) {
+						cleanAllHandler.sendEmptyMessage(-2);
+						return;
+					}
+					int result = mMyOrder.submitDelDish(CLEANALL, CLEANALL);
+					if (result < 0) {
+						cleanAllHandler.sendEmptyMessage(result);
+						return;
+					}
 					cleanAllHandler.sendEmptyMessage(result);
-					return;
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
-				cleanAllHandler.sendEmptyMessage(result);
-			} catch (Exception e) {
-				e.printStackTrace();
 			}
-		}
+		}.start();
 	}
 
 	private AlertDialog.Builder networkDialog() {
@@ -263,9 +254,9 @@ public class DelOrderActivity extends OrderBaseActivity {
 
 					@Override
 					public void onClick(DialogInterface dialog, int i) {
-						ARERTDIALOG = 0;
+						NETWORK_ARERTDIALOG = 0;
 						showProgressDlg("正在连接服务器...");
-						new Thread(new getOrderThread()).start();
+						getOrderThread();
 					}
 				});
 		mAlertDialog.setNegativeButton("退出",
@@ -274,13 +265,31 @@ public class DelOrderActivity extends OrderBaseActivity {
 					@Override
 					public void onClick(DialogInterface dialog, int i) {
 						finish();
-						ARERTDIALOG = 0;
+						NETWORK_ARERTDIALOG = 0;
 					}
 				});
 
 		return mAlertDialog;
 	}
 
+	private OnClickListener cleanBtnClicked = new OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+			delDishAlert(CLEANALL);
+			fillDelData();
+			mMyOrderAdapter.notifyDataSetChanged();
+		}
+	};
+
+	private OnClickListener delClicked = new OnClickListener() {
+
+		public void onClick(View v) {
+			final int position = Integer.parseInt(v.getTag().toString());
+			delDishAlert(position);
+		}
+	};
+	
 	@Override
 	public void finish() {
 		mMyOrder.clear();
@@ -289,11 +298,10 @@ public class DelOrderActivity extends OrderBaseActivity {
 
 	private void delHanderError(Message msg) {
 		String errMsg = "退菜订单失败";
-		if (msg.what == ErrorNum.PRINTER_ERR_CONNECT_TIMEOUT
-				|| msg.what == ErrorNum.PRINTER_ERR_NO_PAPER) {
+		if (isPrinterError(msg)) {
 			errMsg += ":无法连接打印机或打印机缺纸";
 		}
-		ARERTDIALOG = 1;
+		NETWORK_ARERTDIALOG = 1;
 		mNetWrorkAlertDialog.setMessage(errMsg + ",请检查连接网络重试");
 		mNetWrorkcancel = mNetWrorkAlertDialog.show();
 	}

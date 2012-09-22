@@ -187,18 +187,22 @@ public class MenuBaseActivity extends BaseActivity {
 
 	public void updateDishQuantity(final int position, final int quantity) {
 		if (quantity < 0) {
-			new Thread() {
-				public void run() {
-					int ret = mMyOrder.minus(mDishes.getDish(position),
-							-quantity);
-					minushandler.sendEmptyMessage(ret);
-				}
-			}.start();
+			minusOrder(position, quantity);
 		} else {
 			mMyOrder.add(position, quantity);
 		}
 		updateOrderedDishCount();
 		mDishLstAdapter.notifyDataSetChanged();
+	}
+
+	protected void minusOrder(final int position, final int quantity) {
+		new Thread() {
+			public void run() {
+				int ret = mMyOrder.minus(mDishes.getDish(position),
+						-quantity);
+				minushandler.sendEmptyMessage(ret);
+			}
+		}.start();
 	}
 
 	public void showDeletePhoneOrderProcessDlg() {
