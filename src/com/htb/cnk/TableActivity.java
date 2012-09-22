@@ -6,7 +6,6 @@ import android.os.Message;
 
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.Setting;
-import com.htb.constant.ErrorNum;
 
 public class TableActivity extends TableClickActivity {
 

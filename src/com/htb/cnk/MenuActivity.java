@@ -29,9 +29,9 @@ public class MenuActivity extends MenuBaseActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		layout = R.layout.menu_activity;
 		super.onCreate(savedInstanceState);
+		mMyOrder.talbeClear();
 		setListData();
 		setMenuClickListener();
-
 		if (Info.isNewCustomer() && Info.getMode() == Info.WORK_MODE_CUSTOMER) {
 			showGuide();
 		}
@@ -40,6 +40,7 @@ public class MenuActivity extends MenuBaseActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+		
 		updateOrderedDishCount();
 		if (mDishLstAdapter != null) {
 			mDishLstAdapter.notifyDataSetChanged();

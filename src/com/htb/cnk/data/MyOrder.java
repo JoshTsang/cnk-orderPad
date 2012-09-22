@@ -300,7 +300,7 @@ public class MyOrder {
 			mOrder.clear();
 		}
 	}
-
+	
 	public float getOrderedCount(int did) {
 		for (OrderedDish dish : mOrder) {
 			if (dish.getDishId() == did) {
