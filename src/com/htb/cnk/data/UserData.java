@@ -68,8 +68,8 @@ public class UserData {
 		String pwd[] = userPwd.split(",");
 		
 		mId = pwd[0];
-		if (pwd[1].equals(UserData.mPwd)
-				&& userPerminssionRet.equals(Integer.toString(0))) {
+		//TODO verify Permission
+		if (pwd[1].equals(UserData.mPwd)) {
 			return 1;
 		} else {
 			Log.e("compare", "userPwd.error:" + userPwd + " userPermission:"

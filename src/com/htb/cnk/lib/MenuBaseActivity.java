@@ -120,7 +120,6 @@ public class MenuBaseActivity extends BaseActivity {
 	}
 
 	public View getFastOrderMenu(int position, View convertView) {
-		mSettingsBtn.setText("快捷");
 		ItemViewHolder viewHolder;
 		Dish dishDetail = mDishes.getDish(position);
 

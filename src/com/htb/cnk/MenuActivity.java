@@ -30,6 +30,7 @@ public class MenuActivity extends MenuBaseActivity {
 		layout = R.layout.menu_activity;
 		super.onCreate(savedInstanceState);
 		setListData();
+		setMenuView();
 		setMenuClickListener();
 
 		if (Info.isNewCustomer() && Info.getMode() == Info.WORK_MODE_CUSTOMER) {
@@ -43,6 +44,14 @@ public class MenuActivity extends MenuBaseActivity {
 		updateOrderedDishCount();
 		if (mDishLstAdapter != null) {
 			mDishLstAdapter.notifyDataSetChanged();
+		}
+	}
+	
+	private void setMenuView() {
+		if (Info.getMode() == Info.WORK_MODE_CUSTOMER) {
+			mSettingsBtn.setVisibility(View.GONE);
+		} else {
+			mSettingsBtn.setText("快捷");
 		}
 	}
 	
