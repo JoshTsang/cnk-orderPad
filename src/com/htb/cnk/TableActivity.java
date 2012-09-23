@@ -1,8 +1,12 @@
 package com.htb.cnk;
 
+import java.util.ArrayList;
+
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.Setting;
@@ -22,13 +26,8 @@ public class TableActivity extends TableClickActivity {
 		mTotalPriceTableHandler = totalPriceTableHandler;
 		mChangeTIdHandler = changeTIdHandler;
 		mCopyTIdHandler = copyTIdHandler;
-		mCheckOutHandler = checkOutHandler;
+//		mCheckOutHandler = checkOutHandler;
 		mCombineTIdHandler = combineTIdHandler;
-	}
-
-	private void netWorkDialogShow(String messages) {
-		NETWORK_ARERTDIALOG = 1;
-		mNetWrorkcancel = mNetWrorkAlertDialog.setMessage(messages).show();
 	}
 
 	Handler tableHandler = new Handler() {
@@ -66,7 +65,12 @@ public class TableActivity extends TableClickActivity {
 				if (mTotalPrice <= 0) {
 					toastText("菜品为空，请点菜！");
 				} else {
-					checkOutSubmitDialog().show();
+					intent = new Intent();
+					intent.putExtra("price", mTotalPrice);
+					intent.putIntegerArrayListExtra("tableId", (ArrayList<Integer>) selectedTable);
+					intent.putStringArrayListExtra("tableName", (ArrayList<String>) tableName);
+					intent.setClass(TableActivity.this, CheckOutActivity.class);
+					TableActivity.this.startActivity(intent);  
 				}
 			}
 			mpDialog.cancel();
@@ -102,24 +106,24 @@ public class TableActivity extends TableClickActivity {
 		}
 	};
 
-	Handler checkOutHandler = new Handler() {
-		public void handleMessage(Message msg) {
-			if (msg.what == -2) {
-				toastText(R.string.checkOutWarning);
-			} else if (msg.what == -1) {
-				netWorkDialogShow("收银出错，请检查连接网络重试");
-			} else if (isPrinterError(msg)) {
-				toastText("退菜订单失败");
-			} else {
-				if (Setting.enabledCleanTableAfterCheckout()) {
-					cleanTableThread(selectedTable);
-				} else {
-					binderStart();
-					toastText(R.string.checkOutSucc);
-				}
-			}
-		}
-	};
+//	Handler checkOutHandler = new Handler() {
+//		public void handleMessage(Message msg) {
+//			if (msg.what == -2) {
+//				toastText(R.string.checkOutWarning);
+//			} else if (msg.what == -1) {
+//				netWorkDialogShow("收银出错，请检查连接网络重试");
+//			} else if (isPrinterError(msg)) {
+//				toastText("退菜订单失败");
+//			} else {
+//				if (Setting.enabledCleanTableAfterCheckout()) {
+//					cleanTableThread(selectedTable);
+//				} else {
+//					binderStart();
+//					toastText(R.string.checkOutSucc);
+//				}
+//			}
+//		}
+//	};
 	
 	Handler combineTIdHandler = new Handler() {
 		public void handleMessage(Message msg) {

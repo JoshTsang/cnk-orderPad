@@ -55,7 +55,7 @@ public class TableBaseActivity extends BaseActivity {
 	protected NotificationTableService.MyBinder binder;
 	protected boolean binderFlag;
 	protected Intent intent;
-	protected double mTotalPrice;
+	public double mTotalPrice;
 	protected AlertDialog.Builder mChangeDialog;
 	protected List<String> tableName = new ArrayList<String>();
 	protected tableItemClickListener mTableClicked;
@@ -122,7 +122,7 @@ public class TableBaseActivity extends BaseActivity {
 		
 	}
 	
-	protected void findViews() {
+	private void findViews() {
 		mBackBtn = (Button) findViewById(R.id.back);
 		mUpdateBtn = (Button) findViewById(R.id.checkOutTable);
 		mStatisticsBtn = (Button) findViewById(R.id.logout);
@@ -241,10 +241,15 @@ public class TableBaseActivity extends BaseActivity {
 	protected void binderStart() {
 		if (binderFlag) {
 			binder.start();
-			return;
+			return ;
 		}
 	}
-
+	
+	protected void netWorkDialogShow(String messages) {
+		NETWORK_ARERTDIALOG = 1;
+		mNetWrorkcancel = mNetWrorkAlertDialog.setMessage(messages).show();
+	}
+	
 	public class MyReceiver extends BroadcastReceiver {
 
 		@Override

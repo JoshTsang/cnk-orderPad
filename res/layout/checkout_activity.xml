@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal" >
+
+    <!-- 统计信息 -->
+
+    <RelativeLayout
+        android:layout_width="180dip"
+        android:layout_height="match_parent"
+        android:background="@drawable/left"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:id="@+id/titleBar"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <Button
+                android:id="@+id/back_btn"
+                android:layout_width="90dip"
+                android:layout_height="45dip"
+                android:background="#00000000"
+                android:gravity="center"
+                android:text="@string/back"
+                android:textColor="#F9E8BB"
+                android:textSize="25dip" />
+
+            <Button
+                android:id="@+id/left_btn"
+                android:layout_width="90dip"
+                android:layout_height="45dip"
+                android:background="#00000000"
+                android:gravity="center"
+                android:textColor="#F9E8BB"
+                android:textSize="25dip" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/submit"
+            android:layout_width="fill_parent"
+            android:layout_height="60dip"
+            android:layout_alignParentBottom="true"
+            android:background="@drawable/left_bottom"
+            android:textColor="#F9E8BB"
+            android:textSize="35dip" />
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_below="@id/titleBar"
+            android:layout_marginBottom="5dip"
+            android:layout_marginTop="5dip"
+            android:orientation="vertical" >
+
+            <!-- 应收 -->
+
+            <TextView
+                android:id="@+id/receivable"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dip"
+                android:text="应收"
+                android:textSize="35dip" />
+
+            <TextView
+                android:id="@+id/receivableQuan"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:textSize="40dip" />
+            <!-- 实收 -->
+
+            <TextView
+                android:id="@+id/income"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="7dip"
+                android:text="实收"
+                android:textSize="35dip" />
+
+            <EditText
+                android:id="@+id/incomeEdit"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:scrollHorizontally="true" />
+            <!-- 找零 -->
+
+            <TextView
+                android:id="@+id/change"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="7dip"
+                android:text="找零"
+                android:textSize="35dip"/>
+
+            <TextView
+                android:id="@+id/changeQuan"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:textSize="40dip"/>
+           
+        </LinearLayout>
+    </RelativeLayout>
+
+    <!-- 我点的菜 -->
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/right"
+        android:orientation="vertical" >
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="43dip"
+                android:gravity="center"
+                android:text="@string/myOrder"
+                android:textColor="#652A25"
+                android:textSize="30dip" />
+
+            <Button
+                android:id="@+id/refresh"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="15dp"
+                android:background="@drawable/refresh"
+                android:text="@string/refresh"
+                android:textColor="#652A25"
+                android:textSize="22sp" />
+
+            <Button
+                android:id="@+id/comment"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_alignParentRight="true"
+                android:layout_marginLeft="15dp"
+                android:background="@drawable/refresh"
+                android:text="@string/comment"
+                android:textColor="#652A25"
+                android:textSize="22sp" />
+        </RelativeLayout>
+
+        <ListView
+            android:id="@+id/myOrderList"
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="10dip"
+            android:divider="#DECFBB"
+            android:dividerHeight="1dip" >
+        </ListView>
+    </LinearLayout>
+
+</LinearLayout>

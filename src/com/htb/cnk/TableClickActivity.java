@@ -14,6 +14,7 @@ import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.text.method.DigitsKeyListener;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -26,6 +27,7 @@ import android.widget.Toast;
 
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.Setting;
+import com.htb.cnk.data.TableSetting;
 import com.htb.constant.Table;
 
 public class TableClickActivity extends TableBaseActivity {
@@ -36,8 +38,8 @@ public class TableClickActivity extends TableBaseActivity {
 	protected final int COMBINE_DIALOG = 1;
 	protected final int CHANGE_DIALOG = 2;
 	protected List<Integer> selectedTable = new ArrayList<Integer>();
-	private double mIncome;
-	private double mChange;
+	protected double mIncome;
+	protected double mChange;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -439,6 +441,7 @@ public class TableClickActivity extends TableBaseActivity {
 			public void run() {
 				try {
 					Message msg = new Message();
+					mTableHandler.sendEmptyMessage(DISABLE_GRIDVIEW);
 					int ret = mSettings.cleanTalble(tableId);
 					if (ret < 0) {
 						mTableHandler.sendEmptyMessage(ret);
@@ -463,7 +466,7 @@ public class TableClickActivity extends TableBaseActivity {
 				try {
 					Message msg = new Message();
 					int ret = mSettings.updateStatus(tableId,
-							mSettings.getStatus(position) - Table.PHONE_STATUS);
+							TableSetting.PHONE_ORDER);
 					if (ret < 0) {
 						mTableHandler.sendEmptyMessage(ret);
 						return;
@@ -546,7 +549,7 @@ public class TableClickActivity extends TableBaseActivity {
 		}.start();
 	}
 
-	private void checkOut(final List<Integer> destIId,
+	protected void checkOut(final List<Integer> destIId,
 			final List<String> tableName, final Double receivable,
 			final Double income, final Double change) {
 		new Thread() {
@@ -622,7 +625,7 @@ public class TableClickActivity extends TableBaseActivity {
 	/**
 	 * 
 	 */
-	private void setClassToActivity(Class<?> setClass) {
+	protected void setClassToActivity(Class<?> setClass) {
 		intent.setClass(TableClickActivity.this,
 				setClass);
 		TableClickActivity.this.startActivity(intent);
@@ -711,4 +714,5 @@ public class TableClickActivity extends TableBaseActivity {
 			}
 		}
 	}
+	
 }
