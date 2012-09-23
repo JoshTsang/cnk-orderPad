@@ -139,6 +139,7 @@ public class Cnk_orderPadActivity extends BaseActivity {
 				handlerSync.sendEmptyMessage(LATEST_MENU);
 				int menuVer = getCurrentMenuVer();
 				if (UpdateMenuActivity.isUpdateNeed(menuVer)) {
+					Log.d(TAG, "update Menu needed");
 					handlerSync.sendEmptyMessage(UPDATE_MENU);
 				} else {
 					handlerSync.sendEmptyMessage(LATEST_MENU);

@@ -8,7 +8,7 @@ public class Version {
 	final String TAG = "version";
 	public final String UPDATE_SAVENAME = "cnk.apk";
 	final int minor = 0;
-	final int build = 19;
+	final int build = 21;
 	int ver;
 	
 	public Version(Context context) {
