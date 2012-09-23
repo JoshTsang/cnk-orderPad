@@ -374,7 +374,7 @@ public class MyOrder {
 		}
 	}
 
-	public int getPersonsFromServer(int tableId) {
+	public static int getPersonsFromServer(int tableId) {
 		String response = Http.get(Server.GET_PERSONS, "TID=" + tableId);
 		if ("null".equals(response)) {
 			Log.w(TAG, "getPersonsFromServer.null");
@@ -404,10 +404,10 @@ public class MyOrder {
 	public int getFLavorFromServer() {
 		String response = Http.get(Server.GET_FLAVOR, "");
 		if ("null".equals(response)) {
-			Log.w(TAG, "getPersonsFromServer.null");
+			Log.w(TAG, "getFLavorFromServer.null");
 			return -2;
 		} else if (response == null) {
-			Log.e(TAG, "getPersonsFromServer.timeOut");
+			Log.e(TAG, "getFLavorFromServer.timeOut");
 			return TIME_OUT;
 		}
 		try {

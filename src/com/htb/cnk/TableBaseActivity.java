@@ -241,7 +241,7 @@ public class TableBaseActivity extends BaseActivity {
 	protected void binderStart() {
 		if (binderFlag) {
 			binder.start();
-			return;
+			return ;
 		}
 	}
 
