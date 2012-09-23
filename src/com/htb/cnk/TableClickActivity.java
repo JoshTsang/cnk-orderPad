@@ -439,6 +439,7 @@ public class TableClickActivity extends TableBaseActivity {
 			public void run() {
 				try {
 					Message msg = new Message();
+					mTableHandler.sendEmptyMessage(DISABLE_GRIDVIEW);
 					int ret = mSettings.cleanTalble(tableId);
 					if (ret < 0) {
 						mTableHandler.sendEmptyMessage(ret);

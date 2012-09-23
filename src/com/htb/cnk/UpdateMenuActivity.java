@@ -47,7 +47,7 @@ import com.htb.constant.Server;
 public class UpdateMenuActivity extends BaseActivity {
 	final static int DOWNLOAD_THUMBNAIL = 1;
 	final static int DOWNLOAD_PIC = 2;
-	
+	final static String TAG = "UpdateMenuActivity";
 	private TextView mStateTxt;
 	private DBFile mDBFile;
 	private SharedPreferences mSharedPre = null;
@@ -137,6 +137,7 @@ public class UpdateMenuActivity extends BaseActivity {
 		if (mMenuVer == currentMenuVer) {
 			return false;
 		} else {
+			Log.d(TAG, "MenuVer =" + mMenuVer + "current:" + currentMenuVer);
 			return true;
 		}
 	}
