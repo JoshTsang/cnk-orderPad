@@ -58,6 +58,7 @@ public class Statistics {
 	private SQLiteDatabase mDbMenu;
 	private float mTotalAmount = 0;
 	private int tableUsage;
+	private int servedPersons;
 	
 	
 	public Statistics(Context context) {
@@ -158,13 +159,7 @@ public class Statistics {
 			return -1;
 		}
 		
-		int ret = getTableUsage(startDT, endDT);
-		if (ret < 0) {
-			return -1;
-		} else {
-			tableUsage = ret;
-		}
-		return 0;
+		return perpareSummary(startDT, endDT);
 	}
 	
 	public int perparePerformanceResult(Calendar start, Calendar end) {
@@ -201,16 +196,31 @@ public class Statistics {
 			return -1;
 		}
 		
+		return perpareSummary(startDT, endDT);
+	}
+
+	public int perpareSummary(String startDT, String endDT) {
 		int ret = getTableUsage(startDT, endDT);
 		if (ret < 0) {
 			return -1;
 		} else {
 			tableUsage = ret;
 		}
+		
+		ret = getPersons(startDT, endDT);
+		if (ret < 0) {
+			return -1;
+		} else {
+			servedPersons = ret;
+		}
 		return 0;
 	}
 	public int getTableUsage() {
 		return tableUsage;
+	}
+	
+	public int getServedPersons() {
+		return servedPersons;
 	}
 	
 	public int print(Calendar start, Calendar end) {
@@ -335,10 +345,27 @@ public class Statistics {
 		}
 		return null;
 	}
+	
 	private int getTableUsage(String startDT, String endDT) {
 		int ret = -1;
 		try {
 			Cursor resultSet = mDbSales.query(CnkDbHelper.TABLE_INFO, new String[] {"count()"},
+					  "DATETIME(timestamp)>='"+startDT +"' and DATETIME(timestamp)<='" + endDT+"'",
+					  null, null, null, null, null);
+			if (resultSet.moveToNext()) {
+				return resultSet.getInt(0);
+			}
+		} catch (Exception e) {
+			return -1;
+		}
+		
+		return ret;
+	}
+	
+	private int getPersons(String startDT, String endDT) {
+		int ret = -1;
+		try {
+			Cursor resultSet = mDbSales.query(CnkDbHelper.TABLE_INFO, new String[] {"sum(persons)"},
 					  "DATETIME(timestamp)>='"+startDT +"' and DATETIME(timestamp)<='" + endDT+"'",
 					  null, null, null, null, null);
 			if (resultSet.moveToNext()) {
