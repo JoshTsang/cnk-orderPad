@@ -13,6 +13,7 @@ import com.htb.cnk.data.Setting;
 
 public class TableActivity extends TableClickActivity {
 
+	static final String TAG= "TablesActivity";
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -65,12 +66,15 @@ public class TableActivity extends TableClickActivity {
 				if (mTotalPrice <= 0) {
 					toastText("菜品为空，请点菜！");
 				} else {
-					intent = new Intent();
-					intent.putExtra("price", mTotalPrice);
-					intent.putIntegerArrayListExtra("tableId", (ArrayList<Integer>) selectedTable);
-					intent.putStringArrayListExtra("tableName", (ArrayList<String>) tableName);
-					intent.setClass(TableActivity.this, CheckOutActivity.class);
-					TableActivity.this.startActivity(intent);  
+					Intent checkOutIntent = new Intent();
+					Bundle bundle =new Bundle();
+					Log.d(TAG, "price:" + mTotalPrice);
+	                bundle.putDouble("price", mTotalPrice);
+	                bundle.putIntegerArrayList("tableId", (ArrayList<Integer>) selectedTable);
+	                bundle.putStringArrayList("tableName", (ArrayList<String>) tableName);
+	                checkOutIntent.putExtras(bundle); 
+					checkOutIntent.setClass(TableActivity.this, CheckOutActivity.class);
+					TableActivity.this.startActivity(checkOutIntent);  
 				}
 			}
 			mpDialog.cancel();

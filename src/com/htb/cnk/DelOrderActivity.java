@@ -56,7 +56,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 	}
 
 	private void fillDelData() {
-		mMyOrderAdapter = new MyOrderAdapter(this, mMyOrder) {
+		mMyOrderAdapter = new MyOrderAdapter(this, mPhoneOrder) {
 			@Override
 			public View getView(int position, View convertView, ViewGroup arg2) {
 				TextView dishName;
@@ -68,7 +68,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 					convertView = LayoutInflater.from(DelOrderActivity.this)
 							.inflate(R.layout.item_delorder, null);
 				}
-				OrderedDish dishDetail = mMyOrder.getOrderedDish(position);
+				OrderedDish dishDetail = mPhoneOrder.getOrderedDish(position);
 
 				dishName = (TextView) convertView.findViewById(R.id.dishName);
 				dishPrice = (TextView) convertView.findViewById(R.id.dishPrice);
@@ -108,12 +108,12 @@ public class DelOrderActivity extends OrderBaseActivity {
 		new Thread() {
 			public void run() {
 				try {
-					int ret = mMyOrder.submitDelDish(position, type);
+					int ret = mPhoneOrder.submitDelDish(position, type);
 					if (ret < 0) {
 						delDishHandler.sendEmptyMessage(ret);
 						return;
 					}
-					mMyOrder.minus(position, updateOrderQuan);
+					mPhoneOrder.minus(position, updateOrderQuan);
 					delDishHandler.sendEmptyMessage(ret);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -128,7 +128,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 		if (position == CLEANALL) {
 			messages = "确认退掉所有菜品";
 		} else {
-			messages = "确认退菜：" + mMyOrder.getOrderedDish(position).getName();
+			messages = "确认退菜：" + mPhoneOrder.getOrderedDish(position).getName();
 		}
 		delDishDialog(position, messages);
 	}
@@ -150,13 +150,13 @@ public class DelOrderActivity extends OrderBaseActivity {
 						} else {
 							showProgressDlg("正在退掉菜品");
 							if (MyOrder.convertFloat(
-									mMyOrder.getQuantity(position))
+									mPhoneOrder.getQuantity(position))
 									.indexOf(".") == -1) {
 								delDish(position, UPDATE_ORDER_QUAN,
 										UPDATE_ORDER);
 							} else {
 								delDish(position,
-										mMyOrder.getQuantity(position),
+										mPhoneOrder.getQuantity(position),
 										DEL_ITEM_ORDER);
 							}
 						}
@@ -173,7 +173,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 				NETWORK_ARERTDIALOG = 1;
 				mNetWrorkcancel = mNetWrorkAlertDialog.show();
 			} else {
-				mMyOrder.removeServedDishes();
+				mPhoneOrder.removeServedDishes();
 				fillDelData();
 				mMyOrderAdapter.notifyDataSetChanged();
 			}
@@ -202,7 +202,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 					delHanderError(msg);
 				}
 			} else {
-				mMyOrder.clear();
+				mPhoneOrder.clear();
 				fillDelData();
 				mMyOrderAdapter.notifyDataSetChanged();
 			}
@@ -213,7 +213,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 		new Thread() {
 			public void run() {
 				try {
-					int ret = mMyOrder.getOrderFromServer(Info.getTableId());
+					int ret = mPhoneOrder.getOrderFromServer(Info.getTableId());
 					getOrderHandler.sendEmptyMessage(ret);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -227,11 +227,11 @@ public class DelOrderActivity extends OrderBaseActivity {
 		new Thread() {
 			public void run() {
 				try {
-					if (mMyOrder.count() == 0) {
+					if (mPhoneOrder.count() == 0) {
 						cleanAllHandler.sendEmptyMessage(-2);
 						return;
 					}
-					int result = mMyOrder.submitDelDish(CLEANALL, CLEANALL);
+					int result = mPhoneOrder.submitDelDish(CLEANALL, CLEANALL);
 					if (result < 0) {
 						cleanAllHandler.sendEmptyMessage(result);
 						return;
@@ -293,7 +293,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 	
 	@Override
 	public void finish() {
-		mMyOrder.clear();
+		mPhoneOrder.clear();
 		super.finish();
 	}
 

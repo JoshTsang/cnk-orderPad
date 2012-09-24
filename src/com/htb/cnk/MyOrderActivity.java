@@ -51,10 +51,10 @@ public class MyOrderActivity extends OrderBaseActivity {
 	}
 
 	private MyOrderAdapter getMyOrderAdapterInstance() {
-		return new MyOrderAdapter(this, mMyOrder) {
+		return new MyOrderAdapter(this, mPhoneOrder) {
 			@Override
 			public View getView(int position, View convertView, ViewGroup arg2) {
-				OrderedDish dishDetail = mMyOrder.getOrderedDish(position);
+				OrderedDish dishDetail = mPhoneOrder.getOrderedDish(position);
 				ItemViewHolder itemViewHolder;
 				if (convertView == null) {
 					convertView = LayoutInflater.from(MyOrderActivity.this)
@@ -78,9 +78,9 @@ public class MyOrderActivity extends OrderBaseActivity {
 
 	private void updateDishQuantity(int position, int quantity) {
 		if (quantity < 0) {
-			mMyOrder.minus(position, -quantity);
+			mPhoneOrder.minus(position, -quantity);
 		} else {
-			mMyOrder.add(position, quantity);
+			mPhoneOrder.add(position, quantity);
 		}
 
 		mMyOrderAdapter.notifyDataSetChanged();
@@ -88,14 +88,14 @@ public class MyOrderActivity extends OrderBaseActivity {
 	}
 
 	private void minusDishQuantity(final int position, final int quantity) {
-		if (mMyOrder.getOrderedDish(position).getQuantity() > quantity) {
+		if (mPhoneOrder.getOrderedDish(position).getQuantity() > quantity) {
 			updateDishQuantity(position, -quantity);
 		} else {
 			new AlertDialog.Builder(MyOrderActivity.this)
 					.setTitle("请注意")
 					.setMessage(
 							"确认删除"
-									+ mMyOrder.getOrderedDish(position)
+									+ mPhoneOrder.getOrderedDish(position)
 											.getName())
 					.setPositiveButton("确定",
 							new DialogInterface.OnClickListener() {
@@ -213,7 +213,7 @@ public class MyOrderActivity extends OrderBaseActivity {
 
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						mMyOrder.clear();
+						mPhoneOrder.clear();
 						mMyOrderAdapter.notifyDataSetChanged();
 						finish();
 						if (Info.getMode() == Info.WORK_MODE_CUSTOMER) {
@@ -284,7 +284,7 @@ public class MyOrderActivity extends OrderBaseActivity {
 		public void fillData(OrderedDish dishDetail) {
 			dishName.setText(dishDetail.getName());
 			dishPrice.setText(Double.toString(dishDetail.getPrice()) + " 元/份");
-			dishQuantity.setText(mMyOrder.convertFloat(dishDetail.getQuantity()));
+			dishQuantity.setText(mPhoneOrder.convertFloat(dishDetail.getQuantity()));
 		}
 	}
 }

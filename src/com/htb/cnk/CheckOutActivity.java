@@ -38,10 +38,12 @@ public class CheckOutActivity extends TableActivity{
 	protected ListView mMyOrderLst;
 	protected MyOrderAdapter mMyOrderAdapter;
 	protected MyOrder mMyOrder;
+	private Intent checkOutIntent ;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.checkout_activity);
+		checkOutIntent = this.getIntent();
 		mCheckOutHandler = checkOutHandler;
 		mTableHandler =  tableHandler;
 		mMyOrder = new MyOrder(CheckOutActivity.this);
@@ -65,7 +67,6 @@ public class CheckOutActivity extends TableActivity{
 	}
 	
 	private void setCheckOutView(){
-		getTableValue();
 		mSubmitBtn.setText("结账");
 		mLeftBtn.setVisibility(View.GONE);
 		mRefreshBtn.setVisibility(View.GONE);
@@ -73,6 +74,7 @@ public class CheckOutActivity extends TableActivity{
 		mBackBtn.setOnClickListener(backBtnClicked);
 		mSubmitBtn.setOnClickListener(submitClicked);
 		mIncomeEdit.addTextChangedListener(watcher);
+		getTableValue();
 		updateTabelInfos();
 	}
 	
@@ -122,12 +124,11 @@ public class CheckOutActivity extends TableActivity{
 	}
 	
 	private void getTableValue(){
-		Intent intent = new Intent();
-		intent = getIntent();
-		intent.getDoubleExtra("price", mTotalPrice);
+		Bundle bundle = checkOutIntent.getExtras();
+		mTotalPrice = bundle.getDouble("price");
 		Log.d("price", "price:"+mTotalPrice);
-		selectedTable = intent.getIntegerArrayListExtra("tableId");
-		tableName = intent.getStringArrayListExtra("tableName");
+		selectedTable = bundle.getIntegerArrayList("tableId");
+		tableName = bundle.getStringArrayList("tableName");
 //		Log.d("getTableValue", "id0: "+selectedTable.toString()  +" tableName0: "+tableName.toString());
 	}
 
@@ -217,8 +218,9 @@ public class CheckOutActivity extends TableActivity{
 					cleanTableThread(selectedTable);
 				} else {
 					binderStart();
-					toastText(R.string.checkOutSucc);
 				}
+				toastText(R.string.checkOutSucc);
+				finish();
 			}
 		}
 	};
