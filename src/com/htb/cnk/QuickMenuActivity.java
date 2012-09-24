@@ -118,7 +118,7 @@ public class QuickMenuActivity extends MenuBaseActivity {
 	public void updateOrderedDishCount() {
 		BUTTON_TEXT_CHANGED = 1;
 		mEditQucik.setText("");
-		mOrderedDishCount.setText(Integer.toString(mMyOrder.totalQuantity()));
+		mOrderedDishCount.setText(Integer.toString(mMyOrder.getTotalQuantity()));
 	}
 	
 	private TextWatcher watcher = new TextWatcher() {

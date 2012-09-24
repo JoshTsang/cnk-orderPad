@@ -28,6 +28,7 @@ import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.NotificationTypes;
 import com.htb.cnk.data.Notifications;
+import com.htb.cnk.data.PhoneOrder;
 import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.lib.BaseActivity;
 import com.htb.cnk.lib.Ringtone;
@@ -45,7 +46,7 @@ public class TableBaseActivity extends BaseActivity {
 	protected ArrayList<HashMap<String, Object>> lstImageItem = new ArrayList<HashMap<String, Object>>();
 	protected Notifications mNotificaion = new Notifications();
 	protected NotificationTypes mNotificationType = new NotificationTypes();
-	protected MyOrder mMyOrder;
+	protected PhoneOrder mPhoneOrder;
 	protected AlertDialog.Builder mNetWrorkAlertDialog;
 	protected AlertDialog mNetWrorkcancel;
 	protected Ringtone mRingtone;
@@ -99,7 +100,7 @@ public class TableBaseActivity extends BaseActivity {
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setContentView(R.layout.table_activity);
 
-		mMyOrder = new MyOrder(TableBaseActivity.this);
+		mPhoneOrder = new PhoneOrder(TableBaseActivity.this);
 		mSettings = new TableSetting();
 		mRingtone = new Ringtone(TableBaseActivity.this);
 		mpDialog = new ProgressDialog(TableBaseActivity.this);

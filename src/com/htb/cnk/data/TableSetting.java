@@ -363,7 +363,7 @@ public class TableSetting implements Serializable {
 		}
 		JSONObject order = new JSONObject();
 		String time = getCurrentTime();
-		int destPersons = MyOrder.getPersonsFromServer(destTId);
+		int destPersons = MyOrder.loodPersons(destTId);
 		if(destPersons < 0){
 			Log.e(TAG, "mOrder.getPersonsFromServer");
 			return destPersons;

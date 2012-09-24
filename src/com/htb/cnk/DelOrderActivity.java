@@ -15,7 +15,7 @@ import android.widget.TextView;
 import com.htb.cnk.adapter.MyOrderAdapter;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder;
-import com.htb.cnk.data.MyOrder.OrderedDish;
+import com.htb.cnk.data.OrderedDish;
 import com.htb.cnk.lib.OrderBaseActivity;
 
 public class DelOrderActivity extends OrderBaseActivity {
@@ -172,7 +172,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 				NETWORK_ARERTDIALOG = 1;
 				mNetWrorkcancel = mNetWrorkAlertDialog.show();
 			} else {
-				mMyOrder.nullServing();
+				mMyOrder.removeServedDishes();
 				fillDelData();
 				mMyOrderAdapter.notifyDataSetChanged();
 			}

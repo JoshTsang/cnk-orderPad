@@ -17,8 +17,8 @@ import android.widget.Toast;
 import com.htb.cnk.adapter.MyOrderAdapter;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder;
+import com.htb.cnk.data.OrderedDish;
 import com.htb.cnk.data.TableSetting;
-import com.htb.cnk.data.MyOrder.OrderedDish;
 import com.htb.cnk.data.TableSetting.TableSettingItem;
 import com.htb.cnk.lib.OrderBaseActivity;
 import com.htb.constant.ErrorNum;
@@ -125,10 +125,10 @@ public class PhoneActivity extends OrderBaseActivity {
 			mMyOrderLst.setAdapter(mMyOrderAdapter);
 			mpDialog.cancel();
 			if (msg.what < 0) {
-				mMyOrder.phoneClear();
+				mPhoneOrder.phoneClear();
 				queryWarningDialog();
 			} else if (msg.what == MyOrder.RET_NULL_PHONE_ORDER) {
-				mMyOrder.phoneClear();
+				mPhoneOrder.phoneClear();
 				toastText(R.string.delPhoneWarning);
 			}
 			mMyOrderAdapter.notifyDataSetChanged();
@@ -140,7 +140,7 @@ public class PhoneActivity extends OrderBaseActivity {
 			public void run() {
 				int ret = -1;
 				try {
-					ret = mMyOrder.getPhoneOrderFromServer(Info.getTableId());
+					ret = mPhoneOrder.getPhoneOrderFromServer(Info.getTableId());
 					queryHandler.sendEmptyMessage(ret);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -205,7 +205,7 @@ public class PhoneActivity extends OrderBaseActivity {
 						queryHandler.sendEmptyMessage(ret);
 						return;
 					}
-					ret = mMyOrder.cleanServerPhoneOrder(Info.getTableId());
+					ret = mPhoneOrder.cleanServerPhoneOrder(Info.getTableId());
 					if (ret < 0) {
 						queryHandler.sendEmptyMessage(ret);
 						return;

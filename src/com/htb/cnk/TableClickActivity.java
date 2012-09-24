@@ -164,7 +164,7 @@ public class TableClickActivity extends TableBaseActivity {
 				.setItems(additems, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						mMyOrder.clear();
+						mPhoneOrder.clear();
 						addDialogChoiceMode(which);
 					}
 
@@ -469,7 +469,7 @@ public class TableClickActivity extends TableBaseActivity {
 						mTableHandler.sendEmptyMessage(ret);
 						return;
 					}
-					ret = mMyOrder.cleanServerPhoneOrder(tableId);
+					ret = mPhoneOrder.cleanServerPhoneOrder(tableId);
 					if (ret < 0) {
 						mTableHandler.sendEmptyMessage(ret);
 						return;
