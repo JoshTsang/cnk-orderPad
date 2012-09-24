@@ -22,80 +22,16 @@ import com.htb.cnk.lib.Http;
 import com.htb.constant.Server;
 
 public class MyOrder {
-	private final static String TAG = "MyOrder";
+	protected final static String TAG = "MyOrder";
 	public final static int ERR_GET_PHONE_ORDER_FAILED = -10;
 	public final static int RET_NULL_PHONE_ORDER = 1;
 	public final static int RET_MINUS_SUCC = -2;
 	public final static int DEL_ALL_ORDER = -1;
 	public final static int UPDATE_ORDER = 0;
 	public final static int DEL_ITEM_ORDER = -2;
-	private final static int MODE_PAD = 0;
-	private final static int MODE_PHONE = 1;
-	private final static int TIME_OUT = -1;
-
-	public class OrderedDish {
-		Dish dish;
-		float padQuantity;
-		int phoneQuantity;
-		int status;
-		int tableId;
-		String flavor;
-
-		public OrderedDish(Dish dish, float quantity, int tableId, int status,
-				int type) {
-			this.dish = dish;
-			this.tableId = tableId;
-			this.status = status;
-			if (type == MODE_PAD) {
-				this.padQuantity = quantity;
-				this.phoneQuantity = 0;
-			} else if (type == MODE_PHONE) {
-				this.phoneQuantity = (int) quantity;
-				this.padQuantity = 0;
-			}
-
-		}
-
-		public String getName() {
-			return dish.getName();
-		}
-
-		public int getServedQuantity() {
-			return status;
-		}
-
-		public float getQuantity() {
-			return padQuantity + phoneQuantity;
-		}
-
-		public double getPrice() {
-			return dish.getPrice();
-		}
-
-		public int getDishId() {
-			return dish.getId();
-		}
-
-		public int getStatus() {
-			return status;
-		}
-
-		public void addStatus(int add) {
-			this.status += add;
-		}
-
-		public int getTableId() {
-			return this.tableId;
-		}
-
-		public String getFlavor() {
-			return this.flavor;
-		}
-
-		public void setFlavor(String flavor) {
-			this.flavor = flavor;
-		}
-	}
+	final static int MODE_PAD = 0;
+	protected final static int MODE_PHONE = 1;
+	protected final static int TIME_OUT = -1;
 
 	private CnkDbHelper mCnkDbHelper;
 	protected SQLiteDatabase mDb;
@@ -133,7 +69,7 @@ public class MyOrder {
 				return 0;
 			}
 		}
-		mOrder.add(new OrderedDish(dish, quantity, tableId, status, type));
+		mOrder.add(new OrderedDish(this, dish, quantity, tableId, status, type));
 		return 0;
 	}
 
@@ -145,7 +81,7 @@ public class MyOrder {
 			}
 		}
 
-		mOrder.add(new OrderedDish(dish, quantity, tableId, 1, type));
+		mOrder.add(new OrderedDish(this, dish, quantity, tableId, 1, type));
 		return 0;
 	}
 
@@ -172,7 +108,7 @@ public class MyOrder {
 		return mOrder.size();
 	}
 
-	public int totalQuantity() {
+	public int getTotalQuantity() {
 		int count = 0;
 
 		for (OrderedDish item : mOrder) {
@@ -260,10 +196,6 @@ public class MyOrder {
 		return mOrder.get(position);
 	}
 
-	public int getPhoneQuantity(int position) {
-		return mOrder.get(position).phoneQuantity;
-	}
-
 	public void removeItem(int position) {
 		mOrder.remove(position);
 	}
@@ -281,18 +213,6 @@ public class MyOrder {
 	public void clear() {
 		mOrder.clear();
 		comment = "";
-	}
-
-	public void phoneClear() {
-		for (int i = 0; i < mOrder.size(); i++) {
-			OrderedDish item = (OrderedDish) mOrder.get(i);
-			if (item.padQuantity == 0) {
-				mOrder.remove(item);
-				i--;
-			} else {
-				item.phoneQuantity = 0;
-			}
-		}
 	}
 
 	public void talbeClear() {
@@ -363,18 +283,7 @@ public class MyOrder {
 
 	}
 
-	public void nullServing() {
-		for (int i = 0; i < mOrder.size(); i++) {
-			OrderedDish item = (OrderedDish) mOrder.get(i);
-			mOrder.get(i).padQuantity = item.getQuantity() - item.status;
-			if (mOrder.get(i).padQuantity <= 0) {
-				mOrder.remove(i);
-				i--;
-			}
-		}
-	}
-
-	public static int getPersonsFromServer(int tableId) {
+	public static int loodPersons(int tableId) {
 		String response = Http.get(Server.GET_PERSONS, "TID=" + tableId);
 		if ("null".equals(response)) {
 			Log.w(TAG, "getPersonsFromServer.null");
@@ -471,56 +380,12 @@ public class MyOrder {
 		}
 	}
 
-	public int getPhoneOrderFromServer(int tableId) {
-		talbeClear();
-		String response = Http.get(Server.GET_GETPHONEORDER, "TID=" + tableId);
-		if (response == null) {
-			Log.e(TAG, "getPhoneOrderFromServer.timeOut");
-			return TIME_OUT;
-		} else if ("null".equals(response)) {
-			return RET_NULL_PHONE_ORDER;
-		}
-
-		try {
-			JSONArray tableList = new JSONArray(response);
-			int length = tableList.length();
-			phoneClear();
-			for (int i = 0; i < length; i++) {
-				JSONObject item = tableList.getJSONObject(i);
-				int quantity = item.getInt("quantity");
-				int dishId = item.getInt("dish_id");
-				// int status = item.getInt("status");
-
-				Cursor cur = getDishNameAndPriceFromDB(dishId);
-				String name = cur.getString(0);
-				float dishPrice = cur.getFloat(1);
-				Dish mDish = new Dish(dishId, name, dishPrice, null);
-				addOrder(mDish, quantity, tableId, 0, MODE_PHONE);
-			}
-			return 0;
-		} catch (Exception e) {
-			Log.e(TAG, response);
-			e.printStackTrace();
-		}
-
-		return -1;
-	}
-
 	public String getDishName(int index) {
 		String name = getDishNameFromDB(index);
 		if (name == null) {
 			return "菜名为空";
 		}
 		return name;
-	}
-
-	public int cleanServerPhoneOrder(int tableId) {
-		String phoneOrderPkg = Http.get(Server.DELETE_PHONEORDER, "TID="
-				+ tableId);
-		if (!ErrorPHP.isSucc(phoneOrderPkg, TAG)) {
-			return -1;
-		}
-		return 0;
 	}
 
 	public int submitDelDish(int position, int type) {
@@ -587,36 +452,6 @@ public class MyOrder {
 
 	}
 
-	private int minus(OrderedDish item, float quantity) {
-		if ((item.padQuantity + item.phoneQuantity) > quantity) {
-			if (item.padQuantity > quantity) {
-				item.padQuantity -= quantity;
-				return 0;
-			} else {
-				quantity -= item.padQuantity;
-
-				if (minusPhoneOrderOnServer(Info.getTableId(),
-						item.phoneQuantity - quantity, item.getDishId()) < 0) {
-					return -1;
-				} else {
-					item.phoneQuantity -= quantity;
-					item.padQuantity = 0;
-					return 0;
-				}
-
-			}
-		} else {
-			if (item.phoneQuantity > 0) {
-				if (minusPhoneOrderOnServer(Info.getTableId(), 0,
-						item.getDishId()) < 0) {
-					return -1;
-				}
-			}
-			mOrder.remove(item);
-			return 0;
-		}
-	}
-
 	private String getDishNameFromDB(int id) {
 		Cursor cur = mDb.query(CnkDbHelper.DISH_TABLE_NAME,
 				new String[] { CnkDbHelper.DISH_NAME }, CnkDbHelper.DISH_ID
@@ -628,7 +463,7 @@ public class MyOrder {
 		return null;
 	}
 
-	private Cursor getDishNameAndPriceFromDB(int id) {
+	protected Cursor getDishNameAndPriceFromDB(int id) {
 		Cursor cur = mDb.query(CnkDbHelper.DISH_TABLE_NAME, new String[] {
 				CnkDbHelper.DISH_NAME, CnkDbHelper.DISH_PRICE },
 				CnkDbHelper.DISH_ID + "=" + id, null, null, null, null);
@@ -639,18 +474,21 @@ public class MyOrder {
 		return null;
 	}
 
-	private int delPhoneOrderedDish(int tableId, int dishId) {
-		showServerDelProgress();
-		String phoneOrderedPkg = Http.get(Server.DELETE_PHONEORDER, "TID="
-				+ tableId + "&DID=" + dishId);
-		if (!ErrorPHP.isSucc(phoneOrderedPkg, TAG)) {
-			return -1;
+	private int minus(OrderedDish item, float quantity) {
+		if (item.padQuantity > quantity) {
+			if (item.padQuantity > quantity) {
+				item.padQuantity -= quantity;
+				return 0;
+			} else {
+				quantity -= item.padQuantity;
+			}
+		} else {
+			mOrder.remove(item);
+			return 0;
 		}
-		remove(dishId);
 		return 0;
-
 	}
-
+	
 	private int updateServerServedDish(int tableId, int dishId, int status) {
 		String dishStatusPkg = Http.get(Server.SERVE_ORDER, "TID=" + tableId
 				+ "&DID=" + dishId + "&STATUS=" + status);
@@ -658,21 +496,6 @@ public class MyOrder {
 			return 0;
 		} else {
 			return -1;
-		}
-	}
-
-	private int minusPhoneOrderOnServer(int tableId, float quantity, int dishId) {
-		if (quantity != 0) {
-			showServerDelProgress();
-			String phoneOrderPkg = Http.get(Server.UPDATE_PHONE_ORDER, "DID="
-					+ dishId + "&DNUM=" + quantity + "&TID=" + tableId);
-
-			if (!ErrorPHP.isSucc(phoneOrderPkg, TAG)) {
-				return -1;
-			}
-			return 0;
-		} else {
-			return delPhoneOrderedDish(tableId, dishId);
 		}
 	}
 
@@ -699,6 +522,17 @@ public class MyOrder {
 			mDb.close();
 		}
 		super.finalize();
+	}
+
+	public void removeServedDishes() {
+		for (int i = 0; i < mOrder.size(); i++) {
+			OrderedDish item = (OrderedDish) mOrder.get(i);
+			mOrder.get(i).padQuantity = item.getQuantity() - item.status;
+			if (mOrder.get(i).padQuantity <= 0) {
+				mOrder.remove(i);
+				i--;
+			}
+		}
 	}
 
 }

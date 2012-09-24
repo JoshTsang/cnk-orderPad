@@ -20,7 +20,7 @@ import android.widget.Toast;
 import com.htb.cnk.adapter.MyOrderAdapter;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder;
-import com.htb.cnk.data.MyOrder.OrderedDish;
+import com.htb.cnk.data.OrderedDish;
 import com.htb.cnk.data.Setting;
 
 public class CheckOutActivity extends TableActivity{
@@ -37,13 +37,14 @@ public class CheckOutActivity extends TableActivity{
 	protected EditText mIncomeEdit;
 	protected ListView mMyOrderLst;
 	protected MyOrderAdapter mMyOrderAdapter;
-	
+	protected MyOrder mMyOrder;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.checkout_activity);
 		mCheckOutHandler = checkOutHandler;
 		mTableHandler =  tableHandler;
+		mMyOrder = new MyOrder(CheckOutActivity.this);
 		checkfindViews();
 		setCheckOutView();
 	}
@@ -121,7 +122,9 @@ public class CheckOutActivity extends TableActivity{
 	}
 	
 	private void getTableValue(){
-		getIntent().getDoubleExtra("price", mTotalPrice);
+		Intent intent = new Intent();
+		intent = getIntent();
+		intent.getDoubleExtra("price", mTotalPrice);
 		Log.d("price", "price:"+mTotalPrice);
 		selectedTable = intent.getIntegerArrayListExtra("tableId");
 		tableName = intent.getStringArrayListExtra("tableName");

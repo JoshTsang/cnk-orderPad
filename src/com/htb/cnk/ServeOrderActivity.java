@@ -18,7 +18,7 @@ import android.widget.Toast;
 import com.htb.cnk.adapter.MyOrderAdapter;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder;
-import com.htb.cnk.data.MyOrder.OrderedDish;
+import com.htb.cnk.data.OrderedDish;
 import com.htb.cnk.lib.OrderBaseActivity;
 
 public class ServeOrderActivity extends OrderBaseActivity {

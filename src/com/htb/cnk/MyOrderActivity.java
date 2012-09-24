@@ -17,8 +17,8 @@ import android.widget.TextView;
 
 import com.htb.cnk.adapter.MyOrderAdapter;
 import com.htb.cnk.data.Info;
+import com.htb.cnk.data.OrderedDish;
 import com.htb.cnk.data.TableSetting;
-import com.htb.cnk.data.MyOrder.OrderedDish;
 import com.htb.cnk.lib.OrderBaseActivity;
 import com.htb.constant.ErrorNum;
 import com.htb.constant.Table;

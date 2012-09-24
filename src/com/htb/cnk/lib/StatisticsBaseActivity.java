@@ -44,6 +44,7 @@ public class StatisticsBaseActivity extends BaseActivity {
 	protected TextView mEndDate;
 	protected TextView mEndTime;
 	protected TextView mTableUsage;
+	protected TextView mPersons;
 	protected TextView mTotalAmount;
 	protected ListView mSalesData;
 	protected ProgressDialog mpDialog;
@@ -89,6 +90,7 @@ public class StatisticsBaseActivity extends BaseActivity {
 		mEndDate = (TextView) findViewById(R.id.endDate);
 		mEndTime = (TextView) findViewById(R.id.endTime);
 		mTotalAmount = (TextView) findViewById(R.id.totalAmount);
+		mPersons = (TextView) findViewById(R.id.persons);
 		mSalesData = (ListView) findViewById(R.id.salesData);
 		mTableUsage = (TextView) findViewById(R.id.tableUsage);
 	}
@@ -211,6 +213,7 @@ public class StatisticsBaseActivity extends BaseActivity {
 		mEndDate.setText(date.format(end.getTime()));
 		mEndTime.setText(time.format(end.getTime()));
 		mTableUsage.setText(Integer.toString(mStatistics.getTableUsage()));
+		mPersons.setText(Integer.toString(mStatistics.getServedPersons()));
 		mTotalAmount.setText(MyOrder.convertFloat(mStatistics.getTotalAmount()));
 		mStatisticsAdapter.notifyDataSetChanged();
 	}

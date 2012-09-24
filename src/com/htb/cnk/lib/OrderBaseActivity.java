@@ -23,6 +23,7 @@ import com.htb.cnk.R;
 import com.htb.cnk.adapter.MyOrderAdapter;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder;
+import com.htb.cnk.data.PhoneOrder;
 import com.htb.cnk.data.Setting;
 import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.lib.BaseActivity;
@@ -41,17 +42,20 @@ public class OrderBaseActivity extends BaseActivity {
 	protected TextView mDishCountTxt;
 	protected TextView mTotalPriceTxt;
 	protected ListView mMyOrderLst;
+	protected PhoneOrder mPhoneOrder;
 	protected MyOrder mMyOrder;
 	protected ProgressDialog mpDialog;
 	protected Handler mSubmitHandler;
 	protected MyOrderAdapter mMyOrderAdapter;
 	protected int persons;
 	private TableSetting mSettings;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.myorder_activity);
-		mMyOrder = new MyOrder(OrderBaseActivity.this);
+		mPhoneOrder = new PhoneOrder(OrderBaseActivity.this);
+		mMyOrder = (MyOrder)mPhoneOrder;
 		mSettings = new TableSetting();
 		mpDialog = new ProgressDialog(OrderBaseActivity.this);
 		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -69,7 +73,7 @@ public class OrderBaseActivity extends BaseActivity {
 	public void getPersons() {
 		new Thread() {
 			public void run() {
-				int ret = mMyOrder.getPersonsFromServer(Info.getTableId());
+				int ret = mMyOrder.loodPersons(Info.getTableId());
 				if (ret < 0) {
 					persons = 0;
 				} else {
@@ -117,7 +121,7 @@ public class OrderBaseActivity extends BaseActivity {
 
 	protected void updateTabelInfos() {
 		DecimalFormat format = new DecimalFormat("#.00");
-		mDishCountTxt.setText(Integer.toString(mMyOrder.totalQuantity())
+		mDishCountTxt.setText(Integer.toString(mMyOrder.getTotalQuantity())
 				+ " 道菜");
 		mTotalPriceTxt
 				.setText(format.format(mMyOrder.getTotalPrice()) + " 元");

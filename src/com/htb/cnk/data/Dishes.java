@@ -19,6 +19,11 @@ import com.htb.constant.Server;
  */
 public class Dishes {
 
+	final static int ID_COLUMN = 0;
+	final static int NAME_COLUMN = 1;
+	final static int PRICE_COLUMN = 2;
+	final static int PIC_COLUMN = 3;
+	
 	private List<Dish> mDishes = new ArrayList<Dish>();
 	private List<Integer> mSoldOutItemsId = new ArrayList<Integer>();
 	private int mCategoryId;
@@ -26,11 +31,6 @@ public class Dishes {
 	private CnkDbHelper mCnkDbHelper;
 	private SQLiteDatabase mDb;
 	private Context mContext;
-
-	final static int ID_COLUMN = 0;
-	final static int NAME_COLUMN = 1;
-	final static int PRICE_COLUMN = 2;
-	final static int PIC_COLUMN = 3;
 
 	public Dishes(Context context) {
 		mContext = context;
@@ -104,7 +104,7 @@ public class Dishes {
 
 	private int removeSoldOutItems(int id) {
 		int ret;
-		ret = getSoldItemsFromSever(id);
+		ret = loadSoldOutItems(id);
 		if (ret < 0) {
 			return ret;
 		}
@@ -121,7 +121,7 @@ public class Dishes {
 		return 0;
 	}
 
-	private int getSoldItemsFromSever(int id) {
+	private int loadSoldOutItems(int id) {
 		String dishStatusPkg = Http.get(Server.GET_DISH_STATUS, "CID="
 				+ Integer.toString(id));
 
