@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -20,10 +21,6 @@ import com.htb.cnk.data.OrderedDish;
 import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.lib.OrderBaseActivity;
 
-/**
- * @author josh
- * 
- */
 public class PhoneActivity extends OrderBaseActivity {
 
 	@Override
@@ -161,6 +158,7 @@ public class PhoneActivity extends OrderBaseActivity {
 		new Thread() {
 			public void run() {
 				int ret = mPhoneOrder.minus(position, -quantity);
+				Log.d("mins", "ret:"+ret);
 				delPhoneOrderhandler.sendEmptyMessage(ret);
 			}
 		}.start();
@@ -317,7 +315,7 @@ public class PhoneActivity extends OrderBaseActivity {
 					updateTabelInfos();
 					break;
 				default:
-					showProgressDlg("正在删除...");
+					break;
 				}
 			}
 		}

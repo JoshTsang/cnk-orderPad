@@ -78,7 +78,6 @@ public class CheckOutActivity extends TableActivity{
 	
 	Handler tableHandler = new Handler() {
 		public void handleMessage(Message msg) {
-			mpDialog.cancel();
 		}
 	};
 	

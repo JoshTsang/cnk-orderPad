@@ -27,7 +27,7 @@ import com.htb.constant.Table;
  * @author josh
  * 
  */
-public class MyOrderActivity extends OrderBaseActivity {	
+public class MyOrderActivity extends OrderBaseActivity {
 	private TableSetting mSettings = new TableSetting();
 
 	@Override
@@ -37,7 +37,7 @@ public class MyOrderActivity extends OrderBaseActivity {
 		fillOrderData();
 		setOrderClickListener();
 		mSubmitHandler = handler;
-		
+
 	}
 
 	private void setOrderViews() {
@@ -105,16 +105,7 @@ public class MyOrderActivity extends OrderBaseActivity {
 										int which) {
 									updateDishQuantity(position, -quantity);
 								}
-							})
-					.setNegativeButton("取消",
-							new DialogInterface.OnClickListener() {
-
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
-
-								}
-							}).show();
+							}).setNegativeButton("取消", null).show();
 		}
 	}
 
@@ -146,17 +137,16 @@ public class MyOrderActivity extends OrderBaseActivity {
 			minusDishQuantity(position, 5);
 		}
 	};
-	
+
 	private OnLongClickListener quantityClicked = new OnLongClickListener() {
 
 		@Override
 		public boolean onLongClick(View v) {
-			final int position = Integer
-					.parseInt(v.getTag().toString());
+			final int position = Integer.parseInt(v.getTag().toString());
 			showUpdateQuantityDlg(position);
 			return false;
 		}
-		
+
 	};
 
 	Handler handler = new Handler() {
@@ -174,8 +164,9 @@ public class MyOrderActivity extends OrderBaseActivity {
 			new Thread() {
 				public void run() {
 					try {
-						int ret = updateStatus(Info.getTableId(),TableSetting.MY_ORDER); 
-						if(ret < 0){
+						int ret = updateStatus(Info.getTableId(),
+								TableSetting.MY_ORDER);
+						if (ret < 0) {
 							handler.sendEmptyMessage(ret);
 						}
 					} catch (Exception e) {
@@ -233,8 +224,8 @@ public class MyOrderActivity extends OrderBaseActivity {
 		TextView dishQuantity;
 		Button plusBtn;
 		Button minusBtn;
-		//Button plus5Btn;
-		//Button minus5Btn;
+		// Button plus5Btn;
+		// Button minus5Btn;
 		Button flavorBtn;
 
 		public ItemViewHolder(View convertView) {
@@ -244,8 +235,8 @@ public class MyOrderActivity extends OrderBaseActivity {
 					.findViewById(R.id.dishQuantity);
 			plusBtn = (Button) convertView.findViewById(R.id.dishPlus);
 			minusBtn = (Button) convertView.findViewById(R.id.dishMinus);
-			//plus5Btn = (Button) convertView.findViewById(R.id.dishPlus5);
-			//minus5Btn = (Button) convertView.findViewById(R.id.dishMinus5);
+			// plus5Btn = (Button) convertView.findViewById(R.id.dishPlus5);
+			// minus5Btn = (Button) convertView.findViewById(R.id.dishMinus5);
 			flavorBtn = (Button) convertView.findViewById(R.id.flavor);
 		}
 
@@ -258,16 +249,16 @@ public class MyOrderActivity extends OrderBaseActivity {
 					updateDishQuantity(position, 1);
 				}
 			});
-//			plus5Btn.setOnClickListener(new OnClickListener() {
-//
-//				public void onClick(View v) {
-//					final int position = Integer
-//							.parseInt(v.getTag().toString());
-//					updateDishQuantity(position, 5);
-//				}
-//			});
+			// plus5Btn.setOnClickListener(new OnClickListener() {
+			//
+			// public void onClick(View v) {
+			// final int position = Integer
+			// .parseInt(v.getTag().toString());
+			// updateDishQuantity(position, 5);
+			// }
+			// });
 			minusBtn.setOnClickListener(minusClicked);
-//			minus5Btn.setOnClickListener(minus5Clicked);
+			// minus5Btn.setOnClickListener(minus5Clicked);
 			flavorBtn.setOnClickListener(flavorClicked);
 			dishQuantity.setOnLongClickListener(quantityClicked);
 		}
@@ -275,8 +266,8 @@ public class MyOrderActivity extends OrderBaseActivity {
 		public void setTag(int position) {
 			plusBtn.setTag(position);
 			minusBtn.setTag(position);
-//			plus5Btn.setTag(position);
-//			minus5Btn.setTag(position);
+			// plus5Btn.setTag(position);
+			// minus5Btn.setTag(position);
 			flavorBtn.setTag(position);
 			dishQuantity.setTag(position);
 		}
@@ -284,7 +275,8 @@ public class MyOrderActivity extends OrderBaseActivity {
 		public void fillData(OrderedDish dishDetail) {
 			dishName.setText(dishDetail.getName());
 			dishPrice.setText(Double.toString(dishDetail.getPrice()) + " 元/份");
-			dishQuantity.setText(mPhoneOrder.convertFloat(dishDetail.getQuantity()));
+			dishQuantity.setText(mPhoneOrder.convertFloat(dishDetail
+					.getQuantity()));
 		}
 	}
 }

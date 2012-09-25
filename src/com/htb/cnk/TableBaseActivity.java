@@ -15,6 +15,7 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -151,7 +152,6 @@ public class TableBaseActivity extends BaseActivity {
 	};
 	
 	protected void setTableInfos() {
-	
 		if (lstImageItem.size() > 0) {
 			setStatusAndIcon();
 		} else {
@@ -169,6 +169,7 @@ public class TableBaseActivity extends BaseActivity {
 	}
 
 	private void setStatusAndIcon() {
+		lstImageItem.clear();
 		for (int i = 0, n = 0; i < mSettings.size(); i++) {
 			int status = mSettings.getStatus(i);
 			if (status < Table.NOTIFICATION_STATUS
