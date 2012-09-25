@@ -7,21 +7,15 @@ import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.method.ScrollingMovementMethod;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.htb.cnk.adapter.MyOrderAdapter;
-import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder;
-import com.htb.cnk.data.OrderedDish;
 import com.htb.cnk.data.Setting;
 
 public class CheckOutActivity extends TableActivity{
@@ -96,7 +90,6 @@ public class CheckOutActivity extends TableActivity{
 	private void getTableValue(){
 		Bundle bundle = checkOutIntent.getExtras();
 		mTotalPrice = bundle.getDouble("price");
-		Log.d("price", "price:"+mTotalPrice);
 		selectedTable = bundle.getIntegerArrayList("tableId");
 		tableName = bundle.getStringArrayList("tableName");
 	}
@@ -118,22 +111,29 @@ public class CheckOutActivity extends TableActivity{
 		}
 
 	};
+	
 	TextWatcher watcher = new TextWatcher() {
+
 		String tempStr;
 
 		@Override
 		public void onTextChanged(CharSequence s, int start, int before,
 				int count) {
 			tempStr = s.toString();
-		}
-
-		@Override
-		public void afterTextChanged(Editable arg0) {
+			if(tempStr.indexOf("0") == 0){
+				tempStr = tempStr.substring(1,tempStr.length());
+				mIncomeEdit.setText(tempStr);
+			} 
 			if (tempStr.length() > 0) {
 				mIncome = Double.valueOf(tempStr).doubleValue();
 				mChange = mIncome - mTotalPrice;
 				mChangeText.setText(String.valueOf(mChange));
 			}
+		}
+
+		@Override
+		public void afterTextChanged(Editable arg0) {
+			
 		}
 
 		@Override

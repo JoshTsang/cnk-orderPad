@@ -40,6 +40,8 @@ public class TableClickActivity extends TableBaseActivity {
 	protected List<Integer> selectedTable = new ArrayList<Integer>();
 	protected double mIncome;
 	protected double mChange;
+	protected EditText tableIdEdit;
+	protected EditText personsEdit;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -243,8 +245,6 @@ public class TableClickActivity extends TableBaseActivity {
 
 	private Builder changeTableDialog(final int type) {
 		final AlertDialog.Builder changeTableAlertDialog = alertDialogBuilder(false);
-		final EditText tableIdEdit;
-		final EditText personsEdit;
 		View layout = getDialogLayout(R.layout.change_dialog, R.id.change);
 		personsEdit = (EditText) layout.findViewById(R.id.personsEdit);
 		if (Setting.enabledPersons()) {
@@ -254,6 +254,8 @@ public class TableClickActivity extends TableBaseActivity {
 			tableIdEdit = editTextListener();
 			changeTableAlertDialog.setView(tableIdEdit);
 		}
+		tableIdEdit.addTextChangedListener(watcher(tableIdEdit));
+		personsEdit.addTextChangedListener(watcher(personsEdit));
 		changeTableAlertDialog.setTitle("请输入");
 		changeTableAlertDialog.setPositiveButton("确定",
 				new DialogInterface.OnClickListener() {
@@ -269,7 +271,7 @@ public class TableClickActivity extends TableBaseActivity {
 						}
 						if (type == CHANGE_DIALOG) {
 							judgeChangeTable(changePersons, changeTId);
-						}else if(type == COMBINE_DIALOG){
+						} else if (type == COMBINE_DIALOG) {
 							judgeCombineTable(changePersons, changeTId);
 						}
 					}
@@ -281,6 +283,7 @@ public class TableClickActivity extends TableBaseActivity {
 	private Builder copyTableDialog() {
 		final EditText copyTableText = editTextListener();
 		final AlertDialog.Builder copyTableAlertDialog = alertDialogBuilder(false);
+		copyTableText.addTextChangedListener(watcher(copyTableText));
 		copyTableAlertDialog.setTitle("请输入");
 		copyTableAlertDialog.setView(copyTableText);
 		copyTableAlertDialog.setPositiveButton("确定",
@@ -324,7 +327,7 @@ public class TableClickActivity extends TableBaseActivity {
 		final List<Integer> tableId = new ArrayList<Integer>();
 		final List<String> tableNameStr = new ArrayList<String>();
 		final AlertDialog.Builder checkOutAlertDialog = alertDialogBuilder(false);
-		if(checkOut.size() <= 0){
+		if (checkOut.size() <= 0) {
 			checkOutAlertDialog.setMessage("还没有桌子开台");
 			checkOutAlertDialog.setPositiveButton("确认", null);
 			return checkOutAlertDialog;
@@ -369,55 +372,59 @@ public class TableClickActivity extends TableBaseActivity {
 		return checkOutAlertDialog;
 	}
 
-	protected Builder checkOutSubmitDialog() {
-		final AlertDialog.Builder changeTableAlertDialog = alertDialogBuilder(false);
-		View layout = getDialogLayout(R.layout.checkout_dialog, R.id.check_out);
-		TextView receivableText = (TextView) layout
-				.findViewById(R.id.receivableQuan);
-		final EditText incomeEdit = (EditText) layout
-				.findViewById(R.id.incomeEdit);
-		final TextView changeText = (TextView) layout
-				.findViewById(R.id.changeQuan);
-		TextWatcher watcher = new TextWatcher() {
-			String tempStr;
-
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before,
-					int count) {
-				tempStr = s.toString();
-			}
-
-			@Override
-			public void afterTextChanged(Editable arg0) {
-				if (tempStr.length() > 0) {
-					mIncome = Double.valueOf(tempStr).doubleValue();
-					mChange = mIncome - mTotalPrice;
-					changeText.setText(String.valueOf(mChange));
-				}
-			}
-
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count,
-					int after) {
-			}
-
-		};
-		incomeEdit.addTextChangedListener(watcher);
-		receivableText.setText(String.valueOf(mTotalPrice));
-		changeTableAlertDialog.setView(layout);
-		changeTableAlertDialog.setTitle("请输入");
-		changeTableAlertDialog.setPositiveButton("确定",
-				new DialogInterface.OnClickListener() {
-
-					@Override
-					public void onClick(DialogInterface dialog, int i) {
-						checkOut(selectedTable, tableName, mTotalPrice,
-								mIncome, mChange);
-					}
-				});
-		changeTableAlertDialog.setNegativeButton("取消", null);
-		return changeTableAlertDialog;
-	}
+	// protected Builder checkOutSubmitDialog() {
+	// final AlertDialog.Builder changeTableAlertDialog =
+	// alertDialogBuilder(false);
+	// View layout = getDialogLayout(R.layout.checkout_dialog, R.id.check_out);
+	// TextView receivableText = (TextView) layout
+	// .findViewById(R.id.receivableQuan);
+	// final EditText incomeEdit = (EditText) layout
+	// .findViewById(R.id.incomeEdit);
+	// final TextView changeText = (TextView) layout
+	// .findViewById(R.id.changeQuan);
+	// TextWatcher watcher = new TextWatcher() {
+	// String tempStr;
+	//
+	// @Override
+	// public void onTextChanged(CharSequence s, int start, int before,
+	// int count) {
+	// tempStr = s.toString();
+	// if (tempStr.indexOf(0) == 0) {
+	// tempStr = tempStr.substring(0);
+	// }
+	// }
+	//
+	// @Override
+	// public void afterTextChanged(Editable arg0) {
+	// if (tempStr.length() > 0) {
+	// mIncome = Double.valueOf(tempStr).doubleValue();
+	// mChange = mIncome - mTotalPrice;
+	// changeText.setText(String.valueOf(mChange));
+	// }
+	// }
+	//
+	// @Override
+	// public void beforeTextChanged(CharSequence s, int start, int count,
+	// int after) {
+	// }
+	//
+	// };
+	// incomeEdit.addTextChangedListener(watcher);
+	// receivableText.setText(String.valueOf(mTotalPrice));
+	// changeTableAlertDialog.setView(layout);
+	// changeTableAlertDialog.setTitle("请输入");
+	// changeTableAlertDialog.setPositiveButton("确定",
+	// new DialogInterface.OnClickListener() {
+	//
+	// @Override
+	// public void onClick(DialogInterface dialog, int i) {
+	// checkOut(selectedTable, tableName, mTotalPrice,
+	// mIncome, mChange);
+	// }
+	// });
+	// changeTableAlertDialog.setNegativeButton("取消", null);
+	// return changeTableAlertDialog;
+	// }
 
 	private AlertDialog.Builder alertDialogBuilder(boolean cancelable) {
 		final AlertDialog.Builder alertDialog = new AlertDialog.Builder(
@@ -499,7 +506,7 @@ public class TableClickActivity extends TableBaseActivity {
 			public void run() {
 				try {
 					double ret = mSettings.getTotalPriceTable(
-							TableClickActivity.this, selectedTable,tableName);
+							TableClickActivity.this, selectedTable, tableName);
 					mTotalPriceTableHandler.sendEmptyMessage((int) ret);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -569,7 +576,7 @@ public class TableClickActivity extends TableBaseActivity {
 			}
 		}.start();
 	}
-	
+
 	private int getTableStatusFromServer() {
 		int ret = mSettings.getTableStatusFromServer();
 		if (ret < 0) {
@@ -577,7 +584,7 @@ public class TableClickActivity extends TableBaseActivity {
 		}
 		return ret;
 	}
-	
+
 	private boolean isNameMinimum(int tId) {
 		return tId >= Integer.parseInt(mSettings.getNameIndex(0));
 	}
@@ -588,13 +595,14 @@ public class TableClickActivity extends TableBaseActivity {
 	}
 
 	private boolean isStatusLegal(String changeTId, int status) {
+		Log.d("a", changeTId);
 		return mSettings.getStatusTableId(mSettings.getId(changeTId)) == status;
 	}
 
 	private boolean isBoundaryLegal(String changeTId, int status) {
 		int tId = Integer.parseInt(changeTId);
 		return isNameMinimum(tId) && isNameMaximum(tId)
-				&& isStatusLegal(changeTId, status);
+				&& isStatusLegal(String.valueOf(tId), status);
 	}
 
 	private int getNotifiycations() {
@@ -614,7 +622,7 @@ public class TableClickActivity extends TableBaseActivity {
 			toastText(R.string.changeTIdWarning);
 		}
 	}
-	
+
 	private void judgeCombineTable(String changePersons, String changeTId)
 			throws NumberFormatException {
 		if (changeTId.equals("") || changePersons.equals("")) {
@@ -626,13 +634,39 @@ public class TableClickActivity extends TableBaseActivity {
 			toastText(R.string.combineTIdWarning);
 		}
 	}
- 
-	/**
-	 * 
-	 */
+
+	public TextWatcher watcher(final EditText id) {
+		TextWatcher watcher = new TextWatcher() {
+			String tempStr;
+			EditText edit;
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before,
+					int count) {
+				tempStr = s.toString();
+				if (tempStr.indexOf("0") == 0) {
+					tempStr = tempStr.substring(1, tempStr.length());
+					edit = id;
+					edit.setText(tempStr);
+				}
+			}
+
+			@Override
+			public void afterTextChanged(Editable arg0) {
+
+			}
+
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count,
+					int after) {
+			}
+
+		};
+		return watcher;
+	}
+
 	protected void setClassToActivity(Class<?> setClass) {
-		intent.setClass(TableClickActivity.this,
-				setClass);
+		intent.setClass(TableClickActivity.this, setClass);
 		TableClickActivity.this.startActivity(intent);
 	}
 
@@ -719,5 +753,5 @@ public class TableClickActivity extends TableBaseActivity {
 			}
 		}
 	}
-	
+
 }
