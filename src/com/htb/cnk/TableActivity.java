@@ -9,7 +9,6 @@ import android.os.Message;
 import android.util.Log;
 
 import com.htb.cnk.data.Info;
-import com.htb.cnk.data.Setting;
 
 public class TableActivity extends TableClickActivity {
 
@@ -27,7 +26,6 @@ public class TableActivity extends TableClickActivity {
 		mTotalPriceTableHandler = totalPriceTableHandler;
 		mChangeTIdHandler = changeTIdHandler;
 		mCopyTIdHandler = copyTIdHandler;
-//		mCheckOutHandler = checkOutHandler;
 		mCombineTIdHandler = combineTIdHandler;
 	}
 
@@ -110,24 +108,6 @@ public class TableActivity extends TableClickActivity {
 		}
 	};
 
-//	Handler checkOutHandler = new Handler() {
-//		public void handleMessage(Message msg) {
-//			if (msg.what == -2) {
-//				toastText(R.string.checkOutWarning);
-//			} else if (msg.what == -1) {
-//				netWorkDialogShow("收银出错，请检查连接网络重试");
-//			} else if (isPrinterError(msg)) {
-//				toastText("退菜订单失败");
-//			} else {
-//				if (Setting.enabledCleanTableAfterCheckout()) {
-//					cleanTableThread(selectedTable);
-//				} else {
-//					binderStart();
-//					toastText(R.string.checkOutSucc);
-//				}
-//			}
-//		}
-//	};
 	
 	Handler combineTIdHandler = new Handler() {
 		public void handleMessage(Message msg) {

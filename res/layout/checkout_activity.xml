@@ -147,15 +147,14 @@
                 android:textColor="#652A25"
                 android:textSize="22sp" />
         </RelativeLayout>
-
-        <ListView
-            android:id="@+id/myOrderList"
-            android:layout_width="fill_parent"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="10dip"
-            android:divider="#DECFBB"
-            android:dividerHeight="1dip" >
-        </ListView>
+        <TextView
+            	android:id="@+id/checkOutPrinter"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:textColor="#652A25"
+                android:scrollbars="vertical"  
+   				android:singleLine="false"    
+                android:textSize="30dip"/>
     </LinearLayout>
 
 </LinearLayout>
