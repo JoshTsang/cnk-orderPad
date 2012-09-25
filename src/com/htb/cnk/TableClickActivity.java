@@ -323,13 +323,18 @@ public class TableClickActivity extends TableBaseActivity {
 		ArrayList<HashMap<String, Object>> checkOut = mSettings.getCombine();
 		final List<Integer> tableId = new ArrayList<Integer>();
 		final List<String> tableNameStr = new ArrayList<String>();
+		final AlertDialog.Builder checkOutAlertDialog = alertDialogBuilder(false);
+		if(checkOut.size() <= 0){
+			checkOutAlertDialog.setMessage("还没有桌子开台");
+			checkOutAlertDialog.setPositiveButton("确认", null);
+			return checkOutAlertDialog;
+		}
 		for (HashMap<String, Object> item : checkOut) {
 			tableNameStr.add(item.get("name").toString());
 			tableId.add(item.get("id").hashCode());
 		}
 		final int size = mSettings.size();
 		final boolean selected[] = new boolean[size];
-		final AlertDialog.Builder checkOutAlertDialog = alertDialogBuilder(false);
 		checkOutAlertDialog.setTitle("请选择桌号");
 		checkOutAlertDialog.setMultiChoiceItems(
 				(String[]) tableNameStr.toArray(new String[0]), null,
@@ -494,7 +499,7 @@ public class TableClickActivity extends TableBaseActivity {
 			public void run() {
 				try {
 					double ret = mSettings.getTotalPriceTable(
-							TableClickActivity.this, selectedTable);
+							TableClickActivity.this, selectedTable,tableName);
 					mTotalPriceTableHandler.sendEmptyMessage((int) ret);
 				} catch (Exception e) {
 					e.printStackTrace();

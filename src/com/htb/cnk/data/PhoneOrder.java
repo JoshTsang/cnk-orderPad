@@ -106,6 +106,11 @@ public class PhoneOrder extends MyOrder {
 				}
 			}
 
+	public int minus(int position, float quantity) {
+		OrderedDish item = mOrder.get(position);
+		return minus(item, quantity);
+	}
+	
 	private int minus(OrderedDish item, float quantity) {
 		if ((item.padQuantity + item.phoneQuantity) > quantity) {
 			if (item.padQuantity > quantity) {

@@ -9,10 +9,10 @@ import android.os.Message;
 import android.util.Log;
 
 import com.htb.cnk.data.Info;
-import com.htb.cnk.data.Setting;
 
 public class TableActivity extends TableClickActivity {
 
+	static final String TAG= "TablesActivity";
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -26,7 +26,6 @@ public class TableActivity extends TableClickActivity {
 		mTotalPriceTableHandler = totalPriceTableHandler;
 		mChangeTIdHandler = changeTIdHandler;
 		mCopyTIdHandler = copyTIdHandler;
-//		mCheckOutHandler = checkOutHandler;
 		mCombineTIdHandler = combineTIdHandler;
 	}
 
@@ -65,12 +64,15 @@ public class TableActivity extends TableClickActivity {
 				if (mTotalPrice <= 0) {
 					toastText("菜品为空，请点菜！");
 				} else {
-					intent = new Intent();
-					intent.putExtra("price", mTotalPrice);
-					intent.putIntegerArrayListExtra("tableId", (ArrayList<Integer>) selectedTable);
-					intent.putStringArrayListExtra("tableName", (ArrayList<String>) tableName);
-					intent.setClass(TableActivity.this, CheckOutActivity.class);
-					TableActivity.this.startActivity(intent);  
+					Intent checkOutIntent = new Intent();
+					Bundle bundle =new Bundle();
+					Log.d(TAG, "price:" + mTotalPrice);
+	                bundle.putDouble("price", mTotalPrice);
+	                bundle.putIntegerArrayList("tableId", (ArrayList<Integer>) selectedTable);
+	                bundle.putStringArrayList("tableName", (ArrayList<String>) tableName);
+	                checkOutIntent.putExtras(bundle); 
+					checkOutIntent.setClass(TableActivity.this, CheckOutActivity.class);
+					TableActivity.this.startActivity(checkOutIntent);  
 				}
 			}
 			mpDialog.cancel();
@@ -106,24 +108,6 @@ public class TableActivity extends TableClickActivity {
 		}
 	};
 
-//	Handler checkOutHandler = new Handler() {
-//		public void handleMessage(Message msg) {
-//			if (msg.what == -2) {
-//				toastText(R.string.checkOutWarning);
-//			} else if (msg.what == -1) {
-//				netWorkDialogShow("收银出错，请检查连接网络重试");
-//			} else if (isPrinterError(msg)) {
-//				toastText("退菜订单失败");
-//			} else {
-//				if (Setting.enabledCleanTableAfterCheckout()) {
-//					cleanTableThread(selectedTable);
-//				} else {
-//					binderStart();
-//					toastText(R.string.checkOutSucc);
-//				}
-//			}
-//		}
-//	};
 	
 	Handler combineTIdHandler = new Handler() {
 		public void handleMessage(Message msg) {

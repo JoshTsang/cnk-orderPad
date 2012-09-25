@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,15 +34,18 @@ public class CheckOutActivity extends TableActivity{
 	protected TextView mDishCountTxt;
 	protected TextView mTotalPriceTxt;
 	protected TextView mReceivableText;
+	protected TextView mCheckOutPrinte;
 	protected TextView mChangeText;
 	protected EditText mIncomeEdit;
 	protected ListView mMyOrderLst;
 	protected MyOrderAdapter mMyOrderAdapter;
 	protected MyOrder mMyOrder;
+	private Intent checkOutIntent ;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.checkout_activity);
+		checkOutIntent = this.getIntent();
 		mCheckOutHandler = checkOutHandler;
 		mTableHandler =  tableHandler;
 		mMyOrder = new MyOrder(CheckOutActivity.this);
@@ -62,10 +66,10 @@ public class CheckOutActivity extends TableActivity{
 		mReceivableText = (TextView)findViewById(R.id.receivableQuan);
 		mIncomeEdit = (EditText)findViewById(R.id.incomeEdit);
 		mChangeText = (TextView)findViewById(R.id.changeQuan);
+		mCheckOutPrinte = (TextView) findViewById(R.id.checkOutPrinter);
 	}
 	
 	private void setCheckOutView(){
-		getTableValue();
 		mSubmitBtn.setText("结账");
 		mLeftBtn.setVisibility(View.GONE);
 		mRefreshBtn.setVisibility(View.GONE);
@@ -73,6 +77,8 @@ public class CheckOutActivity extends TableActivity{
 		mBackBtn.setOnClickListener(backBtnClicked);
 		mSubmitBtn.setOnClickListener(submitClicked);
 		mIncomeEdit.addTextChangedListener(watcher);
+		mCheckOutPrinte.setMovementMethod(ScrollingMovementMethod.getInstance());
+		getTableValue();
 		updateTabelInfos();
 	}
 	
@@ -82,53 +88,17 @@ public class CheckOutActivity extends TableActivity{
 		}
 	};
 	
-	private void setAdapter() {
-		mMyOrderAdapter = new MyOrderAdapter(this, mMyOrder) {
-			@Override
-			public View getView(int position, View convertView, ViewGroup arg2) {
-				TextView dishName;
-				TextView dishPrice;
-				TextView dishQuantity;
-				TextView dishServedQuantity;
-				if (convertView == null) {
-					convertView = LayoutInflater.from(CheckOutActivity.this)
-							.inflate(R.layout.item_checkout, null);
-				}
-				OrderedDish dishDetail = mMyOrder.getOrderedDish(position);
-
-				dishName = (TextView) convertView.findViewById(R.id.dishName);
-				dishPrice = (TextView) convertView.findViewById(R.id.dishPrice);
-				dishServedQuantity = (TextView) convertView
-						.findViewById(R.id.dishServedQuantity);
-				dishQuantity = (TextView) convertView
-						.findViewById(R.id.dishQuantity);
-
-				dishName.setText(dishDetail.getName());
-
-				dishPrice.setText(Double.toString(dishDetail.getPrice())
-						+ " 元/份");
-				dishQuantity
-						.setText(MyOrder.convertFloat(dishDetail.getQuantity()));
-				dishServedQuantity.setText(Integer.toString(dishDetail.getServedQuantity()));
-				return convertView;
-			}
-		};
-		mMyOrderLst.setAdapter(mMyOrderAdapter);
-	}
-	
 	private void updateTabelInfos() {
-		Log.d("price", "price:"+mTotalPrice);
+		mCheckOutPrinte.setText(mSettings.checkOutJson());
 		mReceivableText.setText(String.valueOf(mTotalPrice));
 	}
 	
 	private void getTableValue(){
-		Intent intent = new Intent();
-		intent = getIntent();
-		intent.getDoubleExtra("price", mTotalPrice);
+		Bundle bundle = checkOutIntent.getExtras();
+		mTotalPrice = bundle.getDouble("price");
 		Log.d("price", "price:"+mTotalPrice);
-		selectedTable = intent.getIntegerArrayListExtra("tableId");
-		tableName = intent.getStringArrayListExtra("tableName");
-//		Log.d("getTableValue", "id0: "+selectedTable.toString()  +" tableName0: "+tableName.toString());
+		selectedTable = bundle.getIntegerArrayList("tableId");
+		tableName = bundle.getStringArrayList("tableName");
 	}
 
 	private OnClickListener backBtnClicked = new OnClickListener() {
@@ -173,36 +143,6 @@ public class CheckOutActivity extends TableActivity{
 
 	};
 	
-	protected void queryThread() {
-		new Thread() {
-			public void run() {
-				try {
-					int ret = mMyOrder.getOrderFromServer(Info.getTableId());
-					queryHandler.sendEmptyMessage(ret);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}.start();
-	}
-	
-	Handler queryHandler = new Handler() {
-		public void handleMessage(Message msg) {
-			mpDialog.cancel();
-			if (msg.what == -2) {
-				Toast.makeText(getApplicationContext(),
-						getResources().getString(R.string.delWarning),
-						Toast.LENGTH_SHORT).show();
-			} else if (msg.what == -1) {
-				netWorkDialogShow("查询菜品失败，请检查连接网络重试");
-			} else {
-				setAdapter();
-				mMyOrderAdapter.notifyDataSetChanged();
-				updateTabelInfos();
-			}
-			
-		}
-	};
 	
 	Handler checkOutHandler = new Handler() {
 		public void handleMessage(Message msg) {
@@ -217,8 +157,9 @@ public class CheckOutActivity extends TableActivity{
 					cleanTableThread(selectedTable);
 				} else {
 					binderStart();
-					toastText(R.string.checkOutSucc);
 				}
+				toastText(R.string.checkOutSucc);
+				finish();
 			}
 		}
 	};

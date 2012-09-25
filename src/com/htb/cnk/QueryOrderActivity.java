@@ -55,7 +55,7 @@ public class QueryOrderActivity extends OrderBaseActivity {
 	}
 
 	private void setAdapter() {
-		mMyOrderAdapter = new MyOrderAdapter(this, mMyOrder) {
+		mMyOrderAdapter = new MyOrderAdapter(this, mPhoneOrder) {
 			@Override
 			public View getView(int position, View convertView, ViewGroup arg2) {
 				TextView dishName;
@@ -66,7 +66,7 @@ public class QueryOrderActivity extends OrderBaseActivity {
 					convertView = LayoutInflater.from(QueryOrderActivity.this)
 							.inflate(R.layout.item_queryorder, null);
 				}
-				OrderedDish dishDetail = mMyOrder.getOrderedDish(position);
+				OrderedDish dishDetail = mPhoneOrder.getOrderedDish(position);
 
 				dishName = (TextView) convertView.findViewById(R.id.dishName);
 				dishPrice = (TextView) convertView.findViewById(R.id.dishPrice);
@@ -130,7 +130,7 @@ public class QueryOrderActivity extends OrderBaseActivity {
 		new Thread() {
 			public void run() {
 				try {
-					int ret = mMyOrder.getOrderFromServer(Info.getTableId());
+					int ret = mPhoneOrder.getOrderFromServer(Info.getTableId());
 					queryHandler.sendEmptyMessage(ret);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -170,7 +170,7 @@ public class QueryOrderActivity extends OrderBaseActivity {
 	
 	@Override
 	public void finish() {
-		mMyOrder.clear();
+		mPhoneOrder.clear();
 		super.finish();
 	}
 

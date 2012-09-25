@@ -12,17 +12,13 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.htb.cnk.adapter.MyOrderAdapter;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.OrderedDish;
 import com.htb.cnk.data.TableSetting;
-import com.htb.cnk.data.TableSetting.TableSettingItem;
 import com.htb.cnk.lib.OrderBaseActivity;
-import com.htb.constant.ErrorNum;
-import com.htb.constant.Table;
 
 /**
  * @author josh
@@ -63,11 +59,11 @@ public class PhoneActivity extends OrderBaseActivity {
 
 	private MyOrderAdapter getMyOrderAdapterInstance() {
 
-		return new MyOrderAdapter(this, mMyOrder) {
+		return new MyOrderAdapter(this, mPhoneOrder) {
 			@Override
 			public View getView(int position, View convertView, ViewGroup arg2) {
 				viewHolder1 holder1;
-				OrderedDish dishDetail = mMyOrder.getOrderedDish(position);
+				OrderedDish dishDetail = mPhoneOrder.getOrderedDish(position);
 
 				if (convertView == null) {
 					convertView = LayoutInflater.from(PhoneActivity.this)
@@ -154,7 +150,7 @@ public class PhoneActivity extends OrderBaseActivity {
 		if (quantity < 0) {
 			minusThread(position, quantity);
 		} else {
-			mMyOrder.add(position, quantity);
+			mPhoneOrder.add(position, quantity);
 			mMyOrderAdapter.notifyDataSetChanged();
 			updateTabelInfos();
 		}
@@ -164,7 +160,7 @@ public class PhoneActivity extends OrderBaseActivity {
 	private void minusThread(final int position, final int quantity) {
 		new Thread() {
 			public void run() {
-				int ret = mMyOrder.minus(position, -quantity);
+				int ret = mPhoneOrder.minus(position, -quantity);
 				delPhoneOrderhandler.sendEmptyMessage(ret);
 			}
 		}.start();
@@ -175,7 +171,7 @@ public class PhoneActivity extends OrderBaseActivity {
 	}
 
 	private void minusDishQuantity(final int position, final int quantity) {
-		if (mMyOrder.getOrderedDish(position).getQuantity() > quantity) {
+		if (mPhoneOrder.getOrderedDish(position).getQuantity() > quantity) {
 			updateDishQuantity(position, -quantity);
 		} else {
 			minusDishDialog(position, quantity);
@@ -186,7 +182,7 @@ public class PhoneActivity extends OrderBaseActivity {
 		new AlertDialog.Builder(PhoneActivity.this)
 				.setTitle("请注意")
 				.setMessage(
-						"确认删除" + mMyOrder.getOrderedDish(position).getName())
+						"确认删除" + mPhoneOrder.getOrderedDish(position).getName())
 				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 
 					@Override
