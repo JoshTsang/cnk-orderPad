@@ -58,6 +58,7 @@ public class TableSetting implements Serializable {
 
 	private static List<TableSettingItem> mTableSettings = new ArrayList<TableSettingItem>();
 	private static List<String> checkOutPrinter = new ArrayList<String>();
+
 	public void add(TableSettingItem item) {
 		mTableSettings.add(item);
 	}
@@ -196,7 +197,7 @@ public class TableSetting implements Serializable {
 		}
 
 		int start = tableStatusPkg.indexOf("[");
-		int end = tableStatusPkg.indexOf("]"); 
+		int end = tableStatusPkg.indexOf("]");
 
 		if ((start < 0) || (end < 0)) {
 			Log.e(TAG, "getItemTableStatus:tableStatusPkg is " + tableStatusPkg);
@@ -364,7 +365,7 @@ public class TableSetting implements Serializable {
 		JSONObject order = new JSONObject();
 		String time = getCurrentTime();
 		int destPersons = MyOrder.loodPersons(destTId);
-		if(destPersons < 0){
+		if (destPersons < 0) {
 			Log.e(TAG, "mOrder.getPersonsFromServer");
 			return destPersons;
 		}
@@ -375,14 +376,16 @@ public class TableSetting implements Serializable {
 		if (!ErrorPHP.isSucc(tablecombinePkg, TAG)) {
 			return -2;
 		}
-		
+
 		return 0;
 	}
 
-	public double getTotalPriceTable(Context context, List<Integer> srcTId,List<String>tableName) {
+	public double getTotalPriceTable(Context context, List<Integer> srcTId,
+			List<String> tableName) {
 		double totalPrice = 0;
 		String time = getCurrentTime();
 		int i = 0;
+		checkOutPrinter.clear();
 		for (Integer item : srcTId) {
 			int ret = getOrderFromServer(context, item.intValue());
 			if (ret == -1) {
@@ -396,10 +399,56 @@ public class TableSetting implements Serializable {
 			i++;
 			totalPrice = totalPrice + mOrder.getTotalPrice();
 		}
+
 		return totalPrice;
 	}
-	
-	
+
+	public String checkOutJson() {
+		String checkOutJson = new String();
+		checkOutJson = String.format("\b%s%24s%9s%8s%10s", "品名", "", "单价",
+				"数量", "小计");
+		int k = 0;
+		List<String> tableName = new ArrayList<String>();
+		List<Float> totalPrice = new ArrayList<Float>();
+		for (String item : checkOutPrinter) {
+			try {
+				JSONObject json = new JSONObject(item.toString());
+				tableName.add(json.getString("tableName"));
+				JSONArray jsonArrary = json.getJSONArray("order");
+				checkOutJson = String.format("%s\n\r\b%s", checkOutJson,
+						tableName.get(k) + "桌");
+				float Price = 0;
+				for (int i = 0; i < jsonArrary.length(); i++) {
+					JSONObject jsonItem = (JSONObject) jsonArrary.get(i);
+					float quan = jsonItem.getInt("quan");
+					float price = jsonItem.getInt("price");
+					String name = jsonItem.getString("name");
+					Price = Price + (quan * price);
+					String dish = String.format("%s%24s%7.2f%6.2f%8.2f", name,
+							"", price, quan, Price);
+					checkOutJson = String.format("%s\n\r\b%s", checkOutJson,
+							dish);
+				}
+				totalPrice.add(Price);
+				k++;
+			} catch (JSONException e) {
+				Log.e(TAG, "checkOutJson.error");
+				e.printStackTrace();
+			}
+		}
+		checkOutJson = String.format("%s\n\r%s", checkOutJson,
+				"------------------------------------------");
+		float endPrice = 0;
+		for (int i = 0; i < k; i++) {
+			checkOutJson = String.format("%s\n\r\b%s%45s%8.2f", checkOutJson,
+					tableName.get(i).toString() + "桌", "", totalPrice.get(i));
+			endPrice = endPrice + totalPrice.get(i);
+		}
+		checkOutJson = String.format("%s\n\r\b%s%45s%8.2f", checkOutJson, "合计",
+				"", endPrice);
+		return checkOutJson;
+	}
+
 	private String getCurrentTime() {
 		Date date = new Date();
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

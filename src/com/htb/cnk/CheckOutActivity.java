@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,6 +34,7 @@ public class CheckOutActivity extends TableActivity{
 	protected TextView mDishCountTxt;
 	protected TextView mTotalPriceTxt;
 	protected TextView mReceivableText;
+	protected TextView mCheckOutPrinte;
 	protected TextView mChangeText;
 	protected EditText mIncomeEdit;
 	protected ListView mMyOrderLst;
@@ -64,6 +66,7 @@ public class CheckOutActivity extends TableActivity{
 		mReceivableText = (TextView)findViewById(R.id.receivableQuan);
 		mIncomeEdit = (EditText)findViewById(R.id.incomeEdit);
 		mChangeText = (TextView)findViewById(R.id.changeQuan);
+		mCheckOutPrinte = (TextView) findViewById(R.id.checkOutPrinter);
 	}
 	
 	private void setCheckOutView(){
@@ -74,6 +77,7 @@ public class CheckOutActivity extends TableActivity{
 		mBackBtn.setOnClickListener(backBtnClicked);
 		mSubmitBtn.setOnClickListener(submitClicked);
 		mIncomeEdit.addTextChangedListener(watcher);
+		mCheckOutPrinte.setMovementMethod(ScrollingMovementMethod.getInstance());
 		getTableValue();
 		updateTabelInfos();
 	}
@@ -84,12 +88,8 @@ public class CheckOutActivity extends TableActivity{
 		}
 	};
 	
-	private void setAdapter() {
-		
-	}
-	
 	private void updateTabelInfos() {
-		setAdapter();
+		mCheckOutPrinte.setText(mSettings.checkOutJson());
 		mReceivableText.setText(String.valueOf(mTotalPrice));
 	}
 	

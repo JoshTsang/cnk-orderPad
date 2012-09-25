@@ -25,7 +25,6 @@ import android.widget.SimpleAdapter;
 import com.htb.cnk.NotificationTableService.MyBinder;
 import com.htb.cnk.TableClickActivity.tableItemClickListener;
 import com.htb.cnk.data.Info;
-import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.NotificationTypes;
 import com.htb.cnk.data.Notifications;
 import com.htb.cnk.data.PhoneOrder;
