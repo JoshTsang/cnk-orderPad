@@ -78,6 +78,10 @@ public class Http {
 			Log.e(TAG, "getPrinterListFailed");
 			return ErrorNum.PRINTER_ERR_CONNECT_TIMEOUT;
 		}
+		if (printers.length == 0) {
+			return 0;
+		}
+		
 		for(String printerIp:printers) {
 			ret = getPrinterStatus(printerIp);
 			if (ret < 0) {
@@ -102,7 +106,9 @@ public class Http {
 			String[] str = response.substring(start+1, end).split(",");
 			Set<String> set = new TreeSet<String>();
 			for (int i = 0; i < str.length; i++) {
-				set.add(str[i]);
+				if (!"".equals(str[i])) {
+					set.add(str[i]);
+				}
 			}
 			str = (String[]) set.toArray(new String[0]);
 			return str;
