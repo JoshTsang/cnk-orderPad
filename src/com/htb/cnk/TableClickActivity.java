@@ -494,7 +494,7 @@ public class TableClickActivity extends TableBaseActivity {
 			public void run() {
 				try {
 					double ret = mSettings.getTotalPriceTable(
-							TableClickActivity.this, selectedTable);
+							TableClickActivity.this, selectedTable,tableName);
 					mTotalPriceTableHandler.sendEmptyMessage((int) ret);
 				} catch (Exception e) {
 					e.printStackTrace();

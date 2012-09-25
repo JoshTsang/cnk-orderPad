@@ -85,41 +85,11 @@ public class CheckOutActivity extends TableActivity{
 	};
 	
 	private void setAdapter() {
-		mMyOrderAdapter = new MyOrderAdapter(this, mMyOrder) {
-			@Override
-			public View getView(int position, View convertView, ViewGroup arg2) {
-				TextView dishName;
-				TextView dishPrice;
-				TextView dishQuantity;
-				TextView dishServedQuantity;
-				if (convertView == null) {
-					convertView = LayoutInflater.from(CheckOutActivity.this)
-							.inflate(R.layout.item_checkout, null);
-				}
-				OrderedDish dishDetail = mMyOrder.getOrderedDish(position);
-
-				dishName = (TextView) convertView.findViewById(R.id.dishName);
-				dishPrice = (TextView) convertView.findViewById(R.id.dishPrice);
-				dishServedQuantity = (TextView) convertView
-						.findViewById(R.id.dishServedQuantity);
-				dishQuantity = (TextView) convertView
-						.findViewById(R.id.dishQuantity);
-
-				dishName.setText(dishDetail.getName());
-
-				dishPrice.setText(Double.toString(dishDetail.getPrice())
-						+ " 元/份");
-				dishQuantity
-						.setText(MyOrder.convertFloat(dishDetail.getQuantity()));
-				dishServedQuantity.setText(Integer.toString(dishDetail.getServedQuantity()));
-				return convertView;
-			}
-		};
-		mMyOrderLst.setAdapter(mMyOrderAdapter);
+		
 	}
 	
 	private void updateTabelInfos() {
-		Log.d("price", "price:"+mTotalPrice);
+		setAdapter();
 		mReceivableText.setText(String.valueOf(mTotalPrice));
 	}
 	
@@ -129,7 +99,6 @@ public class CheckOutActivity extends TableActivity{
 		Log.d("price", "price:"+mTotalPrice);
 		selectedTable = bundle.getIntegerArrayList("tableId");
 		tableName = bundle.getStringArrayList("tableName");
-//		Log.d("getTableValue", "id0: "+selectedTable.toString()  +" tableName0: "+tableName.toString());
 	}
 
 	private OnClickListener backBtnClicked = new OnClickListener() {
@@ -174,36 +143,6 @@ public class CheckOutActivity extends TableActivity{
 
 	};
 	
-	protected void queryThread() {
-		new Thread() {
-			public void run() {
-				try {
-					int ret = mMyOrder.getOrderFromServer(Info.getTableId());
-					queryHandler.sendEmptyMessage(ret);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}.start();
-	}
-	
-	Handler queryHandler = new Handler() {
-		public void handleMessage(Message msg) {
-			mpDialog.cancel();
-			if (msg.what == -2) {
-				Toast.makeText(getApplicationContext(),
-						getResources().getString(R.string.delWarning),
-						Toast.LENGTH_SHORT).show();
-			} else if (msg.what == -1) {
-				netWorkDialogShow("查询菜品失败，请检查连接网络重试");
-			} else {
-				setAdapter();
-				mMyOrderAdapter.notifyDataSetChanged();
-				updateTabelInfos();
-			}
-			
-		}
-	};
 	
 	Handler checkOutHandler = new Handler() {
 		public void handleMessage(Message msg) {

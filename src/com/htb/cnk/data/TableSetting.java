@@ -57,7 +57,7 @@ public class TableSetting implements Serializable {
 	}
 
 	private static List<TableSettingItem> mTableSettings = new ArrayList<TableSettingItem>();
-
+	private static List<String> checkOutPrinter = new ArrayList<String>();
 	public void add(TableSettingItem item) {
 		mTableSettings.add(item);
 	}
@@ -379,8 +379,10 @@ public class TableSetting implements Serializable {
 		return 0;
 	}
 
-	public double getTotalPriceTable(Context context, List<Integer> srcTId) {
+	public double getTotalPriceTable(Context context, List<Integer> srcTId,List<String>tableName) {
 		double totalPrice = 0;
+		String time = getCurrentTime();
+		int i = 0;
 		for (Integer item : srcTId) {
 			int ret = getOrderFromServer(context, item.intValue());
 			if (ret == -1) {
@@ -388,11 +390,16 @@ public class TableSetting implements Serializable {
 						"mOrder.getOrderFromServer.timeout:getTotalPriceTable");
 				return TIME_OUT;
 			}
+			JSONObject order = new JSONObject();
+			orderJson(item.intValue(), order, tableName.get(i), time, 0);
+			checkOutPrinter.add(order.toString());
+			i++;
 			totalPrice = totalPrice + mOrder.getTotalPrice();
 		}
 		return totalPrice;
 	}
-
+	
+	
 	private String getCurrentTime() {
 		Date date = new Date();
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
