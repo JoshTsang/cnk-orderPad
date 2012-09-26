@@ -214,18 +214,21 @@ public class UpdateMenuActivity extends BaseActivity {
 			mDb = mCnkDbHelper.getReadableDatabase();
 			
 			Cursor dishes = mDb.query(CnkDbHelper.DISH_TABLE_NAME, new String[] {
-					  CnkDbHelper.DISH_PIC},
+					  CnkDbHelper.DISH_PIC, CnkDbHelper.DISH_NAME},
 					  null, null, null, null, null);
 			while (dishes.moveToNext()) {
 				String picName = dishes.getString(0);
 				if (picName != null && !"".equals(picName) && !"null".equals(picName)) {
 					ret = downloadPic(Server.IMG_PATH+ picName, picName);
+					Log.i(TAG, "downloading pic " + picName + " for " + dishes.getString(1));
 					if (ret < 0) {
 						count++;
 						if (count >= 10) {
 							return ErrorNum.DOWNLOAD_PIC_FAILED;
 						}
 					}
+				} else {
+					Log.i(TAG, "no pic for " + dishes.getString(1));
 				}
 			}
 			

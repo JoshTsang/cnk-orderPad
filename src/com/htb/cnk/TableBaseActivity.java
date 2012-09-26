@@ -184,7 +184,7 @@ public class TableBaseActivity extends BaseActivity {
 		HashMap<String, Object> map;
 		if (lstImageItem.size() <= position) {
 			map = new HashMap<String, Object>();
-			map.put(ITEM_TEXT, "第" + mSettings.getNameIndex(position) + "桌");
+			map.put(ITEM_TEXT, mSettings.getNameIndex(position));
 		} else {
 			map = lstImageItem.get(position);
 		}

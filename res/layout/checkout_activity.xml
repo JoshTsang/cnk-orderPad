@@ -5,7 +5,6 @@
     android:orientation="horizontal" >
 
     <!-- 统计信息 -->
-
     <RelativeLayout
         android:layout_width="180dip"
         android:layout_height="match_parent"
@@ -111,6 +110,7 @@
         android:layout_width="fill_parent"
         android:layout_height="match_parent"
         android:background="@drawable/right"
+        android:paddingLeft="10dp"
         android:orientation="vertical" >
 
         <RelativeLayout
@@ -121,7 +121,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="43dip"
                 android:gravity="center"
-                android:text="@string/myOrder"
+                android:text="结账"
                 android:textColor="#652A25"
                 android:textSize="30dip" />
 

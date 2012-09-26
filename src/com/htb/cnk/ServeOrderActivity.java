@@ -31,8 +31,8 @@ public class ServeOrderActivity extends OrderBaseActivity {
 		void setup() {
 			map.clear();
 			OrderedDish dishDetail;
-			for (int i=0; i<mPhoneOrder.count(); i++) {
-				dishDetail = mPhoneOrder.getOrderedDish(i);
+			for (int i=0; i<mMyOrder.count(); i++) {
+				dishDetail = mMyOrder.getOrderedDish(i);
 				if ((dishDetail.getQuantity()-dishDetail.getServedQuantity()) > 0) {
 					map.add(i);	
 				}
@@ -65,7 +65,7 @@ public class ServeOrderActivity extends OrderBaseActivity {
 	
 	private void setAdapter() {
 		postionToIndex.setup();
-		mMyOrderAdapter = new MyOrderAdapter(this, mPhoneOrder) {
+		mMyOrderAdapter = new MyOrderAdapter(this, mMyOrder) {
 			
 			@Override
 			public int getCount() {
@@ -83,7 +83,7 @@ public class ServeOrderActivity extends OrderBaseActivity {
 					convertView = LayoutInflater.from(ServeOrderActivity.this)
 							.inflate(R.layout.item_queryorder, null);
 				}
-				OrderedDish dishDetail = mPhoneOrder.getOrderedDish(postionToIndex.getIndex(position));
+				OrderedDish dishDetail = mMyOrder.getOrderedDish(postionToIndex.getIndex(position));
 
 				dishName = (TextView) convertView.findViewById(R.id.dishName);
 				dishPrice = (TextView) convertView.findViewById(R.id.dishPrice);
@@ -114,7 +114,7 @@ public class ServeOrderActivity extends OrderBaseActivity {
 			showProgressDlg("更新服务器状态...");
 			new Thread() {
 				public void run() {
-					int ret = mPhoneOrder.setDishStatus(postionToIndex.getIndex(position));
+					int ret = mMyOrder.setDishStatus(postionToIndex.getIndex(position));
 					markServedHandle.sendEmptyMessage(ret);
 				}
 			}.start();
@@ -155,7 +155,7 @@ public class ServeOrderActivity extends OrderBaseActivity {
 	class queryThread implements Runnable {
 		public void run() {
 			try {
-				int ret = mPhoneOrder.getOrderFromServer(Info.getTableId());
+				int ret = mMyOrder.getOrderFromServer(Info.getTableId());
 				queryHandler.sendEmptyMessage(ret);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -165,7 +165,7 @@ public class ServeOrderActivity extends OrderBaseActivity {
 	
 	@Override
 	public void finish() {
-		mPhoneOrder.clear();
+		mMyOrder.clear();
 		Intent intent = new Intent();
 		intent.setClass(ServeOrderActivity.this, QueryOrderActivity.class);
 		startActivity(intent);

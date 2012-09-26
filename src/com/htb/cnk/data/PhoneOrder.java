@@ -90,27 +90,35 @@ public class PhoneOrder extends MyOrder {
 	
 	}
 
-	private int minusPhoneOrderOnServer(int tableId, float quantity,
-			int dishId) {
-				if (quantity != 0) {
-					showServerDelProgress();
-					String phoneOrderPkg = Http.get(Server.UPDATE_PHONE_ORDER, "DID="
-							+ dishId + "&DNUM=" + quantity + "&TID=" + tableId);
-			
-					if (!ErrorPHP.isSucc(phoneOrderPkg, TAG)) {
-						return -1;
-					}
-					return 0;
-				} else {
-					return delPhoneOrderedDish(tableId, dishId);
-				}
+	private int minusPhoneOrderOnServer(int tableId, float quantity, int dishId) {
+		if (quantity != 0) {
+			showServerDelProgress();
+			String phoneOrderPkg = Http.get(Server.UPDATE_PHONE_ORDER, "DID="
+					+ dishId + "&DNUM=" + quantity + "&TID=" + tableId);
+
+			if (!ErrorPHP.isSucc(phoneOrderPkg, TAG)) {
+				return -1;
 			}
+			return 0;
+		} else {
+			return delPhoneOrderedDish(tableId, dishId);
+		}
+	}
+
+	public int minus(Dish dish, int quantity) {
+		for (OrderedDish item : mOrder) {
+			if (item.dish.getId() == dish.getId()) {
+				return minus(item, quantity);
+			}
+		}
+		return 0;
+	}
 
 	public int minus(int position, float quantity) {
 		OrderedDish item = mOrder.get(position);
 		return minus(item, quantity);
 	}
-	
+
 	private int minus(OrderedDish item, float quantity) {
 		if ((item.padQuantity + item.phoneQuantity) > quantity) {
 			if (item.padQuantity > quantity) {
@@ -118,7 +126,7 @@ public class PhoneOrder extends MyOrder {
 				return 0;
 			} else {
 				quantity -= item.padQuantity;
-	
+
 				if (minusPhoneOrderOnServer(Info.getTableId(),
 						item.phoneQuantity - quantity, item.getDishId()) < 0) {
 					return -1;

@@ -42,8 +42,7 @@ public class OrderBaseActivity extends BaseActivity {
 	protected TextView mDishCountTxt;
 	protected TextView mTotalPriceTxt;
 	protected ListView mMyOrderLst;
-	protected PhoneOrder mPhoneOrder;
-	protected MyOrder mMyOrder;
+	protected PhoneOrder mMyOrder;
 	protected ProgressDialog mpDialog;
 	protected Handler mSubmitHandler;
 	protected MyOrderAdapter mMyOrderAdapter;
@@ -54,8 +53,7 @@ public class OrderBaseActivity extends BaseActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.myorder_activity);
-		mPhoneOrder = new PhoneOrder(OrderBaseActivity.this);
-		mMyOrder = (MyOrder)mPhoneOrder;
+		mMyOrder = new PhoneOrder(OrderBaseActivity.this);
 		mSettings = new TableSetting();
 		mpDialog = new ProgressDialog(OrderBaseActivity.this);
 		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
