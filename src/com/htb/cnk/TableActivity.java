@@ -6,10 +6,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 
 import com.htb.cnk.data.Info;
-import com.htb.cnk.data.MyOrder;
 
 public class TableActivity extends TableClickActivity {
 
@@ -29,6 +27,7 @@ public class TableActivity extends TableClickActivity {
 		mChangeTIdHandler = changeTIdHandler;
 		mCopyTIdHandler = copyTIdHandler;
 		mCombineTIdHandler = combineTIdHandler;
+		mNotificationTypeHandler = notificationTypeHandler;
 	}
 
 	Handler tableHandler = new Handler() {
@@ -62,15 +61,14 @@ public class TableActivity extends TableClickActivity {
 		public void handleMessage(Message msg) {
 			if (msg.what < 0) {
 				netWorkDialogShow("统计失败，"
-						+ R.string.networkErrorWarning);
+						+ getResources().getString(R.string.networkErrorWarning));
 			} else {
 				mTotalPrice = (double) msg.what;
 				if (mTotalPrice <= 0) {
-					toastText("菜品为空，请点菜！");
+					toastText(R.string.dishNull);
 				} else {
 					Intent checkOutIntent = new Intent();
 					Bundle bundle = new Bundle();
-					Log.d(TAG, "price:" + mTotalPrice);
 					bundle.putDouble("price", mTotalPrice);
 					bundle.putIntegerArrayList("tableId",
 							(ArrayList<Integer>) selectedTable);
@@ -92,7 +90,7 @@ public class TableActivity extends TableClickActivity {
 				toastText(R.string.changeTIdWarning);
 			} else if (msg.what == -1) {
 				netWorkDialogShow("转台失败，"
-						+ R.string.networkErrorWarning);
+						+ getResources().getString(R.string.networkErrorWarning));
 			} else if (isPrinterError(msg)) {
 				toastText(R.string.changeSucc);
 			} else {
@@ -108,7 +106,7 @@ public class TableActivity extends TableClickActivity {
 				toastText(R.string.copyTIdwarning);
 			} else if (msg.what == -1) {
 				netWorkDialogShow("复制失败，"
-						+ R.string.networkErrorWarning);
+						+ getResources().getString(R.string.networkErrorWarning));
 			} else {
 				intent.setClass(TableActivity.this, MyOrderActivity.class);
 				Info.setMode(Info.WORK_MODE_WAITER);
@@ -123,7 +121,7 @@ public class TableActivity extends TableClickActivity {
 				toastText(R.string.checkOutWarning);
 			} else if (msg.what == -1) {
 				netWorkDialogShow("合并出错，"
-						+R.string.networkErrorWarning);
+						+getResources().getString(R.string.networkErrorWarning));
 			} else if (isPrinterError(msg)) {
 				toastText(R.string.combineError);
 			} else {
@@ -144,11 +142,20 @@ public class TableActivity extends TableClickActivity {
 	Handler notificationHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			if (msg.what < 0) {
-				// Todo network failure warning
+				toastText(R.string.notificationWarning);
 			} else {
 				binderStart();
 			}
 		}
 	};
+	
+	Handler notificationTypeHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			if (msg.what < 0) {
+				toastText(R.string.notificationTypeWarning);
+			}
+		}
+	};
+	
 
 }

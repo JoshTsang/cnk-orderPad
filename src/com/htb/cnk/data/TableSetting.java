@@ -1,7 +1,6 @@
 package com.htb.cnk.data;
 
 import java.io.Serializable;
-import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -69,14 +68,17 @@ public class TableSetting implements Serializable {
 		return mTableSettings.size();
 	}
 
-	public int getStatus(int index) {
-		return mTableSettings.get(index).getStatus();
-	}
-	
-	public void clear(){
+	public void clear() {
 		mTableSettings.clear();
 	}
-	
+
+	public int getStatusIndex(int index) {
+		if (isIndexBoundary(index)) {
+			return mTableSettings.get(index).getStatus();
+		}
+		return -1;
+	}
+
 	public int getStatusTableId(int tableId) {
 		int i;
 		for (i = 0; i < mTableSettings.size() - 1; i++) {
@@ -88,7 +90,18 @@ public class TableSetting implements Serializable {
 	}
 
 	public int getIdIndex(int index) {
-		return mTableSettings.get(index).getId();
+		if (isIndexBoundary(index)) {
+			return mTableSettings.get(index).getId();
+		}
+		return -1;
+	}
+
+	/**
+	 * @param index
+	 * @return
+	 */
+	private boolean isIndexBoundary(int index) {
+		return index >= 0 && index < mTableSettings.size();
 	}
 
 	public int getId(int tableId) {
@@ -119,7 +132,10 @@ public class TableSetting implements Serializable {
 	}
 
 	public String getNameIndex(int index) {
-		return mTableSettings.get(index).getName();
+		if (isIndexBoundary(index)) {
+			return mTableSettings.get(index).getName();
+		}
+		return null;
 	}
 
 	public String[] getNameAll() {
@@ -156,7 +172,9 @@ public class TableSetting implements Serializable {
 	}
 
 	public void setStatus(int index, int n) {
-		mTableSettings.get(index).setStatus(n);
+		if (isIndexBoundary(index)) {
+			mTableSettings.get(index).setStatus(n);
+		}
 	}
 
 	public int getTableStatusFromServer() {
@@ -421,7 +439,7 @@ public class TableSetting implements Serializable {
 		List<Float> totalPrice = new ArrayList<Float>();
 		NumberFormat nf = NumberFormat.getInstance();
 		nf.setMinimumFractionDigits(2);
-		
+
 		for (String item : checkOutPrinter) {
 			try {
 				JSONObject json = new JSONObject(item.toString());
@@ -440,35 +458,40 @@ public class TableSetting implements Serializable {
 					byte[] strByte = name.getBytes();
 					int strlen = name.length();
 					int strByteLen = strByte.length;
-					int zhLen = (strByteLen - strlen)/2;
+					int zhLen = (strByteLen - strlen) / 2;
 					int enLen = strlen - zhLen;
-					int spaceLen = zhLen*2 + enLen;
+					int spaceLen = zhLen * 2 + enLen;
 					spaceLen = 19 - spaceLen;
 					spaceLen *= 2;
 					if (enLen > 0) {
 						spaceLen += 1;
 					}
 
-					Log.d(TAG, "dishName:" + name + " zhLen:" + zhLen + " enLen:" + enLen + " spaceLen:" + spaceLen);
-					Log.d(TAG, "dishName:" + name + " strLen:" + strlen + " strByteLen:" + strByteLen);
+//					Log.d(TAG, "dishName:" + name + " zhLen:" + zhLen
+//							+ " enLen:" + enLen + " spaceLen:" + spaceLen);
+//					Log.d(TAG, "dishName:" + name + " strLen:" + strlen
+//							+ " strByteLen:" + strByteLen);
 
-					
 					String priceStr = nf.format(price);
 					String quanStr = nf.format(quan);
 					String itemTotalPrice = nf.format(Price);
 					int priceSpaceLen = getSpaceLen(7, priceStr.length());
 					int quanSpaceLen = getSpaceLen(5, quanStr.length());
-					int totalPriceSpaceLen = getSpaceLen(7, itemTotalPrice.length());
+					int totalPriceSpaceLen = getSpaceLen(7,
+							itemTotalPrice.length());
 					if (spaceLen > 2) {
-						dish = String.format("%s%" + spaceLen + "s%s%" + priceSpaceLen + "s%s%" + quanSpaceLen + 
-								"s%" + totalPriceSpaceLen +"s%s", name,
-								"", priceStr, "", quanStr, "", "", itemTotalPrice);
+						dish = String.format("%s%" + spaceLen + "s%s%"
+								+ priceSpaceLen + "s%s%" + quanSpaceLen + "s%"
+								+ totalPriceSpaceLen + "s%s", name, "",
+								priceStr, "", quanStr, "", "", itemTotalPrice);
 					} else {
-						Log.d(TAG, "%s\r\n%36s%s%" + priceSpaceLen + "s%s%" + quanSpaceLen + 
-								"s%" + totalPriceSpaceLen +"s%s");
-						dish = String.format("%s\r\n%42s%s%" + priceSpaceLen + "s%s%" + quanSpaceLen + 
-								"s%" + totalPriceSpaceLen +"s%s", name,
-								"", priceStr, "", quanStr, "", "", itemTotalPrice);
+//						Log.d(TAG, "%s\r\n%36s%s%" + priceSpaceLen + "s%s%"
+//								+ quanSpaceLen + "s%" + totalPriceSpaceLen
+//								+ "s%s");
+						dish = String.format("%s\r\n%42s%s%" + priceSpaceLen
+								+ "s%s%" + quanSpaceLen + "s%"
+								+ totalPriceSpaceLen + "s%s", name, "",
+								priceStr, "", quanStr, "", "", itemTotalPrice);
 					}
 					checkOutJson = String.format("%s\n\r\b%s", checkOutJson,
 							dish);
@@ -485,22 +508,24 @@ public class TableSetting implements Serializable {
 		float endPrice = 0;
 		for (int i = 0; i < k; i++) {
 			String tName = tableName.get(i).toString();
-			String totalPriceStr =  nf.format(totalPrice.get(i));
+			String totalPriceStr = nf.format(totalPrice.get(i));
 			int len = 38 - tName.length() - totalPriceStr.length();
-			checkOutJson += String.format("\r\n %s%" + len*2 + "s%s", tName + "桌", "",
-					totalPriceStr);
+			checkOutJson += String.format("\r\n %s%" + len * 2 + "s%s", tName
+					+ "桌", "", totalPriceStr);
 			endPrice = endPrice + totalPrice.get(i);
 		}
 		String endPriceStr = nf.format(endPrice);
-		checkOutJson = String.format("%s\n\r %s%" + ((36-endPriceStr.length())*2-1) + "s%s", checkOutJson, "合计", "", endPriceStr);
+		checkOutJson = String.format("%s\n\r %s%"
+				+ ((36 - endPriceStr.length()) * 2 - 1) + "s%s", checkOutJson,
+				"合计", "", endPriceStr);
 		return checkOutJson;
 	}
 
 	private int getSpaceLen(int expect, int actal) {
 		int ret = (expect - actal) * 2;
-		return ret>0?ret:1;
+		return ret > 0 ? ret : 1;
 	}
-	
+
 	private String getCurrentTime() {
 		Date date = new Date();
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
