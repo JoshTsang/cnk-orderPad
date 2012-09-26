@@ -14,7 +14,6 @@ import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.text.method.DigitsKeyListener;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -22,8 +21,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.Setting;
@@ -311,7 +308,7 @@ public class TableClickActivity extends TableBaseActivity {
 		final EditText copyTableText = new EditText(this);
 		copyTableText.setKeyListener(new DigitsKeyListener(false, true));
 		copyTableText
-				.setFilters(new InputFilter[] { new InputFilter.LengthFilter(3) });
+				.setFilters(new InputFilter[] { new InputFilter.LengthFilter(4) });
 		return copyTableText;
 	}
 
@@ -585,24 +582,16 @@ public class TableClickActivity extends TableBaseActivity {
 		return ret;
 	}
 
-	private boolean isNameMinimum(int tId) {
-		return tId >= Integer.parseInt(mSettings.getNameIndex(0));
+	private boolean isStatusLegal(String tableName, int status) {
+		return mSettings.getStatusTableId(mSettings.getId(tableName)) == status;
 	}
-
-	private boolean isNameMaximum(int tId) {
-		return tId <= Integer
-				.parseInt(mSettings.getNameIndex(mSettings.size() - 1));
+	
+	private boolean isName(String tableName){
+		return (mSettings.getId(tableName) != -1);
 	}
-
-	private boolean isStatusLegal(String changeTId, int status) {
-		Log.d("a", changeTId);
-		return mSettings.getStatusTableId(mSettings.getId(changeTId)) == status;
-	}
-
-	private boolean isBoundaryLegal(String changeTId, int status) {
-		int tId = Integer.parseInt(changeTId);
-		return isNameMinimum(tId) && isNameMaximum(tId)
-				&& isStatusLegal(String.valueOf(tId), status);
+	
+	private boolean isBoundaryLegal(String changeName, int status) {
+		return isName(changeName) && isStatusLegal(changeName, status);
 	}
 
 	private int getNotifiycations() {
@@ -611,24 +600,24 @@ public class TableClickActivity extends TableBaseActivity {
 		return ret;
 	}
 
-	private void judgeChangeTable(String changePersons, String changeTId)
+	private void judgeChangeTable(String changePersons, String changeName)
 			throws NumberFormatException {
-		if (changeTId.equals("") || changePersons.equals("")) {
+		if (changeName.equals("") || changePersons.equals("")) {
 			toastText(R.string.idAndPersonsIsNull);
-		} else if (isBoundaryLegal(changeTId, Table.NORMAL_TABLE_STAUTS)) {
-			changeTable(mSettings.getId(changeTId),
+		} else if (isBoundaryLegal(changeName, Table.NORMAL_TABLE_STAUTS)) {
+			changeTable(mSettings.getId(changeName),
 					Integer.parseInt(changePersons));
 		} else {
 			toastText(R.string.changeTIdWarning);
 		}
 	}
 
-	private void judgeCombineTable(String changePersons, String changeTId)
+	private void judgeCombineTable(String changePersons, String changeName)
 			throws NumberFormatException {
-		if (changeTId.equals("") || changePersons.equals("")) {
+		if (changeName.equals("") || changePersons.equals("")) {
 			toastText(R.string.idAndPersonsIsNull);
-		} else if (isBoundaryLegal(changeTId, Table.OPEN_TABLE_STATUS)) {
-			combineTable(mSettings.getId(changeTId),
+		} else if (isBoundaryLegal(changeName, Table.OPEN_TABLE_STATUS)) {
+			combineTable(mSettings.getId(changeName),
 					Integer.parseInt(changePersons));
 		} else {
 			toastText(R.string.combineTIdWarning);

@@ -72,7 +72,11 @@ public class TableSetting implements Serializable {
 	public int getStatus(int index) {
 		return mTableSettings.get(index).getStatus();
 	}
-
+	
+	public void clear(){
+		mTableSettings.clear();
+	}
+	
 	public int getStatusTableId(int tableId) {
 		int i;
 		for (i = 0; i < mTableSettings.size() - 1; i++) {

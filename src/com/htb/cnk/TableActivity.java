@@ -134,7 +134,6 @@ public class TableActivity extends TableClickActivity {
 
 	Handler notificationHandler = new Handler() {
 		public void handleMessage(Message msg) {
-			mpDialog.cancel();
 			if (msg.what < 0) {
 				// Todo network failure warning
 			} else {
