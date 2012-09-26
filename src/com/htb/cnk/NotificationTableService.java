@@ -14,7 +14,7 @@ import com.htb.cnk.data.TableSetting;
 public class NotificationTableService extends Service {
 
 	private final int DISABLE_GRIDVIEW = 10;
-	private final int MILLISECONDS = 1000 * 30;
+	private final int MILLISECONDS = 1000 * 15;
 	private Notifications mNotificaion = new Notifications();
 	private TableSetting mSettings = new TableSetting();
 	private final int UPDATE_TABLE_INFOS = 5;
@@ -28,7 +28,7 @@ public class NotificationTableService extends Service {
 	public class MyBinder extends Binder {
 		public void start() {
 			new Thread(new tableThread()).start();
-		}
+		} 
 	}
 
 	public Runnable mTasks = new Runnable() {

@@ -57,20 +57,24 @@ public class TableClickActivity extends TableBaseActivity {
 
 	protected AlertDialog.Builder networkDialog() {
 		final AlertDialog.Builder networkAlertDialog = alertDialogBuilder(false);
-		networkAlertDialog.setTitle("错误");// 设置对话框标题
-		networkAlertDialog.setMessage("网络连接失败，请检查网络后重试");// 设置对话框内容
-		networkAlertDialog.setPositiveButton("重试",
+		networkAlertDialog.setTitle(getResources().getString(R.string.error));// 设置对话框标题
+		networkAlertDialog.setMessage(getResources().getString(
+				R.string.networkErrorWarning));// 设置对话框内容
+		networkAlertDialog.setPositiveButton(
+				getResources().getString(R.string.tryAgain),
 				new DialogInterface.OnClickListener() {
 
 					@Override
 					public void onClick(DialogInterface dialog, int i) {
 						dialog.cancel();
 						NETWORK_ARERTDIALOG = 0;
-						showProgressDlg("正在获取状态...");
+						showProgressDlg(getResources().getString(
+								R.string.getStatus));
 						binderStart();
 					}
 				});
-		networkAlertDialog.setNegativeButton("退出",
+		networkAlertDialog.setNegativeButton(
+				getResources().getString(R.string.exit),
 				new DialogInterface.OnClickListener() {
 
 					@Override
@@ -85,9 +89,9 @@ public class TableClickActivity extends TableBaseActivity {
 	}
 
 	private Dialog cleanDialog() {
-		final CharSequence[] cleanitems = { "清台", "转台", "并台", "退菜", "添加菜",
-				"查看菜" };
-		Dialog cleanDialog = alertDialogBuilder(true).setTitle("选择功能")
+		final CharSequence[] cleanitems = getResources().getStringArray(
+				R.array.openStatus);
+		Dialog cleanDialog = alertDialogBuilder(true).setTitle(getResources().getString(R.string.chooseFunction))
 				.setItems(cleanitems, new DialogInterface.OnClickListener() {
 
 					@Override
@@ -126,42 +130,44 @@ public class TableClickActivity extends TableBaseActivity {
 
 	private AlertDialog.Builder cleanTableDialog() {
 		final AlertDialog.Builder cleanTableAlertDialog = alertDialogBuilder(false);
-		cleanTableAlertDialog.setMessage("请确认是否清台");
-		cleanTableAlertDialog.setPositiveButton("清台",
+		cleanTableAlertDialog.setMessage(getResources().getString(R.string.isCleanTable));
+		cleanTableAlertDialog.setPositiveButton(getResources().getString(R.string.cleanTable),
 				new DialogInterface.OnClickListener() {
 
 					@Override
 					public void onClick(DialogInterface dialog, int i) {
-						showProgressDlg("正在清台...");
+						showProgressDlg(getResources().getString(R.string.cleanTableNow));
 						selectedTable.clear();
 						selectedTable.add(Info.getTableId());
 						cleanTableThread(selectedTable);
 					}
 				});
-		cleanTableAlertDialog.setNegativeButton("取消", null);
+		cleanTableAlertDialog.setNegativeButton(
+				getResources().getString(R.string.cancel), null);
 		return cleanTableAlertDialog;
 	}
 
 	private AlertDialog.Builder cleanPhoneDialog(final int position) {
 		final AlertDialog.Builder cleanPhoneAlertDialog = alertDialogBuilder(false);
-		cleanPhoneAlertDialog.setMessage("是否清除顾客点的菜");
-		cleanPhoneAlertDialog.setPositiveButton("是",
+		cleanPhoneAlertDialog.setMessage(getResources().getString(R.string.isCleanOrder));
+		cleanPhoneAlertDialog.setPositiveButton(getResources().getString(R.string.yes),
 				new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int i) {
-						showProgressDlg("正在删除手机点的菜...");
+						showProgressDlg(getResources().getString(R.string.cleanPhoneOrderNow));
 						cleanPhoneThread(position, Info.getTableId());
 						dialog.cancel();
 					}
 				});
-		cleanPhoneAlertDialog.setNegativeButton("否", null);
+		cleanPhoneAlertDialog.setNegativeButton(getResources().getString(R.string.no), null);
 		return cleanPhoneAlertDialog;
 	}
 
 	private AlertDialog.Builder addDialog() {
-		final CharSequence[] additems = { "开台-顾客模式 ", "开台-服务模式", "开台-复制模式" };
+		final CharSequence[] additems = getResources().getStringArray(
+				R.array.normalStatus);
 		AlertDialog.Builder addDialog = alertDialogBuilder(true);
-		addDialog.setTitle("选择功能")
+		addDialog.setTitle(getResources().getString(R.string.chooseFunction))
 				.setItems(additems, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
@@ -197,9 +203,10 @@ public class TableClickActivity extends TableBaseActivity {
 	}
 
 	private AlertDialog.Builder addPhoneDialog(final int position) {
-		final CharSequence[] additems = { "查看顾客已点的菜", "取消顾客已点的菜" };
+		final CharSequence[] additems = getResources().getStringArray(
+				R.array.phoneStatus);
 		AlertDialog.Builder addPhoneDialog = alertDialogBuilder(true);
-		addPhoneDialog.setTitle("选择功能")
+		addPhoneDialog.setTitle(getResources().getString(R.string.chooseFunction))
 				.setItems(additems, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
@@ -228,15 +235,21 @@ public class TableClickActivity extends TableBaseActivity {
 				.getNotifiycationsType(Info.getTableId());
 		String[] additems = (String[]) add.toArray(new String[add.size()]);
 		AlertDialog.Builder notificationDialog = alertDialogBuilder(false);
-		notificationDialog.setTitle("客户呼叫需求").setIcon(R.drawable.ic_launcher)
-				.setItems(additems, null).setNegativeButton("取消", null)
-				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+		notificationDialog
+				.setTitle(getResources().getString(R.string.customerCall))
+				.setIcon(R.drawable.ic_launcher)
+				.setItems(additems, null)
+				.setNegativeButton(getResources().getString(R.string.cancel),
+						null)
+				.setPositiveButton(getResources().getString(R.string.ok),
+						new DialogInterface.OnClickListener() {
 
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						cleanNotification();
-					}
-				}).create();
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+								cleanNotification();
+							}
+						}).create();
 		return notificationDialog;
 	}
 
@@ -253,8 +266,9 @@ public class TableClickActivity extends TableBaseActivity {
 		}
 		tableIdEdit.addTextChangedListener(watcher(tableIdEdit));
 		personsEdit.addTextChangedListener(watcher(personsEdit));
-		changeTableAlertDialog.setTitle("请输入");
-		changeTableAlertDialog.setPositiveButton("确定",
+		changeTableAlertDialog.setTitle(getResources().getString(R.string.pleaseInput));
+		changeTableAlertDialog.setPositiveButton(
+				getResources().getString(R.string.ok),
 				new DialogInterface.OnClickListener() {
 
 					@Override
@@ -273,7 +287,8 @@ public class TableClickActivity extends TableBaseActivity {
 						}
 					}
 				});
-		changeTableAlertDialog.setNegativeButton("取消", null);
+		changeTableAlertDialog.setNegativeButton(
+				getResources().getString(R.string.cancel), null);
 		return changeTableAlertDialog;
 	}
 
@@ -281,9 +296,10 @@ public class TableClickActivity extends TableBaseActivity {
 		final EditText copyTableText = editTextListener();
 		final AlertDialog.Builder copyTableAlertDialog = alertDialogBuilder(false);
 		copyTableText.addTextChangedListener(watcher(copyTableText));
-		copyTableAlertDialog.setTitle("请输入");
+		copyTableAlertDialog.setTitle(getResources().getString(R.string.pleaseInput));
 		copyTableAlertDialog.setView(copyTableText);
-		copyTableAlertDialog.setPositiveButton("确定",
+		copyTableAlertDialog.setPositiveButton(
+				getResources().getString(R.string.ok),
 				new DialogInterface.OnClickListener() {
 
 					@Override
@@ -300,7 +316,8 @@ public class TableClickActivity extends TableBaseActivity {
 						}
 					}
 				});
-		copyTableAlertDialog.setNegativeButton("取消", null);
+		copyTableAlertDialog.setNegativeButton(
+				getResources().getString(R.string.cancel), null);
 		return copyTableAlertDialog;
 	}
 
@@ -325,8 +342,9 @@ public class TableClickActivity extends TableBaseActivity {
 		final List<String> tableNameStr = new ArrayList<String>();
 		final AlertDialog.Builder checkOutAlertDialog = alertDialogBuilder(false);
 		if (checkOut.size() <= 0) {
-			checkOutAlertDialog.setMessage("还没有桌子开台");
-			checkOutAlertDialog.setPositiveButton("确认", null);
+			checkOutAlertDialog.setMessage(getResources().getString(R.string.tableNotOpen));
+			checkOutAlertDialog.setPositiveButton(
+					getResources().getString(R.string.ok), null);
 			return checkOutAlertDialog;
 		}
 		for (HashMap<String, Object> item : checkOut) {
@@ -335,7 +353,7 @@ public class TableClickActivity extends TableBaseActivity {
 		}
 		final int size = mSettings.size();
 		final boolean selected[] = new boolean[size];
-		checkOutAlertDialog.setTitle("请选择桌号");
+		checkOutAlertDialog.setTitle(getResources().getString(R.string.chooseTableId));
 		checkOutAlertDialog.setMultiChoiceItems(
 				(String[]) tableNameStr.toArray(new String[0]), null,
 				new DialogInterface.OnMultiChoiceClickListener() {
@@ -357,15 +375,17 @@ public class TableClickActivity extends TableBaseActivity {
 					}
 				}
 				if (type == CHECKOUT_LIST) {
-					showProgressDlg("正在统计金额，请稍等");
+					showProgressDlg(getResources().getString(R.string.statisticsAmount));
 					getTotalPriceTable();
 				}
 
 			}
 		};
 
-		checkOutAlertDialog.setPositiveButton("确认", btnListener);
-		checkOutAlertDialog.setNegativeButton("取消", null);
+		checkOutAlertDialog.setPositiveButton(
+				getResources().getString(R.string.ok), btnListener);
+		checkOutAlertDialog.setNegativeButton(
+				getResources().getString(R.string.cancel), null);
 		return checkOutAlertDialog;
 	}
 
@@ -409,17 +429,18 @@ public class TableClickActivity extends TableBaseActivity {
 	// incomeEdit.addTextChangedListener(watcher);
 	// receivableText.setText(String.valueOf(mTotalPrice));
 	// changeTableAlertDialog.setView(layout);
-	// changeTableAlertDialog.setTitle("请输入");
-	// changeTableAlertDialog.setPositiveButton("确定",
+	// changeTableAlertDialog.setTitle(getResources().getString(R.string.pleaseInput));
+	// changeTableAlertDialog.setPositiveButton(getResources().getString(R.string.ok),
 	// new DialogInterface.OnClickListener() {
 	//
-	// @Override
+	// @Override    
 	// public void onClick(DialogInterface dialog, int i) {
 	// checkOut(selectedTable, tableName, mTotalPrice,
 	// mIncome, mChange);
 	// }
 	// });
-	// changeTableAlertDialog.setNegativeButton("取消", null);
+	// changeTableAlertDialog.setNegativeButton(getResources().getString(R.string.cancel),
+	// null);
 	// return changeTableAlertDialog;
 	// }
 
@@ -585,11 +606,11 @@ public class TableClickActivity extends TableBaseActivity {
 	private boolean isStatusLegal(String tableName, int status) {
 		return mSettings.getStatusTableId(mSettings.getId(tableName)) == status;
 	}
-	
-	private boolean isName(String tableName){
+
+	private boolean isName(String tableName) {
 		return (mSettings.getId(tableName) != -1);
 	}
-	
+
 	private boolean isBoundaryLegal(String changeName, int status) {
 		return isName(changeName) && isStatusLegal(changeName, status);
 	}
@@ -687,10 +708,10 @@ public class TableClickActivity extends TableBaseActivity {
 		@Override
 		public void onClick(View v) {
 			new AlertDialog.Builder(TableClickActivity.this)
-					.setTitle("注意")
+					.setTitle(getResources().getString(R.string.notice))
 					.setCancelable(false)
-					.setMessage("确认交班？")
-					.setPositiveButton("确定",
+					.setMessage(getResources().getString(R.string.islogOut))
+					.setPositiveButton(getResources().getString(R.string.ok),
 							new DialogInterface.OnClickListener() {
 
 								@Override
@@ -700,7 +721,10 @@ public class TableClickActivity extends TableBaseActivity {
 									Info.setTableId(-1);
 									finish();
 								}
-							}).setNegativeButton("取消", null).show();
+							})
+					.setNegativeButton(
+							getResources().getString(R.string.cancel), null)
+					.show();
 		}
 	};
 
