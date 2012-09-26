@@ -86,7 +86,7 @@ public class TableBaseActivity extends BaseActivity {
 			mNetWrorkcancel.cancel();
 			NETWORK_ARERTDIALOG = 0;
 		}
-		showProgressDlg("正在获取状态，请稍等。。。");
+		showProgressDlg(getResources().getString(R.string.getStatus));
 		binderStart();
 	}
 	
@@ -106,7 +106,7 @@ public class TableBaseActivity extends BaseActivity {
 		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 		mpDialog.setIndeterminate(false);
 		mpDialog.setCancelable(false);
-		mpDialog.setTitle("请稍等");
+		mpDialog.setTitle(getResources().getString(R.string.pleaseWait));
 		findViews();
 		Info.setMode(Info.WORK_MODE_WAITER);
 		
@@ -232,7 +232,7 @@ public class TableBaseActivity extends BaseActivity {
 				try {
 					int ret = mNotificationType.getNotifiycationsType();
 					if(ret < 0){
-						toastText("服务功能出现问题，暂时不能使用此功能，请联系技术开发人员来解决");
+						toastText(getResources().getString(R.string.notificationTypeWarning));
 					}
 				} catch (Exception e) {
 					e.printStackTrace();

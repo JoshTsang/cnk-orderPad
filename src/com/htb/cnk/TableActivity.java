@@ -13,7 +13,8 @@ import com.htb.cnk.data.MyOrder;
 
 public class TableActivity extends TableClickActivity {
 
-	static final String TAG= "TablesActivity";
+	static final String TAG = "TablesActivity";
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -37,7 +38,8 @@ public class TableActivity extends TableClickActivity {
 				if (NETWORK_ARERTDIALOG == 1) {
 					mNetWrorkcancel.cancel();
 				}
-				netWorkDialogShow("网络连接失败，请检查连接网络重试！");
+				netWorkDialogShow(getResources().getString(
+						R.string.networkErrorWarning));
 			} else {
 				switch (msg.what) {
 				case UPDATE_TABLE_INFOS:
@@ -59,21 +61,25 @@ public class TableActivity extends TableClickActivity {
 	Handler totalPriceTableHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			if (msg.what < 0) {
-				netWorkDialogShow("统计失败，请检查连接网络重试");
+				netWorkDialogShow("统计失败，"
+						+ R.string.networkErrorWarning);
 			} else {
 				mTotalPrice = (double) msg.what;
 				if (mTotalPrice <= 0) {
 					toastText("菜品为空，请点菜！");
 				} else {
 					Intent checkOutIntent = new Intent();
-					Bundle bundle =new Bundle();
+					Bundle bundle = new Bundle();
 					Log.d(TAG, "price:" + mTotalPrice);
-	                bundle.putDouble("price", mTotalPrice);
-	                bundle.putIntegerArrayList("tableId", (ArrayList<Integer>) selectedTable);
-	                bundle.putStringArrayList("tableName", (ArrayList<String>) tableName);
-	                checkOutIntent.putExtras(bundle); 
-					checkOutIntent.setClass(TableActivity.this, CheckOutActivity.class);
-					TableActivity.this.startActivity(checkOutIntent);  
+					bundle.putDouble("price", mTotalPrice);
+					bundle.putIntegerArrayList("tableId",
+							(ArrayList<Integer>) selectedTable);
+					bundle.putStringArrayList("tableName",
+							(ArrayList<String>) tableName);
+					checkOutIntent.putExtras(bundle);
+					checkOutIntent.setClass(TableActivity.this,
+							CheckOutActivity.class);
+					TableActivity.this.startActivity(checkOutIntent);
 				}
 			}
 			mpDialog.cancel();
@@ -85,12 +91,13 @@ public class TableActivity extends TableClickActivity {
 			if (msg.what == -2) {
 				toastText(R.string.changeTIdWarning);
 			} else if (msg.what == -1) {
-				netWorkDialogShow("转台失败，请检查连接网络重试");
+				netWorkDialogShow("转台失败，"
+						+ R.string.networkErrorWarning);
 			} else if (isPrinterError(msg)) {
-				toastText("退菜订单失败");
+				toastText(R.string.changeSucc);
 			} else {
 				binderStart();
-				toastText(R.string.changeTId);
+				toastText(R.string.changeSucc);
 			}
 		}
 	};
@@ -100,7 +107,8 @@ public class TableActivity extends TableClickActivity {
 			if (msg.what == -2) {
 				toastText(R.string.copyTIdwarning);
 			} else if (msg.what == -1) {
-				netWorkDialogShow("复制失败，请检查连接网络重试");
+				netWorkDialogShow("复制失败，"
+						+ R.string.networkErrorWarning);
 			} else {
 				intent.setClass(TableActivity.this, MyOrderActivity.class);
 				Info.setMode(Info.WORK_MODE_WAITER);
@@ -109,22 +117,22 @@ public class TableActivity extends TableClickActivity {
 		}
 	};
 
-	
 	Handler combineTIdHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			if (msg.what == -2) {
 				toastText(R.string.checkOutWarning);
 			} else if (msg.what == -1) {
-				netWorkDialogShow("合并出错，请检查连接网络重试");
+				netWorkDialogShow("合并出错，"
+						+R.string.networkErrorWarning);
 			} else if (isPrinterError(msg)) {
-				toastText("合并失败");
+				toastText(R.string.combineError);
 			} else {
 				binderStart();
-				toastText(R.string.combineTId);
+				toastText(R.string.combineSucc);
 			}
 		}
 	};
-	
+
 	Handler ringtoneHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			if (msg.what > 0) {
