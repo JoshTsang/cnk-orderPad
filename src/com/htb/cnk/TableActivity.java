@@ -9,6 +9,7 @@ import android.os.Message;
 import android.util.Log;
 
 import com.htb.cnk.data.Info;
+import com.htb.cnk.data.MyOrder;
 
 public class TableActivity extends TableClickActivity {
 

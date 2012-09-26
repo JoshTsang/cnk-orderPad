@@ -158,7 +158,6 @@ public class PhoneActivity extends OrderBaseActivity {
 		new Thread() {
 			public void run() {
 				int ret = mPhoneOrder.minus(position, -quantity);
-				Log.d("mins", "ret:"+ret);
 				delPhoneOrderhandler.sendEmptyMessage(ret);
 			}
 		}.start();
