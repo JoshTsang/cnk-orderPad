@@ -12,7 +12,9 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.htb.cnk.data.UserData;
 import com.htb.cnk.lib.BaseActivity;
+import com.htb.constant.Permission;
 
 
 public class ManageActivity extends BaseActivity {
@@ -84,10 +86,24 @@ public class ManageActivity extends BaseActivity {
 		}
 	};
 	
+	private void errDlg(String msg) {
+		new AlertDialog.Builder(ManageActivity.this)
+		.setTitle("错误")
+		.setCancelable(false)
+		.setMessage(msg)
+		.setPositiveButton("确定", null)
+		.show();
+	}
+	
 	private OnClickListener backupClicked = new OnClickListener() {
 
 		@Override
 		public void onClick(View v) {
+			if (UserData.getPermission() > Permission.MANANGER) {
+				errDlg("权限不足");
+				return;
+			}
+			
 			new AlertDialog.Builder(ManageActivity.this)
 			.setTitle("提示")
 			.setMessage("确认备份数据")
@@ -118,6 +134,10 @@ public class ManageActivity extends BaseActivity {
 
 		@Override
 		public void onClick(View v) {
+			if (UserData.getPermission() > Permission.MANANGER) {
+				errDlg("权限不足");
+				return;
+			}
 			new AlertDialog.Builder(ManageActivity.this)
 			.setTitle("提示")
 			.setMessage("确认将数据恢复到服务器")
@@ -159,9 +179,15 @@ public class ManageActivity extends BaseActivity {
 
 		@Override
 		public void onClick(View v) {
+			if (UserData.getPermission() > Permission.MANANGER) {
+				errDlg("权限不足");
+				return;
+			}
+			
 			Intent intent = new Intent();
 			intent.setClass(ManageActivity.this, StuffPerformanceActivity.class);
 			ManageActivity.this.startActivity(intent);
+		
 		}
 	};
 	private OnClickListener manageClicked = new OnClickListener() {
@@ -181,6 +207,11 @@ public class ManageActivity extends BaseActivity {
 	private OnClickListener statisticsClicked = new OnClickListener() {
 		@Override
 		public void onClick(View v) {
+			if (UserData.getPermission() > Permission.MANANGER) {
+				errDlg("权限不足");
+				return;
+			}
+			
 			Intent intent = new Intent();
 			intent.setClass(ManageActivity.this, StatisticsActivity.class);
 			ManageActivity.this.startActivity(intent);
