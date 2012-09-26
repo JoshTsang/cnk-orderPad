@@ -58,14 +58,14 @@ public class UserData {
 
 		if ((start < 0) || (end < 0)) {
 			Log.e("userPerminssion", "userPerminssion is " + userPerminssion);
-			return -1;
+			return PWD_INCORRECT;
 		}
 
 		String userPerminssionRet = userPerminssion.subSequence(start + 1, end)
 				.toString();
 		if (userPerminssionRet.length() <= 0) {
 			Log.e("userPermission", "userPermission length < 0");
-			return -1;
+			return PWD_INCORRECT;
 		}
 
 		String pwd[] = userPwd.split(",");
