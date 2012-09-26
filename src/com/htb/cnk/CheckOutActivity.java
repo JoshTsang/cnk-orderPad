@@ -34,7 +34,8 @@ public class CheckOutActivity extends TableActivity{
 	protected ListView mMyOrderLst;
 	protected MyOrderAdapter mMyOrderAdapter;
 	protected MyOrder mMyOrder;
-	private Intent checkOutIntent ;
+	private Intent checkOutIntent;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);

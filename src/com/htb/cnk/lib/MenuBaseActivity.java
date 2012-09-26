@@ -35,7 +35,7 @@ import com.htb.cnk.data.Categories;
 import com.htb.cnk.data.Dish;
 import com.htb.cnk.data.Dishes;
 import com.htb.cnk.data.Info;
-import com.htb.cnk.data.MyOrder;
+import com.htb.cnk.data.PhoneOrder;
 import com.htb.constant.ErrorNum;
 
 public class MenuBaseActivity extends BaseActivity {
@@ -53,7 +53,7 @@ public class MenuBaseActivity extends BaseActivity {
 	protected Categories mCategories;
 	protected Dishes mDishes;
 	protected DishListAdapter mDishLstAdapter;
-	protected MyOrder mMyOrder;
+	protected PhoneOrder mMyOrder;
 	protected ProgressDialog mpDialog;
 	protected int layout;
 
@@ -61,7 +61,7 @@ public class MenuBaseActivity extends BaseActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(layout);
-		mMyOrder = new MyOrder(MenuBaseActivity.this);
+		mMyOrder = new PhoneOrder(MenuBaseActivity.this);
 		mDishes = new Dishes(this);
 		mCategories = new Categories(this);
 		findViews();

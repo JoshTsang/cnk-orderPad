@@ -59,11 +59,11 @@ public class PhoneActivity extends OrderBaseActivity {
 
 	private MyOrderAdapter getMyOrderAdapterInstance() {
 
-		return new MyOrderAdapter(this, mPhoneOrder) {
+		return new MyOrderAdapter(this, mMyOrder) {
 			@Override
 			public View getView(int position, View convertView, ViewGroup arg2) {
 				viewHolder1 holder1;
-				OrderedDish dishDetail = mPhoneOrder.getOrderedDish(position);
+				OrderedDish dishDetail = mMyOrder.getOrderedDish(position);
 
 				if (convertView == null) {
 					convertView = LayoutInflater.from(PhoneActivity.this)
@@ -121,10 +121,10 @@ public class PhoneActivity extends OrderBaseActivity {
 			mMyOrderLst.setAdapter(mMyOrderAdapter);
 			mpDialog.cancel();
 			if (msg.what < 0) {
-				mPhoneOrder.phoneClear();
+				mMyOrder.phoneClear();
 				queryWarningDialog();
 			} else if (msg.what == MyOrder.RET_NULL_PHONE_ORDER) {
-				mPhoneOrder.phoneClear();
+				mMyOrder.phoneClear();
 				toastText(R.string.delPhoneWarning);
 			}
 			mMyOrderAdapter.notifyDataSetChanged();
@@ -136,7 +136,7 @@ public class PhoneActivity extends OrderBaseActivity {
 			public void run() {
 				int ret = -1;
 				try {
-					ret = mPhoneOrder.getPhoneOrderFromServer(Info.getTableId());
+					ret = mMyOrder.getPhoneOrderFromServer(Info.getTableId());
 					queryHandler.sendEmptyMessage(ret);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -150,7 +150,7 @@ public class PhoneActivity extends OrderBaseActivity {
 		if (quantity < 0) {
 			minusThread(position, quantity);
 		} else {
-			mPhoneOrder.add(position, quantity);
+			mMyOrder.add(position, quantity);
 			mMyOrderAdapter.notifyDataSetChanged();
 			updateTabelInfos();
 		}
@@ -160,7 +160,7 @@ public class PhoneActivity extends OrderBaseActivity {
 	private void minusThread(final int position, final int quantity) {
 		new Thread() {
 			public void run() {
-				int ret = mPhoneOrder.minus(position, -quantity);
+				int ret = mMyOrder.minus(position, -quantity);
 				delPhoneOrderhandler.sendEmptyMessage(ret);
 			}
 		}.start();
@@ -171,7 +171,7 @@ public class PhoneActivity extends OrderBaseActivity {
 	}
 
 	private void minusDishQuantity(final int position, final int quantity) {
-		if (mPhoneOrder.getOrderedDish(position).getQuantity() > quantity) {
+		if (mMyOrder.getOrderedDish(position).getQuantity() > quantity) {
 			updateDishQuantity(position, -quantity);
 		} else {
 			minusDishDialog(position, quantity);
@@ -182,7 +182,7 @@ public class PhoneActivity extends OrderBaseActivity {
 		new AlertDialog.Builder(PhoneActivity.this)
 				.setTitle("请注意")
 				.setMessage(
-						"确认删除" + mPhoneOrder.getOrderedDish(position).getName())
+						"确认删除" + mMyOrder.getOrderedDish(position).getName())
 				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 
 					@Override
@@ -201,7 +201,7 @@ public class PhoneActivity extends OrderBaseActivity {
 						queryHandler.sendEmptyMessage(ret);
 						return;
 					}
-					ret = mPhoneOrder.cleanServerPhoneOrder(Info.getTableId());
+					ret = mMyOrder.cleanServerPhoneOrder(Info.getTableId());
 					if (ret < 0) {
 						queryHandler.sendEmptyMessage(ret);
 						return;

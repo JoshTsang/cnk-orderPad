@@ -90,19 +90,7 @@ public class MyOrder {
 		return 0;
 	}
 
-	public int minus(Dish dish, int quantity) {
-		for (OrderedDish item : mOrder) {
-			if (item.dish.getId() == dish.getId()) {
-				return minus(item, quantity);
-			}
-		}
-		return 0;
-	}
-
-	public int minus(int position, float quantity) {
-		OrderedDish item = mOrder.get(position);
-		return minus(item, quantity);
-	}
+	
 
 	public int count() {
 		return mOrder.size();
@@ -474,21 +462,6 @@ public class MyOrder {
 		return null;
 	}
 
-	private int minus(OrderedDish item, float quantity) {
-		if (item.padQuantity > quantity) {
-			if (item.padQuantity > quantity) {
-				item.padQuantity -= quantity;
-				return 0;
-			} else {
-				quantity -= item.padQuantity;
-			}
-		} else {
-			mOrder.remove(item);
-			return 0;
-		}
-		return 0;
-	}
-	
 	private int updateServerServedDish(int tableId, int dishId, int status) {
 		String dishStatusPkg = Http.get(Server.SERVE_ORDER, "TID=" + tableId
 				+ "&DID=" + dishId + "&STATUS=" + status);
