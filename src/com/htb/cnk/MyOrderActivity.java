@@ -259,7 +259,9 @@ public class MyOrderActivity extends OrderBaseActivity {
 			// });
 			minusBtn.setOnClickListener(minusClicked);
 			// minus5Btn.setOnClickListener(minus5Clicked);
-			flavorBtn.setOnClickListener(flavorClicked);
+			if (FLAVOR == 0) {
+				flavorBtn.setOnClickListener(flavorClicked);
+			}
 			dishQuantity.setOnLongClickListener(quantityClicked);
 		}
 
@@ -275,7 +277,8 @@ public class MyOrderActivity extends OrderBaseActivity {
 		public void fillData(OrderedDish dishDetail) {
 			dishName.setText(dishDetail.getName());
 			dishPrice.setText(Double.toString(dishDetail.getPrice()) + " 元/份");
-			dishQuantity.setText(mMyOrder.convertFloat(dishDetail.getQuantity()));
+			dishQuantity
+					.setText(mMyOrder.convertFloat(dishDetail.getQuantity()));
 
 		}
 	}
