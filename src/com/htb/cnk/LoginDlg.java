@@ -67,7 +67,6 @@ public class LoginDlg {
 								} else {
 									pdialog = new ProgressDialog(mActivity);
 									pdialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-									//mpDialog.setTitle("请稍等");
 									pdialog.setMessage("正在登陆...");
 									pdialog.setIndeterminate(false);
 									pdialog.setCancelable(false);

@@ -375,13 +375,7 @@ public class Cnk_orderPadActivity extends BaseActivity {
 	void popErrorDlg(int err) {
 		new AlertDialog.Builder(Cnk_orderPadActivity.this).setTitle("错误")
 				.setMessage("更新软件失败！")
-				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-
-					}
-				}).show();
+				.setPositiveButton("确定", null).show();
 
 	}
 
@@ -439,13 +433,7 @@ public class Cnk_orderPadActivity extends BaseActivity {
 							finish();
 						}
 					})
-			.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-
-				@Override
-				public void onClick(DialogInterface dialog,
-						int which) {
-				}
-			}).show();
+			.setNegativeButton("取消", null).show();
 			return true;
 		} else {
 			return super.onKeyDown(keyCode, event);
