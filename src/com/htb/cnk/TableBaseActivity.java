@@ -15,7 +15,6 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -232,7 +231,9 @@ public class TableBaseActivity extends BaseActivity {
 			public void run() {
 				try {
 					int ret = mNotificationType.getNotifiycationsType();
-					mNotificationHandler.sendEmptyMessage(ret);
+					if(ret < 0){
+						toastText("服务功能出现问题，暂时不能使用此功能，请联系技术开发人员来解决");
+					}
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

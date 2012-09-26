@@ -292,6 +292,7 @@ public class TableSetting implements Serializable {
 		if (!ErrorPHP.isSucc(tableChangePkg, TAG)) {
 			return -2;
 		}
+		mOrder.clear();
 		return 0;
 	}
 
@@ -309,6 +310,7 @@ public class TableSetting implements Serializable {
 		if (!ErrorPHP.isSucc(tablecopyPkg, TAG)) {
 			return -2;
 		}
+		mOrder.clear();
 		return 0;
 	}
 
@@ -353,6 +355,7 @@ public class TableSetting implements Serializable {
 		if (!ErrorPHP.isSucc(tablecheckOutPkg, TAG)) {
 			return -2;
 		}
+		mOrder.clear();
 		return 0;
 	}
 
@@ -382,7 +385,7 @@ public class TableSetting implements Serializable {
 		if (!ErrorPHP.isSucc(tablecombinePkg, TAG)) {
 			return -2;
 		}
-
+		mOrder.clear();
 		return 0;
 	}
 

@@ -35,6 +35,7 @@ import com.htb.cnk.data.Categories;
 import com.htb.cnk.data.Dish;
 import com.htb.cnk.data.Dishes;
 import com.htb.cnk.data.Info;
+import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.PhoneOrder;
 import com.htb.constant.ErrorNum;
 
@@ -359,7 +360,7 @@ public class MenuBaseActivity extends BaseActivity {
 			dishPrice.setText(Double.toString(dishDetail.getPrice()) + " 元/份");
 			float orderCount = mMyOrder.getOrderedCount(dishDetail.getId());
 			if (orderCount > 0) {
-				orderedCount.setText(mMyOrder.convertFloat(orderCount));
+				orderedCount.setText(MyOrder.convertFloat(orderCount));
 			} else {
 				orderedCount.setText(" ");
 			}
