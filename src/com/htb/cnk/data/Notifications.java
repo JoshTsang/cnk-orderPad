@@ -42,10 +42,6 @@ public class Notifications {
 		notifications.add(item);
 	}
 
-	public int size() {
-		return notifications.size() - 1;
-	}
-
 	public void clear() {
 		notifications.clear();
 	}
@@ -95,7 +91,6 @@ public class Notifications {
 				typesTemp = types.split(",");
 				asItem = new NotificationItem(id, typesTemp);
 				setting.add(asItem);
-				Log.d("settings", "settings:" + asItem.getId());
 			}
 			return 1;
 		} catch (Exception e) {

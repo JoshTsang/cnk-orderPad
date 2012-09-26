@@ -21,6 +21,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.SimpleAdapter;
+import android.widget.Toast;
 
 import com.htb.cnk.NotificationTableService.MyBinder;
 import com.htb.cnk.TableClickActivity.tableItemClickListener;
@@ -67,11 +68,12 @@ public class TableBaseActivity extends BaseActivity {
 	protected Handler mCombineTIdHandler;
 	protected Handler mCopyTIdHandler;
 	protected Handler mCheckOutHandler;
+	protected Handler mNotificationTypeHandler;
 	protected Button mBackBtn;
 	protected Button mUpdateBtn;
 	protected Button mStatisticsBtn;
 	protected Button mManageBtn;
-	
+
 	@Override
 	protected void onDestroy() {
 		unbindService(conn);
@@ -89,11 +91,11 @@ public class TableBaseActivity extends BaseActivity {
 		showProgressDlg(getResources().getString(R.string.getStatus));
 		binderStart();
 	}
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -109,10 +111,11 @@ public class TableBaseActivity extends BaseActivity {
 		mpDialog.setTitle(getResources().getString(R.string.pleaseWait));
 		findViews();
 		Info.setMode(Info.WORK_MODE_WAITER);
-		
-		intent = new Intent(TableBaseActivity.this, NotificationTableService.class);
+
+		intent = new Intent(TableBaseActivity.this,
+				NotificationTableService.class);
 		startService(intent);
-		
+
 		bindService(intent, conn, Context.BIND_AUTO_CREATE);
 		mReceiver = new MyReceiver();
 		IntentFilter filter = new IntentFilter(
@@ -120,9 +123,9 @@ public class TableBaseActivity extends BaseActivity {
 		registerReceiver(mReceiver, filter);
 
 		NotificationType();
-		
+
 	}
-	
+
 	private void findViews() {
 		mBackBtn = (Button) findViewById(R.id.back);
 		mUpdateBtn = (Button) findViewById(R.id.checkOutTable);
@@ -131,12 +134,11 @@ public class TableBaseActivity extends BaseActivity {
 		gridview = (GridView) findViewById(R.id.gridview);
 	}
 
-	
 	public void showProgressDlg(String msg) {
 		mpDialog.setMessage(msg);
 		mpDialog.show();
 	}
-	
+
 	protected ServiceConnection conn = new ServiceConnection() {
 
 		@Override
@@ -149,7 +151,7 @@ public class TableBaseActivity extends BaseActivity {
 		public void onServiceDisconnected(ComponentName name) {
 		}
 	};
-	
+
 	protected void setTableInfos() {
 		if (lstImageItem.size() > 0) {
 			setStatusAndIcon();
@@ -170,7 +172,7 @@ public class TableBaseActivity extends BaseActivity {
 	private void setStatusAndIcon() {
 		lstImageItem.clear();
 		for (int i = 0, n = 0; i < mSettings.size(); i++) {
-			int status = mSettings.getStatus(i);
+			int status = mSettings.getStatusIndex(i);
 			if (status < Table.NOTIFICATION_STATUS
 					&& mNotificaion.getId(n) == mSettings.getIdIndex(i)) {
 				status = status + Table.NOTIFICATION_STATUS;
@@ -188,14 +190,15 @@ public class TableBaseActivity extends BaseActivity {
 		} else {
 			map = lstImageItem.get(position);
 		}
-	
+
 		imageItemSwitch(position, status, map);
 		if (lstImageItem.size() <= position) {
 			lstImageItem.add(map);
 		}
 	}
 
-	private void imageItemSwitch(int position, int status, HashMap<String, Object> map) {
+	private void imageItemSwitch(int position, int status,
+			HashMap<String, Object> map) {
 		switch (status) {
 		case 0:
 			map.put(IMAGE_ITEM, R.drawable.table_red);
@@ -231,9 +234,7 @@ public class TableBaseActivity extends BaseActivity {
 			public void run() {
 				try {
 					int ret = mNotificationType.getNotifiycationsType();
-					if(ret < 0){
-						toastText(getResources().getString(R.string.notificationTypeWarning));
-					}
+					mNotificationTypeHandler.sendEmptyMessage(ret);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -244,15 +245,15 @@ public class TableBaseActivity extends BaseActivity {
 	protected void binderStart() {
 		if (binderFlag) {
 			binder.start();
-			return ;
+			return;
 		}
 	}
-	
+
 	protected void netWorkDialogShow(String messages) {
 		NETWORK_ARERTDIALOG = 1;
 		mNetWrorkcancel = mNetWrorkAlertDialog.setMessage(messages).show();
 	}
-	
+
 	public class MyReceiver extends BroadcastReceiver {
 
 		@Override

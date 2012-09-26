@@ -11,6 +11,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.htb.cnk.adapter.MyOrderAdapter;
 import com.htb.cnk.data.Info;
@@ -170,6 +171,9 @@ public class DelOrderActivity extends OrderBaseActivity {
 			if (msg.what == -2) {
 				toastText(R.string.delWarning);
 			} else if (msg.what == -1) {
+				if (NETWORK_ARERTDIALOG == 1) {
+					mNetWrorkcancel.cancel();
+				}
 				NETWORK_ARERTDIALOG = 1;
 				mNetWrorkcancel = mNetWrorkAlertDialog.show();
 			} else {
@@ -306,5 +310,5 @@ public class DelOrderActivity extends OrderBaseActivity {
 		mNetWrorkAlertDialog.setMessage(errMsg + ",请检查连接网络重试");
 		mNetWrorkcancel = mNetWrorkAlertDialog.show();
 	}
-
+	
 }

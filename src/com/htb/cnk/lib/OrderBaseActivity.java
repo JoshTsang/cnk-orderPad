@@ -7,6 +7,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.text.InputFilter;
 import android.text.method.DigitsKeyListener;
 import android.view.LayoutInflater;
@@ -49,7 +50,7 @@ public class OrderBaseActivity extends BaseActivity {
 	protected MyOrderAdapter mMyOrderAdapter;
 	protected int persons;
 	private TableSetting mSettings;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -62,11 +63,11 @@ public class OrderBaseActivity extends BaseActivity {
 		mpDialog.setCancelable(false);
 		getPersons();
 		getFLavor();
-		
+
 		findViews();
 		fillData();
 		setClickListener();
-		
+
 	}
 
 	public void getPersons() {
@@ -81,20 +82,16 @@ public class OrderBaseActivity extends BaseActivity {
 			}
 		}.start();
 	}
-	
+
 	public void getFLavor(){
 		new Thread() {
 			public void run() {
 				int ret = mMyOrder.getFLavorFromServer();
-				if(ret < 0){
-					Toast.makeText(getApplicationContext(), "点菜口味数据不对，亲不要使用口味功能，请联系工程师！",
-							Toast.LENGTH_SHORT).show();
-					return;
-				}
+				flavorHandler.sendEmptyMessage(ret);
 			}
 		}.start();
 	}
-	
+
 	private void findViews() {
 		mBackBtn = (Button) findViewById(R.id.back_btn);
 		mSubmitBtn = (Button) findViewById(R.id.submit);
@@ -122,22 +119,22 @@ public class OrderBaseActivity extends BaseActivity {
 		DecimalFormat format = new DecimalFormat("#.00");
 		mDishCountTxt.setText(Integer.toString(mMyOrder.getTotalQuantity())
 				+ " 道菜");
-		mTotalPriceTxt
-				.setText(format.format(mMyOrder.getTotalPrice()) + " 元");
+		mTotalPriceTxt.setText(format.format(mMyOrder.getTotalPrice()) + " 元");
 	}
 
 	protected void showProgressDlg(String msg) {
 		mpDialog.setMessage(msg);
 		mpDialog.show();
 	}
-	
+
 	/**
 	 * @return
 	 */
 	protected int updateStatus(int tableId, int orderType) {
-		return mSettings.updateStatus(Info.getTableId(),TableSetting.PHONE_ORDER);
+		return mSettings.updateStatus(Info.getTableId(),
+				TableSetting.PHONE_ORDER);
 	}
-	
+
 	protected void showUpdateQuantityDlg(final int index) {
 		final EditText changeTableText = new EditText(OrderBaseActivity.this);
 		changeTableText.setKeyListener(new DigitsKeyListener(false, true));
@@ -205,7 +202,7 @@ public class OrderBaseActivity extends BaseActivity {
 			public void run() {
 				int ret = mMyOrder.submit();
 				mSubmitHandler.sendEmptyMessage(ret);
-				}
+			}
 		}.start();
 	}
 
@@ -262,39 +259,42 @@ public class OrderBaseActivity extends BaseActivity {
 	public void flavorDialog(final int position, final boolean[] selected) {
 		new AlertDialog.Builder(OrderBaseActivity.this)
 				.setTitle("口味选择")
-				.setMultiChoiceItems(MyOrder.mFlavor,
-						null, new DialogInterface.OnMultiChoiceClickListener() {
+				.setMultiChoiceItems(MyOrder.mFlavor, null,
+						new DialogInterface.OnMultiChoiceClickListener() {
 
 							@Override
-							public void onClick(DialogInterface dialogInterface,
-									int which, boolean isChecked) {
+							public void onClick(
+									DialogInterface dialogInterface, int which,
+									boolean isChecked) {
 								selected[which] = isChecked;
 							}
-						}).setPositiveButton("确定",  new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialogInterface, int which) {
-								StringBuffer flavorStrBuf = new StringBuffer();
-								String flavorStr = null;
-								for (int i = 0; i < selected.length; i++) {
-									if (selected[i] == true) {
-										flavorStrBuf.append(MyOrder.mFlavor[i] + ",");
-										flavorStr = flavorStrBuf.toString().substring(0, flavorStrBuf.length()-1);
-									}
-								}
-								mMyOrder.setFlavor(flavorStr, position);
-							}
 						})
-				.setNegativeButton("取消", null).show();
+				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialogInterface,
+							int which) {
+						StringBuffer flavorStrBuf = new StringBuffer();
+						String flavorStr = null;
+						for (int i = 0; i < selected.length; i++) {
+							if (selected[i] == true) {
+								flavorStrBuf.append(MyOrder.mFlavor[i] + ",");
+								flavorStr = flavorStrBuf.toString().substring(
+										0, flavorStrBuf.length() - 1);
+							}
+						}
+						mMyOrder.setFlavor(flavorStr, position);
+					}
+				}).setNegativeButton("取消", null).show();
 	}
-	
+
 	private OnClickListener submitBtnClicked = new OnClickListener() {
 
 		@Override
 		public void onClick(View v) {
 			if (Info.getTableId() < 0) {
 				new AlertDialog.Builder(OrderBaseActivity.this).setTitle("请注意")
-				.setMessage("菜谱模式，不能提交订单！").setPositiveButton("确定", null)
-				.show();
+						.setMessage("菜谱模式，不能提交订单！")
+						.setPositiveButton("确定", null).show();
 				return;
 			}
 			if (mMyOrder.count() <= 0) {
@@ -317,44 +317,40 @@ public class OrderBaseActivity extends BaseActivity {
 	};
 
 	private OnClickListener commentClicked = new OnClickListener() {
-		
+
 		@Override
 		public void onClick(View v) {
 			showComment();
 		}
 	};
-	
+
 	protected void showComment() {
 		LayoutInflater factory = LayoutInflater.from(OrderBaseActivity.this);
 		final View DialogView = factory.inflate(R.layout.comment_dialog, null);
-		
-		final EditText commentET = (EditText) DialogView.findViewById(R.id.comment);
-		
+
+		final EditText commentET = (EditText) DialogView
+				.findViewById(R.id.comment);
+
 		commentET.setText(mMyOrder.getComment());
-		
+
 		AlertDialog dlg = new AlertDialog.Builder(OrderBaseActivity.this)
-				.setTitle("备注")
-				.setView(DialogView)
-				.setPositiveButton("确定",
-						new DialogInterface.OnClickListener() {
+				.setTitle("备注").setView(DialogView)
+				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 
-							@Override
-							public void onClick(DialogInterface dialog,
-									int which) {
-								mMyOrder.setComment(commentET.getText().toString());
-							}
-						}).setNegativeButton("取消",
-						new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						mMyOrder.setComment(commentET.getText().toString());
+					}
+				})
+				.setNegativeButton("取消", new DialogInterface.OnClickListener() {
 
-							@Override
-							public void onClick(DialogInterface dialog,
-									int which) {
-							}
-						})
-				.setCancelable(false).create();
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+					}
+				}).setCancelable(false).create();
 		dlg.show();
 	}
-	
+
 	private OnClickListener backBtnClicked = new OnClickListener() {
 
 		@Override
@@ -362,18 +358,27 @@ public class OrderBaseActivity extends BaseActivity {
 			OrderBaseActivity.this.finish();
 		}
 	};
-	
-	protected OnClickListener flavorClicked = new OnClickListener() {
-	
-			@Override
-			public void onClick(View v) {
-				Button text = (Button) v.findViewById(R.id.flavor);
-				text.setTextColor(android.graphics.Color.WHITE);
-				final int position = Integer.parseInt(v.getTag().toString());
-				final boolean selected[] = new boolean[MyOrder.mFlavor.length];
-				flavorDialog(position, selected);
-			}
-		};
-	
 
+	protected OnClickListener flavorClicked = new OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+			Button text = (Button) v.findViewById(R.id.flavor);
+			text.setTextColor(android.graphics.Color.WHITE);
+			final int position = Integer.parseInt(v.getTag().toString());
+			final boolean selected[] = new boolean[MyOrder.mFlavor.length];
+			flavorDialog(position, selected);
+		}
+	};
+
+	Handler flavorHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			if (msg.what < 0) {
+				Toast.makeText(getApplicationContext(), "点菜口味数据不对，亲不要使用口味功能，请联系工程师！",
+						Toast.LENGTH_SHORT).show();
+			} else {
+			}
+		}
+	};
+	
 }
