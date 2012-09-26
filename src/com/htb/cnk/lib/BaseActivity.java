@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.os.Message;
 import android.view.KeyEvent;
-import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.htb.constant.ErrorNum;

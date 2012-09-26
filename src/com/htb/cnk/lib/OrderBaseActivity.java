@@ -72,7 +72,7 @@ public class OrderBaseActivity extends BaseActivity {
 	public void getPersons() {
 		new Thread() {
 			public void run() {
-				int ret = mMyOrder.loodPersons(Info.getTableId());
+				int ret = MyOrder.loodPersons(Info.getTableId());
 				if (ret < 0) {
 					persons = 0;
 				} else {
