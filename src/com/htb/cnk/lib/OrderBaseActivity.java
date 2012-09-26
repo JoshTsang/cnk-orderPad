@@ -35,6 +35,7 @@ import com.htb.constant.Permission;
  * 
  */
 public class OrderBaseActivity extends BaseActivity {
+	protected static int FLAVOR = 0;
 	protected Button mBackBtn;
 	protected Button mSubmitBtn;
 	protected Button mLeftBtn;
@@ -83,7 +84,7 @@ public class OrderBaseActivity extends BaseActivity {
 		}.start();
 	}
 
-	public void getFLavor(){
+	public void getFLavor() {
 		new Thread() {
 			public void run() {
 				int ret = mMyOrder.getFLavorFromServer();
@@ -374,11 +375,14 @@ public class OrderBaseActivity extends BaseActivity {
 	Handler flavorHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			if (msg.what < 0) {
-				Toast.makeText(getApplicationContext(), "点菜口味数据不对，亲不要使用口味功能，请联系工程师！",
-						Toast.LENGTH_SHORT).show();
+				Toast.makeText(getApplicationContext(),
+						"点菜口味数据不对，亲不要使用口味功能，请联系工程师！", Toast.LENGTH_SHORT)
+						.show();
+				FLAVOR = 1;
 			} else {
+				FLAVOR = 0;
 			}
 		}
 	};
-	
+
 }
