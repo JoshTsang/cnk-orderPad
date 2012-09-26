@@ -27,6 +27,7 @@ import com.htb.cnk.data.PhoneOrder;
 import com.htb.cnk.data.Setting;
 import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.lib.BaseActivity;
+import com.htb.constant.Permission;
 
 /**
  * @author josh
@@ -193,7 +194,7 @@ public class OrderBaseActivity extends BaseActivity {
 					public void onClick(DialogInterface dialog, int which) {
 						LoginDlg loginDlg = new LoginDlg(
 								OrderBaseActivity.this, LoginDlg.ACTION_SUBMIT);
-						loginDlg.show();
+						loginDlg.show(Permission.STUFF);
 					}
 				}).setNegativeButton("继续点菜", null).show();
 	}

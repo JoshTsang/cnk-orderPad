@@ -496,7 +496,6 @@ public class TableSetting implements Serializable {
 		return checkOutJson;
 	}
 
-	//TODO might cause crash when return <= 0
 	private int getSpaceLen(int expect, int actal) {
 		int ret = (expect - actal) * 2;
 		return ret>0?ret:1;

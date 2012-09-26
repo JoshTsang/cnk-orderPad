@@ -38,7 +38,7 @@ public class LoginDlg {
 		mAction = action;
 	}
 	
-	public void show() {
+	public void show(final int permissionRequres) {
 		LayoutInflater factory = LayoutInflater.from(mActivity);
 		final View DialogView = factory.inflate(R.layout.setting_dialog, null);
 		SharedPreferences sharedPre = mActivity.getSharedPreferences("userInfo",
@@ -75,7 +75,7 @@ public class LoginDlg {
 									new Thread() {
 									public void run() {
 										try {
-											int ret = UserData.compare();
+											int ret = UserData.compare(permissionRequres);
 											userHandle.sendEmptyMessage(ret);
 										} catch (Exception e) {
 											userHandle.sendEmptyMessage(UserData.PWD_NETWORK_ERR);
@@ -154,6 +154,11 @@ public class LoginDlg {
 				case UserData.PWD_INCORRECT:
 					Toast.makeText(mActivity,
 							R.string.userWarning,
+							Toast.LENGTH_LONG).show();
+					break;
+				case UserData.NO_PERMISSION:
+					Toast.makeText(mActivity,
+							"权限不够",
 							Toast.LENGTH_LONG).show();
 					break;
 				case UserData.PWD_NETWORK_ERR:
