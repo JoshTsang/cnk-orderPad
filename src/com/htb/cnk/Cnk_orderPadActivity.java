@@ -42,6 +42,7 @@ import com.htb.cnk.data.Version;
 import com.htb.cnk.data.WifiAdmin;
 import com.htb.cnk.lib.BaseActivity;
 import com.htb.cnk.lib.Http;
+import com.htb.constant.Permission;
 import com.htb.constant.Server;
 
 public class Cnk_orderPadActivity extends BaseActivity {
@@ -167,7 +168,7 @@ public class Cnk_orderPadActivity extends BaseActivity {
 			if (Info.getMode() == Info.WORK_MODE_CUSTOMER) {
 				LoginDlg loginDlg = new LoginDlg(Cnk_orderPadActivity.this,
 						TableActivity.class);
-				loginDlg.show();
+				loginDlg.show(Permission.STUFF);
 			} else {
 				Intent intent = new Intent();
 				intent.setClass(Cnk_orderPadActivity.this, TableActivity.class);

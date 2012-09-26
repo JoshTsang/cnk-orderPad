@@ -6,12 +6,15 @@ import com.htb.cnk.lib.Http;
 import com.htb.constant.Server;
 
 public class UserData {
+	final static String TAG = "UserData";
 	public final static int PWD_NETWORK_ERR = -1;
 	public final static int PWD_INCORRECT = -2;
+	public final static int NO_PERMISSION = -3;
 
 	static protected String mId;
 	static protected String mName;
 	static protected String mPwd;
+	static protected int mPermission;
 
 	public static void clean() {
 		mName = null;
@@ -38,12 +41,12 @@ public class UserData {
 		return mId;
 	}
 
-	// TODO need parameter permission
-	public static int compare() {
+	public static int compare(int permissionRequire) {
 		String userPwd = Http.get(Server.GET_PWD, "UNAME=" + UserData.mName);
 		if (userPwd == null) {
 			return PWD_NETWORK_ERR;
 		}
+		
 		Log.d("pwd", "userPwd:" + userPwd);
 		String userPerminssion = Http.get(Server.GET_PERMINSSION, "UNAME="
 				+ UserData.mName);
@@ -68,18 +71,27 @@ public class UserData {
 		String pwd[] = userPwd.split(",");
 		
 		mId = pwd[0];
-		//TODO verify Permission
+		
 		if (pwd[1].equals(UserData.mPwd)) {
-			return 1;
+			
 		} else {
 			Log.e("compare", "userPwd.error:" + userPwd + " userPermission:"
 					+ userPerminssionRet);
 			return PWD_INCORRECT;
 		}
 
+		mPermission = Integer.valueOf(userPerminssionRet);
+		if (mPermission > permissionRequire) {
+			Log.e(TAG, "no permission:" + mPermission + " require:" + permissionRequire);
+			return NO_PERMISSION;
+		}
+		
+		return 0;
 	}
 	
-
+	public static int getPermission() {
+		return mPermission;
+	}
 	
 	public static void debugMode() {
 		mId = "1";
