@@ -8,7 +8,7 @@ public class Version {
 	final String TAG = "version";
 	public final String UPDATE_SAVENAME = "cnk.apk";
 	final int minor = 0;
-	final int build = 32;
+	final int build = 33;
 	int ver;
 	
 	public Version(Context context) {
@@ -16,7 +16,7 @@ public class Version {
 		try {
 			ver = context.getPackageManager().getPackageInfo(
 					"com.htb.cnk", 0).versionCode;
-			Log.i(TAG, "ver:" + ver);
+			Log.i(TAG, "ver_local:" + ver);
 		} catch (NameNotFoundException e) {
 			Log.e(TAG, e.getMessage());
 		}
