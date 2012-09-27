@@ -35,7 +35,7 @@ import com.htb.constant.Permission;
  * 
  */
 public class OrderBaseActivity extends BaseActivity {
-	protected static int FLAVOR = 0;
+	protected static Boolean isFlvaorEnable = false;
 	protected Button mBackBtn;
 	protected Button mSubmitBtn;
 	protected Button mLeftBtn;
@@ -257,10 +257,11 @@ public class OrderBaseActivity extends BaseActivity {
 		personSettingDlg.show();
 	}
 
-	public void flavorDialog(final int position, final boolean[] selected) {
+	public void flavorDialog(final int position) {
+		final boolean[] selected = mMyOrder.slectedFlavor(position);
 		new AlertDialog.Builder(OrderBaseActivity.this)
 				.setTitle("口味选择")
-				.setMultiChoiceItems(MyOrder.mFlavor, null,
+				.setMultiChoiceItems(MyOrder.mFlavorName, selected,
 						new DialogInterface.OnMultiChoiceClickListener() {
 
 							@Override
@@ -274,16 +275,7 @@ public class OrderBaseActivity extends BaseActivity {
 					@Override
 					public void onClick(DialogInterface dialogInterface,
 							int which) {
-						StringBuffer flavorStrBuf = new StringBuffer();
-						String flavorStr = null;
-						for (int i = 0; i < selected.length; i++) {
-							if (selected[i] == true) {
-								flavorStrBuf.append(MyOrder.mFlavor[i] + ",");
-								flavorStr = flavorStrBuf.toString().substring(
-										0, flavorStrBuf.length() - 1);
-							}
-						}
-						mMyOrder.setFlavor(flavorStr, position);
+						mMyOrder.setFlavor(selected, position);
 					}
 				}).setNegativeButton("取消", null).show();
 	}
@@ -364,11 +356,12 @@ public class OrderBaseActivity extends BaseActivity {
 
 		@Override
 		public void onClick(View v) {
-			Button text = (Button) v.findViewById(R.id.flavor);
-			text.setTextColor(android.graphics.Color.WHITE);
-			final int position = Integer.parseInt(v.getTag().toString());
-			final boolean selected[] = new boolean[MyOrder.mFlavor.length];
-			flavorDialog(position, selected);
+			if (isFlvaorEnable == true) {
+				Button text = (Button) v.findViewById(R.id.flavor);
+				text.setTextColor(android.graphics.Color.WHITE);
+				final int position = Integer.parseInt(v.getTag().toString());
+				flavorDialog(position);
+			}
 		}
 	};
 
@@ -376,11 +369,10 @@ public class OrderBaseActivity extends BaseActivity {
 		public void handleMessage(Message msg) {
 			if (msg.what < 0) {
 				Toast.makeText(getApplicationContext(),
-						"点菜口味数据不对，亲不要使用口味功能，请联系工程师！", Toast.LENGTH_LONG)
-						.show();
-				FLAVOR = 1;
+						"点菜口味数据不对，亲不要使用口味功能", Toast.LENGTH_LONG).show();
+				isFlvaorEnable = false;
 			} else {
-				FLAVOR = 0;
+				isFlvaorEnable = true;
 			}
 		}
 	};

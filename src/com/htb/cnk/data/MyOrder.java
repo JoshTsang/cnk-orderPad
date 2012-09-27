@@ -32,13 +32,12 @@ public class MyOrder {
 	final static int MODE_PAD = 0;
 	protected final static int MODE_PHONE = 1;
 	protected final static int TIME_OUT = -1;
-
 	private CnkDbHelper mCnkDbHelper;
 	protected SQLiteDatabase mDb;
 	private Context mDelDlgActivity;
 	protected static List<OrderedDish> mOrder = new ArrayList<OrderedDish>();
 	protected int persons;
-	public static String[] mFlavor;
+	public static String[] mFlavorName;
 	public static String comment = "";
 
 	public MyOrder(Context context) {
@@ -89,8 +88,6 @@ public class MyOrder {
 		mOrder.get(position).padQuantity += quantity;
 		return 0;
 	}
-
-	
 
 	public int count() {
 		return mOrder.size();
@@ -172,12 +169,21 @@ public class MyOrder {
 		return 0;
 	}
 
-	public int setFlavor(String flavor, int index) {
+	public int setFlavor(boolean[] flavor, int index) {
 		if (mOrder.size() < index) {
 			return -1;
 		}
 		mOrder.get(index).setFlavor(flavor);
 		return 0;
+	}
+
+	public boolean[] slectedFlavor(int index) {
+		boolean[] slected = new boolean[mFlavorName.length];
+		if (mOrder.get(index).getFlavor() == null) {
+			return slected;
+		}
+		slected = mOrder.get(index).getFlavor();
+		return slected;
 	}
 
 	public OrderedDish getOrderedDish(int position) {
@@ -208,7 +214,7 @@ public class MyOrder {
 			mOrder.clear();
 		}
 	}
-	
+
 	public float getOrderedCount(int did) {
 		for (OrderedDish dish : mOrder) {
 			if (dish.getDishId() == did) {
@@ -250,12 +256,14 @@ public class MyOrder {
 		JSONArray dishes = new JSONArray();
 		try {
 			for (int i = 0; i < mOrder.size(); i++) {
+				String flavorStr = null;
+				flavorStr = getFlavorNameToSubmit(i, flavorStr);
 				JSONObject dish = new JSONObject();
 				dish.put("dishId", mOrder.get(i).dish.getId());
 				dish.put("name", mOrder.get(i).dish.getName());
 				dish.put("price", mOrder.get(i).dish.getPrice());
 				dish.put("quan", mOrder.get(i).getQuantity());
-				dish.put("flavor", mOrder.get(i).flavor);
+				dish.put("flavor", flavorStr);
 				dishes.put(dish);
 			}
 			order.put("order", dishes);
@@ -269,6 +277,22 @@ public class MyOrder {
 		}
 		return 0;
 
+	}
+
+	private String getFlavorNameToSubmit(int i, String flavorStr) {
+		if (mOrder.get(i).flavor != null) {
+			StringBuffer flavorStrBuf = new StringBuffer();
+			for (int k = 0; k < mOrder.get(i).flavor.length; k++) {
+				if (mOrder.get(i).flavor[k] == true) {
+					flavorStrBuf.append(MyOrder.mFlavorName[k] + ",");
+				}
+			}
+			if (!flavorStrBuf.toString().equals("")) {
+				flavorStr = flavorStrBuf.toString().substring(0,
+						flavorStrBuf.length() - 1);
+			}
+		}
+		return flavorStr;
 	}
 
 	public static int loodPersons(int tableId) {
@@ -309,10 +333,10 @@ public class MyOrder {
 		}
 		try {
 			JSONArray flavor = new JSONArray(response);
-			mFlavor = new String[flavor.length()];
+			mFlavorName = new String[flavor.length()];
 			int length = flavor.length();
 			for (int i = 0; i < length; i++) {
-				mFlavor[i] = flavor.getString(i);
+				mFlavorName[i] = flavor.getString(i);
 			}
 			return 0;
 		} catch (Exception e) {
@@ -357,7 +381,7 @@ public class MyOrder {
 		mOrder.get(index).phoneQuantity = 0;
 		mOrder.get(index).padQuantity = quantity;
 	}
-	
+
 	public static String convertFloat(float quantity) {
 		DecimalFormat format = new DecimalFormat("0.00");
 		String quantityStr[] = format.format(quantity).split("\\.");

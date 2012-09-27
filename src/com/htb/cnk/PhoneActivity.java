@@ -98,9 +98,7 @@ public class PhoneActivity extends OrderBaseActivity {
 				holder1.minusBtn.setOnClickListener(minusClicked);
 
 				holder1.flavorBtn.setTag(position);
-				if (FLAVOR == 0) {
-					holder1.flavorBtn.setOnClickListener(flavorClicked);
-				}
+				holder1.flavorBtn.setOnClickListener(flavorClicked);
 				return convertView;
 			}
 
@@ -130,6 +128,7 @@ public class PhoneActivity extends OrderBaseActivity {
 			updateTabelInfos();
 		}
 	};
+
 	protected void queryThread() {
 		new Thread() {
 			public void run() {
@@ -195,8 +194,9 @@ public class PhoneActivity extends OrderBaseActivity {
 		new Thread() {
 			public void run() {
 				try {
-					int ret = updateStatus(Info.getTableId(),TableSetting.PHONE_ORDER); 
-					if(ret < 0){
+					int ret = updateStatus(Info.getTableId(),
+							TableSetting.PHONE_ORDER);
+					if (ret < 0) {
 						queryHandler.sendEmptyMessage(ret);
 						return;
 					}
@@ -229,18 +229,16 @@ public class PhoneActivity extends OrderBaseActivity {
 	 */
 	private void queryWarningDialog() {
 		new AlertDialog.Builder(PhoneActivity.this).setTitle("请注意")
-				.setMessage("无法连接服务器").setPositiveButton("确定", null)
-				.show();
+				.setMessage("无法连接服务器").setPositiveButton("确定", null).show();
 	}
 
 	/**
 	 * @param errMsg
 	 */
 	private void errMsgDialog(String errMsg) {
-		new AlertDialog.Builder(PhoneActivity.this)
-				.setCancelable(false).setTitle("出错了")
-				.setMessage(errMsg).setPositiveButton("确定", null)
-				.show();
+		new AlertDialog.Builder(PhoneActivity.this).setCancelable(false)
+				.setTitle("出错了").setMessage(errMsg)
+				.setPositiveButton("确定", null).show();
 	}
 
 	private OnClickListener backBtnClicked = new OnClickListener() {
