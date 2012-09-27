@@ -258,9 +258,10 @@ public class OrderBaseActivity extends BaseActivity {
 	}
 
 	public void flavorDialog(final int position, final boolean[] selected) {
+
 		new AlertDialog.Builder(OrderBaseActivity.this)
 				.setTitle("口味选择")
-				.setMultiChoiceItems(MyOrder.mFlavor, null,
+				.setMultiChoiceItems(MyOrder.mFlavorName, selected,
 						new DialogInterface.OnMultiChoiceClickListener() {
 
 							@Override
@@ -278,10 +279,13 @@ public class OrderBaseActivity extends BaseActivity {
 						String flavorStr = null;
 						for (int i = 0; i < selected.length; i++) {
 							if (selected[i] == true) {
-								flavorStrBuf.append(MyOrder.mFlavor[i] + ",");
-								flavorStr = flavorStrBuf.toString().substring(
-										0, flavorStrBuf.length() - 1);
+								flavorStrBuf.append(MyOrder.mFlavorName[i]
+										+ ",");
 							}
+						}
+						if (!flavorStrBuf.toString().equals("")) {
+							flavorStr = flavorStrBuf.toString().substring(0,
+									flavorStrBuf.length() - 1);
 						}
 						mMyOrder.setFlavor(flavorStr, position);
 					}
@@ -367,7 +371,8 @@ public class OrderBaseActivity extends BaseActivity {
 			Button text = (Button) v.findViewById(R.id.flavor);
 			text.setTextColor(android.graphics.Color.WHITE);
 			final int position = Integer.parseInt(v.getTag().toString());
-			final boolean selected[] = new boolean[MyOrder.mFlavor.length];
+			boolean selected[] = new boolean[MyOrder.mFlavorName.length];
+			selected = mMyOrder.slectedFlavor(position);
 			flavorDialog(position, selected);
 		}
 	};
@@ -376,8 +381,7 @@ public class OrderBaseActivity extends BaseActivity {
 		public void handleMessage(Message msg) {
 			if (msg.what < 0) {
 				Toast.makeText(getApplicationContext(),
-						"点菜口味数据不对，亲不要使用口味功能，请联系工程师！", Toast.LENGTH_LONG)
-						.show();
+						"点菜口味数据不对，亲不要使用口味功能，请联系工程师！", Toast.LENGTH_LONG).show();
 				FLAVOR = 1;
 			} else {
 				FLAVOR = 0;
