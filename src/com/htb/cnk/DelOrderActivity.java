@@ -21,7 +21,6 @@ import com.htb.cnk.lib.OrderBaseActivity;
 
 public class DelOrderActivity extends OrderBaseActivity {
 	private final int CLEANALL = -1;
-	private final int CLEANITEM = -2;
 	private final int UPDATE_ORDER = 1;
 	private final int DEL_ITEM_ORDER = 2;
 	private int NETWORK_ARERTDIALOG = 0;
