@@ -182,29 +182,10 @@ public class MyOrder {
 		if (mOrder.get(index).getFlavor() == null) {
 			return slected;
 		}
-<<<<<<< HEAD
-		String flavor[] = mOrder.get(index).getFlavor().split(",");
-		for (int i = 0; i < flavor.length; i++) {
-			equalsFlavor(flavor[i], slected);
-		}
-
-		return slected;
-	}
-
-	private void equalsFlavor(String flavor, boolean[] slected) {
-		for (int i = 0; i < mFlavorName.length; i++) {
-			if (mFlavorName[i].equals(flavor)) {
-				slected[i] = true;
-			}
-		}
-	}
-
-=======
 		slected = mOrder.get(index).getFlavor();
 		return slected;
 	}
 
->>>>>>> jone
 	public OrderedDish getOrderedDish(int position) {
 		return mOrder.get(position);
 	}
