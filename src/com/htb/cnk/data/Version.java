@@ -16,7 +16,7 @@ public class Version {
 		try {
 			ver = context.getPackageManager().getPackageInfo(
 					"com.htb.cnk", 0).versionCode;
-			Log.i(TAG, "ver_local:" + ver);
+			Log.i(TAG, "ver_major_local:" + ver);
 		} catch (NameNotFoundException e) {
 			Log.e(TAG, e.getMessage());
 		}
