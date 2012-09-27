@@ -376,7 +376,7 @@ public class OrderBaseActivity extends BaseActivity {
 		public void handleMessage(Message msg) {
 			if (msg.what < 0) {
 				Toast.makeText(getApplicationContext(),
-						"点菜口味数据不对，亲不要使用口味功能，请联系工程师！", Toast.LENGTH_SHORT)
+						"点菜口味数据不对，亲不要使用口味功能，请联系工程师！", Toast.LENGTH_LONG)
 						.show();
 				FLAVOR = 1;
 			} else {

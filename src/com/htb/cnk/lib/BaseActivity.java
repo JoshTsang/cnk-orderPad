@@ -64,10 +64,10 @@ public class BaseActivity extends Activity {
 
 	protected void toastText(int r) {
 		Toast.makeText(getApplicationContext(), getResources().getString(r),
-				Toast.LENGTH_SHORT).show();
+				Toast.LENGTH_LONG).show();
 	}
 
 	protected void toastText(String r) {
-		Toast.makeText(getApplicationContext(), r, Toast.LENGTH_SHORT).show();
+		Toast.makeText(getApplicationContext(), r, Toast.LENGTH_LONG).show();
 	}
 }
