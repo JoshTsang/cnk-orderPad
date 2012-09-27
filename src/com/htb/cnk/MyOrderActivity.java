@@ -259,9 +259,8 @@ public class MyOrderActivity extends OrderBaseActivity {
 			// });
 			minusBtn.setOnClickListener(minusClicked);
 			// minus5Btn.setOnClickListener(minus5Clicked);
-			if (FLAVOR == 0) {
-				flavorBtn.setOnClickListener(flavorClicked);
-			}
+
+			flavorBtn.setOnClickListener(flavorClicked);
 			dishQuantity.setOnLongClickListener(quantityClicked);
 		}
 
