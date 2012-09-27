@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.htb.cnk.adapter.MyOrderAdapter;
 import com.htb.cnk.data.Info;
+import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.OrderedDish;
 import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.lib.OrderBaseActivity;
@@ -37,7 +38,6 @@ public class MyOrderActivity extends OrderBaseActivity {
 		fillOrderData();
 		setOrderClickListener();
 		mSubmitHandler = handler;
-
 	}
 
 	private void setOrderViews() {
@@ -278,7 +278,7 @@ public class MyOrderActivity extends OrderBaseActivity {
 			dishName.setText(dishDetail.getName());
 			dishPrice.setText(Double.toString(dishDetail.getPrice()) + " 元/份");
 			dishQuantity
-					.setText(mMyOrder.convertFloat(dishDetail.getQuantity()));
+					.setText(MyOrder.convertFloat(dishDetail.getQuantity()));
 
 		}
 	}

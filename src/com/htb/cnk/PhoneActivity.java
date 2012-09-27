@@ -98,7 +98,9 @@ public class PhoneActivity extends OrderBaseActivity {
 				holder1.minusBtn.setOnClickListener(minusClicked);
 
 				holder1.flavorBtn.setTag(position);
-				holder1.flavorBtn.setOnClickListener(flavorClicked);
+				if (FLAVOR == 0) {
+					holder1.flavorBtn.setOnClickListener(flavorClicked);
+				}
 				return convertView;
 			}
 
