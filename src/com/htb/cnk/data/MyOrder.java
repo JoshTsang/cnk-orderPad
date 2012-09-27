@@ -169,7 +169,7 @@ public class MyOrder {
 		return 0;
 	}
 
-	public int setFlavor(String flavor, int index) {
+	public int setFlavor(boolean[] flavor, int index) {
 		if (mOrder.size() < index) {
 			return -1;
 		}
@@ -182,6 +182,7 @@ public class MyOrder {
 		if (mOrder.get(index).getFlavor() == null) {
 			return slected;
 		}
+<<<<<<< HEAD
 		String flavor[] = mOrder.get(index).getFlavor().split(",");
 		for (int i = 0; i < flavor.length; i++) {
 			equalsFlavor(flavor[i], slected);
@@ -198,6 +199,12 @@ public class MyOrder {
 		}
 	}
 
+=======
+		slected = mOrder.get(index).getFlavor();
+		return slected;
+	}
+
+>>>>>>> jone
 	public OrderedDish getOrderedDish(int position) {
 		return mOrder.get(position);
 	}
@@ -268,12 +275,14 @@ public class MyOrder {
 		JSONArray dishes = new JSONArray();
 		try {
 			for (int i = 0; i < mOrder.size(); i++) {
+				String flavorStr = null;
+				flavorStr = getFlavorNameToSubmit(i, flavorStr);
 				JSONObject dish = new JSONObject();
 				dish.put("dishId", mOrder.get(i).dish.getId());
 				dish.put("name", mOrder.get(i).dish.getName());
 				dish.put("price", mOrder.get(i).dish.getPrice());
 				dish.put("quan", mOrder.get(i).getQuantity());
-				dish.put("flavor", mOrder.get(i).flavor);
+				dish.put("flavor", flavorStr);
 				dishes.put(dish);
 			}
 			order.put("order", dishes);
@@ -287,6 +296,22 @@ public class MyOrder {
 		}
 		return 0;
 
+	}
+
+	private String getFlavorNameToSubmit(int i, String flavorStr) {
+		if (mOrder.get(i).flavor != null) {
+			StringBuffer flavorStrBuf = new StringBuffer();
+			for (int k = 0; k < mOrder.get(i).flavor.length; k++) {
+				if (mOrder.get(i).flavor[k] == true) {
+					flavorStrBuf.append(MyOrder.mFlavorName[k] + ",");
+				}
+			}
+			if (!flavorStrBuf.toString().equals("")) {
+				flavorStr = flavorStrBuf.toString().substring(0,
+						flavorStrBuf.length() - 1);
+			}
+		}
+		return flavorStr;
 	}
 
 	public static int loodPersons(int tableId) {
