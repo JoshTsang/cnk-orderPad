@@ -32,13 +32,12 @@ public class MyOrder {
 	final static int MODE_PAD = 0;
 	protected final static int MODE_PHONE = 1;
 	protected final static int TIME_OUT = -1;
-
 	private CnkDbHelper mCnkDbHelper;
 	protected SQLiteDatabase mDb;
 	private Context mDelDlgActivity;
 	protected static List<OrderedDish> mOrder = new ArrayList<OrderedDish>();
 	protected int persons;
-	public static String[] mFlavor;
+	public static String[] mFlavorName;
 	public static String comment = "";
 
 	public MyOrder(Context context) {
@@ -89,8 +88,6 @@ public class MyOrder {
 		mOrder.get(position).padQuantity += quantity;
 		return 0;
 	}
-
-	
 
 	public int count() {
 		return mOrder.size();
@@ -180,6 +177,27 @@ public class MyOrder {
 		return 0;
 	}
 
+	public boolean[] slectedFlavor(int index) {
+		boolean[] slected = new boolean[mFlavorName.length];
+		if (mOrder.get(index).getFlavor() == null) {
+			return slected;
+		}
+		String flavor[] = mOrder.get(index).getFlavor().split(",");
+		for (int i = 0; i < flavor.length; i++) {
+			equalsFlavor(flavor[i], slected);
+		}
+
+		return slected;
+	}
+
+	private void equalsFlavor(String flavor, boolean[] slected) {
+		for (int i = 0; i < mFlavorName.length; i++) {
+			if (mFlavorName[i].equals(flavor)) {
+				slected[i] = true;
+			}
+		}
+	}
+
 	public OrderedDish getOrderedDish(int position) {
 		return mOrder.get(position);
 	}
@@ -208,7 +226,7 @@ public class MyOrder {
 			mOrder.clear();
 		}
 	}
-	
+
 	public float getOrderedCount(int did) {
 		for (OrderedDish dish : mOrder) {
 			if (dish.getDishId() == did) {
@@ -309,10 +327,10 @@ public class MyOrder {
 		}
 		try {
 			JSONArray flavor = new JSONArray(response);
-			mFlavor = new String[flavor.length()];
+			mFlavorName = new String[flavor.length()];
 			int length = flavor.length();
 			for (int i = 0; i < length; i++) {
-				mFlavor[i] = flavor.getString(i);
+				mFlavorName[i] = flavor.getString(i);
 			}
 			return 0;
 		} catch (Exception e) {
@@ -357,7 +375,7 @@ public class MyOrder {
 		mOrder.get(index).phoneQuantity = 0;
 		mOrder.get(index).padQuantity = quantity;
 	}
-	
+
 	public static String convertFloat(float quantity) {
 		DecimalFormat format = new DecimalFormat("0.00");
 		String quantityStr[] = format.format(quantity).split("\\.");
