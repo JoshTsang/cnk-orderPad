@@ -27,8 +27,8 @@ public class MyOrder {
 	public final static int RET_NULL_PHONE_ORDER = 1;
 	public final static int RET_MINUS_SUCC = -2;
 	public final static int DEL_ALL_ORDER = -1;
-	public final static int UPDATE_ORDER = 0;
-	public final static int DEL_ITEM_ORDER = -2;
+	public final static int UPDATE_ORDER = 1;
+	public final static int DEL_ITEM_ORDER = 2;
 	final static int MODE_PAD = 0;
 	protected final static int MODE_PHONE = 1;
 	protected final static int TIME_OUT = -1;
@@ -441,8 +441,13 @@ public class MyOrder {
 				dish.put("dishId", mOrder.get(position).dish.getId());
 				dish.put("name", mOrder.get(position).dish.getName());
 				dish.put("price", mOrder.get(position).dish.getPrice());
-				dish.put("quan", (mOrder.get(position).padQuantity + mOrder
-						.get(position).phoneQuantity));
+				if (type == DEL_ITEM_ORDER) {
+					dish.put("quan", (mOrder.get(position).padQuantity + mOrder
+							.get(position).phoneQuantity));
+				} else {
+					dish.put("quan", 1);
+				}
+
 				dishes.put(dish);
 			}
 			order.put("order", dishes);
