@@ -139,30 +139,35 @@ public class DelOrderActivity extends OrderBaseActivity {
 	 * @param messages
 	 */
 	protected void delDishDialog(final int position, String messages) {
-		new AlertDialog.Builder(DelOrderActivity.this).setTitle("请注意")
+		new AlertDialog.Builder(DelOrderActivity.this)
+				.setTitle(getResources().getString(R.string.pleaseNote))
 				.setMessage(messages)
-				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+				.setPositiveButton(getResources().getString(R.string.ok),
+						new DialogInterface.OnClickListener() {
 
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						if (position == CLEANALL) {
-							showProgressDlg("正在退掉所有菜品");
-							cleanAllThread();
-						} else {
-							showProgressDlg("正在退掉菜品");
-							if (MyOrder.convertFloat(
-									mMyOrder.getQuantity(position))
-									.indexOf(".") == -1) {
-								delDish(position, UPDATE_ORDER_QUAN,
-										UPDATE_ORDER);
-							} else {
-								delDish(position,
-										mMyOrder.getQuantity(position),
-										DEL_ITEM_ORDER);
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+								if (position == CLEANALL) {
+									showProgressDlg("正在退掉所有菜品");
+									cleanAllThread();
+								} else {
+									showProgressDlg("正在退掉菜品");
+									if (MyOrder.convertFloat(
+											mMyOrder.getQuantity(position))
+											.indexOf(".") == -1) {
+										delDish(position, UPDATE_ORDER_QUAN,
+												UPDATE_ORDER);
+									} else {
+										delDish(position,
+												mMyOrder.getQuantity(position),
+												DEL_ITEM_ORDER);
+									}
+								}
 							}
-						}
-					}
-				}).setNegativeButton("取消", null).show();
+						})
+				.setNegativeButton(getResources().getString(R.string.cancel),
+						null).show();
 	}
 
 	Handler getOrderHandler = new Handler() {
@@ -201,7 +206,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 			mpDialog.cancel();
 			if (msg.what < 0) {
 				if (msg.what == -2) {
-					toastText("菜都上完，不能再退了");
+					toastText(R.string.notClean);
 				} else {
 					delHanderError(msg);
 				}
@@ -224,7 +229,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 				}
 			}
 		}.start();
-	
+
 	}
 
 	protected void cleanAllThread() {
@@ -248,33 +253,37 @@ public class DelOrderActivity extends OrderBaseActivity {
 		}.start();
 	}
 
-	private AlertDialog.Builder networkDialog() {
-		final AlertDialog.Builder mAlertDialog = new AlertDialog.Builder(
+	protected AlertDialog.Builder networkDialog() {
+		final AlertDialog.Builder networkAlertDialog = new AlertDialog.Builder(
 				DelOrderActivity.this);
-		mAlertDialog.setTitle("错误");// 设置对话框标题
-		mAlertDialog.setMessage("网络连接失败，请检查网络后重试");// 设置对话框内容
-		mAlertDialog.setCancelable(false);
-		mAlertDialog.setPositiveButton("重试",
+		networkAlertDialog.setCancelable(false);
+		networkAlertDialog.setTitle(getResources().getString(R.string.error));// 设置对话框标题
+		networkAlertDialog.setMessage(getResources().getString(
+				R.string.networkErrorWarning));// 设置对话框内容
+		networkAlertDialog.setPositiveButton(
+				getResources().getString(R.string.tryAgain),
 				new DialogInterface.OnClickListener() {
 
 					@Override
 					public void onClick(DialogInterface dialog, int i) {
 						NETWORK_ARERTDIALOG = 0;
-						showProgressDlg("正在连接服务器...");
+						showProgressDlg(getResources().getString(
+								R.string.connectServer));
 						getOrderThread();
 					}
 				});
-		mAlertDialog.setNegativeButton("退出",
+		networkAlertDialog.setNegativeButton(
+				getResources().getString(R.string.exit),
 				new DialogInterface.OnClickListener() {
 
 					@Override
 					public void onClick(DialogInterface dialog, int i) {
-						finish();
 						NETWORK_ARERTDIALOG = 0;
+						finish();
 					}
 				});
 
-		return mAlertDialog;
+		return networkAlertDialog;
 	}
 
 	private OnClickListener cleanBtnClicked = new OnClickListener() {
@@ -294,7 +303,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 			delDishAlert(position);
 		}
 	};
-	
+
 	@Override
 	public void finish() {
 		mMyOrder.clear();
@@ -307,8 +316,9 @@ public class DelOrderActivity extends OrderBaseActivity {
 			errMsg += ":无法连接打印机或打印机缺纸";
 		}
 		NETWORK_ARERTDIALOG = 1;
-		mNetWrorkAlertDialog.setMessage(errMsg + ",请检查连接网络重试");
+		mNetWrorkAlertDialog.setMessage(errMsg + ","
+				+ getResources().getString(R.string.networkErrorWarning));
 		mNetWrorkcancel = mNetWrorkAlertDialog.show();
 	}
-	
+
 }

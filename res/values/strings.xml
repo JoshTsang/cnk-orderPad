@@ -28,7 +28,8 @@
     <string name="tryAgain">重试</string>
     <string name="pleaseWait">请稍等</string>
     <string name="persons">人数</string>
-
+ 	<string name="connectServer">正在连接服务器...</string>
+ 	<string name="pleaseNote">请注意</string>
     <!-- StatisticsActivity -->
     <string name="setTime">设置时间</string>
     <string name="setDate">设置日期</string>
@@ -51,7 +52,7 @@
     <string name="clean">退菜</string>
     <string name="delWarning">亲：还没有点菜！请点菜嘛！</string>
     <string name="cleanAllWarning">亲：已经删除完了，不要再删了！</string>
-
+	<string name="notClean">菜都上完，不能再退了</string>
     <!-- order -->
     <string name="continueOrder">继续点菜</string>
     <string name="phoneOrder">手机点的菜</string>

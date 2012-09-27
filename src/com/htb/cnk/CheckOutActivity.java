@@ -99,6 +99,7 @@ public class CheckOutActivity extends TableActivity{
 
 		@Override
 		public void onClick(View v) {
+			mMyOrder.clear();
 			finish();
 		}
 	};
