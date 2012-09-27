@@ -10,7 +10,7 @@ public class OrderedDish {
 	int phoneQuantity;
 	int status;
 	int tableId;
-	String flavor;
+	boolean []flavor;
 
 	public OrderedDish(MyOrder myOrder, Dish dish, float quantity, int tableId, int status,
 			int type) {
@@ -60,11 +60,11 @@ public class OrderedDish {
 		return this.tableId;
 	}
 
-	public String getFlavor() {
+	public boolean[] getFlavor() {
 		return this.flavor;
 	}
 
-	public void setFlavor(String flavor) {
+	public void setFlavor(boolean[] flavor) {
 		this.flavor = flavor;
 	}
 }
