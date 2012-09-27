@@ -447,14 +447,14 @@ public class TableSetting implements Serializable {
 				JSONArray jsonArrary = json.getJSONArray("order");
 				checkOutJson = String.format("%s\n\r\b%s", checkOutJson,
 						tableName.get(k) + "桌");
-				float Price = 0;
+				float tatolPrice = 0;
 				for (int i = 0; i < jsonArrary.length(); i++) {
 					JSONObject jsonItem = (JSONObject) jsonArrary.get(i);
 					float quan = jsonItem.getInt("quan");
 					float price = jsonItem.getInt("price");
 					String name = jsonItem.getString("name");
 					String dish;
-					Price = Price + (quan * price);
+					tatolPrice = tatolPrice + (quan * price);
 					byte[] strByte = name.getBytes();
 					int strlen = name.length();
 					int strByteLen = strByte.length;
@@ -474,7 +474,7 @@ public class TableSetting implements Serializable {
 
 					String priceStr = nf.format(price);
 					String quanStr = nf.format(quan);
-					String itemTotalPrice = nf.format(Price);
+					String itemTotalPrice = nf.format(quan * price);
 					int priceSpaceLen = getSpaceLen(7, priceStr.length());
 					int quanSpaceLen = getSpaceLen(5, quanStr.length());
 					int totalPriceSpaceLen = getSpaceLen(7,
@@ -496,7 +496,7 @@ public class TableSetting implements Serializable {
 					checkOutJson = String.format("%s\n\r\b%s", checkOutJson,
 							dish);
 				}
-				totalPrice.add(Price);
+				totalPrice.add(tatolPrice);
 				k++;
 			} catch (JSONException e) {
 				Log.e(TAG, "checkOutJson.error");
@@ -505,16 +505,16 @@ public class TableSetting implements Serializable {
 		}
 		checkOutJson = String.format("%s\n\r%s", checkOutJson,
 				"------------------------------------------");
-		float endPrice = 0;
+		float tableAllPrice = 0;
 		for (int i = 0; i < k; i++) {
 			String tName = tableName.get(i).toString();
 			String totalPriceStr = nf.format(totalPrice.get(i));
 			int len = 38 - tName.length() - totalPriceStr.length();
 			checkOutJson += String.format("\r\n %s%" + len * 2 + "s%s", tName
 					+ "桌", "", totalPriceStr);
-			endPrice = endPrice + totalPrice.get(i);
+			tableAllPrice = tableAllPrice + totalPrice.get(i);
 		}
-		String endPriceStr = nf.format(endPrice);
+		String endPriceStr = nf.format(tableAllPrice);
 		checkOutJson = String.format("%s\n\r %s%"
 				+ ((36 - endPriceStr.length()) * 2 - 1) + "s%s", checkOutJson,
 				"合计", "", endPriceStr);
