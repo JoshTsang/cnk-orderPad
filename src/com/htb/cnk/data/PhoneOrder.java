@@ -75,6 +75,7 @@ public class PhoneOrder extends MyOrder {
 		if (!ErrorPHP.isSucc(phoneOrderPkg, TAG)) {
 			return -1;
 		}
+		mOrder.clear();
 		return 0;
 	}
 

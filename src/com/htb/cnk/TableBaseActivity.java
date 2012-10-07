@@ -21,7 +21,6 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.SimpleAdapter;
-import android.widget.Toast;
 
 import com.htb.cnk.NotificationTableService.MyBinder;
 import com.htb.cnk.TableClickActivity.tableItemClickListener;
