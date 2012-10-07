@@ -25,6 +25,7 @@ import com.htb.cnk.data.Info;
 import com.htb.cnk.data.Setting;
 import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.lib.BaseDialog;
+import com.htb.cnk.lib.NetworkDialog;
 import com.htb.constant.Table;
 
 public class TableClickActivity extends TableBaseActivity {
@@ -39,11 +40,12 @@ public class TableClickActivity extends TableBaseActivity {
 	protected double mChange;
 	protected EditText tableIdEdit;
 	protected EditText personsEdit;
-
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mBaseDialog = new BaseDialog(TableClickActivity.this);
+		mNetworkDialog = new NetworkDialog(TableClickActivity.this);
 		mNetWrorkAlertDialog = networkDialog();
 		setClickListeners();
 	}
@@ -57,13 +59,8 @@ public class TableClickActivity extends TableBaseActivity {
 	}
 
 	protected AlertDialog.Builder networkDialog() {
-		return mBaseDialog
-				.setTitleAndMessageDialog(false,
-						getResources().getString(R.string.error),
-						getResources().getString(R.string.networkErrorWarning))
-				.setPositiveButton(getResources().getString(R.string.tryAgain),
-						new DialogInterface.OnClickListener() {
-
+		return mNetworkDialog.networkDialog(new DialogInterface.OnClickListener() {
+						
 							@Override
 							public void onClick(DialogInterface dialog, int i) {
 								dialog.cancel();
@@ -72,9 +69,7 @@ public class TableClickActivity extends TableBaseActivity {
 										R.string.getStatus));
 								binderStart();
 							}
-						})
-				.setNegativeButton(getResources().getString(R.string.exit),
-						new DialogInterface.OnClickListener() {
+						}, new DialogInterface.OnClickListener() {
 
 							@Override
 							public void onClick(DialogInterface dialog, int i) {

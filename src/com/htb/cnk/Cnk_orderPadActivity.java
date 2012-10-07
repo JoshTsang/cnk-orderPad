@@ -42,6 +42,7 @@ import com.htb.cnk.data.Version;
 import com.htb.cnk.data.WifiAdmin;
 import com.htb.cnk.lib.BaseActivity;
 import com.htb.cnk.lib.Http;
+import com.htb.cnk.lib.NetworkDialog;
 import com.htb.constant.Permission;
 import com.htb.constant.Server;
 
@@ -68,7 +69,7 @@ public class Cnk_orderPadActivity extends BaseActivity {
 	private AlertDialog mNetWrorkcancel;
 	private Setting mAppSetting;
 	private AlertDialog.Builder mNetWrorkAlertDialog;
-
+	private NetworkDialog mNetworkDialog;
 	@Override
 	protected void onResume() {
 		if (ARERTDIALOG == 1) {
@@ -85,6 +86,7 @@ public class Cnk_orderPadActivity extends BaseActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		version = new Version(Cnk_orderPadActivity.this);
+		mNetworkDialog = new NetworkDialog(Cnk_orderPadActivity.this);
 		findViews();
 		setClickListeners();
 		Info.setNewCustomer(true);
@@ -125,7 +127,6 @@ public class Cnk_orderPadActivity extends BaseActivity {
 	private void syncWithServer() {
 		mpDialog = new ProgressDialog(Cnk_orderPadActivity.this);
 		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-		// mpDialog.setTitle("请稍等");
 		mpDialog.setMessage("正在与服务器同步...");
 		mpDialog.setIndeterminate(false);
 		mpDialog.setCancelable(false);
@@ -238,13 +239,31 @@ public class Cnk_orderPadActivity extends BaseActivity {
 	}
 
 	private AlertDialog.Builder wifiDialog() {
-		final AlertDialog.Builder mAlertDialog = new AlertDialog.Builder(
-				Cnk_orderPadActivity.this);
-		mAlertDialog.setTitle("错误");// 设置对话框标题
-		mAlertDialog.setMessage("网络连接失败，请检查网络后重试");// 设置对话框内容
-		mAlertDialog.setCancelable(false);
-		mAlertDialog.setPositiveButton("连接",
-				new DialogInterface.OnClickListener() {
+//		final AlertDialog.Builder mAlertDialog = new AlertDialog.Builder(
+//				Cnk_orderPadActivity.this);
+//		mAlertDialog.setTitle("错误");// 设置对话框标题
+//		mAlertDialog.setMessage("网络连接失败，请检查网络后重试");// 设置对话框内容
+//		mAlertDialog.setCancelable(false);
+//		mAlertDialog.setPositiveButton("连接",
+//				new DialogInterface.OnClickListener() {
+//
+//					@Override
+//					public void onClick(DialogInterface dialog, int i) {
+//						mpDialog.setMessage("正在连接wifi，请稍等");
+//						mpDialog.show();
+//						new Thread(new wifiConnect()).start();
+//					}
+//				});
+//		mAlertDialog.setNegativeButton("退出",
+//				new DialogInterface.OnClickListener() {
+//
+//					@Override
+//					public void onClick(DialogInterface dialog, int i) {
+//						finish();
+//					}
+//				});
+
+		return mNetworkDialog.networkDialog(new DialogInterface.OnClickListener() {
 
 					@Override
 					public void onClick(DialogInterface dialog, int i) {
@@ -252,17 +271,13 @@ public class Cnk_orderPadActivity extends BaseActivity {
 						mpDialog.show();
 						new Thread(new wifiConnect()).start();
 					}
-				});
-		mAlertDialog.setNegativeButton("退出",
-				new DialogInterface.OnClickListener() {
+				}, new DialogInterface.OnClickListener() {
 
 					@Override
 					public void onClick(DialogInterface dialog, int i) {
 						finish();
 					}
 				});
-
-		return mAlertDialog;
 	}
 
 	private boolean getServerVerCode() {

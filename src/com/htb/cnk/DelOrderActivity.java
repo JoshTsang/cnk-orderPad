@@ -17,6 +17,7 @@ import com.htb.cnk.adapter.MyOrderAdapter;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.OrderedDish;
+import com.htb.cnk.lib.NetworkDialog;
 import com.htb.cnk.lib.OrderBaseActivity;
 
 public class DelOrderActivity extends OrderBaseActivity {
@@ -253,14 +254,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 	}
 
 	protected AlertDialog.Builder networkDialog() {
-		final AlertDialog.Builder networkAlertDialog = new AlertDialog.Builder(
-				DelOrderActivity.this);
-		networkAlertDialog.setCancelable(false);
-		networkAlertDialog.setTitle(getResources().getString(R.string.error));// 设置对话框标题
-		networkAlertDialog.setMessage(getResources().getString(
-				R.string.networkErrorWarning));// 设置对话框内容
-		networkAlertDialog.setPositiveButton(
-				getResources().getString(R.string.tryAgain),
+		return mNetworkDialog.networkDialog(
 				new DialogInterface.OnClickListener() {
 
 					@Override
@@ -270,10 +264,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 								R.string.connectServer));
 						getOrderThread();
 					}
-				});
-		networkAlertDialog.setNegativeButton(
-				getResources().getString(R.string.exit),
-				new DialogInterface.OnClickListener() {
+				}, new DialogInterface.OnClickListener() {
 
 					@Override
 					public void onClick(DialogInterface dialog, int i) {
@@ -281,8 +272,6 @@ public class DelOrderActivity extends OrderBaseActivity {
 						finish();
 					}
 				});
-
-		return networkAlertDialog;
 	}
 
 	private OnClickListener cleanBtnClicked = new OnClickListener() {

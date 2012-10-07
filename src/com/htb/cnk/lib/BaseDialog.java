@@ -1,6 +1,5 @@
 package com.htb.cnk.lib;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -8,7 +7,7 @@ import android.view.View;
 
 import com.htb.cnk.R;
 
-public class BaseDialog extends Activity {
+public class BaseDialog extends BaseActivity {
 	Context mContext;
 	AlertDialog.Builder alertDialog;
 

@@ -51,12 +51,13 @@ public class OrderBaseActivity extends BaseActivity {
 	protected MyOrderAdapter mMyOrderAdapter;
 	protected int persons;
 	private TableSetting mSettings;
-
+	protected NetworkDialog mNetworkDialog;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.myorder_activity);
 		mMyOrder = new PhoneOrder(OrderBaseActivity.this);
+		mNetworkDialog = new NetworkDialog(OrderBaseActivity.this);
 		mSettings = new TableSetting();
 		mpDialog = new ProgressDialog(OrderBaseActivity.this);
 		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
