@@ -31,6 +31,7 @@ import com.htb.cnk.data.Notifications;
 import com.htb.cnk.data.PhoneOrder;
 import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.lib.BaseActivity;
+import com.htb.cnk.lib.BaseDialog;
 import com.htb.cnk.lib.Ringtone;
 import com.htb.constant.Table;
 
@@ -73,7 +74,8 @@ public class TableBaseActivity extends BaseActivity {
 	protected Button mUpdateBtn;
 	protected Button mStatisticsBtn;
 	protected Button mManageBtn;
-
+	protected BaseDialog mBaseDialog;
+	
 	@Override
 	protected void onDestroy() {
 		unbindService(conn);
