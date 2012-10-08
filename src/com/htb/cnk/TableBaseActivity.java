@@ -29,6 +29,10 @@ import com.htb.cnk.data.NotificationTypes;
 import com.htb.cnk.data.Notifications;
 import com.htb.cnk.data.PhoneOrder;
 import com.htb.cnk.data.TableSetting;
+import com.htb.cnk.dialog.ItemDialog;
+import com.htb.cnk.dialog.MultiChoiceItemsDialog;
+import com.htb.cnk.dialog.TitleAndMessageDialog;
+import com.htb.cnk.dialog.ViewDialog;
 import com.htb.cnk.lib.BaseActivity;
 import com.htb.cnk.lib.Ringtone;
 import com.htb.constant.Table;
@@ -72,7 +76,10 @@ public class TableBaseActivity extends BaseActivity {
 	protected Button mUpdateBtn;
 	protected Button mStatisticsBtn;
 	protected Button mManageBtn;
-
+	protected TitleAndMessageDialog mTitleAndMessageDialog;
+	protected ItemDialog mItemDialog;
+	protected ViewDialog mViewDialog;
+	protected MultiChoiceItemsDialog mMultiChoiceItemsDialog;
 	@Override
 	protected void onDestroy() {
 		unbindService(conn);

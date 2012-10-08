@@ -21,13 +21,12 @@ import com.htb.cnk.data.OrderedDish;
 import com.htb.cnk.lib.OrderBaseActivity;
 
 public class QueryOrderActivity extends OrderBaseActivity {
-	
+
 	private MyOrderAdapter mMyOrderAdapter;
 	private static int ARERTDIALOG = 0;
 	private AlertDialog mNetWrorkcancel;
 	private AlertDialog.Builder mNetWrorkAlertDialog;
-	
-	
+
 	@Override
 	protected void onResume() {
 		if (ARERTDIALOG == 1) {
@@ -38,7 +37,7 @@ public class QueryOrderActivity extends OrderBaseActivity {
 		queryThread();
 		super.onResume();
 	}
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -79,16 +78,18 @@ public class QueryOrderActivity extends OrderBaseActivity {
 
 				dishPrice.setText(Double.toString(dishDetail.getPrice())
 						+ " 元/份");
-				dishQuantity
-						.setText(MyOrder.convertFloat(dishDetail.getQuantity()));
-				dishServedQuantity.setText(Integer.toString(dishDetail.getServedQuantity()));
-				if ((dishDetail.getQuantity()-dishDetail.getServedQuantity()) <= 0) {
+				dishQuantity.setText(MyOrder.convertFloat(dishDetail
+						.getQuantity()));
+				dishServedQuantity.setText(Integer.toString(dishDetail
+						.getServedQuantity()));
+				if ((dishDetail.getQuantity() - dishDetail.getServedQuantity()) <= 0) {
 					int color = Color.rgb(255, 0, 0);
 					dishName.setTextColor(color);
 					dishPrice.setTextColor(color);
 					dishQuantity.setTextColor(color);
 					dishServedQuantity.setTextColor(color);
-					dishServedQuantity.setText(MyOrder.convertFloat(dishDetail.getQuantity()));
+					dishServedQuantity.setText(MyOrder.convertFloat(dishDetail
+							.getQuantity()));
 				} else {
 					int color = Color.rgb(0, 0, 0);
 					dishName.setTextColor(color);
@@ -120,9 +121,9 @@ public class QueryOrderActivity extends OrderBaseActivity {
 
 				TextView tableName = (TextView) findViewById(R.id.tableName);
 				tableName.setText("桌号/人数");
-				mTableNumTxt.setText(Info.getTableName()+"/" + persons);
+				mTableNumTxt.setText(Info.getTableName() + "/" + persons);
 			}
-			
+
 		}
 	};
 
@@ -140,12 +141,7 @@ public class QueryOrderActivity extends OrderBaseActivity {
 	}
 
 	private AlertDialog.Builder networkDialog() {
-		final AlertDialog.Builder mAlertDialog = new AlertDialog.Builder(
-				QueryOrderActivity.this);
-		mAlertDialog.setTitle("错误");// 设置对话框标题
-		mAlertDialog.setMessage("网络连接失败，请检查网络后重试");// 设置对话框内容
-		mAlertDialog.setCancelable(false);
-		mAlertDialog.setPositiveButton("重试",
+		return mNetworkDialog.networkDialog(
 				new DialogInterface.OnClickListener() {
 
 					@Override
@@ -154,9 +150,7 @@ public class QueryOrderActivity extends OrderBaseActivity {
 						showProgressDlg("正在连接服务器...");
 						queryThread();
 					}
-				});
-		mAlertDialog.setNegativeButton("退出",
-				new DialogInterface.OnClickListener() {
+				}, new DialogInterface.OnClickListener() {
 
 					@Override
 					public void onClick(DialogInterface dialog, int i) {
@@ -164,10 +158,8 @@ public class QueryOrderActivity extends OrderBaseActivity {
 						ARERTDIALOG = 0;
 					}
 				});
-
-		return mAlertDialog;
 	}
-	
+
 	@Override
 	public void finish() {
 		mMyOrder.clear();
@@ -185,5 +177,5 @@ public class QueryOrderActivity extends OrderBaseActivity {
 		}
 
 	};
-	
+
 }
