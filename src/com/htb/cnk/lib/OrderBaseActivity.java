@@ -19,7 +19,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.htb.cnk.LoginDlg;
 import com.htb.cnk.R;
 import com.htb.cnk.adapter.MyOrderAdapter;
 import com.htb.cnk.data.Info;
@@ -27,6 +26,8 @@ import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.PhoneOrder;
 import com.htb.cnk.data.Setting;
 import com.htb.cnk.data.TableSetting;
+import com.htb.cnk.dialog.LoginDlg;
+import com.htb.cnk.dialog.TitleAndMessageDialog;
 import com.htb.cnk.lib.BaseActivity;
 import com.htb.constant.Permission;
 
@@ -51,13 +52,13 @@ public class OrderBaseActivity extends BaseActivity {
 	protected MyOrderAdapter mMyOrderAdapter;
 	protected int persons;
 	private TableSetting mSettings;
-	protected NetworkDialog mNetworkDialog;
+	protected TitleAndMessageDialog mNetworkDialog;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.myorder_activity);
 		mMyOrder = new PhoneOrder(OrderBaseActivity.this);
-		mNetworkDialog = new NetworkDialog(OrderBaseActivity.this);
+		mNetworkDialog = new TitleAndMessageDialog(OrderBaseActivity.this);
 		mSettings = new TableSetting();
 		mpDialog = new ProgressDialog(OrderBaseActivity.this);
 		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);

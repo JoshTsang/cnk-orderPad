@@ -17,7 +17,7 @@ import com.htb.cnk.adapter.MyOrderAdapter;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.OrderedDish;
-import com.htb.cnk.lib.NetworkDialog;
+import com.htb.cnk.dialog.TitleAndMessageDialog;
 import com.htb.cnk.lib.OrderBaseActivity;
 
 public class DelOrderActivity extends OrderBaseActivity {

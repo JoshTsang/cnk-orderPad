@@ -40,9 +40,10 @@ import com.htb.cnk.data.Info;
 import com.htb.cnk.data.Setting;
 import com.htb.cnk.data.Version;
 import com.htb.cnk.data.WifiAdmin;
+import com.htb.cnk.dialog.LoginDlg;
+import com.htb.cnk.dialog.TitleAndMessageDialog;
 import com.htb.cnk.lib.BaseActivity;
 import com.htb.cnk.lib.Http;
-import com.htb.cnk.lib.NetworkDialog;
 import com.htb.constant.Permission;
 import com.htb.constant.Server;
 
@@ -69,7 +70,7 @@ public class Cnk_orderPadActivity extends BaseActivity {
 	private AlertDialog mNetWrorkcancel;
 	private Setting mAppSetting;
 	private AlertDialog.Builder mNetWrorkAlertDialog;
-	private NetworkDialog mNetworkDialog;
+	private TitleAndMessageDialog mNetworkDialog;
 	@Override
 	protected void onResume() {
 		if (ARERTDIALOG == 1) {
@@ -86,7 +87,7 @@ public class Cnk_orderPadActivity extends BaseActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		version = new Version(Cnk_orderPadActivity.this);
-		mNetworkDialog = new NetworkDialog(Cnk_orderPadActivity.this);
+		mNetworkDialog = new TitleAndMessageDialog(Cnk_orderPadActivity.this);
 		findViews();
 		setClickListeners();
 		Info.setNewCustomer(true);

@@ -24,8 +24,10 @@ import android.widget.EditText;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.Setting;
 import com.htb.cnk.data.TableSetting;
-import com.htb.cnk.lib.BaseDialog;
-import com.htb.cnk.lib.NetworkDialog;
+import com.htb.cnk.dialog.ItemDialog;
+import com.htb.cnk.dialog.MultiChoiceItemsDialog;
+import com.htb.cnk.dialog.TitleAndMessageDialog;
+import com.htb.cnk.dialog.ViewDialog;
 import com.htb.constant.Table;
 
 public class TableClickActivity extends TableBaseActivity {
@@ -40,12 +42,16 @@ public class TableClickActivity extends TableBaseActivity {
 	protected double mChange;
 	protected EditText tableIdEdit;
 	protected EditText personsEdit;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		mBaseDialog = new BaseDialog(TableClickActivity.this);
-		mNetworkDialog = new NetworkDialog(TableClickActivity.this);
+		mTitleAndMessageDialog = new TitleAndMessageDialog(
+				TableClickActivity.this);
+		mItemDialog = new ItemDialog(TableClickActivity.this);
+		mViewDialog = new ViewDialog(TableClickActivity.this);
+		mMultiChoiceItemsDialog = new MultiChoiceItemsDialog(
+				TableClickActivity.this);
 		mNetWrorkAlertDialog = networkDialog();
 		setClickListeners();
 	}
@@ -59,194 +65,180 @@ public class TableClickActivity extends TableBaseActivity {
 	}
 
 	protected AlertDialog.Builder networkDialog() {
-		return mNetworkDialog.networkDialog(new DialogInterface.OnClickListener() {
-						
-							@Override
-							public void onClick(DialogInterface dialog, int i) {
-								dialog.cancel();
-								NETWORK_ARERTDIALOG = 0;
-								showProgressDlg(getResources().getString(
-										R.string.getStatus));
-								binderStart();
-							}
-						}, new DialogInterface.OnClickListener() {
-
-							@Override
-							public void onClick(DialogInterface dialog, int i) {
-								NETWORK_ARERTDIALOG = 0;
-								dialog.cancel();
-								finish();
-							}
-						});
+		return mTitleAndMessageDialog.networkDialog(networkPositiveListener,
+				networkNegativeListener);
 	}
 
-	private void cleanDialog() {
+	DialogInterface.OnClickListener networkPositiveListener = new DialogInterface.OnClickListener() {
+		@Override
+		public void onClick(DialogInterface dialog, int i) {
+			dialog.cancel();
+			NETWORK_ARERTDIALOG = 0;
+			showProgressDlg(getResources().getString(R.string.getStatus));
+			binderStart();
+		}
+	};
+	DialogInterface.OnClickListener networkNegativeListener = new DialogInterface.OnClickListener() {
+		@Override
+		public void onClick(DialogInterface dialog, int i) {
+			NETWORK_ARERTDIALOG = 0;
+			dialog.cancel();
+			finish();
+		}
+	};
+
+	private AlertDialog.Builder cleanDialog() {
 		final CharSequence[] cleanitems = getResources().getStringArray(
 				R.array.openStatus);
-		mBaseDialog
-				.setTitleDialog(true,
-						getResources().getString(R.string.chooseFunction))
-				.setItems(cleanitems, new DialogInterface.OnClickListener() {
-
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						cleanChioceMode(which);
-					}
-
-					private void cleanChioceMode(int which) {
-						switch (which) {
-						case 0:
-							cleanTableDialog();
-							break;
-						case 1:
-							changeTableDialog(CHANGE_DIALOG).show();
-							break;
-						case 2:
-							changeTableDialog(COMBINE_DIALOG).show();
-							break;
-						case 3:
-							setClassToActivity(DelOrderActivity.class);
-							break;
-						case 4:
-							Info.setMode(Info.WORK_MODE_WAITER);
-							setClassToActivity(MenuActivity.class);
-							break;
-						case 5:
-							setClassToActivity(QueryOrderActivity.class);
-							break;
-						default:
-							break;
-						}
-					}
-				}).show();
+		return mItemDialog.itemChooseFunctionDialog(cleanitems, cleanListener);
 	}
 
-	private void cleanTableDialog() {
-		mBaseDialog
-				.setMessageDialog(false,
-						getResources().getString(R.string.isCleanTable))
-				.setPositiveButton(
-						getResources().getString(R.string.cleanTable),
-						new DialogInterface.OnClickListener() {
+	DialogInterface.OnClickListener cleanListener = new DialogInterface.OnClickListener() {
+		@Override
+		public void onClick(DialogInterface dialog, int which) {
+			cleanChioceMode(which);
+		}
+	};
 
-							@Override
-							public void onClick(DialogInterface dialog, int i) {
-								showProgressDlg(getResources().getString(
-										R.string.cleanTableNow));
-								selectedTable.clear();
-								selectedTable.add(Info.getTableId());
-								cleanTableThread(selectedTable);
-							}
-						})
-				.setNegativeButton(getResources().getString(R.string.cancel),
-						null).show();
+	private void cleanChioceMode(int which) {
+		switch (which) {
+		case 0:
+			cleanTableDialog().show();
+			break;
+		case 1:
+			changeTableDialog(CHANGE_DIALOG).show();
+			break;
+		case 2:
+			changeTableDialog(COMBINE_DIALOG).show();
+			break;
+		case 3:
+			setClassToActivity(DelOrderActivity.class);
+			break;
+		case 4:
+			Info.setMode(Info.WORK_MODE_WAITER);
+			setClassToActivity(MenuActivity.class);
+			break;
+		case 5:
+			setClassToActivity(QueryOrderActivity.class);
+			break;
+		default:
+			break;
+		}
 	}
 
-	private void cleanPhoneDialog(final int position) {
-		mBaseDialog
-				.setMessageDialog(false,
-						getResources().getString(R.string.isCleanOrder))
-				.setPositiveButton(getResources().getString(R.string.yes),
-						new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int i) {
-								showProgressDlg(getResources().getString(
-										R.string.cleanPhoneOrderNow));
-								cleanPhoneThread(position, Info.getTableId());
-								dialog.cancel();
-							}
-						})
-				.setNegativeButton(getResources().getString(R.string.no), null)
-				.show();
+	private AlertDialog.Builder cleanTableDialog() {
+		return mTitleAndMessageDialog.messageDialog(false, getResources()
+				.getString(R.string.isCleanTable),
+				getResources().getString(R.string.yes), cleanTableListener,
+				getResources().getString(R.string.no), null);
 	}
 
-	private void addDialog() {
+	DialogInterface.OnClickListener cleanTableListener = new DialogInterface.OnClickListener() {
+		@Override
+		public void onClick(DialogInterface dialog, int i) {
+			showProgressDlg(getResources().getString(R.string.cleanTableNow));
+			selectedTable.clear();
+			selectedTable.add(Info.getTableId());
+			cleanTableThread(selectedTable);
+		}
+	};
+
+	private AlertDialog.Builder cleanPhoneDialog(final int position) {
+		DialogInterface.OnClickListener cleanPhoneListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int i) {
+				showProgressDlg(getResources().getString(
+						R.string.cleanPhoneOrderNow));
+				cleanPhoneThread(position, Info.getTableId());
+				dialog.cancel();
+			}
+		};
+
+		return mTitleAndMessageDialog.messageDialog(false, getResources()
+				.getString(R.string.isCleanOrder),
+				getResources().getString(R.string.yes), cleanPhoneListener,
+				getResources().getString(R.string.no), null);
+	}
+
+	private AlertDialog.Builder addDialog() {
 		final CharSequence[] additems = getResources().getStringArray(
 				R.array.normalStatus);
-		mBaseDialog
-				.setTitleDialog(true,
-						getResources().getString(R.string.chooseFunction))
-				.setItems(additems, new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						mPhoneOrder.clear();
-						addDialogChoiceMode(which);
-					}
-
-					private void addDialogChoiceMode(int which) {
-						switch (which) {
-						case 0:
-							Info.setMode(Info.WORK_MODE_CUSTOMER);
-							Info.setNewCustomer(true);
-							setClassToActivity(MenuActivity.class);
-							TableClickActivity.this.finish();
-							break;
-						case 1:
-							if (Info.getMenu() == Info.ORDER_QUCIK_MENU) {
-								setClassToActivity(QuickMenuActivity.class);
-							} else {
-								Info.setMode(Info.WORK_MODE_WAITER);
-								setClassToActivity(MenuActivity.class);
-							}
-							break;
-						case 2:
-							copyTableDialog().show();
-							break;
-						default:
-							break;
-						}
-					}
-				}).show();
+		return mItemDialog.itemChooseFunctionDialog(additems, addListener);
 	}
 
-	private void addPhoneDialog(final int position) {
+	DialogInterface.OnClickListener addListener = new DialogInterface.OnClickListener() {
+		@Override
+		public void onClick(DialogInterface dialog, int which) {
+			mPhoneOrder.clear();
+			addDialogChoiceMode(which);
+		}
+	};
+
+	private void addDialogChoiceMode(int which) {
+		switch (which) {
+		case 0:
+			Info.setMode(Info.WORK_MODE_CUSTOMER);
+			Info.setNewCustomer(true);
+			setClassToActivity(MenuActivity.class);
+			TableClickActivity.this.finish();
+			break;
+		case 1:
+			if (Info.getMenu() == Info.ORDER_QUCIK_MENU) {
+				setClassToActivity(QuickMenuActivity.class);
+			} else {
+				Info.setMode(Info.WORK_MODE_WAITER);
+				setClassToActivity(MenuActivity.class);
+			}
+			break;
+		case 2:
+			copyTableDialog().show();
+			break;
+		default:
+			break;
+		}
+	}
+
+	private AlertDialog.Builder addPhoneDialog(final int position) {
 		final CharSequence[] additems = getResources().getStringArray(
 				R.array.phoneStatus);
-		mBaseDialog
-				.setTitleDialog(true,
-						getResources().getString(R.string.chooseFunction))
-				.setItems(additems, new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						addPhoneChoiceMode(position, which);
-					}
+		DialogInterface.OnClickListener addPhoneListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				addPhoneChoiceMode(position, which);
+			}
+		};
 
-					private void addPhoneChoiceMode(final int position,
-							int which) {
-						switch (which) {
-						case 0:
-							setClassToActivity(PhoneActivity.class);
-							break;
-						case 1:
-							cleanPhoneDialog(position);
-							break;
-						default:
-							break;
-						}
-					}
-				}).show();
+		return mItemDialog.itemChooseFunctionDialog(additems, addPhoneListener);
 	}
 
-	private void notificationDialog() {
+	private void addPhoneChoiceMode(final int position, int which) {
+		switch (which) {
+		case 0:
+			setClassToActivity(PhoneActivity.class);
+			break;
+		case 1:
+			cleanPhoneDialog(position).show();
+			break;
+		default:
+			break;
+		}
+	}
+
+	private AlertDialog.Builder notificationDialog() {
 		List<String> add = mNotificaion
 				.getNotifiycationsType(Info.getTableId());
 		String[] additems = (String[]) add.toArray(new String[add.size()]);
-		mBaseDialog
-				.setTitleDialog(false,
-						getResources().getString(R.string.customerCall))
-				.setItems(additems, null)
-				.setNegativeButton(getResources().getString(R.string.cancel),
-						null)
-				.setPositiveButton(getResources().getString(R.string.ok),
-						new DialogInterface.OnClickListener() {
-
-							@Override
-							public void onClick(DialogInterface dialog,
-									int which) {
-								cleanNotification();
-							}
-						}).show();
+		return mItemDialog.itemButtonDialog(false,
+				getResources().getString(R.string.customerCall), additems,
+				null, null, notificationListener);
 	}
+
+	DialogInterface.OnClickListener notificationListener = new DialogInterface.OnClickListener() {
+		@Override
+		public void onClick(DialogInterface dialog, int which) {
+			cleanNotification();
+		}
+	};
 
 	private Builder changeTableDialog(final int type) {
 		final AlertDialog.Builder changeTableAlertDialog;
@@ -254,35 +246,37 @@ public class TableClickActivity extends TableBaseActivity {
 		personsEdit = (EditText) layout.findViewById(R.id.personsEdit);
 		if (Setting.enabledPersons()) {
 			tableIdEdit = (EditText) layout.findViewById(R.id.tableIdEdit);
-			 changeTableAlertDialog = mBaseDialog.setViewDialog(false,layout);
+			changeTableAlertDialog = mViewDialog.viewDialog(false, layout);
 		} else {
 			tableIdEdit = editTextListener();
-			changeTableAlertDialog = mBaseDialog.setViewDialog(false,tableIdEdit);
+			changeTableAlertDialog = mViewDialog.viewDialog(false, tableIdEdit);
 		}
 		tableIdEdit.addTextChangedListener(watcher(tableIdEdit));
 		personsEdit.addTextChangedListener(watcher(personsEdit));
 		changeTableAlertDialog.setTitle(getResources().getString(
 				R.string.pleaseInput));
+
+		DialogInterface.OnClickListener changeTablePositiveListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				String changePersons;
+				String tableName = tableIdEdit.getText().toString();
+				if (Setting.enabledPersons()) {
+					changePersons = personsEdit.getText().toString();
+				} else {
+					changePersons = "0";
+				}
+				if (type == CHANGE_DIALOG) {
+					judgeChangeTable(changePersons, tableName);
+				} else if (type == COMBINE_DIALOG) {
+					judgeCombineTable(changePersons, tableName);
+				}
+			}
+		};
+
 		changeTableAlertDialog.setPositiveButton(
 				getResources().getString(R.string.ok),
-				new DialogInterface.OnClickListener() {
-
-					@Override
-					public void onClick(DialogInterface dialog, int i) {
-						String changePersons;
-						String changeTId = tableIdEdit.getText().toString();
-						if (Setting.enabledPersons()) {
-							changePersons = personsEdit.getText().toString();
-						} else {
-							changePersons = "0";
-						}
-						if (type == CHANGE_DIALOG) {
-							judgeChangeTable(changePersons, changeTId);
-						} else if (type == COMBINE_DIALOG) {
-							judgeCombineTable(changePersons, changeTId);
-						}
-					}
-				});
+				changeTablePositiveListener);
 		changeTableAlertDialog.setNegativeButton(
 				getResources().getString(R.string.cancel), null);
 		return changeTableAlertDialog;
@@ -291,28 +285,24 @@ public class TableClickActivity extends TableBaseActivity {
 	private Builder copyTableDialog() {
 		final EditText copyTableText = editTextListener();
 		copyTableText.addTextChangedListener(watcher(copyTableText));
-		return mBaseDialog.setViewAndTitleDialog(false, copyTableText, getResources().getString(
-				R.string.pleaseInput))
-		.setPositiveButton(
-				getResources().getString(R.string.ok),
-				new DialogInterface.OnClickListener() {
 
-					@Override
-					public void onClick(DialogInterface dialog, int i) {
-						String changeTId = copyTableText.getEditableText()
-								.toString();
-						if (changeTId.equals("")) {
-							toastText(R.string.idAndPersonsIsNull);
-						} else if (isBoundaryLegal(changeTId,
-								Table.OPEN_TABLE_STATUS)) {
-							copyTable(mSettings.getId(changeTId));
-						} else {
-							toastText(R.string.copyTIdwarning);
-						}
-					}
-				})
-		.setNegativeButton(
-				getResources().getString(R.string.cancel), null);
+		DialogInterface.OnClickListener copyTableListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				String changeTId = copyTableText.getEditableText().toString();
+				if (changeTId.equals("")) {
+					toastText(R.string.idAndPersonsIsNull);
+				} else if (isBoundaryLegal(changeTId, Table.OPEN_TABLE_STATUS)) {
+					copyTable(mSettings.getId(changeTId));
+				} else {
+					toastText(R.string.copyTIdwarning);
+				}
+			}
+		};
+
+		return mViewDialog.viewAndTitleAndButtonDialog(false, copyTableText,
+				getResources().getString(R.string.pleaseInput), null,
+				copyTableListener);
 	}
 
 	private EditText editTextListener() {
@@ -336,10 +326,9 @@ public class TableClickActivity extends TableBaseActivity {
 		final AlertDialog.Builder checkOutAlertDialog;
 		ArrayList<HashMap<String, Object>> checkOut = mSettings.getCombine();
 		if (checkOut.size() <= 0) {
-			checkOutAlertDialog = mBaseDialog.setMessageDialog(false, getResources().getString(
-					R.string.tableNotOpen))
-			.setPositiveButton(
-					getResources().getString(R.string.ok), null);
+			checkOutAlertDialog = mTitleAndMessageDialog.messageDialog(false,
+					getResources().getString(R.string.tableNotOpen),
+					getResources().getString(R.string.ok), null, null, null);
 			return checkOutAlertDialog;
 		}
 		for (HashMap<String, Object> item : checkOut) {
@@ -348,18 +337,8 @@ public class TableClickActivity extends TableBaseActivity {
 		}
 		final int size = mSettings.size();
 		final boolean selected[] = new boolean[size];
-		checkOutAlertDialog = mBaseDialog.setTitleDialog(false, getResources().getString(
-				R.string.chooseTableId));
-		checkOutAlertDialog.setMultiChoiceItems(
-				(String[]) tableNameStr.toArray(new String[0]), null,
-				new DialogInterface.OnMultiChoiceClickListener() {
-					@Override
-					public void onClick(DialogInterface dialogInterface,
-							int which, boolean isChecked) {
-						selected[which] = isChecked;
-					}
-				});
-		DialogInterface.OnClickListener btnListener = new DialogInterface.OnClickListener() {
+
+		DialogInterface.OnClickListener listPositiveListener = new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialogInterface, int which) {
 				selectedTable.clear();
@@ -378,11 +357,20 @@ public class TableClickActivity extends TableBaseActivity {
 
 			}
 		};
-		checkOutAlertDialog.setPositiveButton(
-				getResources().getString(R.string.ok), btnListener);
-		checkOutAlertDialog.setNegativeButton(
-				getResources().getString(R.string.cancel), null);
-		return checkOutAlertDialog;
+
+		DialogInterface.OnMultiChoiceClickListener listListener = new DialogInterface.OnMultiChoiceClickListener() {
+			@Override
+			public void onClick(DialogInterface dialogInterface, int which,
+					boolean isChecked) {
+				selected[which] = isChecked;
+			}
+		};
+
+		return mMultiChoiceItemsDialog.titleDialog(false, getResources()
+				.getString(R.string.chooseTableId), (String[]) tableNameStr
+				.toArray(new String[0]), null, listListener, getResources()
+				.getString(R.string.ok), listPositiveListener, getResources()
+				.getString(R.string.cancel), null);
 	}
 
 	private void cleanNotification() {
@@ -540,12 +528,15 @@ public class TableClickActivity extends TableBaseActivity {
 		return mSettings.getStatusTableId(mSettings.getId(tableName)) == status;
 	}
 
-	private boolean isName(String tableName) {
-		return (mSettings.getId(tableName) != -1);
+	private boolean isTId(String tableTId) {
+		return (mSettings.getId(tableTId) != -1);
 	}
 
-	private boolean isBoundaryLegal(String changeName, int status) {
-		return isName(changeName) && isStatusLegal(changeName, status);
+	private boolean isBoundaryLegal(String tableName, int status) {
+		if(tableName.equals(Info.getTableName())){
+			return false;
+		}
+		return isTId(tableName) && isStatusLegal(tableName, status);
 	}
 
 	private int getNotifiycations() {
@@ -554,24 +545,24 @@ public class TableClickActivity extends TableBaseActivity {
 		return ret;
 	}
 
-	private void judgeChangeTable(String changePersons, String changeName)
+	private void judgeChangeTable(String changePersons, String tableName)
 			throws NumberFormatException {
-		if (changeName.equals("") || changePersons.equals("")) {
+		if (tableName.equals("") || changePersons.equals("")) {
 			toastText(R.string.idAndPersonsIsNull);
-		} else if (isBoundaryLegal(changeName, Table.NORMAL_TABLE_STAUTS)) {
-			changeTable(mSettings.getId(changeName),
+		} else if (isBoundaryLegal(tableName, Table.NORMAL_TABLE_STAUTS)) {
+			changeTable(mSettings.getId(tableName),
 					Integer.parseInt(changePersons));
 		} else {
 			toastText(R.string.changeTIdWarning);
 		}
 	}
 
-	private void judgeCombineTable(String changePersons, String changeName)
+	private void judgeCombineTable(String changePersons, String tableName)
 			throws NumberFormatException {
-		if (changeName.equals("") || changePersons.equals("")) {
+		if (tableName.equals("") || changePersons.equals("")) {
 			toastText(R.string.idAndPersonsIsNull);
-		} else if (isBoundaryLegal(changeName, Table.OPEN_TABLE_STATUS)) {
-			combineTable(mSettings.getId(changeName),
+		} else if (isBoundaryLegal(tableName, Table.OPEN_TABLE_STATUS)) {
+			combineTable(mSettings.getId(tableName),
 					Integer.parseInt(changePersons));
 		} else {
 			toastText(R.string.combineTIdWarning);
@@ -640,24 +631,21 @@ public class TableClickActivity extends TableBaseActivity {
 	private OnClickListener logoutClicked = new OnClickListener() {
 		@Override
 		public void onClick(View v) {
-			new AlertDialog.Builder(TableClickActivity.this)
-					.setTitle(getResources().getString(R.string.notice))
-					.setCancelable(false)
-					.setMessage(getResources().getString(R.string.islogOut))
-					.setPositiveButton(getResources().getString(R.string.ok),
-							new DialogInterface.OnClickListener() {
+			mTitleAndMessageDialog.titleAndMessageDialog(false,
+					getResources().getString(R.string.notice),
+					getResources().getString(R.string.islogOut),
+					getResources().getString(R.string.ok),
+					logoutPositiveListener,
+					getResources().getString(R.string.cancel), null).show();
+		}
+	};
 
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
-									Info.setMode(Info.WORK_MODE_CUSTOMER);
-									Info.setTableId(-1);
-									finish();
-								}
-							})
-					.setNegativeButton(
-							getResources().getString(R.string.cancel), null)
-					.show();
+	DialogInterface.OnClickListener logoutPositiveListener = new DialogInterface.OnClickListener() {
+		@Override
+		public void onClick(DialogInterface dialogInterface, int which) {
+			Info.setMode(Info.WORK_MODE_CUSTOMER);
+			Info.setTableId(-1);
+			finish();
 		}
 	};
 
@@ -688,20 +676,20 @@ public class TableClickActivity extends TableBaseActivity {
 		private void tableItemChioceDialog(int arg2, int status) {
 			switch (status) {
 			case 0:
-				addDialog();
+				addDialog().show();
 				break;
 			case 1:
-				cleanDialog();
+				cleanDialog().show();
 				break;
 			case 50:
 			case 51:
-				addPhoneDialog(arg2);
+				addPhoneDialog(arg2).show();
 				break;
 			case 100:
 			case 101:
 			case 150:
 			case 151:
-				notificationDialog();
+				notificationDialog().show();
 				break;
 			default:
 				break;

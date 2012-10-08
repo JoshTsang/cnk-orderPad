@@ -21,7 +21,6 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.SimpleAdapter;
-import android.widget.Toast;
 
 import com.htb.cnk.NotificationTableService.MyBinder;
 import com.htb.cnk.TableClickActivity.tableItemClickListener;
@@ -30,9 +29,11 @@ import com.htb.cnk.data.NotificationTypes;
 import com.htb.cnk.data.Notifications;
 import com.htb.cnk.data.PhoneOrder;
 import com.htb.cnk.data.TableSetting;
+import com.htb.cnk.dialog.ItemDialog;
+import com.htb.cnk.dialog.MultiChoiceItemsDialog;
+import com.htb.cnk.dialog.TitleAndMessageDialog;
+import com.htb.cnk.dialog.ViewDialog;
 import com.htb.cnk.lib.BaseActivity;
-import com.htb.cnk.lib.BaseDialog;
-import com.htb.cnk.lib.NetworkDialog;
 import com.htb.cnk.lib.Ringtone;
 import com.htb.constant.Table;
 
@@ -75,9 +76,10 @@ public class TableBaseActivity extends BaseActivity {
 	protected Button mUpdateBtn;
 	protected Button mStatisticsBtn;
 	protected Button mManageBtn;
-	protected BaseDialog mBaseDialog;
-	protected NetworkDialog mNetworkDialog;
-	
+	protected TitleAndMessageDialog mTitleAndMessageDialog;
+	protected ItemDialog mItemDialog;
+	protected ViewDialog mViewDialog;
+	protected MultiChoiceItemsDialog mMultiChoiceItemsDialog;
 	@Override
 	protected void onDestroy() {
 		unbindService(conn);

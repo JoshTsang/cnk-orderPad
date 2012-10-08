@@ -7,7 +7,7 @@ import android.view.View;
 
 import com.htb.cnk.R;
 
-public class BaseDialog extends BaseActivity {
+public class BaseDialog {
 	Context mContext;
 	AlertDialog.Builder alertDialog;
 
@@ -22,13 +22,13 @@ public class BaseDialog extends BaseActivity {
 		return alertDialog;
 	}
 
-	public AlertDialog.Builder setViewDialog(boolean cancelable, View view) {
+	protected AlertDialog.Builder setViewDialog(boolean cancelable, View view) {
 		alertDialog = alertDialogBuilder(cancelable);
 		alertDialog.setView(view);
 		return alertDialog;
 	}
 
-	public AlertDialog.Builder setViewAndTitleDialog(boolean cancelable,
+	protected AlertDialog.Builder setViewAndTitleDialog(boolean cancelable,
 			View view, String title) {
 		alertDialog = alertDialogBuilder(cancelable);
 		alertDialog.setView(view);
@@ -36,43 +36,35 @@ public class BaseDialog extends BaseActivity {
 		return alertDialog;
 	}
 
-	public AlertDialog.Builder setViewAndTitleAndMesDialog(boolean cancelable,
-			View view, String title, String message) {
+	protected AlertDialog.Builder setViewAndTitleAndMesDialog(
+			boolean cancelable, View view, String title, String message) {
 		alertDialog = alertDialogBuilder(cancelable);
 		alertDialog.setView(view);
 		alertDialog.setTitle(title);
-		alertDialog.setMessage(message);// 设置对话框内容
+		alertDialog.setMessage(message);
 		return alertDialog;
 	}
 
-	public AlertDialog.Builder setTitleDialog(boolean cancelable, String title) {
+	protected AlertDialog.Builder setTitleDialog(boolean cancelable,
+			String title) {
 		alertDialog = alertDialogBuilder(cancelable);
 		alertDialog.setTitle(title);
 		return alertDialog;
 	}
 
-	public AlertDialog.Builder setMessageDialog(boolean cancelable,
+	protected AlertDialog.Builder setMessageDialog(boolean cancelable,
 			String message) {
 		alertDialog = alertDialogBuilder(cancelable);
 		alertDialog.setMessage(message);
 		return alertDialog;
 	}
 
-	public AlertDialog.Builder setTitleAndMessageDialog(boolean cancelable,
+	protected AlertDialog.Builder setTitleAndMessageDialog(boolean cancelable,
 			String title, String message) {
 		alertDialog = alertDialogBuilder(cancelable);
 		alertDialog.setTitle(title);
 		alertDialog.setMessage(message);
 		return alertDialog;
 	}
-
-	public AlertDialog.Builder setPositiveAndNegativeButton(AlertDialog.Builder dialog,
-			String positiveText,String negativeText, DialogInterface.OnClickListener positiveListener,
-			DialogInterface.OnClickListener negativeListener) {
-		dialog.setPositiveButton(positiveText, positiveListener);
-		dialog.setNegativeButton(negativeText, negativeListener);
-		return dialog;
-	}
-	
 
 }
