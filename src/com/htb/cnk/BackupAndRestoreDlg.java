@@ -66,6 +66,7 @@ public class BackupAndRestoreDlg {
 		pdialog.show();
 		restoreAndBackup();
 	}
+	
 	private void restoreAndBackup() {
 		new Thread() {
 			public void run() {

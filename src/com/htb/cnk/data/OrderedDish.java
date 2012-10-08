@@ -1,10 +1,8 @@
 package com.htb.cnk.data;
 
 public class OrderedDish {
-	/**
-	 * 
-	 */
-	private final MyOrder OrderedDish;
+	//FIXME find out why orderedDish is needed here 
+	//private final MyOrder OrderedDish;
 	Dish dish;
 	float padQuantity;
 	int phoneQuantity;
@@ -14,7 +12,7 @@ public class OrderedDish {
 
 	public OrderedDish(MyOrder myOrder, Dish dish, float quantity, int tableId, int status,
 			int type) {
-		OrderedDish = myOrder;
+		//OrderedDish = myOrder;
 		this.dish = dish;
 		this.tableId = tableId;
 		this.status = status;

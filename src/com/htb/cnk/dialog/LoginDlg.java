@@ -3,9 +3,6 @@ package com.htb.cnk.dialog;
 import java.lang.reflect.Method;
 
 import com.htb.cnk.R;
-import com.htb.cnk.R.id;
-import com.htb.cnk.R.layout;
-import com.htb.cnk.R.string;
 import com.htb.cnk.data.Setting;
 import com.htb.cnk.data.UserData;
 

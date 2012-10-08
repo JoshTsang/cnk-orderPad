@@ -7,7 +7,6 @@ import java.util.List;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import com.htb.cnk.lib.Http;
 import com.htb.constant.ErrorNum;

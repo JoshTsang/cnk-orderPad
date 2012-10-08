@@ -22,14 +22,12 @@ import com.htb.cnk.data.OrderedDish;
 import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.lib.OrderBaseActivity;
 import com.htb.constant.ErrorNum;
-import com.htb.constant.Table;
 
 /**
  * @author josh
  * 
  */
 public class MyOrderActivity extends OrderBaseActivity {
-	private TableSetting mSettings = new TableSetting();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

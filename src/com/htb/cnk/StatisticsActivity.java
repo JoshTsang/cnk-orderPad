@@ -7,7 +7,6 @@ import java.util.Date;
 
 import com.htb.cnk.adapter.StatisticsAdapter;
 import com.htb.cnk.data.MyOrder;
-import com.htb.cnk.data.Statistics;
 import com.htb.cnk.lib.StatisticsBaseActivity;
 
 import android.os.Bundle;
