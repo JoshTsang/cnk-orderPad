@@ -365,7 +365,7 @@ public class MyOrder {
 				int dishId = item.getInt("dish_id");
 				int status = item.getInt("status");
 				Float dishPrice = (float) item.getDouble("price");
-				String name = getDishName(dishId);
+				String name = getDishName(dishId).toUpperCase();
 				Dish mDish = new Dish(dishId, name, dishPrice, null);
 				addOrder(mDish, quantity, tableId, status, MODE_PAD);
 			}

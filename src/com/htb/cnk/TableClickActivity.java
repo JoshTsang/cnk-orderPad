@@ -13,6 +13,7 @@ import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.text.method.DigitsKeyListener;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -31,7 +32,7 @@ import com.htb.cnk.dialog.ViewDialog;
 import com.htb.constant.Table;
 
 public class TableClickActivity extends TableBaseActivity {
-
+	static final String TAG = "TableClickActivity";
 	protected final int UPDATE_TABLE_INFOS = 5;
 	protected final int DISABLE_GRIDVIEW = 10;
 	protected final int CHECKOUT_LIST = 1;
@@ -106,10 +107,10 @@ public class TableClickActivity extends TableBaseActivity {
 			cleanTableDialog().show();
 			break;
 		case 1:
-			changeTableDialog(CHANGE_DIALOG).show();
+			changeOrCombineDialog(CHANGE_DIALOG).show();
 			break;
 		case 2:
-			changeTableDialog(COMBINE_DIALOG).show();
+			changeOrCombineDialog(COMBINE_DIALOG).show();
 			break;
 		case 3:
 			setClassToActivity(DelOrderActivity.class);
@@ -240,9 +241,9 @@ public class TableClickActivity extends TableBaseActivity {
 		}
 	};
 
-	private Builder changeTableDialog(final int type) {
+	private Builder changeOrCombineDialog(final int type) {
 		final AlertDialog.Builder changeTableAlertDialog;
-		View layout = getDialogLayout(R.layout.change_dialog, R.id.change);
+		View layout = getDialogLayout(R.layout.change_dialog, R.id.change_dialog);
 		personsEdit = (EditText) layout.findViewById(R.id.personsEdit);
 		if (Setting.enabledPersons()) {
 			tableIdEdit = (EditText) layout.findViewById(R.id.tableIdEdit);
@@ -260,7 +261,7 @@ public class TableClickActivity extends TableBaseActivity {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				String changePersons;
-				String tableName = tableIdEdit.getText().toString();
+				String tableName = tableIdEdit.getText().toString().toUpperCase();
 				if (Setting.enabledPersons()) {
 					changePersons = personsEdit.getText().toString();
 				} else {
@@ -289,11 +290,11 @@ public class TableClickActivity extends TableBaseActivity {
 		DialogInterface.OnClickListener copyTableListener = new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				String changeTId = copyTableText.getEditableText().toString();
-				if (changeTId.equals("")) {
+				String tableName = copyTableText.getEditableText().toString().toUpperCase();
+				if (tableName.equals("")) {
 					toastText(R.string.idAndPersonsIsNull);
-				} else if (isBoundaryLegal(changeTId, Table.OPEN_TABLE_STATUS)) {
-					copyTable(mSettings.getId(changeTId));
+				} else if (isBoundaryLegal(tableName, Table.OPEN_TABLE_STATUS)) {
+					copyTable(mSettings.getId(tableName));
 				} else {
 					toastText(R.string.copyTIdwarning);
 				}
@@ -306,11 +307,11 @@ public class TableClickActivity extends TableBaseActivity {
 	}
 
 	private EditText editTextListener() {
-		final EditText copyTableText = new EditText(this);
-		copyTableText.setKeyListener(new DigitsKeyListener(false, true));
-		copyTableText
-				.setFilters(new InputFilter[] { new InputFilter.LengthFilter(4) });
-		return copyTableText;
+		final EditText editText = new EditText(this);
+//		editText.setKeyListener(new DigitsKeyListener(false, true));
+//		editText
+//				.setFilters(new InputFilter[] { new InputFilter.LengthFilter(6) });
+		return editText;
 	}
 
 	private View getDialogLayout(int layout_dialog, int id) {
