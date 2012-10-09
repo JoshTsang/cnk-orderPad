@@ -113,9 +113,11 @@ public class ManageActivity extends BaseActivity {
 						@Override
 						public void onClick(DialogInterface dialog,
 								int which) {
-							if (backupAndRestoreDlg == null) {
-								backupAndRestoreDlg = new BackupAndRestoreDlg(ManageActivity.this, BackupAndRestoreDlg.ACTION_BACKUP);
-							} else {
+									if (backupAndRestoreDlg == null) {
+										backupAndRestoreDlg = new BackupAndRestoreDlg(
+												ManageActivity.this,
+												BackupAndRestoreDlg.ACTION_BACKUP);
+									} else {
 								backupAndRestoreDlg.show(BackupAndRestoreDlg.ACTION_BACKUP);
 							}
 						}
@@ -130,6 +132,7 @@ public class ManageActivity extends BaseActivity {
 			}).show();
 		} 
 	};
+	
 	private OnClickListener restoreClicked = new OnClickListener() {
 
 		@Override
@@ -147,9 +150,11 @@ public class ManageActivity extends BaseActivity {
 						@Override
 						public void onClick(DialogInterface dialog,
 								int which) {
-							if (backupAndRestoreDlg == null) {
-								backupAndRestoreDlg = new BackupAndRestoreDlg(ManageActivity.this, BackupAndRestoreDlg.ACTION_RESTORE);
-							} else {
+									if (backupAndRestoreDlg == null) {
+										backupAndRestoreDlg = new BackupAndRestoreDlg(
+												ManageActivity.this,
+												BackupAndRestoreDlg.ACTION_RESTORE);
+									} else {
 								backupAndRestoreDlg.show(BackupAndRestoreDlg.ACTION_RESTORE);
 							}
 						}
