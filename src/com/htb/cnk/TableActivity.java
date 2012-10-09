@@ -29,8 +29,8 @@ public class TableActivity extends TableClickActivity {
 
 	private void handler() {
 		mNotificationHandler = notificationHandler;
-		mTableHandler = tableHandler;
-		mRingtoneHandler = ringtoneHandler;
+		setmTableHandler(tableHandler);
+		setmRingtoneHandler(ringtoneHandler);
 		mTotalPriceTableHandler = totalPriceTableHandler;
 		mChangeTIdHandler = changeTIdHandler;
 		mCopyTIdHandler = copyTIdHandler;
@@ -51,7 +51,7 @@ public class TableActivity extends TableClickActivity {
 				switch (msg.what) {
 				case UPDATE_TABLE_INFOS:
 					setTableInfos();
-					if (mSettings.hasPendedPhoneOrder()) {
+					if (getmSettings().hasPendedPhoneOrder()) {
 						ringtoneHandler.sendEmptyMessage(1);
 					}
 					break;
@@ -78,15 +78,15 @@ public class TableActivity extends TableClickActivity {
 		}
 		gridview.setVisibility(View.VISIBLE);
 		mImageItems.notifyDataSetChanged();
-		gridview.setOnItemClickListener(mTableClicked);
+		gridview.setOnItemClickListener(tableItemClickListener);
 	}
 
 	private void setStatusAndIcon() {
 		lstImageItem.clear();
-		for (int i = 0, n = 0; i < mSettings.size(); i++) {
-			int status = mSettings.getStatusIndex(i);
+		for (int i = 0, n = 0; i < getmSettings().size(); i++) {
+			int status = getmSettings().getStatusIndex(i);
 			if (status < Table.NOTIFICATION_STATUS
-					&& mNotificaion.getId(n) == mSettings.getIdIndex(i)) {
+					&& mNotificaion.getId(n) == getmSettings().getIdIndex(i)) {
 				status = status + Table.NOTIFICATION_STATUS;
 				n++;
 			}
@@ -98,7 +98,7 @@ public class TableActivity extends TableClickActivity {
 		HashMap<String, Object> map;
 		if (lstImageItem.size() <= position) {
 			map = new HashMap<String, Object>();
-			map.put(ITEM_TEXT, mSettings.getNameIndex(position));
+			map.put(ITEM_TEXT, getmSettings().getNameIndex(position));
 		} else {
 			map = lstImageItem.get(position);
 		}
@@ -124,16 +124,16 @@ public class TableActivity extends TableClickActivity {
 			break;
 		case 100:
 			map.put(IMAGE_ITEM, R.drawable.table_rednotification);
-			mSettings.setStatus(position, status);
+			getmSettings().setStatus(position, status);
 			break;
 		case 101:
 			map.put(IMAGE_ITEM, R.drawable.table_bluenotification);
-			mSettings.setStatus(position, status);
+			getmSettings().setStatus(position, status);
 			break;
 		case 150:
 		case 151:
 			map.put(IMAGE_ITEM, R.drawable.table_yellownotification);
-			mSettings.setStatus(position, status);
+			getmSettings().setStatus(position, status);
 			break;
 		default:
 			map.put(IMAGE_ITEM, R.drawable.table_red);

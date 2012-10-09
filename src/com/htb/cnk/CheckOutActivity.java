@@ -42,7 +42,7 @@ public class CheckOutActivity extends TableActivity{
 		setContentView(R.layout.checkout_activity);
 		checkOutIntent = this.getIntent();
 		mCheckOutHandler = checkOutHandler;
-		mTableHandler =  tableHandler;
+		setmTableHandler(tableHandler);
 		mMyOrder = new MyOrder(CheckOutActivity.this);
 		checkfindViews();
 		setCheckOutView();
@@ -84,7 +84,7 @@ public class CheckOutActivity extends TableActivity{
 	};
 	
 	private void updateTabelInfos() {
-		mCheckOutPrinte.setText(mSettings.checkOutJson());
+		mCheckOutPrinte.setText(getmSettings().checkOutJson());
 		mReceivableText.setText(String.valueOf(mTotalPrice));
 	}
 	
