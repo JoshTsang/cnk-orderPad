@@ -243,7 +243,7 @@ public class TableSetting implements Serializable {
 			return status;
 		}
 		if (type == PHONE_ORDER) {
-			if (status > Table.PHONE_STATUS) {
+			if (status >= Table.PHONE_STATUS) {
 				status = status - Table.PHONE_STATUS;
 			} else {
 				status = 1;
