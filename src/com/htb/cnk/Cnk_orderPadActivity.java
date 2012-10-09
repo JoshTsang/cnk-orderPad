@@ -42,8 +42,8 @@ import com.htb.cnk.data.Version;
 import com.htb.cnk.data.WifiAdmin;
 import com.htb.cnk.dialog.LoginDlg;
 import com.htb.cnk.dialog.TitleAndMessageDialog;
-import com.htb.cnk.lib.BaseActivity;
 import com.htb.cnk.lib.Http;
+import com.htb.cnk.ui.base.BaseActivity;
 import com.htb.constant.Permission;
 import com.htb.constant.Server;
 

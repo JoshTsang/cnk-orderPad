@@ -142,24 +142,23 @@ public class QueryOrderActivity extends OrderBaseActivity {
 
 	private AlertDialog.Builder networkDialog() {
 		return mNetworkDialog.networkDialog(
-				new DialogInterface.OnClickListener() {
-
-					@Override
-					public void onClick(DialogInterface dialog, int i) {
-						ARERTDIALOG = 0;
-						showProgressDlg("正在连接服务器...");
-						queryThread();
-					}
-				}, new DialogInterface.OnClickListener() {
-
-					@Override
-					public void onClick(DialogInterface dialog, int i) {
-						finish();
-						ARERTDIALOG = 0;
-					}
-				});
+				networkPositiveListener,networkNegativeListener);
 	}
-
+	DialogInterface.OnClickListener networkPositiveListener = new DialogInterface.OnClickListener() {
+		@Override
+		public void onClick(DialogInterface dialog, int i) {
+			ARERTDIALOG = 0;
+			showProgressDlg("正在连接服务器...");
+			queryThread();
+		}
+	};
+	DialogInterface.OnClickListener networkNegativeListener = new DialogInterface.OnClickListener() {
+		@Override
+		public void onClick(DialogInterface dialog, int i) {
+			finish();
+			ARERTDIALOG = 0;
+		}
+	};
 	@Override
 	public void finish() {
 		mMyOrder.clear();

@@ -1,18 +1,26 @@
 package com.htb.cnk;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.view.View;
+import android.widget.SimpleAdapter;
 
 import com.htb.cnk.data.Info;
+import com.htb.constant.Table;
 
 public class TableActivity extends TableClickActivity {
 
 	static final String TAG = "TablesActivity";
-
+	protected ArrayList<HashMap<String, Object>> lstImageItem = new ArrayList<HashMap<String, Object>>();
+	private final String IMAGE_ITEM = "imageItem";
+	private final String ITEM_TEXT = "ItemText";
+	
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -56,6 +64,82 @@ public class TableActivity extends TableClickActivity {
 			}
 		}
 	};
+	protected void setTableInfos() {
+		if (lstImageItem.size() > 0) {
+			setStatusAndIcon();
+		} else {
+			setStatusAndIcon();
+			mImageItems = new SimpleAdapter(TableActivity.this,
+					lstImageItem, R.layout.table_item, new String[] {
+							IMAGE_ITEM, ITEM_TEXT }, new int[] {
+							R.id.ItemImage, R.id.ItemText }) {
+			};
+			gridview.setAdapter(mImageItems);
+		}
+		gridview.setVisibility(View.VISIBLE);
+		mImageItems.notifyDataSetChanged();
+		gridview.setOnItemClickListener(mTableClicked);
+	}
+
+	private void setStatusAndIcon() {
+		lstImageItem.clear();
+		for (int i = 0, n = 0; i < mSettings.size(); i++) {
+			int status = mSettings.getStatusIndex(i);
+			if (status < Table.NOTIFICATION_STATUS
+					&& mNotificaion.getId(n) == mSettings.getIdIndex(i)) {
+				status = status + Table.NOTIFICATION_STATUS;
+				n++;
+			}
+			setTableIcon(i, status);
+		}
+	}
+
+	private void setTableIcon(int position, int status) {
+		HashMap<String, Object> map;
+		if (lstImageItem.size() <= position) {
+			map = new HashMap<String, Object>();
+			map.put(ITEM_TEXT, mSettings.getNameIndex(position));
+		} else {
+			map = lstImageItem.get(position);
+		}
+
+		imageItemSwitch(position, status, map);
+		if (lstImageItem.size() <= position) {
+			lstImageItem.add(map);
+		}
+	}
+
+	private void imageItemSwitch(int position, int status,
+			HashMap<String, Object> map) {
+		switch (status) {
+		case 0:
+			map.put(IMAGE_ITEM, R.drawable.table_red);
+			break;
+		case 1:
+			map.put(IMAGE_ITEM, R.drawable.table_blue);
+			break;
+		case 50:
+		case 51:
+			map.put(IMAGE_ITEM, R.drawable.table_yellow);
+			break;
+		case 100:
+			map.put(IMAGE_ITEM, R.drawable.table_rednotification);
+			mSettings.setStatus(position, status);
+			break;
+		case 101:
+			map.put(IMAGE_ITEM, R.drawable.table_bluenotification);
+			mSettings.setStatus(position, status);
+			break;
+		case 150:
+		case 151:
+			map.put(IMAGE_ITEM, R.drawable.table_yellownotification);
+			mSettings.setStatus(position, status);
+			break;
+		default:
+			map.put(IMAGE_ITEM, R.drawable.table_red);
+			break;
+		}
+	}
 
 	Handler totalPriceTableHandler = new Handler() {
 		public void handleMessage(Message msg) {

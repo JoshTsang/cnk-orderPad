@@ -13,7 +13,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.htb.cnk.data.UserData;
-import com.htb.cnk.lib.BaseActivity;
+import com.htb.cnk.ui.base.BaseActivity;
 import com.htb.constant.Permission;
 
 

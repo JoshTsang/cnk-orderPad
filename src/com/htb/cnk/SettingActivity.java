@@ -12,7 +12,7 @@ import android.widget.Switch;
 
 import com.htb.cnk.data.Setting;
 import com.htb.cnk.data.UserData;
-import com.htb.cnk.lib.BaseActivity;
+import com.htb.cnk.ui.base.BaseActivity;
 
 public class SettingActivity extends BaseActivity {
 	private Switch persons;

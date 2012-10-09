@@ -6,8 +6,17 @@ import java.util.List;
 
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
+import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
 import android.text.Editable;
 import android.text.InputFilter;
@@ -20,38 +29,110 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
+import android.widget.SimpleAdapter;
 
+import com.htb.cnk.NotificationTableService.MyBinder;
 import com.htb.cnk.data.Info;
+import com.htb.cnk.data.NotificationTypes;
+import com.htb.cnk.data.Notifications;
+import com.htb.cnk.data.PhoneOrder;
 import com.htb.cnk.data.Setting;
 import com.htb.cnk.data.TableSetting;
-import com.htb.cnk.dialog.ItemDialog;
-import com.htb.cnk.dialog.MultiChoiceItemsDialog;
-import com.htb.cnk.dialog.TitleAndMessageDialog;
-import com.htb.cnk.dialog.ViewDialog;
+import com.htb.cnk.lib.Ringtone;
 import com.htb.constant.Table;
 
 public class TableClickActivity extends TableBaseActivity {
-
+	
+	
 	protected final int UPDATE_TABLE_INFOS = 5;
 	protected final int DISABLE_GRIDVIEW = 10;
 	protected final int CHECKOUT_LIST = 1;
 	protected final int COMBINE_DIALOG = 1;
 	protected final int CHANGE_DIALOG = 2;
-	protected List<Integer> selectedTable = new ArrayList<Integer>();
+	
+	protected int NETWORK_ARERTDIALOG = 0;
+	
 	protected double mIncome;
 	protected double mChange;
+	protected double mTotalPrice;
+	
 	protected EditText tableIdEdit;
 	protected EditText personsEdit;
+	
+	protected PhoneOrder mPhoneOrder;
+	protected TableSetting mSettings;
+	protected Ringtone mRingtone;
+	
+	protected List<String> tableName = new ArrayList<String>();
+	protected List<Integer> selectedTable = new ArrayList<Integer>();
+	
+	protected AlertDialog.Builder mChangeDialog;
+	protected ProgressDialog mpDialog;
+	protected SimpleAdapter mImageItems;
+	
+	protected Intent intent;
+	protected boolean binderFlag;
+	protected MyReceiver mReceiver;
+	protected NotificationTableService.MyBinder binder;
+	protected int mTableMsg;
+	protected int mRingtoneMsg;
+	protected AlertDialog mNetWrorkcancel;
+	protected AlertDialog.Builder mNetWrorkAlertDialog;
+	
+	protected Notifications mNotificaion = new Notifications();
+	protected NotificationTypes mNotificationType = new NotificationTypes();
+	protected tableItemClickListener mTableClicked;
+	
+	protected Handler mNotificationHandler;
+	protected Handler mTableHandler;
+	protected Handler mRingtoneHandler;
+	protected Handler mTotalPriceTableHandler;
+	protected Handler mChangeTIdHandler;
+	protected Handler mCombineTIdHandler;
+	protected Handler mCopyTIdHandler;
+	protected Handler mCheckOutHandler;
+	protected Handler mNotificationTypeHandler;
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		if (NETWORK_ARERTDIALOG == 1) {
+			mNetWrorkcancel.cancel();
+			NETWORK_ARERTDIALOG = 0;
+		}
+		showProgressDlg(getResources().getString(R.string.getStatus));
+		binderStart();
+	}
+
+	@Override
+	protected void onDestroy() {
+		unbindService(conn);
+		unregisterReceiver(mReceiver);
+		super.onDestroy();
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		mTitleAndMessageDialog = new TitleAndMessageDialog(
-				TableClickActivity.this);
-		mItemDialog = new ItemDialog(TableClickActivity.this);
-		mViewDialog = new ViewDialog(TableClickActivity.this);
-		mMultiChoiceItemsDialog = new MultiChoiceItemsDialog(
-				TableClickActivity.this);
+		
+		mPhoneOrder = new PhoneOrder(TableClickActivity.this);
+		mSettings = new TableSetting();
+		mRingtone = new Ringtone(TableClickActivity.this);
+		mpDialog = new ProgressDialog(TableClickActivity.this);
+
+		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+		mpDialog.setIndeterminate(false);
+		mpDialog.setCancelable(false);
+		mpDialog.setTitle(getResources().getString(R.string.pleaseWait));
+		intent = new Intent(TableClickActivity.this,
+				NotificationTableService.class);
+		startService(intent);
+
+		bindService(intent, conn, Context.BIND_AUTO_CREATE);
+		mReceiver = new MyReceiver();
+		IntentFilter filter = new IntentFilter(
+				NotificationTableService.SERVICE_IDENTIFIER);
+		registerReceiver(mReceiver, filter);
 		mNetWrorkAlertDialog = networkDialog();
 		setClickListeners();
 	}
@@ -62,6 +143,26 @@ public class TableClickActivity extends TableBaseActivity {
 		mUpdateBtn.setOnClickListener(checkOutClicked);
 		mStatisticsBtn.setOnClickListener(logoutClicked);
 		mManageBtn.setOnClickListener(manageClicked);
+	}
+
+	protected ServiceConnection conn = new ServiceConnection() {
+
+		@Override
+		public void onServiceConnected(ComponentName arg0, IBinder arg1) {
+			binder = (MyBinder) arg1;
+			binderFlag = true;
+		}
+
+		@Override
+		public void onServiceDisconnected(ComponentName name) {
+		}
+	};
+
+	protected void binderStart() {
+		if (binderFlag) {
+			binder.start();
+			return;
+		}
 	}
 
 	protected AlertDialog.Builder networkDialog() {
@@ -126,6 +227,16 @@ public class TableClickActivity extends TableBaseActivity {
 		}
 	}
 
+	public void showProgressDlg(String msg) {
+		mpDialog.setMessage(msg);
+		mpDialog.show();
+	}
+
+	protected void netWorkDialogShow(String messages) {
+		NETWORK_ARERTDIALOG = 1;
+		mNetWrorkcancel = mNetWrorkAlertDialog.setMessage(messages).show();
+	}
+	
 	private AlertDialog.Builder cleanTableDialog() {
 		return mTitleAndMessageDialog.messageDialog(false, getResources()
 				.getString(R.string.isCleanTable),
@@ -150,7 +261,6 @@ public class TableClickActivity extends TableBaseActivity {
 				showProgressDlg(getResources().getString(
 						R.string.cleanPhoneOrderNow));
 				cleanPhoneThread(position, Info.getTableId());
-				dialog.cancel();
 			}
 		};
 
@@ -516,6 +626,19 @@ public class TableClickActivity extends TableBaseActivity {
 		}.start();
 	}
 
+	protected void NotificationType() {
+		new Thread() {
+			public void run() {
+				try {
+					int ret = mNotificationType.getNotifiycationsType();
+					mNotificationTypeHandler.sendEmptyMessage(ret);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}.start();
+	}
+
 	private int getTableStatusFromServer() {
 		int ret = mSettings.getTableStatusFromServer();
 		if (ret < 0) {
@@ -533,10 +656,14 @@ public class TableClickActivity extends TableBaseActivity {
 	}
 
 	private boolean isBoundaryLegal(String tableName, int status) {
-		if(tableName.equals(Info.getTableName())){
+		if (tableName.equals(Info.getTableName())) {
 			return false;
 		}
 		return isTId(tableName) && isStatusLegal(tableName, status);
+	}
+
+	private boolean equalNameAndPersons(String changePersons, String tableName) {
+		return tableName.equals("") || changePersons.equals("");
 	}
 
 	private int getNotifiycations() {
@@ -547,9 +674,12 @@ public class TableClickActivity extends TableBaseActivity {
 
 	private void judgeChangeTable(String changePersons, String tableName)
 			throws NumberFormatException {
-		if (tableName.equals("") || changePersons.equals("")) {
+		if (equalNameAndPersons(changePersons, tableName)) {
 			toastText(R.string.idAndPersonsIsNull);
-		} else if (isBoundaryLegal(tableName, Table.NORMAL_TABLE_STAUTS)) {
+			return;
+		}
+
+		if (isBoundaryLegal(tableName, Table.NORMAL_TABLE_STAUTS)) {
 			changeTable(mSettings.getId(tableName),
 					Integer.parseInt(changePersons));
 		} else {
@@ -559,9 +689,12 @@ public class TableClickActivity extends TableBaseActivity {
 
 	private void judgeCombineTable(String changePersons, String tableName)
 			throws NumberFormatException {
-		if (tableName.equals("") || changePersons.equals("")) {
+		if (equalNameAndPersons(changePersons, tableName)) {
 			toastText(R.string.idAndPersonsIsNull);
-		} else if (isBoundaryLegal(tableName, Table.OPEN_TABLE_STATUS)) {
+			return;
+		}
+
+		if (isBoundaryLegal(tableName, Table.OPEN_TABLE_STATUS)) {
 			combineTable(mSettings.getId(tableName),
 					Integer.parseInt(changePersons));
 		} else {
@@ -697,4 +830,17 @@ public class TableClickActivity extends TableBaseActivity {
 		}
 	}
 
+	public class MyReceiver extends BroadcastReceiver {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			Bundle bundle = intent.getExtras();
+			mRingtoneMsg = bundle.getInt("ringtoneMessage");
+			mTableMsg = bundle.getInt("tableMessage");
+			mSettings = (TableSetting) bundle
+					.getSerializable(NotificationTableService.SER_KEY);
+			mTableHandler.sendEmptyMessage(mTableMsg);
+			mRingtoneHandler.sendEmptyMessage(mRingtoneMsg);
+		}
+	}
 }

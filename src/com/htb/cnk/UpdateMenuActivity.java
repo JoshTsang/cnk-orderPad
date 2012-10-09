@@ -34,9 +34,9 @@ import android.view.KeyEvent;
 import android.widget.TextView;
 
 import com.htb.cnk.data.CnkDbHelper;
-import com.htb.cnk.lib.BaseActivity;
 import com.htb.cnk.lib.DBFile;
 import com.htb.cnk.lib.Http;
+import com.htb.cnk.ui.base.BaseActivity;
 import com.htb.constant.ErrorNum;
 import com.htb.constant.Server;
 

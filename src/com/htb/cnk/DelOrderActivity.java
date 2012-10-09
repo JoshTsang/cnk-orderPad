@@ -11,13 +11,11 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.htb.cnk.adapter.MyOrderAdapter;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.OrderedDish;
-import com.htb.cnk.dialog.TitleAndMessageDialog;
 import com.htb.cnk.lib.OrderBaseActivity;
 
 public class DelOrderActivity extends OrderBaseActivity {
@@ -134,40 +132,34 @@ public class DelOrderActivity extends OrderBaseActivity {
 		delDishDialog(position, messages);
 	}
 
-	/**
-	 * @param position
-	 * @param messages
-	 */
 	protected void delDishDialog(final int position, String messages) {
-		new AlertDialog.Builder(DelOrderActivity.this)
-				.setTitle(getResources().getString(R.string.pleaseNote))
-				.setMessage(messages)
-				.setPositiveButton(getResources().getString(R.string.ok),
-						new DialogInterface.OnClickListener() {
+		DialogInterface.OnClickListener delDishPositiveListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				if (position == CLEANALL) {
+					showProgressDlg("正在退掉所有菜品");
+					cleanAllThread();
+				} else {
+					showProgressDlg("正在退掉菜品");
+					if (converFloat(position)) {
+						delDish(position, UPDATE_ORDER_QUAN, UPDATE_ORDER);
+					} else {
+						delDish(position, mMyOrder.getQuantity(position),
+								DEL_ITEM_ORDER);
+					}
+				}
+			}
 
-							@Override
-							public void onClick(DialogInterface dialog,
-									int which) {
-								if (position == CLEANALL) {
-									showProgressDlg("正在退掉所有菜品");
-									cleanAllThread();
-								} else {
-									showProgressDlg("正在退掉菜品");
-									if (MyOrder.convertFloat(
-											mMyOrder.getQuantity(position))
-											.indexOf(".") == -1) {
-										delDish(position, UPDATE_ORDER_QUAN,
-												UPDATE_ORDER);
-									} else {
-										delDish(position,
-												mMyOrder.getQuantity(position),
-												DEL_ITEM_ORDER);
-									}
-								}
-							}
-						})
-				.setNegativeButton(getResources().getString(R.string.cancel),
-						null).show();
+			private boolean converFloat(final int position) {
+				return MyOrder.convertFloat(mMyOrder.getQuantity(position))
+						.indexOf(".") == -1;
+			}
+		};
+
+		mTitleAndMessageDialog.titleAndMessageDialog(false,
+				getResources().getString(R.string.pleaseNote), messages,
+				getResources().getString(R.string.ok), delDishPositiveListener,
+				getResources().getString(R.string.cancel), null).show();
 	}
 
 	Handler getOrderHandler = new Handler() {
@@ -255,25 +247,25 @@ public class DelOrderActivity extends OrderBaseActivity {
 
 	protected AlertDialog.Builder networkDialog() {
 		return mNetworkDialog.networkDialog(
-				new DialogInterface.OnClickListener() {
-
-					@Override
-					public void onClick(DialogInterface dialog, int i) {
-						NETWORK_ARERTDIALOG = 0;
-						showProgressDlg(getResources().getString(
-								R.string.connectServer));
-						getOrderThread();
-					}
-				}, new DialogInterface.OnClickListener() {
-
-					@Override
-					public void onClick(DialogInterface dialog, int i) {
-						NETWORK_ARERTDIALOG = 0;
-						finish();
-					}
-				});
+				networkPositiveListener,networkNegativeListener);
 	}
 
+	DialogInterface.OnClickListener networkPositiveListener = new DialogInterface.OnClickListener() {
+		@Override
+		public void onClick(DialogInterface dialog, int i) {
+			NETWORK_ARERTDIALOG = 0;
+			showProgressDlg(getResources().getString(R.string.connectServer));
+			getOrderThread();
+		}
+	};
+	DialogInterface.OnClickListener networkNegativeListener = new DialogInterface.OnClickListener() {
+		@Override
+		public void onClick(DialogInterface dialog, int i) {
+			NETWORK_ARERTDIALOG = 0;
+			finish();
+		}
+	};
+	
 	private OnClickListener cleanBtnClicked = new OnClickListener() {
 
 		@Override

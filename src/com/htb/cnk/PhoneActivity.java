@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -177,17 +176,18 @@ public class PhoneActivity extends OrderBaseActivity {
 	}
 
 	private void minusDishDialog(final int position, final int quantity) {
-		new AlertDialog.Builder(PhoneActivity.this)
-				.setTitle("请注意")
-				.setMessage(
-						"确认删除" + mMyOrder.getOrderedDish(position).getName())
-				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+		DialogInterface.OnClickListener minusDishPositiveListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				updateDishQuantity(position, -quantity);
+			}
 
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						updateDishQuantity(position, -quantity);
-					}
-				}).setNegativeButton("取消", null).show();
+		};
+		mTitleAndMessageDialog.titleAndMessageDialog(false, "请注意",
+				"确认删除" + mMyOrder.getOrderedDish(position).getName(),
+				getResources().getString(R.string.ok),
+				minusDishPositiveListener,
+				getResources().getString(R.string.cancel), null).show();
 	}
 
 	private void cleanThread() {
@@ -213,32 +213,29 @@ public class PhoneActivity extends OrderBaseActivity {
 	}
 
 	private void phoneWarningDialog() {
-		new AlertDialog.Builder(PhoneActivity.this).setCancelable(false)
-				.setTitle("提示").setMessage("订单已提交")
-				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+		DialogInterface.OnClickListener phoneWarningPositiveListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				finish();
+			}
 
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						finish();
-					}
-				}).show();
+		};
+		mTitleAndMessageDialog.titleAndMessageDialog(false, "提示", "订单已提交",
+				getResources().getString(R.string.ok),
+				phoneWarningPositiveListener, null, null).show();
+
 	}
 
-	/**
-	 * 
-	 */
 	private void queryWarningDialog() {
-		new AlertDialog.Builder(PhoneActivity.this).setTitle("请注意")
-				.setMessage("无法连接服务器").setPositiveButton("确定", null).show();
+		mTitleAndMessageDialog.titleAndMessageDialog(false, "请注意", "无法连接服务器",
+				getResources().getString(R.string.ok),
+				null, null, null).show();
 	}
 
-	/**
-	 * @param errMsg
-	 */
 	private void errMsgDialog(String errMsg) {
-		new AlertDialog.Builder(PhoneActivity.this).setCancelable(false)
-				.setTitle("出错了").setMessage(errMsg)
-				.setPositiveButton("确定", null).show();
+		mTitleAndMessageDialog.titleAndMessageDialog(false, "出错了", errMsg,
+				getResources().getString(R.string.ok),
+				null, null, null).show();
 	}
 
 	private OnClickListener backBtnClicked = new OnClickListener() {

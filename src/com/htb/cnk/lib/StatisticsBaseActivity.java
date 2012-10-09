@@ -24,6 +24,7 @@ import com.htb.cnk.R;
 import com.htb.cnk.adapter.StatisticsAdapter;
 import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.Statistics;
+import com.htb.cnk.ui.base.BaseActivity;
 import com.htb.constant.ErrorNum;
 import com.htb.constant.Server;
 
