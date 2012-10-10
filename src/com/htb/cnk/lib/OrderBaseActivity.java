@@ -47,7 +47,6 @@ public class OrderBaseActivity extends BaseActivity {
 	protected TextView mTotalPriceTxt;
 	protected ListView mMyOrderLst;
 	protected PhoneOrder mMyOrder;
-	protected ProgressDialog mpDialog;
 	protected Handler mSubmitHandler;
 	protected MyOrderAdapter mMyOrderAdapter;
 	protected int persons;
@@ -60,13 +59,8 @@ public class OrderBaseActivity extends BaseActivity {
 		mMyOrder = new PhoneOrder(OrderBaseActivity.this);
 		mNetworkDialog = new TitleAndMessageDialog(OrderBaseActivity.this);
 		mSettings = new TableSetting();
-		mpDialog = new ProgressDialog(OrderBaseActivity.this);
-		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-		mpDialog.setIndeterminate(false);
-		mpDialog.setCancelable(false);
 		getPersons();
 		getFLavor();
-
 		findViews();
 		fillData();
 		setClickListener();

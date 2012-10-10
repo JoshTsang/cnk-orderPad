@@ -46,7 +46,7 @@ public class BaseActivity extends Activity {
 		if (enableUmeng) {
 			MobclickAgent.onError(this);
 		}
-		initProgressDialog();
+		initProgressDlg();
 	}
 
 	@Override
@@ -84,7 +84,7 @@ public class BaseActivity extends Activity {
 		Toast.makeText(getApplicationContext(), r, Toast.LENGTH_LONG).show();
 	}
 	
-	protected void initProgressDialog()  {
+	protected void initProgressDlg()  {
 		mpDialog = new ProgressDialog(BaseActivity.this);
 		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 		mpDialog.setIndeterminate(false);

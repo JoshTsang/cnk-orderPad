@@ -97,11 +97,6 @@ public class DelOrderActivity extends OrderBaseActivity {
 		mLeftBtn.setOnClickListener(cleanBtnClicked);
 	}
 
-	public void showProgressDlg(String msg) {
-		mpDialog.setMessage(msg);
-		mpDialog.show();
-	}
-
 	private void delDish(final int position, final float updateOrderQuan,
 			final int type) {
 		new Thread() {
