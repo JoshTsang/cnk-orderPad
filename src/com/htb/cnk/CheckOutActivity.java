@@ -17,8 +17,9 @@ import android.widget.TextView;
 import com.htb.cnk.adapter.MyOrderAdapter;
 import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.Setting;
+import com.htb.cnk.ui.base.TableBaseActivity;
 
-public class CheckOutActivity extends TableActivity{
+public class CheckOutActivity extends TableBaseActivity{
 	protected Button mBackBtn;
 	protected Button mSubmitBtn;
 	protected Button mLeftBtn;
@@ -42,7 +43,6 @@ public class CheckOutActivity extends TableActivity{
 		setContentView(R.layout.checkout_activity);
 		checkOutIntent = this.getIntent();
 		mCheckOutHandler = checkOutHandler;
-		setmTableHandler(tableHandler);
 		mMyOrder = new MyOrder(CheckOutActivity.this);
 		checkfindViews();
 		setCheckOutView();
@@ -76,12 +76,6 @@ public class CheckOutActivity extends TableActivity{
 		getTableValue();
 		updateTabelInfos();
 	}
-	
-	Handler tableHandler = new Handler() {
-		public void handleMessage(Message msg) {
-			mpDialog.cancel();
-		}
-	};
 	
 	private void updateTabelInfos() {
 		mCheckOutPrinte.setText(getmSettings().checkOutJson());

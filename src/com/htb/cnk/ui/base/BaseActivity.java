@@ -1,11 +1,14 @@
 package com.htb.cnk.ui.base;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.res.Resources.NotFoundException;
 import android.os.Bundle;
 import android.os.Message;
 import android.view.KeyEvent;
 import android.widget.Toast;
 
+import com.htb.cnk.R;
 import com.htb.cnk.dialog.ItemDialog;
 import com.htb.cnk.dialog.MultiChoiceItemsDialog;
 import com.htb.cnk.dialog.TitleAndMessageDialog;
@@ -20,6 +23,7 @@ public class BaseActivity extends Activity {
 	protected ItemDialog mItemDialog;
 	protected ViewDialog mViewDialog;
 	protected MultiChoiceItemsDialog mMultiChoiceItemsDialog;
+	protected ProgressDialog mpDialog;
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
@@ -42,6 +46,7 @@ public class BaseActivity extends Activity {
 		if (enableUmeng) {
 			MobclickAgent.onError(this);
 		}
+		initProgressDialog();
 	}
 
 	@Override
@@ -78,4 +83,18 @@ public class BaseActivity extends Activity {
 	protected void toastText(String r) {
 		Toast.makeText(getApplicationContext(), r, Toast.LENGTH_LONG).show();
 	}
+	
+	protected void initProgressDialog()  {
+		mpDialog = new ProgressDialog(BaseActivity.this);
+		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+		mpDialog.setIndeterminate(false);
+		mpDialog.setCancelable(false);
+		mpDialog.setTitle(getResources().getString(R.string.pleaseWait));
+	}
+	
+	public void showProgressDlg(String msg) {
+		mpDialog.setMessage(msg);
+		mpDialog.show();
+	}
+	
 }

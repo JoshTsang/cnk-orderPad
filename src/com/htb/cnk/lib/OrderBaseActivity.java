@@ -125,11 +125,6 @@ public class OrderBaseActivity extends BaseActivity {
 		mTotalPriceTxt.setText(format.format(mMyOrder.getTotalPrice()) + " 元");
 	}
 
-	protected void showProgressDlg(String msg) {
-		mpDialog.setMessage(msg);
-		mpDialog.show();
-	}
-
 	/**
 	 * @return
 	 */

@@ -7,27 +7,60 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.GridView;
 import android.widget.SimpleAdapter;
 
 import com.htb.cnk.data.Info;
+import com.htb.cnk.ui.base.TableBaseActivity;
 import com.htb.constant.Table;
 
-public class TableActivity extends TableClickActivity {
+public class TableActivity extends TableBaseActivity {
 
 	static final String TAG = "TablesActivity";
-	protected ArrayList<HashMap<String, Object>> lstImageItem = new ArrayList<HashMap<String, Object>>();
+	
 	private final String IMAGE_ITEM = "imageItem";
 	private final String ITEM_TEXT = "ItemText";
 	
+	private ArrayList<HashMap<String, Object>> lstImageItem = new ArrayList<HashMap<String, Object>>();
 	
+	protected Button mBackBtn;
+	protected Button mUpdateBtn;
+	protected Button mStatisticsBtn;
+	protected Button mManageBtn;
+	protected GridView gridview;
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		if (NETWORK_ARERTDIALOG == 1) {
+			mNetWrorkcancel.cancel();
+			NETWORK_ARERTDIALOG = 0;
+		}
+		showProgressDlg(getResources().getString(R.string.getStatus));
+		
+	}
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+				WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		Info.setMode(Info.WORK_MODE_WAITER);
+		setContentView(R.layout.table_activity);
+		Log.d(TAG, TAG);
 		handler();
+		findViews();
+		setClickListeners();
 	}
 
 	private void handler() {
+		Log.d(TAG, "handler");
 		mNotificationHandler = notificationHandler;
 		setmTableHandler(tableHandler);
 		setmRingtoneHandler(ringtoneHandler);
@@ -38,8 +71,26 @@ public class TableActivity extends TableClickActivity {
 		mNotificationTypeHandler = notificationTypeHandler;
 	}
 
+	private void findViews() {
+		gridview = (GridView) findViewById(R.id.gridview);
+		mBackBtn = (Button) findViewById(R.id.back);
+		mUpdateBtn = (Button) findViewById(R.id.checkOutTable);
+		mStatisticsBtn = (Button) findViewById(R.id.logout);
+		mManageBtn = (Button) findViewById(R.id.management);
+
+	}
+
+	protected void setClickListeners() {
+		mBackBtn.setOnClickListener(backClicked);
+		mUpdateBtn.setOnClickListener(checkOutClicked);
+		mStatisticsBtn.setOnClickListener(logoutClicked);
+		mManageBtn.setOnClickListener(manageClicked);
+		mNetWrorkAlertDialog = networkDialog();
+	}
+
 	Handler tableHandler = new Handler() {
 		public void handleMessage(Message msg) {
+			Log.d(TAG, "handler");
 			mpDialog.cancel();
 			if (msg.what < 0) {
 				if (NETWORK_ARERTDIALOG == 1) {
@@ -64,6 +115,112 @@ public class TableActivity extends TableClickActivity {
 			}
 		}
 	};
+
+	Handler changeTIdHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			if (msg.what == -2) {
+				toastText(R.string.changeTIdWarning);
+			} else if (msg.what == -1) {
+				netWorkDialogShow("转台失败，"
+						+ getResources()
+								.getString(R.string.networkErrorWarning));
+			} else if (isPrinterError(msg)) {
+				toastText(R.string.changeSucc);
+			} else {
+				binderStart();
+				toastText(R.string.changeSucc);
+			}
+		}
+	};
+
+	Handler copyTIdHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			if (msg.what == -2) {
+				toastText(R.string.copyTIdwarning);
+			} else if (msg.what == -1) {
+				netWorkDialogShow("复制失败，"
+						+ getResources()
+								.getString(R.string.networkErrorWarning));
+			} else {
+				intent.setClass(TableActivity.this, MyOrderActivity.class);
+				Info.setMode(Info.WORK_MODE_WAITER);
+				TableActivity.this.startActivity(intent);
+			}
+		}
+	};
+
+	Handler combineTIdHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			if (msg.what == -2) {
+				toastText(R.string.checkOutWarning);
+			} else if (msg.what == -1) {
+				netWorkDialogShow("合并出错，"
+						+ getResources()
+								.getString(R.string.networkErrorWarning));
+			} else if (isPrinterError(msg)) {
+				toastText(R.string.combineError);
+			} else {
+				binderStart();
+				toastText(R.string.combineSucc);
+			}
+		}
+	};
+
+	Handler ringtoneHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			if (msg.what > 0) {
+				mRingtone.play();
+			}
+		}
+	};
+
+	Handler notificationHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			if (msg.what < 0) {
+				toastText(R.string.notificationWarning);
+			} else {
+				binderStart();
+			}
+		}
+	};
+
+	Handler notificationTypeHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			if (msg.what < 0) {
+				toastText(R.string.notificationTypeWarning);
+			}
+		}
+	};
+
+	Handler totalPriceTableHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			mpDialog.cancel();
+			if (msg.what < 0) {
+				netWorkDialogShow("统计失败，"
+						+ getResources()
+								.getString(R.string.networkErrorWarning));
+			} else {
+				mTotalPrice = (double) msg.what;
+				if (mTotalPrice <= 0) {
+					toastText(R.string.dishNull);
+				} else {
+					Intent checkOutIntent = new Intent();
+					Bundle bundle = new Bundle();
+					bundle.putDouble("price", mTotalPrice);
+					bundle.putIntegerArrayList("tableId",
+							(ArrayList<Integer>) selectedTable);
+					bundle.putStringArrayList("tableName",
+							(ArrayList<String>) tableName);
+					checkOutIntent.putExtras(bundle);
+					checkOutIntent.setClass(TableActivity.this,
+							CheckOutActivity.class);
+					TableActivity.this.startActivity(checkOutIntent);
+				}
+			}
+			mpDialog.cancel();
+		}
+	};
+	
 	protected void setTableInfos() {
 		if (lstImageItem.size() > 0) {
 			setStatusAndIcon();
@@ -140,106 +297,5 @@ public class TableActivity extends TableClickActivity {
 			break;
 		}
 	}
-
-	Handler totalPriceTableHandler = new Handler() {
-		public void handleMessage(Message msg) {
-			if (msg.what < 0) {
-				netWorkDialogShow("统计失败，"
-						+ getResources().getString(R.string.networkErrorWarning));
-			} else {
-				mTotalPrice = (double) msg.what;
-				if (mTotalPrice <= 0) {
-					toastText(R.string.dishNull);
-				} else {
-					Intent checkOutIntent = new Intent();
-					Bundle bundle = new Bundle();
-					bundle.putDouble("price", mTotalPrice);
-					bundle.putIntegerArrayList("tableId",
-							(ArrayList<Integer>) selectedTable);
-					bundle.putStringArrayList("tableName",
-							(ArrayList<String>) tableName);
-					checkOutIntent.putExtras(bundle);
-					checkOutIntent.setClass(TableActivity.this,
-							CheckOutActivity.class);
-					TableActivity.this.startActivity(checkOutIntent);
-				}
-			}
-			mpDialog.cancel();
-		}
-	};
-
-	Handler changeTIdHandler = new Handler() {
-		public void handleMessage(Message msg) {
-			if (msg.what == -2) {
-				toastText(R.string.changeTIdWarning);
-			} else if (msg.what == -1) {
-				netWorkDialogShow("转台失败，"
-						+ getResources().getString(R.string.networkErrorWarning));
-			} else if (isPrinterError(msg)) {
-				toastText(R.string.changeSucc);
-			} else {
-				binderStart();
-				toastText(R.string.changeSucc);
-			}
-		}
-	};
-
-	Handler copyTIdHandler = new Handler() {
-		public void handleMessage(Message msg) {
-			if (msg.what == -2) {
-				toastText(R.string.copyTIdwarning);
-			} else if (msg.what == -1) {
-				netWorkDialogShow("复制失败，"
-						+ getResources().getString(R.string.networkErrorWarning));
-			} else {
-				intent.setClass(TableActivity.this, MyOrderActivity.class);
-				Info.setMode(Info.WORK_MODE_WAITER);
-				TableActivity.this.startActivity(intent);
-			}
-		}
-	};
-
-	Handler combineTIdHandler = new Handler() {
-		public void handleMessage(Message msg) {
-			if (msg.what == -2) {
-				toastText(R.string.checkOutWarning);
-			} else if (msg.what == -1) {
-				netWorkDialogShow("合并出错，"
-						+getResources().getString(R.string.networkErrorWarning));
-			} else if (isPrinterError(msg)) {
-				toastText(R.string.combineError);
-			} else {
-				binderStart();
-				toastText(R.string.combineSucc);
-			}
-		}
-	};
-
-	Handler ringtoneHandler = new Handler() {
-		public void handleMessage(Message msg) {
-			if (msg.what > 0) {
-				mRingtone.play();
-			}
-		}
-	};
-
-	Handler notificationHandler = new Handler() {
-		public void handleMessage(Message msg) {
-			if (msg.what < 0) {
-				toastText(R.string.notificationWarning);
-			} else {
-				binderStart();
-			}
-		}
-	};
-	
-	Handler notificationTypeHandler = new Handler() {
-		public void handleMessage(Message msg) {
-			if (msg.what < 0) {
-				toastText(R.string.notificationTypeWarning);
-			}
-		}
-	};
-	
 
 }

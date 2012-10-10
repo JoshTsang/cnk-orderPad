@@ -1,4 +1,4 @@
-package com.htb.cnk;
+package com.htb.cnk.service;
 
 import android.app.Service;
 import android.content.Intent;

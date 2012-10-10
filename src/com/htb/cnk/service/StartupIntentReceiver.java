@@ -1,4 +1,4 @@
-package com.htb.cnk.receiver;
+package com.htb.cnk.service;
 
 
 import com.htb.cnk.Cnk_orderPadActivity;

@@ -1,12 +1,10 @@
-package com.htb.cnk;
+package com.htb.cnk.ui.base;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -19,20 +17,21 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.text.Editable;
-import android.text.InputFilter;
 import android.text.TextWatcher;
-import android.text.method.DigitsKeyListener;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.SimpleAdapter;
 
-import com.htb.cnk.NotificationTableService.MyBinder;
+import com.htb.cnk.DelOrderActivity;
+import com.htb.cnk.MenuActivity;
+import com.htb.cnk.PhoneActivity;
+import com.htb.cnk.QueryOrderActivity;
+import com.htb.cnk.QuickMenuActivity;
+import com.htb.cnk.R;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.NotificationTypes;
 import com.htb.cnk.data.Notifications;
@@ -40,125 +39,78 @@ import com.htb.cnk.data.PhoneOrder;
 import com.htb.cnk.data.Setting;
 import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.lib.Ringtone;
-import com.htb.cnk.receiver.MyReceiver;
+import com.htb.cnk.service.MyReceiver;
+import com.htb.cnk.service.NotificationTableService;
+import com.htb.cnk.service.NotificationTableService.MyBinder;
 import com.htb.constant.Table;
 
-public class TableClickActivity extends TableBaseActivity {
-	
-	
+public class TableGridDeskActivity extends BaseActivity {
+
 	protected final int UPDATE_TABLE_INFOS = 5;
 	protected final int DISABLE_GRIDVIEW = 10;
 	protected final int CHECKOUT_LIST = 1;
 	protected final int COMBINE_DIALOG = 1;
 	protected final int CHANGE_DIALOG = 2;
-	
-	protected int NETWORK_ARERTDIALOG = 0;
-	
-	protected double mIncome;
-	protected double mChange;
-	protected double mTotalPrice;
-	
-	protected EditText tableIdEdit;
-	protected EditText personsEdit;
-	
-	protected PhoneOrder mPhoneOrder;
-	private TableSetting mSettings;
-	protected Ringtone mRingtone;
-	
-	protected List<String> tableName = new ArrayList<String>();
-	protected List<Integer> selectedTable = new ArrayList<Integer>();
-	
-	protected AlertDialog.Builder mChangeDialog;
-	protected ProgressDialog mpDialog;
-	protected SimpleAdapter mImageItems;
-	
-	protected Intent intent;
+
 	protected boolean binderFlag;
-	protected MyReceiver mReceiver;
-	protected NotificationTableService.MyBinder binder;
+	protected Intent intent;
+
 	private int mTableMsg;
 	private int mRingtoneMsg;
-	protected AlertDialog mNetWrorkcancel;
-	protected AlertDialog.Builder mNetWrorkAlertDialog;
-	
+
+	private MyReceiver mReceiver;
+	protected NotificationTableService.MyBinder binder;
 	protected Notifications mNotificaion = new Notifications();
 	protected NotificationTypes mNotificationType = new NotificationTypes();
-	
+
+	protected List<String> tableName = new ArrayList<String>();
+	protected List<Integer> selectedTable = new ArrayList<Integer>();
+
+	protected PhoneOrder mPhoneOrder;
+	protected TableSetting mSettings;
+	protected Ringtone mRingtone;
+	protected SimpleAdapter mImageItems;
+
+	protected EditText tableIdEdit;
+	protected EditText personsEdit;
+
 	protected Handler mNotificationHandler;
-	private Handler mTableHandler;
-	private Handler mRingtoneHandler;
-	protected Handler mTotalPriceTableHandler;
+	protected Handler mTableHandler = new Handler();
+	protected Handler mRingtoneHandler =  new Handler();
 	protected Handler mChangeTIdHandler;
 	protected Handler mCombineTIdHandler;
 	protected Handler mCopyTIdHandler;
-	protected Handler mCheckOutHandler;
 	protected Handler mNotificationTypeHandler;
-	
+
 	@Override
 	protected void onResume() {
 		super.onResume();
-		if (NETWORK_ARERTDIALOG == 1) {
-			mNetWrorkcancel.cancel();
-			NETWORK_ARERTDIALOG = 0;
-		}
-		showProgressDlg(getResources().getString(R.string.getStatus));
 		binderStart();
 	}
 
 	@Override
 	protected void onDestroy() {
+		super.onDestroy();
 		unbindService(conn);
 		unregisterReceiver(mReceiver);
-		super.onDestroy();
 	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
 		setNewClass();
-		
-		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-		mpDialog.setIndeterminate(false);
-		mpDialog.setCancelable(false);
-		mpDialog.setTitle(getResources().getString(R.string.pleaseWait));
-		
 		startService(NotificationTableService.class);
 		bindService(intent, conn, Context.BIND_AUTO_CREATE);
+		mReceiver = new MyReceiver(TableGridDeskActivity.this);
 		registerReceiver(mReceiver);
-		
-		mNetWrorkAlertDialog = networkDialog();
-		setClickListeners();
 	}
 
 	private void setNewClass() {
-		mPhoneOrder = new PhoneOrder(TableClickActivity.this);
+		mPhoneOrder = new PhoneOrder(TableGridDeskActivity.this);
 		setmSettings(new TableSetting());
-		mRingtone = new Ringtone(TableClickActivity.this);
-		mpDialog = new ProgressDialog(TableClickActivity.this);
-		mReceiver = new MyReceiver(this);
+		mRingtone = new Ringtone(TableGridDeskActivity.this);
 	}
-
-	private void registerReceiver(BroadcastReceiver receiver) {
-		IntentFilter filter = new IntentFilter(
-				NotificationTableService.SERVICE_IDENTIFIER);
-		registerReceiver(receiver, filter);
-	}
-
-
-	private void startService(Class<?> cla) {
-		intent = new Intent(TableClickActivity.this,
-				cla);
-		startService(intent);
-	}
-
-	protected void setClickListeners() {
-		mBackBtn.setOnClickListener(backClicked);
-		mUpdateBtn.setOnClickListener(checkOutClicked);
-		mStatisticsBtn.setOnClickListener(logoutClicked);
-		mManageBtn.setOnClickListener(manageClicked);
-	}
-
+	
 	protected ServiceConnection conn = new ServiceConnection() {
 
 		@Override
@@ -172,40 +124,15 @@ public class TableClickActivity extends TableBaseActivity {
 		}
 	};
 
-	protected void binderStart() {
-		if (binderFlag) {
-			binder.start();
-			return;
-		}
+	protected void registerReceiver(BroadcastReceiver receiver) {
+		IntentFilter filter = new IntentFilter(
+				NotificationTableService.SERVICE_IDENTIFIER);
+		registerReceiver(receiver, filter);
 	}
 
-	protected AlertDialog.Builder networkDialog() {
-		return mTitleAndMessageDialog.networkDialog(networkPositiveListener,
-				networkNegativeListener);
-	}
-
-	DialogInterface.OnClickListener networkPositiveListener = new DialogInterface.OnClickListener() {
-		@Override
-		public void onClick(DialogInterface dialog, int i) {
-			dialog.cancel();
-			NETWORK_ARERTDIALOG = 0;
-			showProgressDlg(getResources().getString(R.string.getStatus));
-			binderStart();
-		}
-	};
-	DialogInterface.OnClickListener networkNegativeListener = new DialogInterface.OnClickListener() {
-		@Override
-		public void onClick(DialogInterface dialog, int i) {
-			NETWORK_ARERTDIALOG = 0;
-			dialog.cancel();
-			finish();
-		}
-	};
-
-	private AlertDialog.Builder cleanDialog() {
-		final CharSequence[] cleanitems = getResources().getStringArray(
-				R.array.openStatus);
-		return mItemDialog.itemChooseFunctionDialog(cleanitems, cleanListener);
+	protected void startService(Class<?> cla) {
+		intent = new Intent(TableGridDeskActivity.this, cla);
+		startService(intent);
 	}
 
 	DialogInterface.OnClickListener cleanListener = new DialogInterface.OnClickListener() {
@@ -215,16 +142,39 @@ public class TableClickActivity extends TableBaseActivity {
 		}
 	};
 
+	protected void binderStart() {
+		if (binderFlag) {
+			binder.start();
+			return;
+		}
+	}
+
+	private AlertDialog.Builder cleanDialog() {
+		final CharSequence[] cleanitems = getResources().getStringArray(
+				R.array.openStatus);
+		return mItemDialog.itemChooseFunctionDialog(cleanitems, cleanListener);
+	}
+
+	DialogInterface.OnClickListener cleanTableListener = new DialogInterface.OnClickListener() {
+		@Override
+		public void onClick(DialogInterface dialog, int i) {
+			showProgressDlg(getResources().getString(R.string.cleanTableNow));
+			selectedTable.clear();
+			selectedTable.add(Info.getTableId());
+			cleanTableThread(selectedTable);
+		}
+	};
+
 	private void cleanChioceMode(int which) {
 		switch (which) {
 		case 0:
 			cleanTableDialog().show();
 			break;
 		case 1:
-			changeTableDialog(CHANGE_DIALOG).show();
+			changeOrCombineDialog(CHANGE_DIALOG).show();
 			break;
 		case 2:
-			changeTableDialog(COMBINE_DIALOG).show();
+			changeOrCombineDialog(COMBINE_DIALOG).show();
 			break;
 		case 3:
 			setClassToActivity(DelOrderActivity.class);
@@ -241,16 +191,6 @@ public class TableClickActivity extends TableBaseActivity {
 		}
 	}
 
-	public void showProgressDlg(String msg) {
-		mpDialog.setMessage(msg);
-		mpDialog.show();
-	}
-
-	protected void netWorkDialogShow(String messages) {
-		NETWORK_ARERTDIALOG = 1;
-		mNetWrorkcancel = mNetWrorkAlertDialog.setMessage(messages).show();
-	}
-	
 	private AlertDialog.Builder cleanTableDialog() {
 		return mTitleAndMessageDialog.messageDialog(false, getResources()
 				.getString(R.string.isCleanTable),
@@ -258,13 +198,11 @@ public class TableClickActivity extends TableBaseActivity {
 				getResources().getString(R.string.no), null);
 	}
 
-	DialogInterface.OnClickListener cleanTableListener = new DialogInterface.OnClickListener() {
+	DialogInterface.OnClickListener addListener = new DialogInterface.OnClickListener() {
 		@Override
-		public void onClick(DialogInterface dialog, int i) {
-			showProgressDlg(getResources().getString(R.string.cleanTableNow));
-			selectedTable.clear();
-			selectedTable.add(Info.getTableId());
-			cleanTableThread(selectedTable);
+		public void onClick(DialogInterface dialog, int which) {
+			mPhoneOrder.clear();
+			addDialogChoiceMode(which);
 		}
 	};
 
@@ -290,11 +228,10 @@ public class TableClickActivity extends TableBaseActivity {
 		return mItemDialog.itemChooseFunctionDialog(additems, addListener);
 	}
 
-	DialogInterface.OnClickListener addListener = new DialogInterface.OnClickListener() {
+	DialogInterface.OnClickListener notificationListener = new DialogInterface.OnClickListener() {
 		@Override
 		public void onClick(DialogInterface dialog, int which) {
-			mPhoneOrder.clear();
-			addDialogChoiceMode(which);
+			cleanNotification();
 		}
 	};
 
@@ -304,7 +241,7 @@ public class TableClickActivity extends TableBaseActivity {
 			Info.setMode(Info.WORK_MODE_CUSTOMER);
 			Info.setNewCustomer(true);
 			setClassToActivity(MenuActivity.class);
-			TableClickActivity.this.finish();
+			TableGridDeskActivity.this.finish();
 			break;
 		case 1:
 			if (Info.getMenu() == Info.ORDER_QUCIK_MENU) {
@@ -357,16 +294,59 @@ public class TableClickActivity extends TableBaseActivity {
 				null, null, notificationListener);
 	}
 
-	DialogInterface.OnClickListener notificationListener = new DialogInterface.OnClickListener() {
-		@Override
-		public void onClick(DialogInterface dialog, int which) {
-			cleanNotification();
+	protected OnItemClickListener tableItemClickListener = new OnItemClickListener() {
+
+		public void onItemClick(AdapterView<?> arg0,// The AdapterView where the
+													// click happened
+				View arg1,// The view within the AdapterView that was clicked
+				int arg2,// The position of the view in the adapter
+				long arg3// The row id of the item that was clicked
+		) {
+			if (isNameIdStatusLegal(arg2)) {
+				Info.setTableName(getmSettings().getNameIndex(arg2));
+				Info.setTableId(getmSettings().getIdIndex(arg2));
+				tableItemChioceDialog(arg2, getmSettings().getStatusIndex(arg2));
+			} else {
+				toastText("不能获取信息，请检查设备！");
+			}
+			mImageItems.notifyDataSetChanged();
 		}
+
+		private boolean isNameIdStatusLegal(int arg2) {
+			return (getmSettings().getNameIndex(arg2)) != null
+					&& ((getmSettings().getIdIndex(arg2)) != -1)
+					&& ((getmSettings().getStatusIndex(arg2)) != -1);
+		}
+
+		private void tableItemChioceDialog(int arg2, int status) {
+			switch (status) {
+			case 0:
+				addDialog().show();
+				break;
+			case 1:
+				cleanDialog().show();
+				break;
+			case 50:
+			case 51:
+				addPhoneDialog(arg2).show();
+				break;
+			case 100:
+			case 101:
+			case 150:
+			case 151:
+				notificationDialog().show();
+				break;
+			default:
+				break;
+			}
+		}
+
 	};
 
-	private Builder changeTableDialog(final int type) {
+	private Builder changeOrCombineDialog(final int type) {
 		final AlertDialog.Builder changeTableAlertDialog;
-		View layout = getDialogLayout(R.layout.change_dialog, R.id.change);
+		View layout = getDialogLayout(R.layout.change_dialog,
+				R.id.change_dialog);
 		personsEdit = (EditText) layout.findViewById(R.id.personsEdit);
 		if (Setting.enabledPersons()) {
 			tableIdEdit = (EditText) layout.findViewById(R.id.tableIdEdit);
@@ -384,7 +364,8 @@ public class TableClickActivity extends TableBaseActivity {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				String changePersons;
-				String tableName = tableIdEdit.getText().toString();
+				String tableName = tableIdEdit.getText().toString()
+						.toUpperCase();
 				if (Setting.enabledPersons()) {
 					changePersons = personsEdit.getText().toString();
 				} else {
@@ -413,11 +394,12 @@ public class TableClickActivity extends TableBaseActivity {
 		DialogInterface.OnClickListener copyTableListener = new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				String changeTId = copyTableText.getEditableText().toString();
-				if (changeTId.equals("")) {
+				String tableName = copyTableText.getEditableText().toString()
+						.toUpperCase();
+				if (tableName.equals("")) {
 					toastText(R.string.idAndPersonsIsNull);
-				} else if (isBoundaryLegal(changeTId, Table.OPEN_TABLE_STATUS)) {
-					copyTable(getmSettings().getId(changeTId));
+				} else if (isBoundaryLegal(tableName, Table.OPEN_TABLE_STATUS)) {
+					copyTable(mSettings.getId(tableName));
 				} else {
 					toastText(R.string.copyTIdwarning);
 				}
@@ -430,11 +412,11 @@ public class TableClickActivity extends TableBaseActivity {
 	}
 
 	private EditText editTextListener() {
-		final EditText copyTableText = new EditText(this);
-		copyTableText.setKeyListener(new DigitsKeyListener(false, true));
-		copyTableText
-				.setFilters(new InputFilter[] { new InputFilter.LengthFilter(4) });
-		return copyTableText;
+		final EditText editText = new EditText(this);
+		// editText.setKeyListener(new DigitsKeyListener(false, true));
+		// editText
+		// .setFilters(new InputFilter[] { new InputFilter.LengthFilter(6) });
+		return editText;
 	}
 
 	private View getDialogLayout(int layout_dialog, int id) {
@@ -442,59 +424,6 @@ public class TableClickActivity extends TableBaseActivity {
 		View layout = inflater.inflate(layout_dialog,
 				(ViewGroup) findViewById(id));
 		return layout;
-	}
-
-	private Builder listTableNameDialog(final int type) {
-		final List<Integer> tableId = new ArrayList<Integer>();
-		final List<String> tableNameStr = new ArrayList<String>();
-		final AlertDialog.Builder checkOutAlertDialog;
-		ArrayList<HashMap<String, Object>> checkOut = getmSettings().getCombine();
-		if (checkOut.size() <= 0) {
-			checkOutAlertDialog = mTitleAndMessageDialog.messageDialog(false,
-					getResources().getString(R.string.tableNotOpen),
-					getResources().getString(R.string.ok), null, null, null);
-			return checkOutAlertDialog;
-		}
-		for (HashMap<String, Object> item : checkOut) {
-			tableNameStr.add(item.get("name").toString());
-			tableId.add(item.get("id").hashCode());
-		}
-		final int size = getmSettings().size();
-		final boolean selected[] = new boolean[size];
-
-		DialogInterface.OnClickListener listPositiveListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialogInterface, int which) {
-				selectedTable.clear();
-				tableName.clear();
-				for (int i = 0; i < selected.length; i++) {
-					if (selected[i] == true) {
-						selectedTable.add(tableId.get(i));
-						tableName.add(tableNameStr.get(i));
-					}
-				}
-				if (type == CHECKOUT_LIST) {
-					showProgressDlg(getResources().getString(
-							R.string.statisticsAmount));
-					getTotalPriceTable();
-				}
-
-			}
-		};
-
-		DialogInterface.OnMultiChoiceClickListener listListener = new DialogInterface.OnMultiChoiceClickListener() {
-			@Override
-			public void onClick(DialogInterface dialogInterface, int which,
-					boolean isChecked) {
-				selected[which] = isChecked;
-			}
-		};
-
-		return mMultiChoiceItemsDialog.titleDialog(false, getResources()
-				.getString(R.string.chooseTableId), (String[]) tableNameStr
-				.toArray(new String[0]), null, listListener, getResources()
-				.getString(R.string.ok), listPositiveListener, getResources()
-				.getString(R.string.cancel), null);
 	}
 
 	private void cleanNotification() {
@@ -516,10 +445,10 @@ public class TableClickActivity extends TableBaseActivity {
 			public void run() {
 				try {
 					Message msg = new Message();
-					getmTableHandler().sendEmptyMessage(DISABLE_GRIDVIEW);
+					mTableHandler.sendEmptyMessage(DISABLE_GRIDVIEW);
 					int ret = getmSettings().cleanTalble(tableId);
 					if (ret < 0) {
-						getmTableHandler().sendEmptyMessage(ret);
+						mTableHandler.sendEmptyMessage(ret);
 						return;
 					}
 					if (getNotifiycations() < 0)
@@ -527,7 +456,7 @@ public class TableClickActivity extends TableBaseActivity {
 					if (getTableStatusFromServer() < 0)
 						return;
 					msg.what = UPDATE_TABLE_INFOS;
-					getmTableHandler().sendMessage(msg);
+					mTableHandler.sendMessage(msg);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -543,12 +472,12 @@ public class TableClickActivity extends TableBaseActivity {
 					int ret = getmSettings().updateStatus(tableId,
 							TableSetting.PHONE_ORDER);
 					if (ret < 0) {
-						getmTableHandler().sendEmptyMessage(ret);
+						mTableHandler.sendEmptyMessage(ret);
 						return;
 					}
 					ret = mPhoneOrder.cleanServerPhoneOrder(tableId);
 					if (ret < 0) {
-						getmTableHandler().sendEmptyMessage(ret);
+						mTableHandler.sendEmptyMessage(ret);
 						return;
 					}
 					if (getNotifiycations() < 0)
@@ -556,21 +485,7 @@ public class TableClickActivity extends TableBaseActivity {
 					if (getTableStatusFromServer() < 0)
 						return;
 					msg.what = UPDATE_TABLE_INFOS;
-					getmTableHandler().sendMessage(msg);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}.start();
-	}
-
-	private void getTotalPriceTable() {
-		new Thread() {
-			public void run() {
-				try {
-					double ret = getmSettings().getTotalPriceTable(
-							TableClickActivity.this, selectedTable, tableName);
-					mTotalPriceTableHandler.sendEmptyMessage((int) ret);
+					mTableHandler.sendMessage(msg);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -582,10 +497,10 @@ public class TableClickActivity extends TableBaseActivity {
 		new Thread() {
 			public void run() {
 				try {
-					int ret = getmSettings().combineTable(TableClickActivity.this,
-							Info.getTableId(), destTId,
-							getmSettings().getName(Info.getTableId()),
-							getmSettings().getName(destTId), persons);
+					int ret = getmSettings().combineTable(
+							TableGridDeskActivity.this, Info.getTableId(), destTId,
+							mSettings.getName(Info.getTableId()),
+							mSettings.getName(destTId), persons);
 					mCombineTIdHandler.sendEmptyMessage(ret);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -598,8 +513,8 @@ public class TableClickActivity extends TableBaseActivity {
 		new Thread() {
 			public void run() {
 				try {
-					int ret = getmSettings().changeTable(TableClickActivity.this,
-							Info.getTableId(), destTId,
+					int ret = getmSettings().changeTable(
+							TableGridDeskActivity.this, Info.getTableId(), destTId,
 							getmSettings().getName(Info.getTableId()),
 							getmSettings().getName(destTId), persons);
 					mChangeTIdHandler.sendEmptyMessage(ret);
@@ -615,24 +530,8 @@ public class TableClickActivity extends TableBaseActivity {
 			public void run() {
 				try {
 					int ret = getmSettings().getOrderFromServer(
-							TableClickActivity.this, srcTId);
+							TableGridDeskActivity.this, srcTId);
 					mCopyTIdHandler.sendEmptyMessage(ret);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}.start();
-	}
-
-	protected void checkOut(final List<Integer> destIId,
-			final List<String> tableName, final Double receivable,
-			final Double income, final Double change) {
-		new Thread() {
-			public void run() {
-				try {
-					int ret = getmSettings().checkOut(TableClickActivity.this,
-							destIId, tableName, receivable, income, change);
-					mCheckOutHandler.sendEmptyMessage(ret);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -656,7 +555,7 @@ public class TableClickActivity extends TableBaseActivity {
 	private int getTableStatusFromServer() {
 		int ret = getmSettings().getTableStatusFromServer();
 		if (ret < 0) {
-			getmTableHandler().sendEmptyMessage(ret);
+			mTableHandler.sendEmptyMessage(ret);
 		}
 		return ret;
 	}
@@ -682,7 +581,7 @@ public class TableClickActivity extends TableBaseActivity {
 
 	private int getNotifiycations() {
 		int ret = mNotificaion.getNotifiycations();
-		getmRingtoneHandler().sendEmptyMessage(ret);
+		mRingtoneHandler.sendEmptyMessage(ret);
 		return ret;
 	}
 
@@ -747,8 +646,16 @@ public class TableClickActivity extends TableBaseActivity {
 	}
 
 	protected void setClassToActivity(Class<?> setClass) {
-		intent.setClass(TableClickActivity.this, setClass);
-		TableClickActivity.this.startActivity(intent);
+		intent.setClass(TableGridDeskActivity.this, setClass);
+		TableGridDeskActivity.this.startActivity(intent);
+	}
+
+	public TableSetting getmSettings() {
+		return mSettings;
+	}
+
+	public void setmSettings(TableSetting mSettings) {
+		this.mSettings = mSettings;
 	}
 
 	public int getmRingtoneMsg() {
@@ -767,14 +674,6 @@ public class TableClickActivity extends TableBaseActivity {
 		this.mTableMsg = mTableMsg;
 	}
 
-	public TableSetting getmSettings() {
-		return mSettings;
-	}
-
-	public void setmSettings(TableSetting mSettings) {
-		this.mSettings = mSettings;
-	}
-
 	public Handler getmTableHandler() {
 		return mTableHandler;
 	}
@@ -790,98 +689,10 @@ public class TableClickActivity extends TableBaseActivity {
 	public void setmRingtoneHandler(Handler mRingtoneHandler) {
 		this.mRingtoneHandler = mRingtoneHandler;
 	}
-
-	private OnClickListener checkOutClicked = new OnClickListener() {
-
-		@Override
-		public void onClick(View v) {
-			listTableNameDialog(CHECKOUT_LIST).show();
-		}
-	};
-
-	private OnClickListener manageClicked = new OnClickListener() {
-
-		@Override
-		public void onClick(View v) {
-			setClassToActivity(ManageActivity.class);
-		}
-	};
-
-	private OnClickListener backClicked = new OnClickListener() {
-
-		@Override
-		public void onClick(View v) {
-			TableClickActivity.this.finish();
-		}
-	};
-
-	private OnClickListener logoutClicked = new OnClickListener() {
-		@Override
-		public void onClick(View v) {
-			mTitleAndMessageDialog.titleAndMessageDialog(false,
-					getResources().getString(R.string.notice),
-					getResources().getString(R.string.islogOut),
-					getResources().getString(R.string.ok),
-					logoutPositiveListener,
-					getResources().getString(R.string.cancel), null).show();
-		}
-	};
-
-	DialogInterface.OnClickListener logoutPositiveListener = new DialogInterface.OnClickListener() {
-		@Override
-		public void onClick(DialogInterface dialogInterface, int which) {
-			Info.setMode(Info.WORK_MODE_CUSTOMER);
-			Info.setTableId(-1);
-			finish();
-		}
-	};
-
-	OnItemClickListener  tableItemClickListener = new OnItemClickListener() {
-
-				public void onItemClick(AdapterView<?> arg0,// The AdapterView where the
-															// click happened
-						View arg1,// The view within the AdapterView that was clicked
-						int arg2,// The position of the view in the adapter
-						long arg3// The row id of the item that was clicked
-				) {
-					if (isNameIdStatusLegal(arg2)) {
-						Info.setTableName(getmSettings().getNameIndex(arg2));
-						Info.setTableId(getmSettings().getIdIndex(arg2));
-						tableItemChioceDialog(arg2, getmSettings().getStatusIndex(arg2));
-					} else {
-						toastText("不能获取信息，请检查设备！");
-					}
-					mImageItems.notifyDataSetChanged();
-				}
-
-				private boolean isNameIdStatusLegal(int arg2) {
-					return (getmSettings().getNameIndex(arg2)) != null
-							&& ((getmSettings().getIdIndex(arg2)) != -1)
-							&& ((getmSettings().getStatusIndex(arg2)) != -1);
-				}
-
-				private void tableItemChioceDialog(int arg2, int status) {
-					switch (status) {
-					case 0:
-						addDialog().show();
-						break;
-					case 1:
-						cleanDialog().show();
-						break;
-					case 50:
-					case 51:
-						addPhoneDialog(arg2).show();
-						break;
-					case 100:
-					case 101:
-					case 150:
-					case 151:
-						notificationDialog().show();
-						break;
-					default:
-						break;
-					}
-				}
-			
-	};
+	
+	public void sendTableMsg(){
+		getmTableHandler().sendEmptyMessage(getmTableMsg());
+		getmRingtoneHandler().sendEmptyMessage(getmRingtoneMsg());
+	}
 }
+

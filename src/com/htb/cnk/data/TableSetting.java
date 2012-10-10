@@ -158,17 +158,17 @@ public class TableSetting implements Serializable {
 		return tableId;
 	}
 
-	public ArrayList<HashMap<String, Object>> getCombine() {
-		ArrayList<HashMap<String, Object>> combine = new ArrayList<HashMap<String, Object>>();
+	public ArrayList<HashMap<String, Object>> getTableOpen() {
+		ArrayList<HashMap<String, Object>> tableOpen = new ArrayList<HashMap<String, Object>>();
 		for (TableSettingItem item : mTableSettings) {
 			if (item.getStatus() == 1) {
 				HashMap<String, Object> map = new HashMap<String, Object>();
 				map.put("name", item.getName());
 				map.put("id", item.getId());
-				combine.add(map);
+				tableOpen.add(map);
 			}
 		}
-		return combine;
+		return tableOpen;
 	}
 
 	public void setStatus(int index, int n) {
