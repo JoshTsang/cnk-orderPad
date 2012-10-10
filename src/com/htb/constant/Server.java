@@ -41,6 +41,7 @@ public class Server {
 	public final static String GET_FLAVOR = PHP_DIR +  "getFlavor.php";
 	public final static String DEL_ITEM_ORDER = PHP_DIR + "delItemOrder.php";
 	public final static String COMBINE_TABLE = PHP_DIR + "combineTable.php";
+	public final static String GET_FLOORNUM = PHP_DIR + "getFloorNum.php";
 	/* Database */
 	public final static String DB_DIR = "db/";
 	public final static String DB_MENU = DB_DIR + "menu.db";

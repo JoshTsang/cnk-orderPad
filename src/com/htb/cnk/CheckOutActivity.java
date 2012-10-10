@@ -78,7 +78,7 @@ public class CheckOutActivity extends TableBaseActivity{
 	}
 	
 	private void updateTabelInfos() {
-		mCheckOutPrinte.setText(getmSettings().checkOutJson());
+		mCheckOutPrinte.setText(getSettings().checkOutJson());
 		mReceivableText.setText(String.valueOf(mTotalPrice));
 	}
 	

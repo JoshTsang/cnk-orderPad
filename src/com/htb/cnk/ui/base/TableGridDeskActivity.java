@@ -46,8 +46,8 @@ import com.htb.constant.Table;
 
 public class TableGridDeskActivity extends BaseActivity {
 
-	protected final int UPDATE_TABLE_INFOS = 5;
-	protected final int DISABLE_GRIDVIEW = 10;
+	protected final int UPDATE_TABLE_INFOS = 500;
+	protected final int DISABLE_GRIDVIEW = 1000;
 	protected final int CHECKOUT_LIST = 1;
 	protected final int COMBINE_DIALOG = 1;
 	protected final int CHANGE_DIALOG = 2;
@@ -103,11 +103,12 @@ public class TableGridDeskActivity extends BaseActivity {
 		bindService(intent, conn, Context.BIND_AUTO_CREATE);
 		mReceiver = new MyReceiver(TableGridDeskActivity.this);
 		registerReceiver(mReceiver);
+	//	NotificationType();
 	}
 
 	private void setNewClass() {
 		mPhoneOrder = new PhoneOrder(TableGridDeskActivity.this);
-		setmSettings(new TableSetting());
+		setSettings(new TableSetting());
 		mRingtone = new Ringtone(TableGridDeskActivity.this);
 	}
 	
@@ -303,9 +304,9 @@ public class TableGridDeskActivity extends BaseActivity {
 				long arg3// The row id of the item that was clicked
 		) {
 			if (isNameIdStatusLegal(arg2)) {
-				Info.setTableName(getmSettings().getNameIndex(arg2));
-				Info.setTableId(getmSettings().getIdIndex(arg2));
-				tableItemChioceDialog(arg2, getmSettings().getStatusIndex(arg2));
+				Info.setTableName(getSettings().getNameIndex(arg2));
+				Info.setTableId(getSettings().getIdIndex(arg2));
+				tableItemChioceDialog(arg2, getSettings().getStatusIndex(arg2));
 			} else {
 				toastText("不能获取信息，请检查设备！");
 			}
@@ -313,9 +314,9 @@ public class TableGridDeskActivity extends BaseActivity {
 		}
 
 		private boolean isNameIdStatusLegal(int arg2) {
-			return (getmSettings().getNameIndex(arg2)) != null
-					&& ((getmSettings().getIdIndex(arg2)) != -1)
-					&& ((getmSettings().getStatusIndex(arg2)) != -1);
+			return (getSettings().getNameIndex(arg2)) != null
+					&& ((getSettings().getIdIndex(arg2)) != -1)
+					&& ((getSettings().getStatusIndex(arg2)) != -1);
 		}
 
 		private void tableItemChioceDialog(int arg2, int status) {
@@ -446,7 +447,7 @@ public class TableGridDeskActivity extends BaseActivity {
 				try {
 					Message msg = new Message();
 					mTableHandler.sendEmptyMessage(DISABLE_GRIDVIEW);
-					int ret = getmSettings().cleanTalble(tableId);
+					int ret = getSettings().cleanTalble(tableId);
 					if (ret < 0) {
 						mTableHandler.sendEmptyMessage(ret);
 						return;
@@ -469,7 +470,7 @@ public class TableGridDeskActivity extends BaseActivity {
 			public void run() {
 				try {
 					Message msg = new Message();
-					int ret = getmSettings().updateStatus(tableId,
+					int ret = getSettings().updateStatus(tableId,
 							TableSetting.PHONE_ORDER);
 					if (ret < 0) {
 						mTableHandler.sendEmptyMessage(ret);
@@ -497,7 +498,7 @@ public class TableGridDeskActivity extends BaseActivity {
 		new Thread() {
 			public void run() {
 				try {
-					int ret = getmSettings().combineTable(
+					int ret = getSettings().combineTable(
 							TableGridDeskActivity.this, Info.getTableId(), destTId,
 							mSettings.getName(Info.getTableId()),
 							mSettings.getName(destTId), persons);
@@ -513,10 +514,10 @@ public class TableGridDeskActivity extends BaseActivity {
 		new Thread() {
 			public void run() {
 				try {
-					int ret = getmSettings().changeTable(
+					int ret = getSettings().changeTable(
 							TableGridDeskActivity.this, Info.getTableId(), destTId,
-							getmSettings().getName(Info.getTableId()),
-							getmSettings().getName(destTId), persons);
+							getSettings().getName(Info.getTableId()),
+							getSettings().getName(destTId), persons);
 					mChangeTIdHandler.sendEmptyMessage(ret);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -529,7 +530,7 @@ public class TableGridDeskActivity extends BaseActivity {
 		new Thread() {
 			public void run() {
 				try {
-					int ret = getmSettings().getOrderFromServer(
+					int ret = getSettings().getOrderFromServer(
 							TableGridDeskActivity.this, srcTId);
 					mCopyTIdHandler.sendEmptyMessage(ret);
 				} catch (Exception e) {
@@ -553,7 +554,7 @@ public class TableGridDeskActivity extends BaseActivity {
 	}
 
 	private int getTableStatusFromServer() {
-		int ret = getmSettings().getTableStatusFromServer();
+		int ret = getSettings().getTableStatusFromServer();
 		if (ret < 0) {
 			mTableHandler.sendEmptyMessage(ret);
 		}
@@ -561,11 +562,11 @@ public class TableGridDeskActivity extends BaseActivity {
 	}
 
 	private boolean isStatusLegal(String tableName, int status) {
-		return getmSettings().getStatusTableId(getmSettings().getId(tableName)) == status;
+		return getSettings().getStatusTableId(getSettings().getId(tableName)) == status;
 	}
 
 	private boolean isTId(String tableTId) {
-		return (getmSettings().getId(tableTId) != -1);
+		return (getSettings().getId(tableTId) != -1);
 	}
 
 	private boolean isBoundaryLegal(String tableName, int status) {
@@ -578,7 +579,6 @@ public class TableGridDeskActivity extends BaseActivity {
 	private boolean equalNameAndPersons(String changePersons, String tableName) {
 		return tableName.equals("") || changePersons.equals("");
 	}
-
 	private int getNotifiycations() {
 		int ret = mNotificaion.getNotifiycations();
 		mRingtoneHandler.sendEmptyMessage(ret);
@@ -593,7 +593,7 @@ public class TableGridDeskActivity extends BaseActivity {
 		}
 
 		if (isBoundaryLegal(tableName, Table.NORMAL_TABLE_STAUTS)) {
-			changeTable(getmSettings().getId(tableName),
+			changeTable(getSettings().getId(tableName),
 					Integer.parseInt(changePersons));
 		} else {
 			toastText(R.string.changeTIdWarning);
@@ -608,7 +608,7 @@ public class TableGridDeskActivity extends BaseActivity {
 		}
 
 		if (isBoundaryLegal(tableName, Table.OPEN_TABLE_STATUS)) {
-			combineTable(getmSettings().getId(tableName),
+			combineTable(getSettings().getId(tableName),
 					Integer.parseInt(changePersons));
 		} else {
 			toastText(R.string.combineTIdWarning);
@@ -650,49 +650,53 @@ public class TableGridDeskActivity extends BaseActivity {
 		TableGridDeskActivity.this.startActivity(intent);
 	}
 
-	public TableSetting getmSettings() {
+	public TableSetting getSettings() {
 		return mSettings;
 	}
 
-	public void setmSettings(TableSetting mSettings) {
+	public void setSettings(TableSetting mSettings) {
 		this.mSettings = mSettings;
 	}
 
-	public int getmRingtoneMsg() {
+	public int getRingtoneMsg() {
 		return mRingtoneMsg;
 	}
 
-	public void setmRingtoneMsg(int mRingtoneMsg) {
+	public void setRingtoneMsg(int mRingtoneMsg) {
 		this.mRingtoneMsg = mRingtoneMsg;
 	}
 
-	public int getmTableMsg() {
+	public int getTableMsg() {
 		return mTableMsg;
 	}
 
-	public void setmTableMsg(int mTableMsg) {
+	public void setTableMsg(int mTableMsg) {
 		this.mTableMsg = mTableMsg;
 	}
 
-	public Handler getmTableHandler() {
+	public Handler getTableHandler() {
 		return mTableHandler;
 	}
 
-	public void setmTableHandler(Handler mTableHandler) {
+	public void setTableHandler(Handler mTableHandler) {
 		this.mTableHandler = mTableHandler;
 	}
 
-	public Handler getmRingtoneHandler() {
+	public Handler getRingtoneHandler() {
 		return mRingtoneHandler;
 	}
 
-	public void setmRingtoneHandler(Handler mRingtoneHandler) {
+	public void setRingtoneHandler(Handler mRingtoneHandler) {
 		this.mRingtoneHandler = mRingtoneHandler;
 	}
 	
 	public void sendTableMsg(){
-		getmTableHandler().sendEmptyMessage(getmTableMsg());
-		getmRingtoneHandler().sendEmptyMessage(getmRingtoneMsg());
+		getTableHandler().sendEmptyMessage(getTableMsg());
 	}
+	
+	public void sendRingtoneMsg(){
+		getRingtoneHandler().sendEmptyMessage(getRingtoneMsg());
+	}
+	
 }
 

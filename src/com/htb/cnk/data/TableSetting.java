@@ -28,16 +28,28 @@ public class TableSetting implements Serializable {
 	boolean phoneOrderPending;
 	public static final int PHONE_ORDER = 1;
 	public static final int MY_ORDER = 2;
+	public static final int SUBMIT = 0;
+	private int FLOOR_NUM;
+	private int FLOOR_NUM_COUNT = 0;
 
 	public class TableSettingItem {
 		protected int mStatus;
 		protected String mName;
 		protected int mId;
+		protected int mCategory;
+		protected int mIndex;
+		protected int mArea;
+		protected int mFloor;
 
-		public TableSettingItem(int status, String name, int id) {
+		public TableSettingItem(int status, String name, int id, int category,
+				int index, int area, int floor) {
 			mStatus = status;
 			mName = name;
 			mId = id;
+			mCategory = category;
+			mIndex = index;
+			mArea = area;
+			mFloor = floor;
 		}
 
 		public void setStatus(int status) {
@@ -55,43 +67,92 @@ public class TableSetting implements Serializable {
 		public String getName() {
 			return mName;
 		}
+
+		public int getCategory() {
+			return mCategory;
+		}
+
+		public int getIndex() {
+			return mIndex;
+		}
+
+		public int getArea() {
+			return mArea;
+		}
+
+		public int getFloor() {
+			return mFloor;
+		}
+
 	}
 
 	private static List<TableSettingItem> mTableSettings = new ArrayList<TableSettingItem>();
+	private static ArrayList<HashMap<Integer, TableSettingItem>> mTableFloor = new ArrayList<HashMap<Integer, TableSettingItem>>();
 	private static List<String> checkOutPrinter = new ArrayList<String>();
 
-	public void add(TableSettingItem item) {
-		mTableSettings.add(item);
+	public void add(TableSettingItem item, List<TableSettingItem> tableItem) {
+		tableItem.add(item);
 	}
 
 	public int size() {
-		return mTableSettings.size();
+		return mTableFloor.size();
 	}
 
 	public void clear() {
-		mTableSettings.clear();
+		mTableFloor.clear();
+	}
+
+	public void addFloor() {
+		mTableFloor.clear();
+		for (int i = 1; i < FLOOR_NUM + 1; i++) {
+			HashMap<Integer, TableSettingItem> map = new HashMap<Integer, TableSettingItem>();
+			int index = 0;
+			for (int k = 0; k < mTableSettings.size(); k++) {
+				if (i == mTableSettings.get(k).getFloor()) {
+					map.put(index, mTableSettings.get(k));
+					index++;
+				}
+			}
+			mTableFloor.add(map);
+		}
+	}
+
+	public int getFloorSize() {
+		return mTableFloor.get(FLOOR_NUM_COUNT).size();
+	}
+
+	public int getFloorNum() {
+		return FLOOR_NUM;
+	}
+
+	public int getFloorCount() {
+		return FLOOR_NUM_COUNT;
+	}
+
+	public void setFloorCount(int num) {
+		FLOOR_NUM_COUNT = num;
 	}
 
 	public int getStatusIndex(int index) {
 		if (isIndexBoundary(index)) {
-			return mTableSettings.get(index).getStatus();
+			return mTableFloor.get(FLOOR_NUM_COUNT).get(index).getStatus();
 		}
 		return -1;
 	}
 
 	public int getStatusTableId(int tableId) {
 		int i;
-		for (i = 0; i < mTableSettings.size() - 1; i++) {
-			if (tableId == mTableSettings.get(i).getId()) {
+		for (i = 0; i < mTableFloor.get(FLOOR_NUM_COUNT).size() - 1; i++) {
+			if (tableId == mTableFloor.get(FLOOR_NUM_COUNT).get(i).getId()) {
 				break;
 			}
 		}
-		return mTableSettings.get(i).getStatus();
+		return mTableFloor.get(FLOOR_NUM_COUNT).get(i).getStatus();
 	}
 
 	public int getIdIndex(int index) {
 		if (isIndexBoundary(index)) {
-			return mTableSettings.get(index).getId();
+			return mTableFloor.get(FLOOR_NUM_COUNT).get(index).getId();
 		}
 		return -1;
 	}
@@ -101,31 +162,32 @@ public class TableSetting implements Serializable {
 	 * @return
 	 */
 	private boolean isIndexBoundary(int index) {
-		return index >= 0 && index < mTableSettings.size();
+		return index >= 0 && index < mTableFloor.get(FLOOR_NUM_COUNT).size();
 	}
 
 	public int getId(int tableId) {
-		for (TableSettingItem item : mTableSettings) {
-			if (item.getId() == tableId) {
-				return item.getId();
+		for (int i = 0; i < mTableFloor.get(FLOOR_NUM_COUNT).size(); i++) {
+			if (mTableFloor.get(FLOOR_NUM_COUNT).get(i).getId() == tableId) {
+				return mTableFloor.get(FLOOR_NUM_COUNT).get(i).getId();
 			}
 		}
 		return -1;
 	}
 
 	public int getId(String tableName) {
-		for (TableSettingItem item : mTableSettings) {
-			if (item.getName().equals(tableName)) {
-				return item.getId();
+		for (int i = 0; i < mTableFloor.get(FLOOR_NUM_COUNT).size(); i++) {
+			if (mTableFloor.get(FLOOR_NUM_COUNT).get(i).getName()
+					.equals(tableName)) {
+				return mTableFloor.get(FLOOR_NUM_COUNT).get(i).getId();
 			}
 		}
 		return -1;
 	}
 
 	public String getName(int tableId) {
-		for (TableSettingItem item : mTableSettings) {
-			if (item.getId() == tableId) {
-				return item.getName();
+		for (int i = 0; i < mTableFloor.get(FLOOR_NUM_COUNT).size(); i++) {
+			if (mTableFloor.get(FLOOR_NUM_COUNT).get(i).getId() == tableId) {
+				return mTableFloor.get(FLOOR_NUM_COUNT).get(i).getName();
 			}
 		}
 		return null;
@@ -133,38 +195,35 @@ public class TableSetting implements Serializable {
 
 	public String getNameIndex(int index) {
 		if (isIndexBoundary(index)) {
-			return mTableSettings.get(index).getName();
+			return mTableFloor.get(FLOOR_NUM_COUNT).get(index).getName();
 		}
 		return null;
 	}
 
 	public String[] getNameAll() {
-		String tableName[] = new String[mTableSettings.size()];
-		int i = 0;
-		for (TableSettingItem item : mTableSettings) {
-			tableName[i] = item.getName();
-			i++;
+		String tableName[] = new String[mTableFloor.get(FLOOR_NUM_COUNT).size()];
+		for (int i = 0; i < mTableFloor.get(FLOOR_NUM_COUNT).size(); i++) {
+			tableName[i] = mTableFloor.get(FLOOR_NUM_COUNT).get(i).getName();
 		}
 		return tableName;
 	}
 
 	public int[] getIdAll() {
-		int tableId[] = new int[mTableSettings.size()];
-		int i = 0;
-		for (TableSettingItem item : mTableSettings) {
-			tableId[i] = item.getId();
-			i++;
+		int tableId[] = new int[mTableFloor.get(FLOOR_NUM_COUNT).size()];
+		for (int i = 0; i < mTableFloor.get(FLOOR_NUM_COUNT).size(); i++) {
+			tableId[i] = mTableFloor.get(FLOOR_NUM_COUNT).get(i).getId();
 		}
 		return tableId;
 	}
 
 	public ArrayList<HashMap<String, Object>> getTableOpen() {
 		ArrayList<HashMap<String, Object>> tableOpen = new ArrayList<HashMap<String, Object>>();
-		for (TableSettingItem item : mTableSettings) {
-			if (item.getStatus() == 1) {
+		for (int i = 0; i < mTableFloor.get(FLOOR_NUM_COUNT).size(); i++) {
+			if (mTableFloor.get(FLOOR_NUM_COUNT).get(i).getStatus() == 1) {
 				HashMap<String, Object> map = new HashMap<String, Object>();
-				map.put("name", item.getName());
-				map.put("id", item.getId());
+				map.put("name", mTableFloor.get(FLOOR_NUM_COUNT).get(i)
+						.getName());
+				map.put("id", mTableFloor.get(FLOOR_NUM_COUNT).get(i).getId());
 				tableOpen.add(map);
 			}
 		}
@@ -173,7 +232,7 @@ public class TableSetting implements Serializable {
 
 	public void setStatus(int index, int n) {
 		if (isIndexBoundary(index)) {
-			mTableSettings.get(index).setStatus(n);
+			mTableFloor.get(FLOOR_NUM_COUNT).get(index).setStatus(n);
 		}
 	}
 
@@ -197,9 +256,16 @@ public class TableSetting implements Serializable {
 				if (status == 50 || status == 51) {
 					phoneOrderPending = true;
 				}
-				asItem = new TableSettingItem(status, name, id);
-				add(asItem);
+				int category = item.getInt("category");
+				int index = item.getInt("index");
+				int area = item.getInt("area");
+				int floor = item.getInt("floor");
+				asItem = new TableSettingItem(status, name, id, category,
+						index, area, floor);
+				add(asItem, mTableSettings);
 			}
+			floorCategory();
+			addFloor();
 			return 0;
 		} catch (Exception e) {
 			Log.e(TAG, tableStatusPkg);
@@ -252,6 +318,8 @@ public class TableSetting implements Serializable {
 			if (status < Table.PHONE_STATUS) {
 				status = 1;
 			}
+		} else if (type == SUBMIT) {
+			status = 1;
 		}
 		String tableStatusPkg = Http.get(Server.UPDATE_TABLE_STATUS, "TID="
 				+ tableId + "&TST=" + status);
@@ -467,10 +535,10 @@ public class TableSetting implements Serializable {
 						spaceLen += 1;
 					}
 
-//					Log.d(TAG, "dishName:" + name + " zhLen:" + zhLen
-//							+ " enLen:" + enLen + " spaceLen:" + spaceLen);
-//					Log.d(TAG, "dishName:" + name + " strLen:" + strlen
-//							+ " strByteLen:" + strByteLen);
+					// Log.d(TAG, "dishName:" + name + " zhLen:" + zhLen
+					// + " enLen:" + enLen + " spaceLen:" + spaceLen);
+					// Log.d(TAG, "dishName:" + name + " strLen:" + strlen
+					// + " strByteLen:" + strByteLen);
 
 					String priceStr = nf.format(price);
 					String quanStr = nf.format(quan);
@@ -485,9 +553,9 @@ public class TableSetting implements Serializable {
 								+ totalPriceSpaceLen + "s%s", name, "",
 								priceStr, "", quanStr, "", "", itemTotalPrice);
 					} else {
-//						Log.d(TAG, "%s\r\n%36s%s%" + priceSpaceLen + "s%s%"
-//								+ quanSpaceLen + "s%" + totalPriceSpaceLen
-//								+ "s%s");
+						// Log.d(TAG, "%s\r\n%36s%s%" + priceSpaceLen + "s%s%"
+						// + quanSpaceLen + "s%" + totalPriceSpaceLen
+						// + "s%s");
 						dish = String.format("%s\r\n%42s%s%" + priceSpaceLen
 								+ "s%s%" + quanSpaceLen + "s%"
 								+ totalPriceSpaceLen + "s%s", name, "",
@@ -569,6 +637,16 @@ public class TableSetting implements Serializable {
 		}
 		int ret = mOrder.getOrderFromServer(srcTId);
 		return ret;
+	}
+
+	public int floorCategory() {
+		String floorCategoryPkg = Http.get(Server.GET_FLOORNUM, null);
+		// if (!ErrorPHP.isSucc(floorCategoryPkg, TAG)) {
+		// return -1;
+		// }
+		FLOOR_NUM = Integer.parseInt(floorCategoryPkg);
+		Log.d(TAG, FLOOR_NUM + ":num");
+		return 0;
 	}
 
 }

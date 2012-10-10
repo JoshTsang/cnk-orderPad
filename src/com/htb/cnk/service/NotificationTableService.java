@@ -13,11 +13,11 @@ import com.htb.cnk.data.TableSetting;
 
 public class NotificationTableService extends Service {
 
-	private final int DISABLE_GRIDVIEW = 10;
+	private final int DISABLE_GRIDVIEW = 1000;
 	private final int MILLISECONDS = 1000 * 15;
 	private Notifications mNotificaion = new Notifications();
 	private TableSetting mSettings = new TableSetting();
-	private final int UPDATE_TABLE_INFOS = 5;
+	private final int UPDATE_TABLE_INFOS = 500;
 	private Intent intent = new Intent(SERVICE_IDENTIFIER);
 	private Bundle bundle = new Bundle();
 	private static Handler objHandler = new Handler();
@@ -46,9 +46,10 @@ public class NotificationTableService extends Service {
 		public void run() {
 			try {
 				tableHandle.sendEmptyMessage(DISABLE_GRIDVIEW);
-				int ret = mNotificaion.getNotifiycations();
-				intent.putExtra("ringtoneMessage", ret);
-				ret = mSettings.getTableStatusFromServer();
+				//TODO
+//				int ret = mNotificaion.getNotifiycations();
+//				intent.putExtra("ringtoneMessage", ret);
+				int ret = mSettings.getTableStatusFromServer();
 				if (ret < 0) {
 					tableHandle.sendEmptyMessage(ret);
 				} else {

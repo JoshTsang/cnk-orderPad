@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.ui.base.TableGridDeskActivity;
@@ -22,14 +23,16 @@ public class MyReceiver extends BroadcastReceiver {
 	public MyReceiver(TableGridDeskActivity tableDeskActivity) {
 		tableDeskReceiver = tableDeskActivity;
 	}
- 
+
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		Bundle bundle = intent.getExtras();
-		tableDeskReceiver.setmSettings((TableSetting) bundle
+		tableDeskReceiver.setSettings((TableSetting) bundle
 				.getSerializable(NotificationTableService.SER_KEY));
-		tableDeskReceiver.setmRingtoneMsg(bundle.getInt("ringtoneMessage"));
-		tableDeskReceiver.setmTableMsg(bundle.getInt("tableMessage"));
+		tableDeskReceiver.setRingtoneMsg(bundle.getInt("ringtoneMessage"));
+		tableDeskReceiver.setTableMsg(bundle.getInt("tableMessage"));
+		tableDeskReceiver.sendRingtoneMsg();
 		tableDeskReceiver.sendTableMsg();
+		Log.d(TAG, TAG+bundle.getInt("tableMessage"));
 	}
 }

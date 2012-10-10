@@ -1,58 +1,69 @@
-<?xml version="1.0" encoding="utf-8"?> 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" 
-     android:orientation="vertical"
-     android:layout_width="fill_parent" 
-     android:layout_height="fill_parent" 
-     android:layout_weight="1.0" 
-   	 android:background="#F8E9C1"
-     > 
-<LinearLayout android:id="@+id/titlebar"
-    android:layout_width="match_parent"
-    android:layout_height="50dip"
-    android:background="@drawable/statistics_titlebar"
-    android:orientation="horizontal" >
-	    <Button android:id="@+id/back"
-	        android:layout_width="200dip"
-	    	android:layout_height="40dip"
-	    	android:textColor="#F9E8BB"
-	    	android:textSize="35dip"
-	    	android:text="@string/back"
-	    	android:background="#00000000"/>
-	    <Button android:id="@+id/checkOutTable"
-	        android:layout_width="200dip"
-	    	android:layout_height="40dip"
-	    	android:textColor="#F9E8BB"
-	    	android:textSize="35dip"
-	    	android:text="@string/checkout"
-	    	android:background="#00000000"/>
-	    <Button android:id="@+id/logout"
-	        android:layout_width="200dip"
-	    	android:layout_height="40dip"
-	    	android:textColor="#F9E8BB"
-	    	android:textSize="35dip"
-	    	android:text="@string/logout"
-	    	android:background="#00000000"/>
-	    <Button android:id="@+id/management"
-	        android:layout_width="200dip"
-	    	android:layout_height="40dip"
-	    	android:textColor="#F9E8BB"
-	    	android:textSize="35dip"
-	    	android:text="@string/mangement"
-	    	android:background="#00000000"/>
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:layout_weight="1.0"
+    android:background="#F8E9C1"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/titlebar"
+        android:layout_width="match_parent"
+        android:layout_height="50dip"
+        android:background="@drawable/statistics_titlebar"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/back"
+            android:layout_width="200dip"
+            android:layout_height="40dip"
+            android:background="#00000000"
+            android:text="@string/back"
+            android:textColor="#F9E8BB"
+            android:textSize="35dip" />
+
+        <Button
+            android:id="@+id/checkOutTable"
+            android:layout_width="200dip"
+            android:layout_height="40dip"
+            android:background="#00000000"
+            android:text="@string/checkout"
+            android:textColor="#F9E8BB"
+            android:textSize="35dip" />
+
+        <Button
+            android:id="@+id/logout"
+            android:layout_width="200dip"
+            android:layout_height="40dip"
+            android:background="#00000000"
+            android:text="@string/logout"
+            android:textColor="#F9E8BB"
+            android:textSize="35dip" />
+
+        <Button
+            android:id="@+id/management"
+            android:layout_width="200dip"
+            android:layout_height="40dip"
+            android:background="#00000000"
+            android:text="@string/mangement"
+            android:textColor="#F9E8BB"
+            android:textSize="35dip" />
     </LinearLayout>
-<GridView xmlns:android="http://schemas.android.com/apk/res/android"    
-    android:id="@+id/gridview"  
-    android:layout_width="wrap_content"    
-    android:layout_height="fill_parent"  
-    android:numColumns="6"  
-    android:verticalSpacing="30dip"  
-    android:horizontalSpacing="10dip"  
-    android:columnWidth="90dip"  
-    android:stretchMode="columnWidth"  
-    android:paddingTop="5dip"
-    android:gravity="center"
-    android:listSelector="@drawable/grid_selector_background"
->
-</GridView>
- 
+
+    <com.htb.cnk.lib.ScrollLayout
+        android:id="@+id/scr"
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp" >
+    </com.htb.cnk.lib.ScrollLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_scr_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="10dip"
+        android:layout_marginBottom="4dip"
+        android:gravity="center" >
+    </LinearLayout>
+
 </LinearLayout>

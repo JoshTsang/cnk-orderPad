@@ -124,7 +124,7 @@ public class OrderBaseActivity extends BaseActivity {
 	 */
 	protected int updateStatus(int tableId, int orderType) {
 		return mSettings.updateStatus(Info.getTableId(),
-				TableSetting.PHONE_ORDER);
+				orderType);
 	}
 
 	protected void showUpdateQuantityDlg(final int index) {

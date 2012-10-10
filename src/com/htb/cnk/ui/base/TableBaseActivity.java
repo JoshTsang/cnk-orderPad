@@ -59,7 +59,7 @@ public class TableBaseActivity extends TableGridDeskActivity {
 	protected Builder listTableNameDialog(final int type) {
 		final List<Integer> tableId = new ArrayList<Integer>();
 		final List<String> tableNameStr = new ArrayList<String>();
-		ArrayList<HashMap<String, Object>> checkOut = getmSettings()
+		ArrayList<HashMap<String, Object>> checkOut = getSettings()
 				.getTableOpen();
 		if (checkOut.size() <= 0) {
 			 return mTitleAndMessageDialog.messageDialog(false,
@@ -67,7 +67,7 @@ public class TableBaseActivity extends TableGridDeskActivity {
 					getResources().getString(R.string.ok), null, null, null);
 		}
 		setNameAndId(tableId, tableNameStr, checkOut);
-		final boolean selected[] = new boolean[getmSettings().size()];
+		final boolean selected[] = new boolean[getSettings().size()];
 
 		DialogInterface.OnClickListener listPositiveListener = new DialogInterface.OnClickListener() {
 			@Override
@@ -117,7 +117,7 @@ public class TableBaseActivity extends TableGridDeskActivity {
 		new Thread() {
 			public void run() {
 				try {
-					double ret = getmSettings().getTotalPriceTable(
+					double ret = getSettings().getTotalPriceTable(
 							TableBaseActivity.this, selectedTable, tableName);
 					mTotalPriceTableHandler.sendEmptyMessage((int) ret);
 				} catch (Exception e) {

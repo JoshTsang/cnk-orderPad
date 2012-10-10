@@ -2,7 +2,6 @@ package com.htb.cnk.ui.base;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.res.Resources.NotFoundException;
 import android.os.Bundle;
 import android.os.Message;
 import android.view.KeyEvent;
