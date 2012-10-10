@@ -103,6 +103,7 @@ public class TableGridDeskActivity extends BaseActivity {
 		bindService(intent, conn, Context.BIND_AUTO_CREATE);
 		mReceiver = new MyReceiver(TableGridDeskActivity.this);
 		registerReceiver(mReceiver);
+		NotificationType();
 	}
 
 	private void setNewClass() {

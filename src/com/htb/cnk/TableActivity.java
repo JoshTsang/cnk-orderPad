@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -53,14 +52,12 @@ public class TableActivity extends TableBaseActivity {
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		Info.setMode(Info.WORK_MODE_WAITER);
 		setContentView(R.layout.table_activity);
-		Log.d(TAG, TAG);
 		handler();
 		findViews();
 		setClickListeners();
 	}
 
 	private void handler() {
-		Log.d(TAG, "handler");
 		mNotificationHandler = notificationHandler;
 		setmTableHandler(tableHandler);
 		setmRingtoneHandler(ringtoneHandler);
@@ -90,7 +87,6 @@ public class TableActivity extends TableBaseActivity {
 
 	Handler tableHandler = new Handler() {
 		public void handleMessage(Message msg) {
-			Log.d(TAG, "handler");
 			mpDialog.cancel();
 			if (msg.what < 0) {
 				if (NETWORK_ARERTDIALOG == 1) {

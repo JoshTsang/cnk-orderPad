@@ -28,6 +28,7 @@ public class TableSetting implements Serializable {
 	boolean phoneOrderPending;
 	public static final int PHONE_ORDER = 1;
 	public static final int MY_ORDER = 2;
+	public static final int SUBMIT = 0;
 
 	public class TableSettingItem {
 		protected int mStatus;
@@ -252,6 +253,8 @@ public class TableSetting implements Serializable {
 			if (status < Table.PHONE_STATUS) {
 				status = 1;
 			}
+		} else if (type == SUBMIT) {
+			status = 1;
 		}
 		String tableStatusPkg = Http.get(Server.UPDATE_TABLE_STATUS, "TID="
 				+ tableId + "&TST=" + status);
@@ -467,10 +470,10 @@ public class TableSetting implements Serializable {
 						spaceLen += 1;
 					}
 
-//					Log.d(TAG, "dishName:" + name + " zhLen:" + zhLen
-//							+ " enLen:" + enLen + " spaceLen:" + spaceLen);
-//					Log.d(TAG, "dishName:" + name + " strLen:" + strlen
-//							+ " strByteLen:" + strByteLen);
+					// Log.d(TAG, "dishName:" + name + " zhLen:" + zhLen
+					// + " enLen:" + enLen + " spaceLen:" + spaceLen);
+					// Log.d(TAG, "dishName:" + name + " strLen:" + strlen
+					// + " strByteLen:" + strByteLen);
 
 					String priceStr = nf.format(price);
 					String quanStr = nf.format(quan);
@@ -485,9 +488,9 @@ public class TableSetting implements Serializable {
 								+ totalPriceSpaceLen + "s%s", name, "",
 								priceStr, "", quanStr, "", "", itemTotalPrice);
 					} else {
-//						Log.d(TAG, "%s\r\n%36s%s%" + priceSpaceLen + "s%s%"
-//								+ quanSpaceLen + "s%" + totalPriceSpaceLen
-//								+ "s%s");
+						// Log.d(TAG, "%s\r\n%36s%s%" + priceSpaceLen + "s%s%"
+						// + quanSpaceLen + "s%" + totalPriceSpaceLen
+						// + "s%s");
 						dish = String.format("%s\r\n%42s%s%" + priceSpaceLen
 								+ "s%s%" + quanSpaceLen + "s%"
 								+ totalPriceSpaceLen + "s%s", name, "",

@@ -194,7 +194,7 @@ public class PhoneActivity extends OrderBaseActivity {
 			public void run() {
 				try {
 					int ret = updateStatus(Info.getTableId(),
-							TableSetting.PHONE_ORDER);
+							TableSetting.SUBMIT);
 					if (ret < 0) {
 						queryHandler.sendEmptyMessage(ret);
 						return;
