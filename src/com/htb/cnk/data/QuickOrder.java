@@ -95,7 +95,7 @@ public class QuickOrder {
 			}
 		}
 		try {
-			Cursor dishes = getDishesFromDataBase(CnkDbHelper.DISH_TABLE_NAME);
+			Cursor dishes = getDishesFromDataBase(CnkDbHelper.TABLE_DISH_INFO);
 			while (dishes.moveToNext()) {
 				Map<String, Object> map = new HashMap<String, Object>();
 				Dish dish = new Dish(dishes.getInt(ID_COLUMN),

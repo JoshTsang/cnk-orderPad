@@ -123,11 +123,13 @@ public class UpdateMenuActivity extends BaseActivity {
 	public static boolean isUpdateNeed(int currentMenuVer) {
 		String serverRespond = Http.get(Server.MENU_VERSION, "");
 		if (serverRespond == null || "".equals(serverRespond)) {
+			Log.e(TAG, "no respond when request menu version, currentMVer:" + currentMenuVer);
 			return false;
 		} else {
 			int start = serverRespond.indexOf("[") + 1;
 			int end = serverRespond.indexOf("]");
 			if (start < 0 || end < 0) {
+				Log.e(TAG, "illegal package, action:getMenuVersion, pkg:" + serverRespond);
 				return false;
 			} else {
 				String ver = serverRespond.substring(start, end);
@@ -213,7 +215,7 @@ public class UpdateMenuActivity extends BaseActivity {
 					null, 1);
 			mDb = mCnkDbHelper.getReadableDatabase();
 			
-			Cursor dishes = mDb.query(CnkDbHelper.DISH_TABLE_NAME, new String[] {
+			Cursor dishes = mDb.query(CnkDbHelper.TABLE_DISH_INFO, new String[] {
 					  CnkDbHelper.DISH_PIC, CnkDbHelper.DISH_NAME},
 					  null, null, null, null, null);
 			while (dishes.moveToNext()) {

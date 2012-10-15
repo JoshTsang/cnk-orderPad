@@ -57,7 +57,8 @@ public class PhoneOrder extends MyOrder {
 				Cursor cur = getDishNameAndPriceFromDB(dishId);
 				String name = cur.getString(0);
 				float dishPrice = cur.getFloat(1);
-				Dish mDish = new Dish(dishId, name, dishPrice, null);
+				int printer = cur.getInt(2);
+				Dish mDish = new Dish(dishId, name, dishPrice, null, printer);
 				addOrder(mDish, quantity, tableId, 0, MODE_PHONE);
 			}
 			return 0;

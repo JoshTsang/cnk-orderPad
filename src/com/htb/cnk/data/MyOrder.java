@@ -263,6 +263,7 @@ public class MyOrder {
 				dish.put("name", mOrder.get(i).dish.getName());
 				dish.put("price", mOrder.get(i).dish.getPrice());
 				dish.put("quan", mOrder.get(i).getQuantity());
+				dish.put("printer", mOrder.get(i).getPrinter());
 				dish.put("flavor", flavorStr);
 				dishes.put(dish);
 			}
@@ -470,7 +471,7 @@ public class MyOrder {
 	}
 
 	private String getDishNameFromDB(int id) {
-		Cursor cur = mDb.query(CnkDbHelper.DISH_TABLE_NAME,
+		Cursor cur = mDb.query(CnkDbHelper.TABLE_DISH_INFO,
 				new String[] { CnkDbHelper.DISH_NAME }, CnkDbHelper.DISH_ID
 						+ "=" + id, null, null, null, null);
 
@@ -481,8 +482,8 @@ public class MyOrder {
 	}
 
 	protected Cursor getDishNameAndPriceFromDB(int id) {
-		Cursor cur = mDb.query(CnkDbHelper.DISH_TABLE_NAME, new String[] {
-				CnkDbHelper.DISH_NAME, CnkDbHelper.DISH_PRICE },
+		Cursor cur = mDb.query(CnkDbHelper.TABLE_DISH_INFO, new String[] {
+				CnkDbHelper.DISH_NAME, CnkDbHelper.DISH_PRICE, CnkDbHelper.DISH_PRINTER},
 				CnkDbHelper.DISH_ID + "=" + id, null, null, null, null);
 
 		if (cur.moveToNext()) {

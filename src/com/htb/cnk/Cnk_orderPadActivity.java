@@ -146,6 +146,7 @@ public class Cnk_orderPadActivity extends BaseActivity {
 					Log.d(TAG, "update Menu needed");
 					handlerSync.sendEmptyMessage(UPDATE_MENU);
 				} else {
+					Log.d(TAG, "no new menu founded");
 					handlerSync.sendEmptyMessage(LATEST_MENU);
 				}
 			}

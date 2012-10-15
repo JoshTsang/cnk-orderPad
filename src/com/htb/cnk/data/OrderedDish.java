@@ -37,6 +37,10 @@ public class OrderedDish {
 	public float getQuantity() {
 		return padQuantity + phoneQuantity;
 	}
+	
+	public int getPrinter() {
+		return dish.getPrinter();
+	}
 
 	public double getPrice() {
 		return dish.getPrice();

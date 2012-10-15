@@ -22,11 +22,12 @@ public class Dishes {
 	final static int NAME_COLUMN = 1;
 	final static int PRICE_COLUMN = 2;
 	final static int PIC_COLUMN = 3;
+	final static int PRINTER_COLUMN = 4;
 	
 	private List<Dish> mDishes = new ArrayList<Dish>();
 	private List<Integer> mSoldOutItemsId = new ArrayList<Integer>();
 	private int mCategoryId;
-	private String mTableName = "";
+	//private String mTableName = "";
 	private CnkDbHelper mCnkDbHelper;
 	private SQLiteDatabase mDb;
 	private Context mContext;
@@ -35,9 +36,11 @@ public class Dishes {
 		mContext = context;
 	}
 
-	public int setCategory(int categoryId, String tableName) {
+	public int setCategory(int categoryId) {
+		if (mCategoryId == categoryId) {
+			return 0;
+		}
 		mCategoryId = categoryId;
-		mTableName = tableName;
 		mDishes.clear();
 		int ret = fillCategoriesData();
 		if (ret < 0) {
@@ -81,12 +84,12 @@ public class Dishes {
 			}
 		}
 		try {
-			Cursor dishes = getDishesFromDataBase(mTableName);
+			Cursor dishes = getDishesFromDataBase(mCategoryId);
 			while (dishes.moveToNext()) {
 				mDishes.add(new Dish(dishes.getInt(ID_COLUMN), dishes
-						.getString(NAME_COLUMN),
-						dishes.getFloat(PRICE_COLUMN), dishes
-								.getString(PIC_COLUMN)));
+						.getString(NAME_COLUMN), dishes.getFloat(PRICE_COLUMN),
+						dishes.getString(PIC_COLUMN), dishes
+								.getInt(PRINTER_COLUMN)));
 			}
 			return 0;
 		} catch (Exception e) {
@@ -95,10 +98,20 @@ public class Dishes {
 		}
 	}
 
-	private Cursor getDishesFromDataBase(String tableName) {
-		return mDb.query(tableName, new String[] { CnkDbHelper.DISH_ID,
-				CnkDbHelper.DISH_NAME, CnkDbHelper.DISH_PRICE,
-				CnkDbHelper.DISH_PIC }, null, null, null, null, null);
+	private Cursor getDishesFromDataBase(int categoryId) {
+		String sql = String
+				.format("SELECT %s.%s, %s, %s, %s, %s FROM %s,%s Where %s.%s=%s.%s and %s.%s=%d",
+						CnkDbHelper.TABLE_DISH_INFO, CnkDbHelper.DISH_ID,
+						CnkDbHelper.DISH_NAME,
+						CnkDbHelper.DISH_PRICE,
+						CnkDbHelper.DISH_PIC,
+						CnkDbHelper.DISH_PRINTER,
+						CnkDbHelper.TABLE_DISH_INFO,
+						CnkDbHelper.TABLE_DISH_CATEGORY,
+						CnkDbHelper.TABLE_DISH_INFO, CnkDbHelper.DISH_ID,
+						CnkDbHelper.TABLE_DISH_CATEGORY,CnkDbHelper.DC_DISH_ID,
+						CnkDbHelper.TABLE_DISH_CATEGORY, CnkDbHelper.CATEGORY_ID, categoryId);
+		return mDb.rawQuery(sql, null);
 	}
 
 	private int removeSoldOutItems(int id) {

@@ -327,7 +327,7 @@ public class Statistics {
 	}
 
 	private String getDishNameFromDB(int id) {
-		Cursor cur = mDbMenu.query(CnkDbHelper.DISH_TABLE_NAME, new String[] {CnkDbHelper.DISH_NAME},
+		Cursor cur = mDbMenu.query(CnkDbHelper.TABLE_DISH_INFO, new String[] {CnkDbHelper.DISH_NAME},
 				  	CnkDbHelper.DISH_ID + "=" + id, null, null, null, null);
 		
 		if (cur.moveToNext()) {

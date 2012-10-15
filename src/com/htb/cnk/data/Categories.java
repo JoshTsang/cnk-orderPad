@@ -17,11 +17,9 @@ import android.database.sqlite.SQLiteDatabase;
 public class Categories {
 	public class Category {
 		public int mCategoryId;
-		public String mTableName;
 		public String mName;
 		
-		public Category(String tableName, String name, int id) {
-			mTableName = tableName;
+		public Category(String name, int id) {
 			mName = name;
 			mCategoryId = id;
 		}
@@ -44,10 +42,6 @@ public class Categories {
 		return mCategories.get(position).mName;
 	}
 	
-	public String getTableName(int position) {
-		return mCategories.get(position).mTableName;
-	}
-	
 	public int getCategoryId(int position) {
 		return mCategories.get(position).mCategoryId;
 	}
@@ -56,18 +50,17 @@ public class Categories {
 		mDb = mCnkDbHelper.getReadableDatabase();
 		final int CATEGORY_ID = 0;
 		final int CATEGORY_NAME = 1;
-		final int CATEGORY_TABLE_NAME = 2;
+		
 		try {
 			Cursor categories = mDb.query(CnkDbHelper.TABLE_CATEGORIES, 
-					new String[] {CnkDbHelper.CATEGORY_ID, CnkDbHelper.CATEGORY_NAME,
-					CnkDbHelper.CATEGORY_TABLE_NAME},
-					null, null, null, null, null);
+					new String[] {CnkDbHelper.CATEGORY_ID, CnkDbHelper.CATEGORY_NAME
+					}, null, null, null, null, null);
 			while (categories.moveToNext()) {
-				mCategories.add(new Category(categories.getString(CATEGORY_TABLE_NAME),
-						categories.getString(CATEGORY_NAME),
+				mCategories.add(new Category(categories.getString(CATEGORY_NAME),
 						categories.getInt(CATEGORY_ID)));
 			} 
 		} catch (Exception e) {
+			e.printStackTrace();
 			return ErrorNum.DB_BROKEN;
 		}
 		mDb.close();

@@ -14,17 +14,21 @@ public class CnkDbHelper extends SQLiteOpenHelper {
 	public final static String DB_MENU = "cnk.db";
 	public final static String DB_SALES = "sales.db";
 	
-	public final static String TABLE_CATEGORIES = "table_show";
+	public final static String TABLE_CATEGORIES = "category";
 	
-	public final static String CATEGORY_ID = "id";
-	public final static String CATEGORY_NAME = "class";
-	public final static String CATEGORY_TABLE_NAME = "tablename";
+	public final static String CATEGORY_ID = "categoryID";
+	public final static String CATEGORY_NAME = "categoryName";
 	
-	public final static String DISH_TABLE_NAME = "total_menu";
+	public final static String TABLE_DISH_INFO = "dishInfo";
 	public final static String DISH_ID = "id";
 	public final static String DISH_NAME = "name";
 	public final static String DISH_PRICE = "price";
 	public final static String DISH_PIC = "pictureBUrl";
+	public final static String DISH_PRINTER = "sortPrint";
+	
+	public final static String TABLE_DISH_CATEGORY = "dishCategory";
+	public final static String DC_DISH_ID = "dishId";
+	public final static String DC_CATEGORY_ID = "categoryID";
 	
 	public final static String TABLE_INFO = "table_info";
 	public final static String TABLE_ID = "table_id";

@@ -9,12 +9,22 @@ public class Dish {
 	private String mName;
 	private float mPrice;
 	private String mPic;
+	private int mPrinter;
+	
+	public Dish(int id, String name, float price, String pic, int printer) {
+		mId = id;
+		mName = name;
+		mPrice = price;
+		mPic = pic;
+		mPrinter = printer;
+	}
 	
 	public Dish(int id, String name, float price, String pic) {
 		mId = id;
 		mName = name;
 		mPrice = price;
 		mPic = pic;
+		mPrinter = 0;
 	}
 
 	public int getId() {
@@ -33,4 +43,7 @@ public class Dish {
 		return mPic;
 	}
 	
+	public int getPrinter() {
+		return mPrinter;
+	}
 }

@@ -73,15 +73,14 @@ public class MenuActivity extends MenuBaseActivity {
 		// handler.sendEmptyMessage(ret);
 		// }
 		// }.start();
-		mDishes.setCategory(mCategories.getCategoryId(position),
-				mCategories.getTableName(position));
+		mDishes.setCategory(mCategories.getCategoryId(position));
 		mDishLstAdapter.notifyDataSetChanged();
 	}
 	
 	public void setListData() {
 		if (mCategories.count() <= 0) {
 			errorAccurDlg("菜谱数据损坏,请更新菜谱!", FINISH_ACTIVITY);
-			Log.e(TAG, "menu data base is broken");
+			Log.e(TAG, "menu data base is broken, categories.count <= 0");
 			return;
 		}
 		setCategories();
