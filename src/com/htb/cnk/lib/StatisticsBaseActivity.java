@@ -22,6 +22,7 @@ import android.widget.TimePicker;
 
 import com.htb.cnk.R;
 import com.htb.cnk.adapter.StatisticsAdapter;
+import com.htb.cnk.data.CnkDbHelper;
 import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.Statistics;
 import com.htb.cnk.ui.base.BaseActivity;
@@ -117,7 +118,7 @@ public class StatisticsBaseActivity extends BaseActivity {
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-				int ret = mStatistics.downloadDB(Server.SERVER_DB_SALES);
+				int ret = mStatistics.downloadDB(Server.SERVER_DB_SALES, CnkDbHelper.SALES_DATA);
 				if (ret < 0) {
 					handler.sendEmptyMessage(ret);
 					Log.e(TAG, "Download sales db failed:" + ret);
@@ -315,7 +316,8 @@ public class StatisticsBaseActivity extends BaseActivity {
 			mEndTimeBtn.setText(df.format(mEndSet.getTime()));
 		}
 	};
-	private Handler handler = new Handler() {
+	
+	protected Handler handler = new Handler() {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
 			if (msg.what < 0) {
@@ -324,8 +326,10 @@ public class StatisticsBaseActivity extends BaseActivity {
 					popUpDlg("错误", "下载销售数据失败,错误码:" + msg.what, true);
 					break;
 				case ErrorNum.GET_LATEST_STATISTICS_FAILED:
+					popUpDlg("错误", "获取上次统计时间失败！", true);
 					break;
 				default:
+					popUpDlg("错误", "下载销售数据失败,错误码:" + msg.what, true);
 					Log.e(TAG, "unknow error num");
 				}
 			}

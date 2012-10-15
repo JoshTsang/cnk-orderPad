@@ -23,6 +23,7 @@ public class QuickOrder {
 	final static int NAME_COLUMN = 1;
 	final static int PRICE_COLUMN = 2;
 	final static int PIC_COLUMN = 3;
+	final static int PINTER_COLUMN = 4;
 
 	private static List<Map<String, Object>> QuickTotalItems = new ArrayList<Map<String, Object>>();
 	private static List<Dish> mDishes = new ArrayList<Dish>();
@@ -101,7 +102,8 @@ public class QuickOrder {
 				Dish dish = new Dish(dishes.getInt(ID_COLUMN),
 						dishes.getString(NAME_COLUMN),
 						dishes.getFloat(PRICE_COLUMN),
-						dishes.getString(PIC_COLUMN));
+						dishes.getString(PIC_COLUMN),
+						dishes.getInt(PINTER_COLUMN));
 				map.put(HanziHelper.words2Pinyin(dishes.getString(NAME_COLUMN)),
 						dish);
 				QuickTotalItems.add(map);
@@ -116,7 +118,7 @@ public class QuickOrder {
 	private Cursor getDishesFromDataBase(String tableName) {
 		return mDb.query(tableName, new String[] { CnkDbHelper.DISH_ID,
 				CnkDbHelper.DISH_NAME, CnkDbHelper.DISH_PRICE,
-				CnkDbHelper.DISH_PIC }, null, null, null, null, null);
+				CnkDbHelper.DISH_PIC, CnkDbHelper.DISH_PRINTER }, null, null, null, null, null);
 	}
 
 	@Override

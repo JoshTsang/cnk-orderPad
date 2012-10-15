@@ -13,6 +13,7 @@ public class CnkDbHelper extends SQLiteOpenHelper {
 	public final static String DATABASE_NAME = "cnk.db";
 	public final static String DB_MENU = "cnk.db";
 	public final static String DB_SALES = "sales.db";
+	public final static String DB_USER = "user.db";
 	
 	public final static String TABLE_CATEGORIES = "category";
 	
@@ -35,7 +36,7 @@ public class CnkDbHelper extends SQLiteOpenHelper {
 	public final static String TABLE_NAME = "table_name";
 	public final static String TABLE_STATUS = "status";
 	
-	public final static String USER_TABLE = "administrator";
+	public final static String USER_TABLE = "userInfo";
 	public final static String USER_ID = "id";
 	public final static String USER_NAME = "username";
 	public final static String SALES_DATA = "sales_data";
