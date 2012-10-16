@@ -53,12 +53,14 @@ public class PhoneOrder extends MyOrder {
 				int quantity = item.getInt("quantity");
 				int dishId = item.getInt("dish_id");
 				// int status = item.getInt("status");
-	
-				Cursor cur = getDishNameAndPriceFromDB(dishId);
-				String name = cur.getString(0);
-				float dishPrice = cur.getFloat(1);
-				int printer = cur.getInt(2);
-				Dish mDish = new Dish(dishId, name, dishPrice, null, printer);
+	//TODO handle cur == null
+				Cursor cur = getDishInfoFromDB(dishId);
+				String name = cur.getString(NAME_COLUMN);
+				float dishPrice = cur.getFloat(PRICE_COLUMN);
+				int printer = cur.getInt(PRINTER_COLUMN);
+				String unit = cur.getString(UNIT_NAME);
+				String pic = cur.getString(PIC_COLUMN);
+				Dish mDish = new Dish(dishId, name, dishPrice, pic, unit, printer);
 				addOrder(mDish, quantity, tableId, 0, MODE_PHONE);
 			}
 			return 0;

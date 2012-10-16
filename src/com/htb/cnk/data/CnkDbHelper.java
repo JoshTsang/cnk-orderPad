@@ -25,7 +25,7 @@ public class CnkDbHelper extends SQLiteOpenHelper {
 	public final static String DISH_NAME = "name";
 	public final static String DISH_PRICE = "price";
 	public final static String DISH_PIC = "pictureBUrl";
-	public final static String DISH_PRINTER = "sortPrint";
+	public final static String DISH_PRINTER = "sortPrintID";
 	
 	public final static String TABLE_DISH_CATEGORY = "dishCategory";
 	public final static String DC_DISH_ID = "dishId";
@@ -35,11 +35,15 @@ public class CnkDbHelper extends SQLiteOpenHelper {
 	public final static String TABLE_ID = "table_id";
 	public final static String TABLE_NAME = "table_name";
 	public final static String TABLE_STATUS = "status";
+	public final static String TABLE_UNIT = "unit";
 	
 	public final static String USER_TABLE = "userInfo";
 	public final static String USER_ID = "id";
 	public final static String USER_NAME = "username";
 	public final static String SALES_DATA = "sales_data";
+	
+	public final static String UNIT_ID = "unitID";
+	public final static String UNIT_NAME = "unitName";
 	
 	public CnkDbHelper(Context context, String name, CursorFactory factory,
 			int version) {

@@ -27,14 +27,24 @@ public class MyOrder {
 	public final static int RET_NULL_PHONE_ORDER = 1;
 	public final static int RET_MINUS_SUCC = -2;
 	public final static int DEL_ALL_ORDER = -1;
+	
 	public final static int UPDATE_ORDER = 1;
 	public final static int DEL_ITEM_ORDER = 2;
+	
 	final static int MODE_PAD = 0;
 	protected final static int MODE_PHONE = 1;
+	
 	protected final static int TIME_OUT = -1;
-	private CnkDbHelper mCnkDbHelper;
+	
+	final static int NAME_COLUMN = 0;
+	final static int PRICE_COLUMN = 1;
+	final static int PIC_COLUMN = 2;
+	final static int PRINTER_COLUMN = 3;
+	final static int UNIT_NAME = 4;
+	
+	protected CnkDbHelper mCnkDbHelper;
 	protected SQLiteDatabase mDb;
-	private Context mDelDlgActivity;
+	protected Context mContext;
 	protected static List<OrderedDish> mOrder = new ArrayList<OrderedDish>();
 	protected int persons;
 	public static String[] mFlavorName;
@@ -44,7 +54,7 @@ public class MyOrder {
 		mCnkDbHelper = new CnkDbHelper(context, CnkDbHelper.DATABASE_NAME,
 				null, 1);
 		mDb = mCnkDbHelper.getReadableDatabase();
-		mDelDlgActivity = context;
+		mContext = context;
 	}
 
 	public void setPersons(int persons) {
@@ -366,8 +376,12 @@ public class MyOrder {
 				int dishId = item.getInt("dish_id");
 				int status = item.getInt("status");
 				Float dishPrice = (float) item.getDouble("price");
-				String name = getDishName(dishId).toUpperCase();
-				Dish mDish = new Dish(dishId, name, dishPrice, null);
+				Cursor cur = getDishInfoFromDB(dishId);
+				String name = cur.getString(NAME_COLUMN);
+				String pic = cur.getString(PIC_COLUMN);
+				int printer = cur.getInt(PRINTER_COLUMN);
+				String unit = cur.getString(UNIT_NAME);
+				Dish mDish = new Dish(dishId, name, dishPrice, pic, unit, printer);
 				addOrder(mDish, quantity, tableId, status, MODE_PAD);
 			}
 			return 0;
@@ -469,7 +483,7 @@ public class MyOrder {
 		return 0;
 
 	}
-
+	
 	private String getDishNameFromDB(int id) {
 		Cursor cur = mDb.query(CnkDbHelper.TABLE_DISH_INFO,
 				new String[] { CnkDbHelper.DISH_NAME }, CnkDbHelper.DISH_ID
@@ -481,10 +495,20 @@ public class MyOrder {
 		return null;
 	}
 
-	protected Cursor getDishNameAndPriceFromDB(int id) {
-		Cursor cur = mDb.query(CnkDbHelper.TABLE_DISH_INFO, new String[] {
-				CnkDbHelper.DISH_NAME, CnkDbHelper.DISH_PRICE, CnkDbHelper.DISH_PRINTER},
-				CnkDbHelper.DISH_ID + "=" + id, null, null, null, null);
+	protected Cursor getDishInfoFromDB(int id) {
+		String sql = String
+				.format("SELECT %s, %s, %s, %s, %s FROM %s,%s,%s Where %s.%s=%s and %s.%s=%d",
+						CnkDbHelper.DISH_NAME,
+						CnkDbHelper.DISH_PRICE,
+						CnkDbHelper.DISH_PIC,
+						CnkDbHelper.DISH_PRINTER,
+						CnkDbHelper.UNIT_NAME,
+						CnkDbHelper.TABLE_DISH_INFO,
+						CnkDbHelper.TABLE_DISH_CATEGORY,
+						CnkDbHelper.TABLE_UNIT,
+						CnkDbHelper.TABLE_UNIT, "id", CnkDbHelper.UNIT_ID,
+						CnkDbHelper.TABLE_DISH_INFO, CnkDbHelper.DISH_ID, id);
+		Cursor cur = mDb.rawQuery(sql, null);
 
 		if (cur.moveToNext()) {
 			return cur;
@@ -505,9 +529,9 @@ public class MyOrder {
 	public void showServerDelProgress() {
 		Method showDelProcessDlg;
 		try {
-			showDelProcessDlg = mDelDlgActivity.getClass().getMethod(
+			showDelProcessDlg = mContext.getClass().getMethod(
 					"showDeletePhoneOrderProcessDlg", new Class[0]);
-			showDelProcessDlg.invoke(mDelDlgActivity, new Object[0]);
+			showDelProcessDlg.invoke(mContext, new Object[0]);
 		} catch (NoSuchMethodException e) {
 			e.printStackTrace();
 		} catch (IllegalArgumentException e) {

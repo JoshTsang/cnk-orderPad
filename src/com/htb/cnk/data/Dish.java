@@ -10,20 +10,23 @@ public class Dish {
 	private float mPrice;
 	private String mPic;
 	private int mPrinter;
+	private String mUnit;
 	
-	public Dish(int id, String name, float price, String pic, int printer) {
+	public Dish(int id, String name, float price, String pic, String unit, int printer) {
 		mId = id;
 		mName = name;
 		mPrice = price;
 		mPic = pic;
 		mPrinter = printer;
+		mUnit = unit;
 	}
 	
-	public Dish(int id, String name, float price, String pic) {
+	public Dish(int id, String name, float price, String pic, String unit) {
 		mId = id;
 		mName = name;
 		mPrice = price;
 		mPic = pic;
+		mUnit = unit;
 		mPrinter = 0;
 	}
 
