@@ -46,6 +46,10 @@ public class Dish {
 		return mPic;
 	}
 	
+	public String getUnit() {
+		return mUnit;
+	}
+	
 	public int getPrinter() {
 		return mPrinter;
 	}
