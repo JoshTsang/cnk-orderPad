@@ -85,7 +85,7 @@ public class PhoneActivity extends OrderBaseActivity {
 				holder1.dishName.setText(dishDetail.getName());
 				holder1.dishPrice
 						.setText(Double.toString(dishDetail.getPrice())
-								+ " 元/份");
+								+ " 元/" + dishDetail.getUnit());
 				holder1.dishQuantity.setText(MyOrder.convertFloat(dishDetail
 						.getQuantity()));
 

@@ -30,6 +30,10 @@ public class OrderedDish {
 		return dish.getName();
 	}
 
+	public String getUnit() {
+		return dish.getUnit();
+	}
+	
 	public int getServedQuantity() {
 		return status;
 	}
