@@ -199,10 +199,15 @@ public class DelOrderActivity extends OrderBaseActivity {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
 			if (msg.what < 0) {
-				if (msg.what == -2) {
+				switch (msg.what) {
+				case -2:
 					toastText(R.string.notClean);
-				} else {
-					delHanderError(msg);
+					break;
+				case MyOrder.NOTHING_TO_DEL:
+					toastText(R.string.nothingToDel);
+					break;
+				default:
+					break;
 				}
 			} else {
 				mMyOrder.clear();
