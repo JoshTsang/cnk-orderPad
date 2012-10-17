@@ -213,6 +213,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 				mMyOrder.clear();
 				fillDelData();
 				mMyOrderAdapter.notifyDataSetChanged();
+				getOrderThread();
 			}
 		}
 	};
