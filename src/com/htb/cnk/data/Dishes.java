@@ -29,8 +29,8 @@ public class Dishes {
 	private List<Integer> mSoldOutItemsId = new ArrayList<Integer>();
 	private int mCategoryId;
 	//private String mTableName = "";
-	private static CnkDbHelper mCnkDbHelper;
-	private static SQLiteDatabase mDb;
+	private CnkDbHelper mCnkDbHelper;
+	private SQLiteDatabase mDb;
 	private Context mContext;
 
 	public Dishes(Context context) {
@@ -104,6 +104,8 @@ public class Dishes {
 				e.printStackTrace();
 				return ErrorNum.DB_BROKEN;
 			}
+		} else if (mDb == null) {
+			mDb = mCnkDbHelper.getReadableDatabase();
 		}
 		
 		return 0;
@@ -179,6 +181,7 @@ public class Dishes {
 	protected void finalize() throws Throwable {
 		if (mDb != null) {
 			mDb.close();
+			mDb = null;
 		}
 		super.finalize();
 	}
