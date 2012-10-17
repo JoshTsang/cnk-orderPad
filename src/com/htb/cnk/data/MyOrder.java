@@ -446,9 +446,9 @@ public class MyOrder {
 					dish.put("dishId", mOrder.get(i).dish.getId());
 					dish.put("name", mOrder.get(i).dish.getName());
 					dish.put("price", mOrder.get(i).dish.getPrice());
-					dish.put(
-							"quan",
+					dish.put("quan",
 							(mOrder.get(i).padQuantity + mOrder.get(i).phoneQuantity));
+					dish.put("printer", mOrder.get(i).getPrinter());
 					dishes.put(dish);
 				}
 			} else {
@@ -463,6 +463,7 @@ public class MyOrder {
 					dish.put("quan", 1);
 				}
 
+				dish.put("printer", mOrder.get(position).getPrinter());
 				dishes.put(dish);
 			}
 			order.put("order", dishes);
@@ -472,6 +473,7 @@ public class MyOrder {
 		if (type == DEL_ALL_ORDER) {
 			response = Http.post(Server.DEL_ORDER, order.toString());
 		} else {
+			Log.d(TAG, order.toString());
 			response = Http.post(
 					Server.UPDATE_TABLE_ORDER + "?TID=" + Info.getTableId()
 							+ "&DID=" + mOrder.get(position).dish.getId()
