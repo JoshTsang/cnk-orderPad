@@ -18,6 +18,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -67,7 +68,7 @@ public class TableGridDeskActivity extends BaseActivity {
 	protected List<Integer> selectedTable = new ArrayList<Integer>();
 
 	protected PhoneOrder mPhoneOrder;
-	protected TableSetting mSettings;
+	private TableSetting mSettings;
 	protected Ringtone mRingtone;
 	protected SimpleAdapter mImageItems;
 
@@ -76,7 +77,7 @@ public class TableGridDeskActivity extends BaseActivity {
 
 	protected Handler mNotificationHandler;
 	protected Handler mTableHandler = new Handler();
-	protected Handler mRingtoneHandler =  new Handler();
+	protected Handler mRingtoneHandler = new Handler();
 	protected Handler mChangeTIdHandler;
 	protected Handler mCombineTIdHandler;
 	protected Handler mCopyTIdHandler;
@@ -103,15 +104,15 @@ public class TableGridDeskActivity extends BaseActivity {
 		bindService(intent, conn, Context.BIND_AUTO_CREATE);
 		mReceiver = new MyReceiver(TableGridDeskActivity.this);
 		registerReceiver(mReceiver);
-	//	NotificationType();
+		NotificationType();
 	}
 
 	private void setNewClass() {
 		mPhoneOrder = new PhoneOrder(TableGridDeskActivity.this);
-		setSettings(new TableSetting());
+		setSettings(new TableSetting(TableGridDeskActivity.this));
 		mRingtone = new Ringtone(TableGridDeskActivity.this);
 	}
-	
+
 	protected ServiceConnection conn = new ServiceConnection() {
 
 		@Override
@@ -303,14 +304,16 @@ public class TableGridDeskActivity extends BaseActivity {
 				int arg2,// The position of the view in the adapter
 				long arg3// The row id of the item that was clicked
 		) {
+			Log.d("table", "arg2:" + arg2 + " floorCurrent:"
+					+ getSettings().getFloorCurrent());
 			if (isNameIdStatusLegal(arg2)) {
 				Info.setTableName(getSettings().getNameIndex(arg2));
 				Info.setTableId(getSettings().getIdIndex(arg2));
 				tableItemChioceDialog(arg2, getSettings().getStatusIndex(arg2));
+				Log.d("table", getSettings().getStatusIndex(arg2)+":status");
 			} else {
 				toastText("不能获取信息，请检查设备！");
 			}
-			mImageItems.notifyDataSetChanged();
 		}
 
 		private boolean isNameIdStatusLegal(int arg2) {
@@ -338,6 +341,7 @@ public class TableGridDeskActivity extends BaseActivity {
 				notificationDialog().show();
 				break;
 			default:
+				addDialog().show();
 				break;
 			}
 		}
@@ -470,6 +474,7 @@ public class TableGridDeskActivity extends BaseActivity {
 			public void run() {
 				try {
 					Message msg = new Message();
+					mTableHandler.sendEmptyMessage(DISABLE_GRIDVIEW);
 					int ret = getSettings().updateStatus(tableId,
 							TableSetting.PHONE_ORDER);
 					if (ret < 0) {
@@ -499,8 +504,8 @@ public class TableGridDeskActivity extends BaseActivity {
 			public void run() {
 				try {
 					int ret = getSettings().combineTable(
-							TableGridDeskActivity.this, Info.getTableId(), destTId,
-							mSettings.getName(Info.getTableId()),
+							  Info.getTableId(),
+							destTId, mSettings.getName(Info.getTableId()),
 							mSettings.getName(destTId), persons);
 					mCombineTIdHandler.sendEmptyMessage(ret);
 				} catch (Exception e) {
@@ -515,8 +520,8 @@ public class TableGridDeskActivity extends BaseActivity {
 			public void run() {
 				try {
 					int ret = getSettings().changeTable(
-							TableGridDeskActivity.this, Info.getTableId(), destTId,
-							getSettings().getName(Info.getTableId()),
+							  Info.getTableId(),
+							destTId, getSettings().getName(Info.getTableId()),
 							getSettings().getName(destTId), persons);
 					mChangeTIdHandler.sendEmptyMessage(ret);
 				} catch (Exception e) {
@@ -530,8 +535,7 @@ public class TableGridDeskActivity extends BaseActivity {
 		new Thread() {
 			public void run() {
 				try {
-					int ret = getSettings().getOrderFromServer(
-							TableGridDeskActivity.this, srcTId);
+					int ret = getSettings().getOrderFromServer(srcTId);
 					mCopyTIdHandler.sendEmptyMessage(ret);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -554,11 +558,30 @@ public class TableGridDeskActivity extends BaseActivity {
 	}
 
 	private int getTableStatusFromServer() {
-		int ret = getSettings().getTableStatusFromServer();
+		int ret = getSettings().getTableStatusFromServerActivity();
 		if (ret < 0) {
 			mTableHandler.sendEmptyMessage(ret);
 		}
 		return ret;
+	}
+
+	private void getParseTableSetting(final String msg) {
+		new Thread() {
+			public void run() {
+				try {
+					mTableHandler.sendEmptyMessage(DISABLE_GRIDVIEW);
+					int ret = getSettings().parseTableSetting(msg);
+					if (ret < 0) {
+						mTableHandler.sendEmptyMessage(ret);
+					} else {
+						mTableHandler.sendEmptyMessage(UPDATE_TABLE_INFOS);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}.start();
+
 	}
 
 	private boolean isStatusLegal(String tableName, int status) {
@@ -579,6 +602,7 @@ public class TableGridDeskActivity extends BaseActivity {
 	private boolean equalNameAndPersons(String changePersons, String tableName) {
 		return tableName.equals("") || changePersons.equals("");
 	}
+
 	private int getNotifiycations() {
 		int ret = mNotificaion.getNotifiycations();
 		mRingtoneHandler.sendEmptyMessage(ret);
@@ -670,8 +694,8 @@ public class TableGridDeskActivity extends BaseActivity {
 		return mTableMsg;
 	}
 
-	public void setTableMsg(int mTableMsg) {
-		this.mTableMsg = mTableMsg;
+	public void setTableMsg(String mTableMsg) {
+		getParseTableSetting(mTableMsg);
 	}
 
 	public Handler getTableHandler() {
@@ -688,15 +712,15 @@ public class TableGridDeskActivity extends BaseActivity {
 
 	public void setRingtoneHandler(Handler mRingtoneHandler) {
 		this.mRingtoneHandler = mRingtoneHandler;
+		sendRingtoneMsg();
 	}
-	
-	public void sendTableMsg(){
+
+	public void sendTableMsg() {
 		getTableHandler().sendEmptyMessage(getTableMsg());
 	}
-	
-	public void sendRingtoneMsg(){
+
+	public void sendRingtoneMsg() {
 		getRingtoneHandler().sendEmptyMessage(getRingtoneMsg());
 	}
-	
-}
 
+}

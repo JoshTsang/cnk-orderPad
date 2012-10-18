@@ -30,12 +30,20 @@ public class OrderedDish {
 		return dish.getName();
 	}
 
+	public String getUnit() {
+		return dish.getUnit();
+	}
+	
 	public int getServedQuantity() {
 		return status;
 	}
 
 	public float getQuantity() {
 		return padQuantity + phoneQuantity;
+	}
+	
+	public int getPrinter() {
+		return dish.getPrinter();
 	}
 
 	public double getPrice() {

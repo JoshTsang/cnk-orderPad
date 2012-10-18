@@ -54,8 +54,10 @@ public class Statistics {
 	private List<SalesRow> mSalesData = new ArrayList<SalesRow>(); 
 	private CnkDbHelper mCnkDbMenu;
 	private CnkDbHelper mCnkDbSales;
+	private CnkDbHelper mCnkDbUser;
 	private SQLiteDatabase mDbSales;
 	private SQLiteDatabase mDbMenu;
+	private SQLiteDatabase mDbUser;
 	private float mTotalAmount = 0;
 	private int tableUsage;
 	private int servedPersons;
@@ -68,15 +70,15 @@ public class Statistics {
 		mDbMenu = mCnkDbMenu.getReadableDatabase();
 	}
 	
-	public int downloadDB(String serverDBName) {
+	public int downloadDB(String serverDBName, String localDBName) {
 		String filePath = Environment
                 .getExternalStorageDirectory().getAbsolutePath()
                 + "/cainaoke/";
-		File file = mContext.getDatabasePath(CnkDbHelper.DB_SALES);
+		File file = mContext.getDatabasePath(localDBName);
         file.delete();
-        File fileDownload = new File(filePath + Server.DB_SALES);
+        File fileDownload = new File(filePath + localDBName);
         fileDownload.delete();
-		DBFile mDBFile = new DBFile(mContext, CnkDbHelper.DB_SALES);;
+		DBFile mDBFile = new DBFile(mContext, localDBName);;
         try {
         	FTPClient ftpClient = new FTPClient();
 
@@ -89,7 +91,7 @@ public class Statistics {
         	        ftpClient.setFileType(org.apache.commons.net.ftp.FTP.BINARY_FILE_TYPE);
         	        BufferedOutputStream buffIn = null;
         	        ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
-        	        buffIn = new BufferedOutputStream(new FileOutputStream(filePath+Server.SERVER_DB_SALES));
+        	        buffIn = new BufferedOutputStream(new FileOutputStream(filePath+localDBName));
         	        ftpClient.enterLocalPassiveMode();
         	        boolean ret = ftpClient.retrieveFile(serverDBName, buffIn);
         	        buffIn.close();
@@ -115,7 +117,7 @@ public class Statistics {
         		e.printStackTrace();
         		return ErrorNum.DOWNLOAD_DB_FAILED;
         	}
-            if (mDBFile.copyDatabase(CnkDbHelper.DB_SALES) < 0) {
+            if (mDBFile.copyDatabase(localDBName) < 0) {
             	return ErrorNum.COPY_DB_FAILED;
             }
             return 0;
@@ -327,7 +329,7 @@ public class Statistics {
 	}
 
 	private String getDishNameFromDB(int id) {
-		Cursor cur = mDbMenu.query(CnkDbHelper.DISH_TABLE_NAME, new String[] {CnkDbHelper.DISH_NAME},
+		Cursor cur = mDbMenu.query(CnkDbHelper.TABLE_DISH_INFO, new String[] {CnkDbHelper.DISH_NAME},
 				  	CnkDbHelper.DISH_ID + "=" + id, null, null, null, null);
 		
 		if (cur.moveToNext()) {
@@ -337,7 +339,13 @@ public class Statistics {
 	}
 	
 	private String getWaiterNameFromDB(int id) {
-		Cursor cur = mDbMenu.query(CnkDbHelper.USER_TABLE, new String[] {CnkDbHelper.USER_NAME},
+		if (mCnkDbUser == null) {
+			mCnkDbUser = new CnkDbHelper(mContext, CnkDbHelper.DB_USER,
+					null, 1);
+			mDbUser = mCnkDbUser.getReadableDatabase();
+		}
+		
+		Cursor cur = mDbUser.query(CnkDbHelper.USER_TABLE, new String[] {CnkDbHelper.USER_NAME},
 			  	CnkDbHelper.USER_ID + "=" + id, null, null, null, null);
 	
 		if (cur.moveToNext()) {

@@ -3,7 +3,8 @@ package com.htb.constant;
 public class Server {
 	public final static String SERVER_IP = "192.168.0.1";
 	public final static String SERVER_DOMIN = "http://" + SERVER_IP;
-	public final static String SERVER_DB_MENU = "test.db3";
+	public final static String SERVER_DB_MENU = "dish.db3";
+	public final static String SERVER_DB_USER = "user.db3";
 	public final static String SERVER_DB_SALES = "sales.db";
 	
 	public final static String FTP_USERNAME = "root";
@@ -46,6 +47,7 @@ public class Server {
 	public final static String DB_DIR = "db/";
 	public final static String DB_MENU = DB_DIR + "menu.db";
 	public final static String DB_SALES = DB_DIR + "sales.db";
+	public final static String DB_USER = DB_DIR + "user.db";
 	
 	/* other */
 	public final static String SERVER_PIC_DIR = "/upload/ftp_temp/temp/";

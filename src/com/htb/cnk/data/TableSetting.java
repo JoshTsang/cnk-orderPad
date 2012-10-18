@@ -1,12 +1,14 @@
 package com.htb.cnk.data;
 
 import java.io.Serializable;
+import java.security.Timestamp;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Timer;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,7 +32,8 @@ public class TableSetting implements Serializable {
 	public static final int MY_ORDER = 2;
 	public static final int SUBMIT = 0;
 	private int FLOOR_NUM;
-	private int FLOOR_NUM_COUNT = 0;
+	private int FLOOR_NUM_CURRENT = 10;
+	private Context mContext;
 
 	public class TableSettingItem {
 		protected int mStatus;
@@ -90,6 +93,14 @@ public class TableSetting implements Serializable {
 	private static ArrayList<HashMap<Integer, TableSettingItem>> mTableFloor = new ArrayList<HashMap<Integer, TableSettingItem>>();
 	private static List<String> checkOutPrinter = new ArrayList<String>();
 
+	public TableSetting(){
+		
+	}
+	
+	public TableSetting(Context context) {
+		mContext = context;
+	}
+
 	public void add(TableSettingItem item, List<TableSettingItem> tableItem) {
 		tableItem.add(item);
 	}
@@ -118,41 +129,41 @@ public class TableSetting implements Serializable {
 	}
 
 	public int getFloorSize() {
-		return mTableFloor.get(FLOOR_NUM_COUNT).size();
+		return mTableFloor.get(FLOOR_NUM_CURRENT).size();
 	}
 
 	public int getFloorNum() {
 		return FLOOR_NUM;
 	}
 
-	public int getFloorCount() {
-		return FLOOR_NUM_COUNT;
+	public int getFloorCurrent() {
+		return FLOOR_NUM_CURRENT;
 	}
 
-	public void setFloorCount(int num) {
-		FLOOR_NUM_COUNT = num;
+	public void setFloorCurrent(int num) {
+		FLOOR_NUM_CURRENT = num;
 	}
 
 	public int getStatusIndex(int index) {
 		if (isIndexBoundary(index)) {
-			return mTableFloor.get(FLOOR_NUM_COUNT).get(index).getStatus();
+			return mTableFloor.get(FLOOR_NUM_CURRENT).get(index).getStatus();
 		}
 		return -1;
 	}
 
 	public int getStatusTableId(int tableId) {
 		int i;
-		for (i = 0; i < mTableFloor.get(FLOOR_NUM_COUNT).size() - 1; i++) {
-			if (tableId == mTableFloor.get(FLOOR_NUM_COUNT).get(i).getId()) {
+		for (i = 0; i < mTableFloor.get(FLOOR_NUM_CURRENT).size() - 1; i++) {
+			if (tableId == mTableFloor.get(FLOOR_NUM_CURRENT).get(i).getId()) {
 				break;
 			}
 		}
-		return mTableFloor.get(FLOOR_NUM_COUNT).get(i).getStatus();
+		return mTableFloor.get(FLOOR_NUM_CURRENT).get(i).getStatus();
 	}
 
 	public int getIdIndex(int index) {
 		if (isIndexBoundary(index)) {
-			return mTableFloor.get(FLOOR_NUM_COUNT).get(index).getId();
+			return mTableFloor.get(FLOOR_NUM_CURRENT).get(index).getId();
 		}
 		return -1;
 	}
@@ -162,32 +173,32 @@ public class TableSetting implements Serializable {
 	 * @return
 	 */
 	private boolean isIndexBoundary(int index) {
-		return index >= 0 && index < mTableFloor.get(FLOOR_NUM_COUNT).size();
+		return index >= 0 && index < mTableFloor.get(FLOOR_NUM_CURRENT).size();
 	}
 
 	public int getId(int tableId) {
-		for (int i = 0; i < mTableFloor.get(FLOOR_NUM_COUNT).size(); i++) {
-			if (mTableFloor.get(FLOOR_NUM_COUNT).get(i).getId() == tableId) {
-				return mTableFloor.get(FLOOR_NUM_COUNT).get(i).getId();
+		for (int i = 0; i < mTableFloor.get(FLOOR_NUM_CURRENT).size(); i++) {
+			if (mTableFloor.get(FLOOR_NUM_CURRENT).get(i).getId() == tableId) {
+				return mTableFloor.get(FLOOR_NUM_CURRENT).get(i).getId();
 			}
 		}
 		return -1;
 	}
 
 	public int getId(String tableName) {
-		for (int i = 0; i < mTableFloor.get(FLOOR_NUM_COUNT).size(); i++) {
-			if (mTableFloor.get(FLOOR_NUM_COUNT).get(i).getName()
+		for (int i = 0; i < mTableFloor.get(FLOOR_NUM_CURRENT).size(); i++) {
+			if (mTableFloor.get(FLOOR_NUM_CURRENT).get(i).getName()
 					.equals(tableName)) {
-				return mTableFloor.get(FLOOR_NUM_COUNT).get(i).getId();
+				return mTableFloor.get(FLOOR_NUM_CURRENT).get(i).getId();
 			}
 		}
 		return -1;
 	}
 
 	public String getName(int tableId) {
-		for (int i = 0; i < mTableFloor.get(FLOOR_NUM_COUNT).size(); i++) {
-			if (mTableFloor.get(FLOOR_NUM_COUNT).get(i).getId() == tableId) {
-				return mTableFloor.get(FLOOR_NUM_COUNT).get(i).getName();
+		for (int i = 0; i < mTableFloor.get(FLOOR_NUM_CURRENT).size(); i++) {
+			if (mTableFloor.get(FLOOR_NUM_CURRENT).get(i).getId() == tableId) {
+				return mTableFloor.get(FLOOR_NUM_CURRENT).get(i).getName();
 			}
 		}
 		return null;
@@ -195,35 +206,36 @@ public class TableSetting implements Serializable {
 
 	public String getNameIndex(int index) {
 		if (isIndexBoundary(index)) {
-			return mTableFloor.get(FLOOR_NUM_COUNT).get(index).getName();
+			return mTableFloor.get(FLOOR_NUM_CURRENT).get(index).getName();
 		}
 		return null;
 	}
 
 	public String[] getNameAll() {
-		String tableName[] = new String[mTableFloor.get(FLOOR_NUM_COUNT).size()];
-		for (int i = 0; i < mTableFloor.get(FLOOR_NUM_COUNT).size(); i++) {
-			tableName[i] = mTableFloor.get(FLOOR_NUM_COUNT).get(i).getName();
+		String tableName[] = new String[mTableFloor.get(FLOOR_NUM_CURRENT)
+				.size()];
+		for (int i = 0; i < mTableFloor.get(FLOOR_NUM_CURRENT).size(); i++) {
+			tableName[i] = mTableFloor.get(FLOOR_NUM_CURRENT).get(i).getName();
 		}
 		return tableName;
 	}
 
 	public int[] getIdAll() {
-		int tableId[] = new int[mTableFloor.get(FLOOR_NUM_COUNT).size()];
-		for (int i = 0; i < mTableFloor.get(FLOOR_NUM_COUNT).size(); i++) {
-			tableId[i] = mTableFloor.get(FLOOR_NUM_COUNT).get(i).getId();
+		int tableId[] = new int[mTableFloor.get(FLOOR_NUM_CURRENT).size()];
+		for (int i = 0; i < mTableFloor.get(FLOOR_NUM_CURRENT).size(); i++) {
+			tableId[i] = mTableFloor.get(FLOOR_NUM_CURRENT).get(i).getId();
 		}
 		return tableId;
 	}
 
 	public ArrayList<HashMap<String, Object>> getTableOpen() {
 		ArrayList<HashMap<String, Object>> tableOpen = new ArrayList<HashMap<String, Object>>();
-		for (int i = 0; i < mTableFloor.get(FLOOR_NUM_COUNT).size(); i++) {
-			if (mTableFloor.get(FLOOR_NUM_COUNT).get(i).getStatus() == 1) {
+		for (int i = 0; i < mTableFloor.get(FLOOR_NUM_CURRENT).size(); i++) {
+			if (mTableFloor.get(FLOOR_NUM_CURRENT).get(i).getStatus() == 1) {
 				HashMap<String, Object> map = new HashMap<String, Object>();
-				map.put("name", mTableFloor.get(FLOOR_NUM_COUNT).get(i)
+				map.put("name", mTableFloor.get(FLOOR_NUM_CURRENT).get(i)
 						.getName());
-				map.put("id", mTableFloor.get(FLOOR_NUM_COUNT).get(i).getId());
+				map.put("id", mTableFloor.get(FLOOR_NUM_CURRENT).get(i).getId());
 				tableOpen.add(map);
 			}
 		}
@@ -232,16 +244,34 @@ public class TableSetting implements Serializable {
 
 	public void setStatus(int index, int n) {
 		if (isIndexBoundary(index)) {
-			mTableFloor.get(FLOOR_NUM_COUNT).get(index).setStatus(n);
+			mTableFloor.get(FLOOR_NUM_CURRENT).get(index).setStatus(n);
 		}
 	}
 
-	public int getTableStatusFromServer() {
+	public int getTableStatusFromServerActivity() {
 		String tableStatusPkg = Http.get(Server.GET_TABLE_STATUS, null);
+		// Log.d(TAG, tableStatusPkg);
 		if (tableStatusPkg == null) {
 			Log.e(TAG, "getTableStatusFromServer.timeout");
 			return TIME_OUT;
 		}
+		return parseTableSetting(tableStatusPkg);
+	}
+
+	public String getTableStatusFromServer() {
+		String tableStatusPkg = Http.get(Server.GET_TABLE_STATUS, null);
+		if (tableStatusPkg == null) {
+			Log.e(TAG, "getTableStatusFromServer.timeout");
+			return null;
+		}
+		return tableStatusPkg;
+	}
+
+	/**
+	 * @param tableStatusPkg
+	 * @return
+	 */
+	public int parseTableSetting(String tableStatusPkg) {
 		try {
 			JSONArray tableList = new JSONArray(tableStatusPkg);
 			int length = tableList.length();
@@ -268,7 +298,6 @@ public class TableSetting implements Serializable {
 			addFloor();
 			return 0;
 		} catch (Exception e) {
-			Log.e(TAG, tableStatusPkg);
 			e.printStackTrace();
 		}
 		return -1;
@@ -357,9 +386,9 @@ public class TableSetting implements Serializable {
 		return 0;
 	}
 
-	public int changeTable(Context context, int srcTId, int destTId,
-			String srcName, String destName, int persons) {
-		int ret = getOrderFromServer(context, srcTId);
+	public int changeTable(int srcTId, int destTId, String srcName,
+			String destName, int persons) {
+		int ret = getOrderFromServer(srcTId);
 		if (ret == -1) {
 			Log.e(TAG, "mOrder.getOrderFromServer.timeout:changeTable");
 			return TIME_OUT;
@@ -382,8 +411,8 @@ public class TableSetting implements Serializable {
 		return 0;
 	}
 
-	public int copyTable(Context context, int srcTId, int destTId, int persons) {
-		int ret = getOrderFromServer(context, srcTId);
+	public int copyTable(int srcTId, int destTId, int persons) {
+		int ret = getOrderFromServer(srcTId);
 		if (ret == -1) {
 			Log.e(TAG, "mOrder.getOrderFromServer.timeout:copyTable");
 			return TIME_OUT;
@@ -400,9 +429,8 @@ public class TableSetting implements Serializable {
 		return 0;
 	}
 
-	public int checkOut(Context context, List<Integer> srcTId,
-			List<String> tableName, Double receivable, Double income,
-			Double change) {
+	public int checkOut(List<Integer> srcTId, List<String> tableName,
+			Double receivable, Double income, Double change) {
 		int ret = Http.getPrinterStatus(Server.PRINTER_CONTENT_TYPE_ORDER);
 		if (ret < 0) {
 			return ret;
@@ -412,7 +440,7 @@ public class TableSetting implements Serializable {
 		JSONArray orderArrary = new JSONArray();
 		int i = 0;
 		for (Integer item : srcTId) {
-			ret = getOrderFromServer(context, item.intValue());
+			ret = getOrderFromServer(item.intValue());
 			if (ret == -1) {
 				Log.e(TAG, "mOrder.getOrderFromServer.timeout:checkOut");
 				return TIME_OUT;
@@ -445,9 +473,9 @@ public class TableSetting implements Serializable {
 		return 0;
 	}
 
-	public int combineTable(Context context, int srcTId, int destTId,
-			String srcName, String destName, int persons) {
-		int ret = getOrderFromServer(context, srcTId);
+	public int combineTable(int srcTId, int destTId, String srcName,
+			String destName, int persons) {
+		int ret = getOrderFromServer(srcTId);
 		if (ret == -1) {
 			Log.e(TAG, "mOrder.getOrderFromServer.timeout:combineTable");
 			return TIME_OUT;
@@ -475,14 +503,14 @@ public class TableSetting implements Serializable {
 		return 0;
 	}
 
-	public double getTotalPriceTable(Context context, List<Integer> srcTId,
+	public double getTotalPriceTable(List<Integer> srcTId,
 			List<String> tableName) {
 		double totalPrice = 0;
 		String time = getCurrentTime();
 		int i = 0;
 		checkOutPrinter.clear();
 		for (Integer item : srcTId) {
-			int ret = getOrderFromServer(context, item.intValue());
+			int ret = getOrderFromServer(item.intValue());
 			if (ret == -1) {
 				Log.e(TAG,
 						"mOrder.getOrderFromServer.timeout:getTotalPriceTable");
@@ -629,9 +657,9 @@ public class TableSetting implements Serializable {
 		}
 	}
 
-	public int getOrderFromServer(Context context, int srcTId) {
+	public int getOrderFromServer(int srcTId) {
 		if (mOrder == null) {
-			mOrder = new MyOrder(context);
+			mOrder = new MyOrder(mContext);
 		} else {
 			mOrder.clear();
 		}

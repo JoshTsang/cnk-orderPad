@@ -358,7 +358,7 @@ public class MenuBaseActivity extends BaseActivity {
 
 		void setData(Dish dishDetail) {
 			dishName.setText(dishDetail.getName());
-			dishPrice.setText(Double.toString(dishDetail.getPrice()) + " 元/份");
+			dishPrice.setText(Double.toString(dishDetail.getPrice()) + " 元/" + dishDetail.getUnit());
 			float orderCount = mMyOrder.getOrderedCount(dishDetail.getId());
 			if (orderCount > 0) {
 				orderedCount.setText(MyOrder.convertFloat(orderCount));

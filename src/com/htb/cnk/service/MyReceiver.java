@@ -27,12 +27,8 @@ public class MyReceiver extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		Bundle bundle = intent.getExtras();
-		tableDeskReceiver.setSettings((TableSetting) bundle
-				.getSerializable(NotificationTableService.SER_KEY));
 		tableDeskReceiver.setRingtoneMsg(bundle.getInt("ringtoneMessage"));
-		tableDeskReceiver.setTableMsg(bundle.getInt("tableMessage"));
+		tableDeskReceiver.setTableMsg(bundle.getString("tableMessage"));
 		tableDeskReceiver.sendRingtoneMsg();
-		tableDeskReceiver.sendTableMsg();
-		Log.d(TAG, TAG+bundle.getInt("tableMessage"));
 	}
 }

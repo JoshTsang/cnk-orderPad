@@ -55,16 +55,16 @@ public class TableBaseActivity extends TableGridDeskActivity {
 		NETWORK_ARERTDIALOG = 1;
 		mNetWrorkcancel = mNetWrorkAlertDialog.setMessage(messages).show();
 	}
-	
+
 	protected Builder listTableNameDialog(final int type) {
 		final List<Integer> tableId = new ArrayList<Integer>();
 		final List<String> tableNameStr = new ArrayList<String>();
 		ArrayList<HashMap<String, Object>> checkOut = getSettings()
 				.getTableOpen();
 		if (checkOut.size() <= 0) {
-			 return mTitleAndMessageDialog.messageDialog(false,
-					getResources().getString(R.string.tableNotOpen),
-					getResources().getString(R.string.ok), null, null, null);
+			return mTitleAndMessageDialog.messageDialog(false, getResources()
+					.getString(R.string.tableNotOpen), getResources()
+					.getString(R.string.ok), null, null, null);
 		}
 		setNameAndId(tableId, tableNameStr, checkOut);
 		final boolean selected[] = new boolean[getSettings().size()];
@@ -112,13 +112,13 @@ public class TableBaseActivity extends TableGridDeskActivity {
 			tableId.add(item.get("id").hashCode());
 		}
 	}
-		
+
 	void getTotalPriceTable() {
 		new Thread() {
 			public void run() {
 				try {
 					double ret = getSettings().getTotalPriceTable(
-							TableBaseActivity.this, selectedTable, tableName);
+							selectedTable, tableName);
 					mTotalPriceTableHandler.sendEmptyMessage((int) ret);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -127,14 +127,14 @@ public class TableBaseActivity extends TableGridDeskActivity {
 		}.start();
 	}
 
-	public  void checkOut(final List<Integer> destIId,
+	public void checkOut(final List<Integer> destIId,
 			final List<String> tableName, final Double receivable,
 			final Double income, final Double change) {
 		new Thread() {
 			public void run() {
 				try {
-					int ret = mSettings.checkOut(TableBaseActivity.this,
-							destIId, tableName, receivable, income, change);
+					int ret = getSettings().checkOut(destIId, tableName,
+							receivable, income, change);
 					mCheckOutHandler.sendEmptyMessage(ret);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -142,7 +142,7 @@ public class TableBaseActivity extends TableGridDeskActivity {
 			}
 		}.start();
 	}
-	
+
 	protected OnClickListener checkOutClicked = new OnClickListener() {
 
 		@Override
@@ -163,7 +163,7 @@ public class TableBaseActivity extends TableGridDeskActivity {
 
 		@Override
 		public void onClick(View v) {
-			TableBaseActivity.this.finish();
+			finish();
 		}
 	};
 
@@ -186,6 +186,6 @@ public class TableBaseActivity extends TableGridDeskActivity {
 			Info.setTableId(-1);
 			finish();
 		}
-	};	
+	};
 
 }

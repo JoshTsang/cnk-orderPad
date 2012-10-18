@@ -77,7 +77,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 
 				dishName.setText(dishDetail.getName());
 				dishPrice.setText(Double.toString(dishDetail.getPrice())
-						+ " 元/份");
+						+ " 元/" + dishDetail.getUnit());
 				dishQuantity.setText(MyOrder.convertFloat(dishDetail
 						.getQuantity()));
 

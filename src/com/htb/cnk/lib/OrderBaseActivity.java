@@ -58,7 +58,7 @@ public class OrderBaseActivity extends BaseActivity {
 		setContentView(R.layout.myorder_activity);
 		mMyOrder = new PhoneOrder(OrderBaseActivity.this);
 		mNetworkDialog = new TitleAndMessageDialog(OrderBaseActivity.this);
-		mSettings = new TableSetting();
+		mSettings = new TableSetting(OrderBaseActivity.this);
 		getPersons();
 		getFLavor();
 		findViews();

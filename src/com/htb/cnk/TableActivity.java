@@ -4,18 +4,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import android.app.LauncherActivity.ListItem;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -23,7 +18,9 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
 
+import com.hp.hpl.sparta.Text;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.TableInfo;
 import com.htb.cnk.lib.ScrollLayout;
@@ -37,20 +34,20 @@ public class TableActivity extends TableBaseActivity {
 	private final String IMAGE_ITEM = "imageItem";
 	private final String ITEM_TEXT = "ItemText";
 
-	private ArrayList<HashMap<String, Object>> lstImageItem;
+//	private ArrayList<HashMap<String, Object>> lstImageItem = new ArrayList<HashMap<String, Object>>();;
 	protected Button mBackBtn;
 	protected Button mUpdateBtn;
 	protected Button mStatisticsBtn;
 	protected Button mManageBtn;
 	protected GridView mGridView;
-	private static int floorNum;
 
 	private int PageCount;
 	private ScrollLayout curPage;
 	private LinearLayout layoutBottom;
 	private List<TableInfo> lstDate = new ArrayList<TableInfo>();
-	private TableInfo info = new TableInfo();
-	private ImageView imgCur;
+	private List<SimpleAdapter> mAdapterList = new ArrayList<SimpleAdapter>();
+	private TextView imgCur;
+	private boolean flag = false;
 
 	@Override
 	protected void onResume() {
@@ -66,30 +63,31 @@ public class TableActivity extends TableBaseActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
-		this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-				WindowManager.LayoutParams.FLAG_FULLSCREEN);
+	
 		Info.setMode(Info.WORK_MODE_WAITER);
 		setContentView(R.layout.table_activity);
-		// setViewPager();
 		findViews();
 		setClickListeners();
 		handler();
 	}
 
-	private void setGrid() {
+	private void setGridView() {
 		curPage = (ScrollLayout) findViewById(R.id.scr);
 		layoutBottom = (LinearLayout) findViewById(R.id.layout_scr_bottom);
+		imgCur.setText("1楼");
+		layoutBottom.addView(imgCur);
 		curPage.getLayoutParams().height = this.getWindowManager()
-				.getDefaultDisplay().getHeight() * 2 / 3;
-		if (mGridView != null) {
-			curPage.removeAllViews();
-		}
+				.getDefaultDisplay().getHeight() * 4 / 5;
 		setTableInfos();
 		curPage.setPageListener(new ScrollLayout.PageListener() {
 			@Override
 			public void page(int page) {
+				if (page < 0) {
+					return;
+				}
 				setCurPage(page);
+				mGridView = (GridView) curPage.getChildAt(page);
+				setGridViewAdapter(page);
 			}
 		});
 	}
@@ -99,16 +97,9 @@ public class TableActivity extends TableBaseActivity {
 	 */
 	public void setCurPage(int page) {
 		layoutBottom.removeAllViews();
-		for (int i = 0; i < PageCount; i++) {
-			imgCur = new ImageView(TableActivity.this);
-			imgCur.setBackgroundResource(R.drawable.bg_img_item);
-			imgCur.setId(i);
-			// 判断当前页码来更新
-			if (imgCur.getId() == page) {
-				imgCur.setBackgroundResource(R.drawable.bg_img_item_true);
-			}
-			layoutBottom.addView(imgCur);
-		}
+		imgCur.setText(page + 1 + "楼");
+		layoutBottom.addView(imgCur);
+		getSettings().setFloorCurrent(page);
 	}
 
 	private void handler() {
@@ -127,8 +118,7 @@ public class TableActivity extends TableBaseActivity {
 		mUpdateBtn = (Button) findViewById(R.id.checkOutTable);
 		mStatisticsBtn = (Button) findViewById(R.id.logout);
 		mManageBtn = (Button) findViewById(R.id.management);
-		// mGridView = (GridView) findViewById(R.id.gridview);
-
+		imgCur = new TextView(TableActivity.this);
 	}
 
 	protected void setClickListeners() {
@@ -137,6 +127,7 @@ public class TableActivity extends TableBaseActivity {
 		mStatisticsBtn.setOnClickListener(logoutClicked);
 		mManageBtn.setOnClickListener(manageClicked);
 		mNetWrorkAlertDialog = networkDialog();
+
 	}
 
 	Handler changeTIdHandler = new Handler() {
@@ -262,14 +253,18 @@ public class TableActivity extends TableBaseActivity {
 			} else {
 				switch (msg.what) {
 				case UPDATE_TABLE_INFOS:
-					setGrid();
+					if (!flag) {
+						setGridView();
+					}
+					updateGrid(getSettings().getFloorCurrent());
+					flag = true;
 					if (getSettings().hasPendedPhoneOrder()) {
 						ringtoneHandler.sendEmptyMessage(1);
 					}
 					break;
 				case DISABLE_GRIDVIEW:
-					if(mGridView != null)
-					mGridView.setOnItemClickListener(null);
+					if (mGridView != null)
+						mGridView.setOnItemClickListener(null);
 					break;
 				default:
 					break;
@@ -278,91 +273,52 @@ public class TableActivity extends TableBaseActivity {
 		}
 	};
 
+	private void updateGrid(int page) {
+		mGridView = (GridView) curPage.getChildAt(page);
+		Log.d(TAG, "page:" + page);
+		setGridViewAdapter(page);
+	}
+
 	protected void setTableInfos() {
 		PageCount = getSettings().getFloorNum();
 		if (mGridView != null) {
 			curPage.removeAllViews();
 		}
-		for (floorNum = 0; floorNum < PageCount; floorNum++) {
+		TableInfo tableInfo = new TableInfo();
+		for (int floorNum = 0; floorNum < PageCount; floorNum++) {
 			mGridView = new GridView(TableActivity.this);
-			lstImageItem = new ArrayList<HashMap<String, Object>>();
-			if (lstImageItem.size() > 0) {
-				setStatusAndIcon(floorNum);
-			} else {
-				setStatusAndIcon(floorNum);
-				mImageItems = new SimpleAdapter(TableActivity.this,
-						lstImageItem, R.layout.table_item, new String[] {
-								IMAGE_ITEM, ITEM_TEXT }, new int[] {
-								R.id.ItemImage, R.id.ItemText }) {
-				};
-				mGridView.setAdapter(mImageItems);
-			}
+			tableInfo.addGridItem(floorNum, mNotificaion);
+			lstDate.add(tableInfo);
+			mImageItems = new SimpleAdapter(TableActivity.this, lstDate.get(floorNum).getGridItem(),
+					R.layout.table_item,
+					new String[] { IMAGE_ITEM, ITEM_TEXT }, new int[] {
+							R.id.ItemImage, R.id.ItemText }) {
+			};
+			mAdapterList.add(mImageItems);
+			mGridView.setAdapter(mImageItems);
+			mImageItems.notifyDataSetChanged();
 			mGridView.setNumColumns(6);
 			mGridView.setHorizontalSpacing(10);
 			mGridView.setVisibility(View.VISIBLE);
 			mGridView.setOnItemClickListener(tableItemClickListener);
+			mGridView.setTag(floorNum);
 			curPage.addView(mGridView);
 		}
+		getSettings().setFloorCurrent(0);
 	}
 
-	private void setStatusAndIcon(int floorNum) {
-		getSettings().setFloorCount(floorNum);
-		int tableSize = getSettings().getFloorSize();
-		for (int i = 0, n = 0; i < tableSize; i++) {
-			int status = getSettings().getStatusIndex(i);
-			if (status < Table.NOTIFICATION_STATUS
-					&& mNotificaion.getId(n) == getSettings().getIdIndex(i)) {
-				status = status + Table.NOTIFICATION_STATUS;
-				n++;
-			}
-			setTableIcon(i, status);
-		}
-	}
+	/**
+	 * @param page
+	 */
+	private void setGridViewAdapter(int page) {
 
-	private void setTableIcon(int position, int status) {
-		HashMap<String, Object> map;
-		if (lstImageItem.size() <= position) {
-			map = new HashMap<String, Object>();
-			map.put(ITEM_TEXT, getSettings().getNameIndex(position));
-		} else {
-			map = lstImageItem.get(position);
-		}
-
-		imageItemSwitch(position, status, map);
-		if (lstImageItem.size() <= position) {
-			lstImageItem.add(map);
-		}
-	}
-
-	private void imageItemSwitch(int position, int status,
-			HashMap<String, Object> map) {
-		switch (status) {
-		case 0:
-			map.put(IMAGE_ITEM, R.drawable.table_red);
-			break;
-		case 1:
-			map.put(IMAGE_ITEM, R.drawable.table_blue);
-			break;
-		case 50:
-		case 51:
-			map.put(IMAGE_ITEM, R.drawable.table_yellow);
-			break;
-		case 100:
-			map.put(IMAGE_ITEM, R.drawable.table_rednotification);
-			getSettings().setStatus(position, status);
-			break;
-		case 101:
-			map.put(IMAGE_ITEM, R.drawable.table_bluenotification);
-			getSettings().setStatus(position, status);
-			break;
-		case 150:
-		case 151:
-			map.put(IMAGE_ITEM, R.drawable.table_yellownotification);
-			getSettings().setStatus(position, status);
-			break;
-		default:
-			map.put(IMAGE_ITEM, R.drawable.table_red);
-			break;
-		}
+//		if (lstImageItem.size() > 0) {
+//			setStatusAndIcon(page);
+//		}
+		
+		lstDate.get(page).addGridItem(page, mNotificaion);
+		mGridView.setOnItemClickListener(tableItemClickListener);
+		SimpleAdapter currentPageAdapter = mAdapterList.get(page);
+		currentPageAdapter.notifyDataSetChanged();
 	}
 }

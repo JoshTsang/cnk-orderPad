@@ -45,31 +45,18 @@ public class NotificationTableService extends Service {
 	class tableThread implements Runnable {
 		public void run() {
 			try {
-				tableHandle.sendEmptyMessage(DISABLE_GRIDVIEW);
-				//TODO
-//				int ret = mNotificaion.getNotifiycations();
-//				intent.putExtra("ringtoneMessage", ret);
-				int ret = mSettings.getTableStatusFromServer();
-				if (ret < 0) {
-					tableHandle.sendEmptyMessage(ret);
-				} else {
-					tableHandle.sendEmptyMessage(UPDATE_TABLE_INFOS);
-				}
+				int notification = mNotificaion.getNotifiycations();
+				intent.putExtra("ringtoneMessage", notification);
+				String ret = mSettings.getTableStatusFromServer();
+				intent.putExtra("tableMessage", ret);
+				intent.putExtras(bundle);
+				sendBroadcast(intent);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 
 		}
 	}
-
-	private Handler tableHandle = new Handler() {
-		public void handleMessage(Message msg) {
-			intent.putExtra("tableMessage", msg.what);
-			bundle.putSerializable(SER_KEY, mSettings);
-			intent.putExtras(bundle);
-			sendBroadcast(intent);
-		}
-	};
 
 	@Override
 	public void onCreate() {

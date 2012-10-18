@@ -6,10 +6,15 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.htb.cnk.adapter.StatisticsAdapter;
+import com.htb.cnk.data.CnkDbHelper;
 import com.htb.cnk.data.MyOrder;
+import com.htb.cnk.lib.Http;
 import com.htb.cnk.lib.StatisticsBaseActivity;
+import com.htb.constant.ErrorNum;
+import com.htb.constant.Server;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,16 +23,37 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class StuffPerformanceActivity extends StatisticsBaseActivity {
-
+	final static String TAG = "StuffPerformanceActivity";
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
+		downloadUserInfo();
 		setViews();
 		setPerClickListener();
 		setAdapter();
 	}
 
+	private void downloadUserInfo() {
+		showProgressDlg("正在加载销售数据...");
+		new Thread() {
+			public void run() {
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				int ret = mStatistics.downloadDB(Server.SERVER_DB_USER, CnkDbHelper.DB_USER);
+				if (ret < 0) {
+					handler.sendEmptyMessage(ret);
+					Log.e(TAG, "Download sales db failed:" + ret);
+					return;
+				}
+			}
+		}.start();
+	}
+	
 	private void setViews() {
 		
 	}

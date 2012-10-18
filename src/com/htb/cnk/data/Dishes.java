@@ -22,11 +22,13 @@ public class Dishes {
 	final static int NAME_COLUMN = 1;
 	final static int PRICE_COLUMN = 2;
 	final static int PIC_COLUMN = 3;
+	final static int PRINTER_COLUMN = 4;
+	final static int UNIT_NAME = 5;
 	
 	private List<Dish> mDishes = new ArrayList<Dish>();
 	private List<Integer> mSoldOutItemsId = new ArrayList<Integer>();
 	private int mCategoryId;
-	private String mTableName = "";
+	//private String mTableName = "";
 	private CnkDbHelper mCnkDbHelper;
 	private SQLiteDatabase mDb;
 	private Context mContext;
@@ -35,9 +37,11 @@ public class Dishes {
 		mContext = context;
 	}
 
-	public int setCategory(int categoryId, String tableName) {
+	public int setCategory(int categoryId) {
+		if (mCategoryId == categoryId) {
+			return 0;
+		}
 		mCategoryId = categoryId;
-		mTableName = tableName;
 		mDishes.clear();
 		int ret = fillCategoriesData();
 		if (ret < 0) {
@@ -68,8 +72,29 @@ public class Dishes {
 	public void clear() {
 		mDishes.clear();
 	}
-
+	
 	private int fillCategoriesData() {
+		int ret = connectDB();
+		if (ret < 0) {
+			return ret;
+		}
+		
+		try {
+			Cursor dishes = getDishesFromDataBase(mCategoryId);
+			while (dishes.moveToNext()) {
+				mDishes.add(new Dish(dishes.getInt(ID_COLUMN), dishes
+						.getString(NAME_COLUMN), dishes.getFloat(PRICE_COLUMN),
+						dishes.getString(PIC_COLUMN), dishes.getString(UNIT_NAME), dishes
+								.getInt(PRINTER_COLUMN)));
+			}
+			return 0;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ErrorNum.DB_BROKEN;
+		}
+	}
+
+	private int connectDB() {
 		if (mCnkDbHelper == null) {
 			try {
 				mCnkDbHelper = new CnkDbHelper(mContext, CnkDbHelper.DB_MENU,
@@ -79,26 +104,30 @@ public class Dishes {
 				e.printStackTrace();
 				return ErrorNum.DB_BROKEN;
 			}
+		} else if (mDb == null) {
+			mDb = mCnkDbHelper.getReadableDatabase();
 		}
-		try {
-			Cursor dishes = getDishesFromDataBase(mTableName);
-			while (dishes.moveToNext()) {
-				mDishes.add(new Dish(dishes.getInt(ID_COLUMN), dishes
-						.getString(NAME_COLUMN),
-						dishes.getFloat(PRICE_COLUMN), dishes
-								.getString(PIC_COLUMN)));
-			}
-			return 0;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return ErrorNum.DB_BROKEN;
-		}
+		
+		return 0;
 	}
 
-	private Cursor getDishesFromDataBase(String tableName) {
-		return mDb.query(tableName, new String[] { CnkDbHelper.DISH_ID,
-				CnkDbHelper.DISH_NAME, CnkDbHelper.DISH_PRICE,
-				CnkDbHelper.DISH_PIC }, null, null, null, null, null);
+	private Cursor getDishesFromDataBase(int categoryId) {
+		String sql = String
+				.format("SELECT %s.%s, %s, %s, %s, %s, %s FROM %s,%s,%s Where %s.%s=%s.%s and %s.%s=%d and %s.%s=%s",
+						CnkDbHelper.TABLE_DISH_INFO, CnkDbHelper.DISH_ID,
+						CnkDbHelper.DISH_NAME,
+						CnkDbHelper.DISH_PRICE,
+						CnkDbHelper.DISH_PIC,
+						CnkDbHelper.DISH_PRINTER,
+						CnkDbHelper.UNIT_NAME,
+						CnkDbHelper.TABLE_DISH_INFO,
+						CnkDbHelper.TABLE_DISH_CATEGORY,
+						CnkDbHelper.TABLE_UNIT,
+						CnkDbHelper.TABLE_DISH_INFO, CnkDbHelper.DISH_ID,
+						CnkDbHelper.TABLE_DISH_CATEGORY,CnkDbHelper.DC_DISH_ID,
+						CnkDbHelper.TABLE_DISH_CATEGORY, CnkDbHelper.CATEGORY_ID, categoryId,
+						CnkDbHelper.TABLE_UNIT, "id", CnkDbHelper.UNIT_ID);
+		return mDb.rawQuery(sql, null);
 	}
 
 	private int removeSoldOutItems(int id) {
@@ -152,6 +181,7 @@ public class Dishes {
 	protected void finalize() throws Throwable {
 		if (mDb != null) {
 			mDb.close();
+			mDb = null;
 		}
 		super.finalize();
 	}

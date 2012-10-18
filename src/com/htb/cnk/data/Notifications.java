@@ -69,7 +69,6 @@ public class Notifications {
 
 	public int getNotifiycations() {
 		String notificationPkg = Http.get(Server.GET_NOTIFICATION, null);
-		Log.d("get", notificationPkg);
 		if (notificationPkg == null || "".equals(notificationPkg)) {
 			return TIME_OUT;
 		} else if ("null".equals(notificationPkg)) {
