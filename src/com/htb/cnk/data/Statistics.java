@@ -93,6 +93,7 @@ public class Statistics {
         	        ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
         	        buffIn = new BufferedOutputStream(new FileOutputStream(filePath+localDBName));
         	        ftpClient.enterLocalPassiveMode();
+        	        Log.i(TAG, "downloading db, src:"+serverDBName+" dest:"+filePath+localDBName);
         	        boolean ret = ftpClient.retrieveFile(serverDBName, buffIn);
         	        buffIn.close();
         	        ftpClient.logout();
@@ -158,6 +159,7 @@ public class Statistics {
 				mTotalAmount += resultSet.getFloat(TOTAL_AMOUNT);
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			return -1;
 		}
 		
@@ -195,6 +197,7 @@ public class Statistics {
 				mTotalAmount += resultSet.getFloat(TOTAL_AMOUNT);
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			return -1;
 		}
 		
@@ -306,7 +309,7 @@ public class Statistics {
 	public String getWaiterName(int uid) {
 		String name = getWaiterNameFromDB(uid);
 		if (name == null) {
-			return "菜名错误";
+			return "服务员名称错误";
 		}
 		return name;
 	}
@@ -315,6 +318,10 @@ public class Statistics {
 	protected void finalize() throws Throwable {
 		mDbMenu.close();
 		if (mCnkDbSales != null) {
+			mDbSales.close();
+		}
+		
+		if (mCnkDbUser != null) {
 			mDbSales.close();
 		}
 		super.finalize();

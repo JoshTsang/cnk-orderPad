@@ -118,7 +118,7 @@ public class StatisticsBaseActivity extends BaseActivity {
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-				int ret = mStatistics.downloadDB(Server.SERVER_DB_SALES, CnkDbHelper.SALES_DATA);
+				int ret = mStatistics.downloadDB(Server.SERVER_DB_SALES, CnkDbHelper.DB_SALES);
 				if (ret < 0) {
 					handler.sendEmptyMessage(ret);
 					Log.e(TAG, "Download sales db failed:" + ret);
@@ -332,6 +332,17 @@ public class StatisticsBaseActivity extends BaseActivity {
 					popUpDlg("错误", "下载销售数据失败,错误码:" + msg.what, true);
 					Log.e(TAG, "unknow error num");
 				}
+			}
+		}
+	};
+	
+	protected Handler handlerPrint = new Handler() {
+		public void handleMessage(Message msg) {
+			mpDialog.cancel();
+			if (msg.what < 0) {
+				popUpDlg("错误", "打印出现错误,请检查打印机" + msg.what, false);
+			} else {
+				popUpDlg("完成", "打印完成", false);
 			}
 		}
 	};

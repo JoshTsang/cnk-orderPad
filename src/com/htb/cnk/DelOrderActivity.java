@@ -119,9 +119,16 @@ public class DelOrderActivity extends OrderBaseActivity {
 
 	private void delDishAlert(final int position) {
 		String messages;
+		
 		if (position == CLEANALL) {
 			messages = "确认退掉所有菜品";
 		} else {
+			if ("斤".equals(mMyOrder.getOrderedDish(position).getUnit())) {
+				new AlertDialog.Builder(DelOrderActivity.this).setCancelable(false)
+				.setTitle("提示").setMessage("该菜品无法退回！")
+				.setPositiveButton("确定", null).show();
+				return;
+			}
 			messages = "确认退菜：" + mMyOrder.getOrderedDish(position).getName();
 		}
 		delDishDialog(position, messages);
@@ -192,15 +199,21 @@ public class DelOrderActivity extends OrderBaseActivity {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
 			if (msg.what < 0) {
-				if (msg.what == -2) {
+				switch (msg.what) {
+				case -2:
 					toastText(R.string.notClean);
-				} else {
-					delHanderError(msg);
+					break;
+				case MyOrder.NOTHING_TO_DEL:
+					toastText(R.string.nothingToDel);
+					break;
+				default:
+					break;
 				}
 			} else {
 				mMyOrder.clear();
 				fillDelData();
 				mMyOrderAdapter.notifyDataSetChanged();
+				getOrderThread();
 			}
 		}
 	};

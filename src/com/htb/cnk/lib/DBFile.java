@@ -51,11 +51,11 @@ public class DBFile {
         File backup = new File(exportDir, dbFile.getName());
         try {
             fileCopy(backup, dbFile);
-            Log.i(TAG, "copy db to db dir:success");
+            Log.i(TAG, "copy db to db dir:success,src:"+exportDir+dbFile.getName()+" dest"+dbFile.getPath());
             return 0;
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e(TAG, "copy db to db dir:fail");
+            Log.e(TAG, "copy db to db dir:fail,src:"+exportDir+dbFile.getName()+" dest"+dbFile.getPath());
             return -1;
         }
         

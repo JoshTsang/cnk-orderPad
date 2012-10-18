@@ -1,14 +1,12 @@
 package com.htb.cnk.data;
 
 import java.io.Serializable;
-import java.security.Timestamp;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Timer;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -649,6 +647,7 @@ public class TableSetting implements Serializable {
 				dish.put("name", mOrder.getName(i));
 				dish.put("price", mOrder.getPrice(i));
 				dish.put("quan", mOrder.getQuantity(i));
+				dish.put("printer", mOrder.getPrinter(i));
 				dishes.put(dish);
 			}
 			order.put("order", dishes);

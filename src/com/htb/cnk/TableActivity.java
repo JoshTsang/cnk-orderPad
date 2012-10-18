@@ -34,7 +34,6 @@ public class TableActivity extends TableBaseActivity {
 	private final String IMAGE_ITEM = "imageItem";
 	private final String ITEM_TEXT = "ItemText";
 
-//	private ArrayList<HashMap<String, Object>> lstImageItem = new ArrayList<HashMap<String, Object>>();;
 	protected Button mBackBtn;
 	protected Button mUpdateBtn;
 	protected Button mStatisticsBtn;
@@ -63,7 +62,7 @@ public class TableActivity extends TableBaseActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-	
+
 		Info.setMode(Info.WORK_MODE_WAITER);
 		setContentView(R.layout.table_activity);
 		findViews();
@@ -289,15 +288,15 @@ public class TableActivity extends TableBaseActivity {
 			mGridView = new GridView(TableActivity.this);
 			tableInfo.addGridItem(floorNum, mNotificaion);
 			lstDate.add(tableInfo);
-			mImageItems = new SimpleAdapter(TableActivity.this, lstDate.get(floorNum).getGridItem(),
-					R.layout.table_item,
-					new String[] { IMAGE_ITEM, ITEM_TEXT }, new int[] {
-							R.id.ItemImage, R.id.ItemText }) {
+			mImageItems = new SimpleAdapter(TableActivity.this, lstDate.get(
+					floorNum).getGridItem(), R.layout.table_item, new String[] {
+					IMAGE_ITEM, ITEM_TEXT }, new int[] { R.id.ItemImage,
+					R.id.ItemText }) {
 			};
 			mAdapterList.add(mImageItems);
 			mGridView.setAdapter(mImageItems);
 			mImageItems.notifyDataSetChanged();
-			mGridView.setNumColumns(6);
+			mGridView.setNumColumns(4);
 			mGridView.setHorizontalSpacing(10);
 			mGridView.setVisibility(View.VISIBLE);
 			mGridView.setOnItemClickListener(tableItemClickListener);
@@ -312,10 +311,6 @@ public class TableActivity extends TableBaseActivity {
 	 */
 	private void setGridViewAdapter(int page) {
 
-//		if (lstImageItem.size() > 0) {
-//			setStatusAndIcon(page);
-//		}
-		
 		lstDate.get(page).addGridItem(page, mNotificaion);
 		mGridView.setOnItemClickListener(tableItemClickListener);
 		SimpleAdapter currentPageAdapter = mAdapterList.get(page);
