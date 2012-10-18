@@ -118,7 +118,7 @@ public class StatisticsBaseActivity extends BaseActivity {
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-				int ret = mStatistics.downloadDB(Server.SERVER_DB_SALES, CnkDbHelper.SALES_DATA);
+				int ret = mStatistics.downloadDB(Server.SERVER_DB_SALES, CnkDbHelper.DB_SALES);
 				if (ret < 0) {
 					handler.sendEmptyMessage(ret);
 					Log.e(TAG, "Download sales db failed:" + ret);
