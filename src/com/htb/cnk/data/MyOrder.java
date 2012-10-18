@@ -146,6 +146,10 @@ public class MyOrder {
 	public float getQuantity(int index) {
 		return mOrder.get(index).getQuantity();
 	}
+	
+	public int getPrinter(int index) {
+		return mOrder.get(index).getPrinter();
+	}
 
 	public double getPrice(int index) {
 		return mOrder.get(index).getPrice();
