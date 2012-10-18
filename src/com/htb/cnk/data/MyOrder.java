@@ -27,6 +27,7 @@ public class MyOrder {
 	public final static int RET_NULL_PHONE_ORDER = 1;
 	public final static int RET_MINUS_SUCC = -2;
 	public final static int DEL_ALL_ORDER = -1;
+	public final static int NOTHING_TO_DEL = -4;
 	
 	public final static int UPDATE_ORDER = 1;
 	public final static int DEL_ITEM_ORDER = 2;
@@ -144,6 +145,10 @@ public class MyOrder {
 
 	public float getQuantity(int index) {
 		return mOrder.get(index).getQuantity();
+	}
+	
+	public int getPrinter(int index) {
+		return mOrder.get(index).getPrinter();
 	}
 
 	public double getPrice(int index) {
@@ -439,17 +444,22 @@ public class MyOrder {
 
 		JSONArray dishes = new JSONArray();
 		try {
-
 			if (type == DEL_ALL_ORDER) {
 				for (int i = 0; i < mOrder.size(); i++) {
+					if ("斤".equals(mOrder.get(i).dish.getUnit())) {
+						continue;
+					}
 					JSONObject dish = new JSONObject();
 					dish.put("dishId", mOrder.get(i).dish.getId());
 					dish.put("name", mOrder.get(i).dish.getName());
 					dish.put("price", mOrder.get(i).dish.getPrice());
-					dish.put(
-							"quan",
+					dish.put("quan",
 							(mOrder.get(i).padQuantity + mOrder.get(i).phoneQuantity));
+					dish.put("printer", mOrder.get(i).getPrinter());
 					dishes.put(dish);
+				}
+				if (dishes.length() <= 0) {
+					return NOTHING_TO_DEL;
 				}
 			} else {
 				JSONObject dish = new JSONObject();
@@ -463,6 +473,7 @@ public class MyOrder {
 					dish.put("quan", 1);
 				}
 
+				dish.put("printer", mOrder.get(position).getPrinter());
 				dishes.put(dish);
 			}
 			order.put("order", dishes);
@@ -472,6 +483,7 @@ public class MyOrder {
 		if (type == DEL_ALL_ORDER) {
 			response = Http.post(Server.DEL_ORDER, order.toString());
 		} else {
+			Log.d(TAG, order.toString());
 			response = Http.post(
 					Server.UPDATE_TABLE_ORDER + "?TID=" + Info.getTableId()
 							+ "&DID=" + mOrder.get(position).dish.getId()

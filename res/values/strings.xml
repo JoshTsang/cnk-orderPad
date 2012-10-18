@@ -53,6 +53,7 @@
     <string name="delWarning">亲：还没有点菜！请点菜嘛！</string>
     <string name="cleanAllWarning">亲：已经删除完了，不要再删了！</string>
 	<string name="notClean">菜都上完，不能再退了</string>
+	<string name="nothingToDel">没有可以退的菜</string>
     <!-- order -->
     <string name="continueOrder">继续点菜</string>
     <string name="phoneOrder">手机点的菜</string>

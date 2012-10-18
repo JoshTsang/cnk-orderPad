@@ -649,6 +649,7 @@ public class TableSetting implements Serializable {
 				dish.put("name", mOrder.getName(i));
 				dish.put("price", mOrder.getPrice(i));
 				dish.put("quan", mOrder.getQuantity(i));
+				dish.put("printer", mOrder.getPrinter(i));
 				dishes.put(dish);
 			}
 			order.put("order", dishes);

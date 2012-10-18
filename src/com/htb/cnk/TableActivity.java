@@ -34,7 +34,6 @@ public class TableActivity extends TableBaseActivity {
 	private final String IMAGE_ITEM = "imageItem";
 	private final String ITEM_TEXT = "ItemText";
 
-//	private ArrayList<HashMap<String, Object>> lstImageItem = new ArrayList<HashMap<String, Object>>();;
 	protected Button mBackBtn;
 	protected Button mUpdateBtn;
 	protected Button mStatisticsBtn;
