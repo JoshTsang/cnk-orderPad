@@ -335,6 +335,17 @@ public class StatisticsBaseActivity extends BaseActivity {
 			}
 		}
 	};
+	
+	protected Handler handlerPrint = new Handler() {
+		public void handleMessage(Message msg) {
+			mpDialog.cancel();
+			if (msg.what < 0) {
+				popUpDlg("错误", "打印出现错误,请检查打印机" + msg.what, false);
+			} else {
+				popUpDlg("完成", "打印完成", false);
+			}
+		}
+	};
 
 	protected void popUpDlg(String title, String msg,
 			final boolean finishActivity) {

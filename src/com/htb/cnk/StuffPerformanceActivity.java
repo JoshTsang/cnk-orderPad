@@ -160,7 +160,17 @@ public class StuffPerformanceActivity extends StatisticsBaseActivity {
 						Toast.LENGTH_LONG).show();
 				return;
 			}
-			popUpDlg("提示", "暂不支持打印", false);
+			showProgressDlg("正在上传打印信息...");
+			new Thread() {
+				public void run() {
+					int ret = mStatistics.print(mStart, mEnd);
+					handlerPrint.sendEmptyMessage(ret);
+				}
+			}.start();
+
+			if (mQueryMode == QUERY_TODAY) {
+				updateLatestStatistics();
+			}
 		}
 	};
 }
