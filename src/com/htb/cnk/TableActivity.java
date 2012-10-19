@@ -1,7 +1,7 @@
 package com.htb.cnk;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,8 +15,8 @@ import android.widget.LinearLayout;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
+import com.htb.cnk.adapter.TableAdapter;
 import com.htb.cnk.data.Info;
-import com.htb.cnk.data.TableInfo;
 import com.htb.cnk.lib.ScrollLayout;
 import com.htb.cnk.ui.base.TableBaseActivity;
 
@@ -27,6 +27,7 @@ public class TableActivity extends TableBaseActivity {
 	private final String IMAGE_ITEM = "imageItem";
 	private final String ITEM_TEXT = "ItemText";
 
+	private final static int EXTERN_PAGE_NUM = 1; //除了楼层以外还有几个页面
 	protected Button mBackBtn;
 	protected Button mUpdateBtn;
 	protected Button mStatisticsBtn;
@@ -35,8 +36,7 @@ public class TableActivity extends TableBaseActivity {
 
 	private ScrollLayout curPage;
 	private LinearLayout layoutBottom;
-	private List<TableInfo> lstDate = new ArrayList<TableInfo>();
-	private List<SimpleAdapter> mAdapterList = new ArrayList<SimpleAdapter>();
+	ArrayList<HashMap<String, Object>> mTableItem = new ArrayList<HashMap<String, Object>>();
 	private TextView imgCur;
 	private boolean flag = false;
 
@@ -48,7 +48,6 @@ public class TableActivity extends TableBaseActivity {
 			NETWORK_ARERTDIALOG = 0;
 		}
 		showProgressDlg(getResources().getString(R.string.getStatus));
-
 	}
 
 	@Override
@@ -58,13 +57,17 @@ public class TableActivity extends TableBaseActivity {
 		Info.setMode(Info.WORK_MODE_WAITER);
 		setContentView(R.layout.table_activity);
 		findViews();
+		mpDialog.show();
 		setClickListeners();
 		setHandler();
+		mTableInfo = new TableAdapter(mTableItem, mNotification);
 	}
 
 	private void setGridView() {
-		imgCur.setText("1楼");
+		imgCur.setTextColor(0xFF4D2412);
+		imgCur.setTextSize(22);
 		layoutBottom.addView(imgCur);
+		setCurPage(0);
 		curPage.getLayoutParams().height = this.getWindowManager()
 				.getDefaultDisplay().getHeight() * 4 / 5;
 		setTableInfos();
@@ -76,7 +79,7 @@ public class TableActivity extends TableBaseActivity {
 				}
 				setCurPage(page);
 				mGridView = (GridView) curPage.getChildAt(page);
-				setGridViewAdapter(page);
+				updateGridViewAdapter(page);
 			}
 		});
 	}
@@ -85,10 +88,16 @@ public class TableActivity extends TableBaseActivity {
 	 * 更新当前页码
 	 */
 	public void setCurPage(int page) {
-		layoutBottom.removeAllViews();
-		imgCur.setText(page + 1 + "楼");
-		layoutBottom.addView(imgCur);
-		getSettings().setFloorCurrent(page);
+		switch (page) {
+		case 0:
+			imgCur.setText("全部");
+			break;
+
+		default:
+			imgCur.setText(page - EXTERN_PAGE_NUM + 1 + "楼");
+			break;
+		}
+		currentPage = page;
 	}
 
 	private void setHandler() {
@@ -174,7 +183,6 @@ public class TableActivity extends TableBaseActivity {
 
 	Handler ringtoneHandler = new Handler() {
 		public void handleMessage(Message msg) {
-			mpDialog.cancel();
 			if (msg.what > 0) {
 				mRingtone.play();
 			}
@@ -248,7 +256,7 @@ public class TableActivity extends TableBaseActivity {
 					if (!flag) {
 						setGridView();
 					}
-					updateGrid(getSettings().getFloorCurrent());
+					updateGrid(currentPage);
 					flag = true;
 					if (getSettings().hasPendedPhoneOrder()) {
 						ringtoneHandler.sendEmptyMessage(1);
@@ -259,6 +267,7 @@ public class TableActivity extends TableBaseActivity {
 						mGridView.setOnItemClickListener(null);
 					break;
 				default:
+					Log.e(TAG, "unhandled case:"+msg.what+(new Exception()).getStackTrace()[2].getLineNumber());
 					break;
 				}
 			}
@@ -267,43 +276,48 @@ public class TableActivity extends TableBaseActivity {
 
 	private void updateGrid(int page) {
 		mGridView = (GridView) curPage.getChildAt(page);
-		setGridViewAdapter(page);
+		updateGridViewAdapter(page);
 	}
 
 	protected void setTableInfos() {
-		int pageCount = getSettings().getFloorNum();
+		int pageCount = getSettings().getFloorNum() + EXTERN_PAGE_NUM;
 		if (mGridView != null) {
 			curPage.removeAllViews();
 		}
-		TableInfo tableInfo = new TableInfo();
+
+		mImageItems = new SimpleAdapter(TableActivity.this, mTableItem,
+				R.layout.table_item,
+				new String[] { IMAGE_ITEM, ITEM_TEXT }, new int[] {
+						R.id.ItemImage, R.id.ItemText }) {
+		};
+		
 		for (int floorNum = 0; floorNum < pageCount; floorNum++) {
 			mGridView = new GridView(TableActivity.this);
-			tableInfo.addGridItem(floorNum, mNotificaion);
-			lstDate.add(tableInfo);
-			mImageItems = new SimpleAdapter(TableActivity.this, lstDate.get(floorNum).getGridItem(),
-					R.layout.table_item,
-					new String[] { IMAGE_ITEM, ITEM_TEXT }, new int[] {
-							R.id.ItemImage, R.id.ItemText }) {
-			};
-			mAdapterList.add(mImageItems);
 			mGridView.setAdapter(mImageItems);
-			mImageItems.notifyDataSetChanged();
 			mGridView.setNumColumns(6);
 			mGridView.setHorizontalSpacing(0);
 			mGridView.setVisibility(View.VISIBLE);
 			mGridView.setOnItemClickListener(tableItemClickListener);
 			curPage.addView(mGridView);
+			curPage.setPadding(0, 0, 0, 0);
 		}
-		getSettings().setFloorCurrent(0);
 	}
 
 	/**
 	 * @param page
 	 */
-	private void setGridViewAdapter(int page) {
-		lstDate.get(page).addGridItem(page, mNotificaion);
+	private void updateGridViewAdapter(int page) {
 		mGridView.setOnItemClickListener(tableItemClickListener);
-		SimpleAdapter currentPageAdapter = mAdapterList.get(page);
-		currentPageAdapter.notifyDataSetChanged();
+		switch (page) {
+		case 0:
+			mTableInfo.filterTables(page, TableAdapter.FILTER_NONE);
+			break;
+
+		default:
+			mTableInfo.filterTables(page-EXTERN_PAGE_NUM, TableAdapter.FILTER_FLOOR);
+			break;
+		}
+		
+		mImageItems.notifyDataSetChanged();
 	}
 }

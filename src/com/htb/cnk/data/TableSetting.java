@@ -29,8 +29,8 @@ public class TableSetting implements Serializable {
 	public static final int PHONE_ORDER = 1;
 	public static final int MY_ORDER = 2;
 	public static final int SUBMIT = 0;
-	private int FLOOR_NUM;
-	private int FLOOR_NUM_CURRENT = 10;
+	private int floorNum;
+	//private int FLOOR_NUM_CURRENT = 10;
 	private Context mContext;
 
 	public class TableSettingItem {
@@ -88,7 +88,7 @@ public class TableSetting implements Serializable {
 	}
 
 	private static List<TableSettingItem> mTableSettings = new ArrayList<TableSettingItem>();
-	private static ArrayList<HashMap<Integer, TableSettingItem>> mTableFloor = new ArrayList<HashMap<Integer, TableSettingItem>>();
+	private static ArrayList<List<TableSettingItem>> mTableFloor = new ArrayList<List<TableSettingItem>>();
 	private static List<String> checkOutPrinter = new ArrayList<String>();
 
 	public TableSetting(){
@@ -113,137 +113,97 @@ public class TableSetting implements Serializable {
 
 	public void addFloor() {
 		mTableFloor.clear();
-		for (int i = 1; i < FLOOR_NUM + 1; i++) {
-			HashMap<Integer, TableSettingItem> map = new HashMap<Integer, TableSettingItem>();
-			int index = 0;
+		for (int i = 1; i < floorNum + 1; i++) {
+			List<TableSettingItem> map = new ArrayList<TableSettingItem>();
 			for (int k = 0; k < mTableSettings.size(); k++) {
 				if (i == mTableSettings.get(k).getFloor()) {
-					map.put(index, mTableSettings.get(k));
-					index++;
+					map.add(mTableSettings.get(k));
 				}
 			}
 			mTableFloor.add(map);
 		}
 	}
 
-	public int getFloorSize() {
-		return mTableFloor.get(FLOOR_NUM_CURRENT).size();
-	}
-
 	public int getFloorNum() {
-		return FLOOR_NUM;
-	}
-
-	public int getFloorCurrent() {
-		return FLOOR_NUM_CURRENT;
-	}
-
-	public void setFloorCurrent(int num) {
-		FLOOR_NUM_CURRENT = num;
-	}
-
-	public int getStatusIndex(int index) {
-		if (isIndexBoundary(index)) {
-			return mTableFloor.get(FLOOR_NUM_CURRENT).get(index).getStatus();
-		}
-		return -1;
+		return floorNum;
 	}
 
 	public int getStatusTableId(int tableId) {
 		int i;
-		for (i = 0; i < mTableFloor.get(FLOOR_NUM_CURRENT).size() - 1; i++) {
-			if (tableId == mTableFloor.get(FLOOR_NUM_CURRENT).get(i).getId()) {
+		for (i = 0; i < mTableSettings.size() - 1; i++) {
+			if (tableId == mTableSettings.get(i).getId()) {
 				break;
 			}
 		}
-		return mTableFloor.get(FLOOR_NUM_CURRENT).get(i).getStatus();
-	}
-
-	public int getIdIndex(int index) {
-		if (isIndexBoundary(index)) {
-			return mTableFloor.get(FLOOR_NUM_CURRENT).get(index).getId();
-		}
-		return -1;
+		return mTableSettings.get(i).getStatus();
 	}
 
 	/**
 	 * @param index
 	 * @return
 	 */
-	private boolean isIndexBoundary(int index) {
-		return index >= 0 && index < mTableFloor.get(FLOOR_NUM_CURRENT).size();
+	private boolean isIndexBoundary(int floor, int index) {
+		return index >= 0 && index < mTableFloor.get(floor).size();
 	}
 
-	public int getId(int tableId) {
-		for (int i = 0; i < mTableFloor.get(FLOOR_NUM_CURRENT).size(); i++) {
-			if (mTableFloor.get(FLOOR_NUM_CURRENT).get(i).getId() == tableId) {
-				return mTableFloor.get(FLOOR_NUM_CURRENT).get(i).getId();
+	public int getId(int floor, int tableId) {
+		for (int i = 0; i < mTableFloor.get(floor).size(); i++) {
+			if (mTableFloor.get(floor).get(i).getId() == tableId) {
+				return mTableFloor.get(floor).get(i).getId();
 			}
 		}
 		return -1;
 	}
 
 	public int getId(String tableName) {
-		for (int i = 0; i < mTableFloor.get(FLOOR_NUM_CURRENT).size(); i++) {
-			if (mTableFloor.get(FLOOR_NUM_CURRENT).get(i).getName()
+		for (int i = 0; i < mTableSettings.size(); i++) {
+			if (mTableSettings.get(i).getName()
 					.equals(tableName)) {
-				return mTableFloor.get(FLOOR_NUM_CURRENT).get(i).getId();
+				return mTableSettings.get(i).getId();
 			}
 		}
 		return -1;
 	}
 
+	//TODO use Hash index to speed up search
 	public String getName(int tableId) {
-		for (int i = 0; i < mTableFloor.get(FLOOR_NUM_CURRENT).size(); i++) {
-			if (mTableFloor.get(FLOOR_NUM_CURRENT).get(i).getId() == tableId) {
-				return mTableFloor.get(FLOOR_NUM_CURRENT).get(i).getName();
+		for (int i = 0; i < mTableSettings.size(); i++) {
+			if (mTableSettings.get(i).getId() == tableId) {
+				return mTableSettings.get(i).getName();
 			}
 		}
 		return null;
 	}
 
-	public String getNameIndex(int index) {
-		if (isIndexBoundary(index)) {
-			return mTableFloor.get(FLOOR_NUM_CURRENT).get(index).getName();
-		}
-		return null;
-	}
-
-	public String[] getNameAll() {
-		String tableName[] = new String[mTableFloor.get(FLOOR_NUM_CURRENT)
+	public String[] getNameAll(int floor) {
+		String tableName[] = new String[mTableFloor.get(floor)
 				.size()];
-		for (int i = 0; i < mTableFloor.get(FLOOR_NUM_CURRENT).size(); i++) {
-			tableName[i] = mTableFloor.get(FLOOR_NUM_CURRENT).get(i).getName();
+		for (int i = 0; i < mTableFloor.get(floor).size(); i++) {
+			tableName[i] = mTableFloor.get(floor).get(i).getName();
 		}
 		return tableName;
 	}
 
-	public int[] getIdAll() {
-		int tableId[] = new int[mTableFloor.get(FLOOR_NUM_CURRENT).size()];
-		for (int i = 0; i < mTableFloor.get(FLOOR_NUM_CURRENT).size(); i++) {
-			tableId[i] = mTableFloor.get(FLOOR_NUM_CURRENT).get(i).getId();
+	public int[] getIdAll(int floor) {
+		int tableId[] = new int[mTableFloor.get(floor).size()];
+		for (int i = 0; i < mTableFloor.get(floor).size(); i++) {
+			tableId[i] = mTableFloor.get(floor).get(i).getId();
 		}
 		return tableId;
 	}
 
 	public ArrayList<HashMap<String, Object>> getTableOpen() {
 		ArrayList<HashMap<String, Object>> tableOpen = new ArrayList<HashMap<String, Object>>();
-		for (int i = 0; i < mTableFloor.get(FLOOR_NUM_CURRENT).size(); i++) {
-			if (mTableFloor.get(FLOOR_NUM_CURRENT).get(i).getStatus() == 1) {
+		for (int i = 0; i < mTableSettings.size(); i++) {
+			if (mTableSettings.get(i).getStatus() == 1) {
 				HashMap<String, Object> map = new HashMap<String, Object>();
-				map.put("name", mTableFloor.get(FLOOR_NUM_CURRENT).get(i)
+				map.put("name", mTableSettings.get(i)
 						.getName());
-				map.put("id", mTableFloor.get(FLOOR_NUM_CURRENT).get(i).getId());
+				map.put("id", mTableSettings.get(i).getId());
 				tableOpen.add(map);
 			}
 		}
 		return tableOpen;
-	}
-
-	public void setStatus(int index, int n) {
-		if (isIndexBoundary(index)) {
-			mTableFloor.get(FLOOR_NUM_CURRENT).get(index).setStatus(n);
-		}
 	}
 
 	public int getTableStatusFromServerActivity() {
@@ -305,6 +265,14 @@ public class TableSetting implements Serializable {
 		return phoneOrderPending;
 	}
 
+	public List<TableSettingItem> getTables() {
+		return mTableSettings;
+	}
+	
+	public List<TableSettingItem> getTablesByFloor(int floor) {
+		return mTableFloor.get(floor);
+	}
+	
 	public int getItemTableStatus(int tableId) {
 		String tableStatusPkg = Http.get(Server.GET_ITEM_TABLE_STATUS, "TSI="
 				+ tableId);
@@ -671,8 +639,8 @@ public class TableSetting implements Serializable {
 		// if (!ErrorPHP.isSucc(floorCategoryPkg, TAG)) {
 		// return -1;
 		// }
-		FLOOR_NUM = Integer.parseInt(floorCategoryPkg);
-		Log.d(TAG, FLOOR_NUM + ":num");
+		floorNum = Integer.parseInt(floorCategoryPkg);
+		Log.d(TAG, floorNum + ":num");
 		return 0;
 	}
 

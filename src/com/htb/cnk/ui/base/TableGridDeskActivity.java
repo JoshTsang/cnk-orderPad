@@ -33,6 +33,7 @@ import com.htb.cnk.PhoneActivity;
 import com.htb.cnk.QueryOrderActivity;
 import com.htb.cnk.QuickMenuActivity;
 import com.htb.cnk.R;
+import com.htb.cnk.adapter.TableAdapter;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.NotificationTypes;
 import com.htb.cnk.data.Notifications;
@@ -61,7 +62,7 @@ public class TableGridDeskActivity extends BaseActivity {
 
 	private MyReceiver mReceiver;
 	protected NotificationTableService.MyBinder binder;
-	protected Notifications mNotificaion = new Notifications();
+	protected Notifications mNotification = new Notifications();
 	protected NotificationTypes mNotificationType = new NotificationTypes();
 
 	protected List<String> tableName = new ArrayList<String>();
@@ -82,6 +83,9 @@ public class TableGridDeskActivity extends BaseActivity {
 	protected Handler mCombineTIdHandler;
 	protected Handler mCopyTIdHandler;
 	protected Handler mNotificationTypeHandler;
+
+	protected int currentPage;
+	protected TableAdapter mTableInfo;
 
 	@Override
 	protected void onResume() {
@@ -288,7 +292,7 @@ public class TableGridDeskActivity extends BaseActivity {
 	}
 
 	private AlertDialog.Builder notificationDialog() {
-		List<String> add = mNotificaion
+		List<String> add = mNotification
 				.getNotifiycationsType(Info.getTableId());
 		String[] additems = (String[]) add.toArray(new String[add.size()]);
 		return mItemDialog.itemButtonDialog(false,
@@ -305,21 +309,21 @@ public class TableGridDeskActivity extends BaseActivity {
 				long arg3// The row id of the item that was clicked
 		) {
 			Log.d("table", "arg2:" + arg2 + " floorCurrent:"
-					+ getSettings().getFloorCurrent());
+					+ currentPage);
 			if (isNameIdStatusLegal(arg2)) {
-				Info.setTableName(getSettings().getNameIndex(arg2));
-				Info.setTableId(getSettings().getIdIndex(arg2));
-				tableItemChioceDialog(arg2, getSettings().getStatusIndex(arg2));
-				Log.d("table", getSettings().getStatusIndex(arg2)+":status");
+				Info.setTableName(mTableInfo.getName(arg2));
+				Info.setTableId(mTableInfo.getId(arg2));
+				tableItemChioceDialog(arg2, mTableInfo.getStatus(arg2));
+				Log.d("table", mTableInfo.getStatus(arg2)+":status");
 			} else {
 				toastText("不能获取信息，请检查设备！");
 			}
 		}
 
 		private boolean isNameIdStatusLegal(int arg2) {
-			return (getSettings().getNameIndex(arg2)) != null
-					&& ((getSettings().getIdIndex(arg2)) != -1)
-					&& ((getSettings().getStatusIndex(arg2)) != -1);
+			return (mTableInfo.getName(arg2)) != null
+					&& (mTableInfo.getId(arg2) != -1)
+					&& (mTableInfo.getStatus(arg2) != -1);
 		}
 
 		private void tableItemChioceDialog(int arg2, int status) {
@@ -435,7 +439,7 @@ public class TableGridDeskActivity extends BaseActivity {
 		new Thread() {
 			public void run() {
 				try {
-					int ret = mNotificaion
+					int ret = mNotification
 							.cleanNotifications(Info.getTableId());
 					mNotificationHandler.sendEmptyMessage(ret);
 				} catch (Exception e) {
@@ -604,7 +608,7 @@ public class TableGridDeskActivity extends BaseActivity {
 	}
 
 	private int getNotifiycations() {
-		int ret = mNotificaion.getNotifiycations();
+		int ret = mNotification.getNotifiycations();
 		mRingtoneHandler.sendEmptyMessage(ret);
 		return ret;
 	}
