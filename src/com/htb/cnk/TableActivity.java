@@ -293,7 +293,7 @@ public class TableActivity extends TableBaseActivity {
 			mGridView = new GridView(TableActivity.this);
 			mGridView.setAdapter(mImageItems);
 			mImageItems.notifyDataSetChanged();
-			mGridView.setNumColumns(4);
+			mGridView.setNumColumns(6);
 			mGridView.setHorizontalSpacing(10);
 			mGridView.setVisibility(View.VISIBLE);
 			mGridView.setOnItemClickListener(tableItemClickListener);
