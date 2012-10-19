@@ -16,7 +16,6 @@ public class NotificationTableService extends Service {
 	private final int DISABLE_GRIDVIEW = 1000;
 	private final int MILLISECONDS = 1000 * 15;
 	private Notifications mNotificaion = new Notifications();
-	private TableSetting mSettings = new TableSetting();
 	private final int UPDATE_TABLE_INFOS = 500;
 	private Intent intent = new Intent(SERVICE_IDENTIFIER);
 	private Bundle bundle = new Bundle();
@@ -47,7 +46,7 @@ public class NotificationTableService extends Service {
 			try {
 				int notification = mNotificaion.getNotifiycations();
 				intent.putExtra("ringtoneMessage", notification);
-				String ret = mSettings.getTableStatusFromServer();
+				String ret = TableSetting.getTableStatusFromServer();
 				intent.putExtra("tableMessage", ret);
 				intent.putExtras(bundle);
 				sendBroadcast(intent);

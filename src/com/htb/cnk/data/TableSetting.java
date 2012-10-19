@@ -14,6 +14,7 @@ import org.json.JSONObject;
 
 import android.content.Context;
 import android.util.Log;
+import android.util.SparseArray;
 
 import com.htb.cnk.lib.ErrorPHP;
 import com.htb.cnk.lib.Http;
@@ -22,7 +23,7 @@ import com.htb.constant.Table;
 
 public class TableSetting implements Serializable {
 	private static final int TIME_OUT = -1;
-	private final String TAG = "tableSetting";
+	private static final String TAG = "tableSetting";
 	private static final long serialVersionUID = 1L;
 	private MyOrder mOrder;
 	boolean phoneOrderPending;
@@ -53,6 +54,10 @@ public class TableSetting implements Serializable {
 			mFloor = floor;
 		}
 
+		public void update(int status) {
+			mStatus = status;
+		}
+		
 		public void setStatus(int status) {
 			mStatus = status;
 		}
@@ -84,16 +89,14 @@ public class TableSetting implements Serializable {
 		public int getFloor() {
 			return mFloor;
 		}
-
 	}
 
 	private static List<TableSettingItem> mTableSettings = new ArrayList<TableSettingItem>();
 	private static ArrayList<List<TableSettingItem>> mTableFloor = new ArrayList<List<TableSettingItem>>();
+	private static SparseArray<TableSettingItem> mTableIndexForId = new SparseArray<TableSetting.TableSettingItem>();
+	private static HashMap<String, TableSettingItem> mTableIndexForName = new HashMap<String, TableSetting.TableSettingItem>();
+	
 	private static List<String> checkOutPrinter = new ArrayList<String>();
-
-	public TableSetting(){
-		
-	}
 	
 	public TableSetting(Context context) {
 		mContext = context;
@@ -138,58 +141,16 @@ public class TableSetting implements Serializable {
 		return mTableSettings.get(i).getStatus();
 	}
 
-	/**
-	 * @param index
-	 * @return
-	 */
-	private boolean isIndexBoundary(int floor, int index) {
-		return index >= 0 && index < mTableFloor.get(floor).size();
-	}
-
-	public int getId(int floor, int tableId) {
-		for (int i = 0; i < mTableFloor.get(floor).size(); i++) {
-			if (mTableFloor.get(floor).get(i).getId() == tableId) {
-				return mTableFloor.get(floor).get(i).getId();
-			}
-		}
-		return -1;
-	}
 
 	public int getId(String tableName) {
-		for (int i = 0; i < mTableSettings.size(); i++) {
-			if (mTableSettings.get(i).getName()
-					.equals(tableName)) {
-				return mTableSettings.get(i).getId();
-			}
-		}
-		return -1;
+		TableSettingItem item = mTableIndexForName.get(tableName);
+		return item==null?(-1):item.getId();
 	}
 
-	//TODO use Hash index to speed up search
 	public String getName(int tableId) {
-		for (int i = 0; i < mTableSettings.size(); i++) {
-			if (mTableSettings.get(i).getId() == tableId) {
-				return mTableSettings.get(i).getName();
-			}
-		}
-		return null;
-	}
-
-	public String[] getNameAll(int floor) {
-		String tableName[] = new String[mTableFloor.get(floor)
-				.size()];
-		for (int i = 0; i < mTableFloor.get(floor).size(); i++) {
-			tableName[i] = mTableFloor.get(floor).get(i).getName();
-		}
-		return tableName;
-	}
-
-	public int[] getIdAll(int floor) {
-		int tableId[] = new int[mTableFloor.get(floor).size()];
-		for (int i = 0; i < mTableFloor.get(floor).size(); i++) {
-			tableId[i] = mTableFloor.get(floor).get(i).getId();
-		}
-		return tableId;
+		TableSettingItem item = mTableIndexForId.get(tableId);
+		
+		return item==null?null:item.getName();
 	}
 
 	public ArrayList<HashMap<String, Object>> getTableOpen() {
@@ -208,7 +169,6 @@ public class TableSetting implements Serializable {
 
 	public int getTableStatusFromServerActivity() {
 		String tableStatusPkg = Http.get(Server.GET_TABLE_STATUS, null);
-		// Log.d(TAG, tableStatusPkg);
 		if (tableStatusPkg == null) {
 			Log.e(TAG, "getTableStatusFromServer.timeout");
 			return TIME_OUT;
@@ -216,7 +176,7 @@ public class TableSetting implements Serializable {
 		return parseTableSetting(tableStatusPkg);
 	}
 
-	public String getTableStatusFromServer() {
+	public static String getTableStatusFromServer() {
 		String tableStatusPkg = Http.get(Server.GET_TABLE_STATUS, null);
 		if (tableStatusPkg == null) {
 			Log.e(TAG, "getTableStatusFromServer.timeout");
@@ -232,28 +192,11 @@ public class TableSetting implements Serializable {
 	public int parseTableSetting(String tableStatusPkg) {
 		try {
 			JSONArray tableList = new JSONArray(tableStatusPkg);
-			int length = tableList.length();
-			TableSettingItem asItem;
-			mTableSettings.clear();
-			phoneOrderPending = false;
-			for (int i = 0; i < length; i++) {
-				JSONObject item = tableList.getJSONObject(i);
-				int id = item.getInt("id");
-				String name = item.getString("name");
-				int status = item.getInt("status");
-				if (status == 50 || status == 51) {
-					phoneOrderPending = true;
-				}
-				int category = item.getInt("category");
-				int index = item.getInt("index");
-				int area = item.getInt("area");
-				int floor = item.getInt("floor");
-				asItem = new TableSettingItem(status, name, id, category,
-						index, area, floor);
-				add(asItem, mTableSettings);
+			if (mTableSettings.size() <= 0) {
+				createTables(tableList);
+			} else {
+				updateTables(tableList);
 			}
-			floorCategory();
-			addFloor();
 			return 0;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -261,6 +204,80 @@ public class TableSetting implements Serializable {
 		return -1;
 	}
 
+	private void createTables(JSONArray tableList)
+			throws JSONException {
+		TableSettingItem asItem;
+		phoneOrderPending = false;
+		int length = tableList.length();
+		
+		for (int i = 0; i < length; i++) {
+			JSONObject item = tableList.getJSONObject(i);
+			int id = item.getInt("id");
+			String name = item.getString("name");
+			int status = item.getInt("status");
+			if (status == 50 || status == 51) {
+				phoneOrderPending = true;
+			}
+			int category = item.getInt("category");
+			int index = item.getInt("index");
+			int area = item.getInt("area");
+			int floor = item.getInt("floor");
+			asItem = new TableSettingItem(status, name, id, category,
+					index, area, floor);
+			add(asItem, mTableSettings);
+		}
+		floorCategory();
+		addFloor();
+		updateIndex();
+	}
+
+	private void updateIndex() {
+		for (TableSettingItem item:mTableSettings) {
+			mTableIndexForId.put(item.getId(), item);
+			mTableIndexForName.put(item.getName(), item);
+		}
+	}
+	
+	private void updateTables(JSONArray tableList)
+			throws JSONException {
+		TableSettingItem asItem;
+		phoneOrderPending = false;
+		int length = tableList.length();
+		boolean isIndexUpdateNeed = false;
+		
+		for (int i = 0; i < length; i++) {
+			JSONObject item = tableList.getJSONObject(i);
+			int id = item.getInt("id");
+			String name = item.getString("name");
+			int status = item.getInt("status");
+			if (status == 50 || status == 51) {
+				phoneOrderPending = true;
+			}
+			int category = item.getInt("category");
+			int index = item.getInt("index");
+			int area = item.getInt("area");
+			int floor = item.getInt("floor");
+			asItem = findTableItemById(id);
+			if (asItem != null) {
+				asItem.update(status);
+			} else {
+				asItem = new TableSettingItem(status, name, id, category,
+						index, area, floor);
+				add(asItem, mTableSettings);
+				isIndexUpdateNeed = true;
+			}
+		}
+
+		floorCategory();
+		if (isIndexUpdateNeed) {
+			updateIndex();
+		}
+	}
+	
+	private TableSettingItem findTableItemById(int id) {
+		return mTableIndexForId.get(id);
+	}
+	
 	public boolean hasPendedPhoneOrder() {
 		return phoneOrderPending;
 	}

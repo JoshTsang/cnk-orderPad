@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
+import android.view.View.OnSystemUiVisibilityChangeListener;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.LinearLayout;
@@ -60,7 +61,7 @@ public class TableActivity extends TableBaseActivity {
 		mpDialog.show();
 		setClickListeners();
 		setHandler();
-		mTableInfo = new TableAdapter(mTableItem, mNotification);
+		mTableInfo = new TableAdapter(mTableItem, mNotification, mSettings);
 	}
 
 	private void setGridView() {
@@ -77,6 +78,7 @@ public class TableActivity extends TableBaseActivity {
 				if (page < 0) {
 					return;
 				}
+				Log.d("TAG", "currentPage:" + page);
 				setCurPage(page);
 				mGridView = (GridView) curPage.getChildAt(page);
 				updateGridViewAdapter(page);
@@ -128,7 +130,6 @@ public class TableActivity extends TableBaseActivity {
 		mStatisticsBtn.setOnClickListener(logoutClicked);
 		mManageBtn.setOnClickListener(manageClicked);
 		mNetWrorkAlertDialog = networkDialog();
-
 	}
 
 	Handler changeTIdHandler = new Handler() {
@@ -281,9 +282,6 @@ public class TableActivity extends TableBaseActivity {
 
 	protected void setTableInfos() {
 		int pageCount = getSettings().getFloorNum() + EXTERN_PAGE_NUM;
-		if (mGridView != null) {
-			curPage.removeAllViews();
-		}
 
 		mImageItems = new SimpleAdapter(TableActivity.this, mTableItem,
 				R.layout.table_item,
@@ -299,7 +297,6 @@ public class TableActivity extends TableBaseActivity {
 			mGridView.setVisibility(View.VISIBLE);
 			mGridView.setOnItemClickListener(tableItemClickListener);
 			curPage.addView(mGridView);
-			curPage.setPadding(0, 0, 0, 0);
 		}
 	}
 

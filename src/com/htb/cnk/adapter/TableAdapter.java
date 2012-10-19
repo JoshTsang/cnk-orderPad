@@ -21,14 +21,15 @@ public class TableAdapter {
 	
 	private int mImageItem;
 	private int mTextItem;
-	private TableSetting mSetting = new TableSetting();
+	private TableSetting mSetting;
 	private Notifications mNotification;
 	private ArrayList<HashMap<String, Object>> lstImageItem;
 	private List<TableSetting.TableSettingItem> resultSet;
 	
-	public TableAdapter(ArrayList<HashMap<String, Object>> lst, Notifications notification) {
+	public TableAdapter(ArrayList<HashMap<String, Object>> lst, Notifications notification, TableSetting ts) {
 		lstImageItem = lst;
 		mNotification = notification;
+		mSetting = ts;
 	}
 	
 	public void filterTables(int arg, int filterType) {
