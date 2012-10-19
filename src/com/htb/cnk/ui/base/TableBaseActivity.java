@@ -67,7 +67,7 @@ public class TableBaseActivity extends TableGridDeskActivity {
 					.getString(R.string.ok), null, null, null);
 		}
 		setNameAndId(tableId, tableNameStr, checkOut);
-		final boolean selected[] = new boolean[getSettings().size()];
+		final boolean selected[] = new boolean[getSettings().tableSeetingsSize()];
 
 		DialogInterface.OnClickListener listPositiveListener = new DialogInterface.OnClickListener() {
 			@Override
