@@ -7,8 +7,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Parcelable;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.LinearLayout;
@@ -17,7 +23,6 @@ import android.widget.TextView;
 
 import com.htb.cnk.adapter.TableAdapter;
 import com.htb.cnk.data.Info;
-import com.htb.cnk.lib.ScrollLayout;
 import com.htb.cnk.ui.base.TableBaseActivity;
 
 public class TableActivity extends TableBaseActivity {
@@ -27,18 +32,22 @@ public class TableActivity extends TableBaseActivity {
 	private final String IMAGE_ITEM = "imageItem";
 	private final String ITEM_TEXT = "ItemText";
 
-	private final static int EXTERN_PAGE_NUM = 1; //除了楼层以外还有几个页面
+	private final static int EXTERN_PAGE_NUM = 1; // 除了楼层以外还有几个页面
 	protected Button mBackBtn;
 	protected Button mUpdateBtn;
 	protected Button mStatisticsBtn;
 	protected Button mManageBtn;
-	protected GridView mGridView;
 
-	private ScrollLayout curPage;
 	private LinearLayout layoutBottom;
 	ArrayList<HashMap<String, Object>> mTableItem = new ArrayList<HashMap<String, Object>>();
 	private TextView imgCur;
 	private boolean flag = false;
+
+	private ViewGroup layout;
+	private ViewPager mPageView;
+	private GridView mGridView;
+	private ArrayList<View> pageViewsList;
+	private LayoutInflater inflater;
 
 	@Override
 	protected void onResume() {
@@ -63,25 +72,32 @@ public class TableActivity extends TableBaseActivity {
 		mTableInfo = new TableAdapter(mTableItem, mNotification);
 	}
 
-	private void setGridView() {
+	private void initViewPager() {
 		imgCur.setTextColor(0xFF4D2412);
 		imgCur.setTextSize(22);
 		layoutBottom.addView(imgCur);
 		setCurPage(0);
-		curPage.getLayoutParams().height = this.getWindowManager()
+		mPageView.getLayoutParams().height = this.getWindowManager()
 				.getDefaultDisplay().getHeight() * 4 / 5;
-		setTableInfos();
-		curPage.setPageListener(new ScrollLayout.PageListener() {
-			@Override
-			public void page(int page) {
-				if (page < 0) {
-					return;
-				}
-				setCurPage(page);
-				mGridView = (GridView) curPage.getChildAt(page);
-				updateGridViewAdapter(page);
-			}
-		});
+		
+		mImageItems = new SimpleAdapter(TableActivity.this, mTableItem,
+				R.layout.table_item, new String[] { IMAGE_ITEM, ITEM_TEXT },
+				new int[] { R.id.ItemImage, R.id.ItemText }) {
+		};
+		
+		inflater = getLayoutInflater();
+		pageViewsList = new ArrayList<View>();
+		pageViewsList.add(inflater.inflate(R.layout.gridview, null));
+		mPageView.setAdapter(new GuidePageAdapter());
+		mPageView.setOnPageChangeListener(new GuidePageChangeListener());
+	}
+
+	public void init(int page) {
+
+		mGridView = (GridView) layout.findViewById(R.id.gridview);
+		mGridView.setAdapter(mImageItems);
+		mGridView.setOnItemClickListener(tableItemClickListener);
+
 	}
 
 	/**
@@ -116,10 +132,9 @@ public class TableActivity extends TableBaseActivity {
 		mUpdateBtn = (Button) findViewById(R.id.checkOutTable);
 		mStatisticsBtn = (Button) findViewById(R.id.logout);
 		mManageBtn = (Button) findViewById(R.id.management);
-		curPage = (ScrollLayout) findViewById(R.id.scr);
 		layoutBottom = (LinearLayout) findViewById(R.id.layout_scr_bottom);
-		
 		imgCur = new TextView(TableActivity.this);
+		mPageView = (ViewPager) findViewById(R.id.scr);
 	}
 
 	protected void setClickListeners() {
@@ -254,9 +269,10 @@ public class TableActivity extends TableBaseActivity {
 				switch (msg.what) {
 				case UPDATE_TABLE_INFOS:
 					if (!flag) {
-						setGridView();
+						initViewPager();
 					}
 					updateGrid(currentPage);
+
 					flag = true;
 					if (getSettings().hasPendedPhoneOrder()) {
 						ringtoneHandler.sendEmptyMessage(1);
@@ -267,7 +283,11 @@ public class TableActivity extends TableBaseActivity {
 						mGridView.setOnItemClickListener(null);
 					break;
 				default:
-					Log.e(TAG, "unhandled case:"+msg.what+(new Exception()).getStackTrace()[2].getLineNumber());
+					Log.e(TAG,
+							"unhandled case:"
+									+ msg.what
+									+ (new Exception()).getStackTrace()[2]
+											.getLineNumber());
 					break;
 				}
 			}
@@ -275,33 +295,7 @@ public class TableActivity extends TableBaseActivity {
 	};
 
 	private void updateGrid(int page) {
-		mGridView = (GridView) curPage.getChildAt(page);
 		updateGridViewAdapter(page);
-	}
-
-	protected void setTableInfos() {
-		int pageCount = getSettings().getFloorNum() + EXTERN_PAGE_NUM;
-		if (mGridView != null) {
-			curPage.removeAllViews();
-		}
-
-		mImageItems = new SimpleAdapter(TableActivity.this, mTableItem,
-				R.layout.table_item,
-				new String[] { IMAGE_ITEM, ITEM_TEXT }, new int[] {
-						R.id.ItemImage, R.id.ItemText }) {
-		};
-		
-		for (int floorNum = 0; floorNum < pageCount; floorNum++) {
-			mGridView = new GridView(TableActivity.this);
-			mGridView.setAdapter(mImageItems);
-			mImageItems.notifyDataSetChanged();
-			mGridView.setNumColumns(4);
-			mGridView.setHorizontalSpacing(10);
-			mGridView.setVisibility(View.VISIBLE);
-			mGridView.setOnItemClickListener(tableItemClickListener);
-			curPage.addView(mGridView);
-			curPage.setPadding(0, 0, 0, 0);
-		}
 	}
 
 	/**
@@ -315,10 +309,91 @@ public class TableActivity extends TableBaseActivity {
 			break;
 
 		default:
-			mTableInfo.filterTables(page-EXTERN_PAGE_NUM, TableAdapter.FILTER_FLOOR);
+			mTableInfo.filterTables(page - EXTERN_PAGE_NUM,
+					TableAdapter.FILTER_FLOOR);
 			break;
 		}
-		
+
 		mImageItems.notifyDataSetChanged();
 	}
+
+	/** 指引页面改监听器 */
+	class GuidePageChangeListener implements OnPageChangeListener {
+
+		public void onPageScrollStateChanged(int arg0) {
+			// TODO Auto-generated method stub
+
+		}
+
+		public void onPageScrolled(int arg0, float arg1, int arg2) {
+			// TODO Auto-generated method stub
+		}
+
+		public void onPageSelected(int arg0) {
+			setCurPage(arg0);
+			updateGridViewAdapter(arg0);
+		}
+
+	}
+
+	/** 指引页面Adapter */
+	class GuidePageAdapter extends PagerAdapter {
+		@Override
+		public int getCount() {
+			return getSettings().getFloorNum() + EXTERN_PAGE_NUM;
+		}
+
+		@Override
+		public boolean isViewFromObject(View arg0, Object arg1) {
+			return arg0 == arg1;
+		}
+
+		@Override
+		public int getItemPosition(Object object) {
+			return super.getItemPosition(object);
+		}
+
+		// 这里是销毁上次滑动的页面，很重要
+		@Override
+		public void destroyItem(View arg0, int arg1, Object arg2) {
+			View view = (View) arg2;
+			((ViewPager) arg0).removeView(view);
+			view = null;
+		}
+
+		// 这里是初始化gridView的过程
+		@Override
+		public Object instantiateItem(View arg0, int arg1) {
+			LayoutInflater inflate = getLayoutInflater();
+			layout = (ViewGroup) inflater.inflate(R.layout.gridview, null);
+			init(arg1);
+			((ViewPager) arg0).addView(layout);
+			return layout;
+		}
+
+		@Override
+		public void restoreState(Parcelable arg0, ClassLoader arg1) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public Parcelable saveState() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public void startUpdate(View arg0) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void finishUpdate(View arg0) {
+			// TODO Auto-generated method stub
+
+		}
+	}
+
 }
