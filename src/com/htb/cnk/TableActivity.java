@@ -72,50 +72,6 @@ public class TableActivity extends TableBaseActivity {
 		mTableInfo = new TableAdapter(mTableItem, mNotification, mSettings);
 	}
 
-	private void initViewPager() {
-		imgCur.setTextColor(0xFF4D2412);
-		imgCur.setTextSize(22);
-		layoutBottom.addView(imgCur);
-		setCurPage(0);
-		mPageView.getLayoutParams().height = this.getWindowManager()
-				.getDefaultDisplay().getHeight() * 4 / 5;
-		
-		mImageItems = new SimpleAdapter(TableActivity.this, mTableItem,
-				R.layout.table_item, new String[] { IMAGE_ITEM, ITEM_TEXT },
-				new int[] { R.id.ItemImage, R.id.ItemText }) {
-		};
-		
-		inflater = getLayoutInflater();
-		pageViewsList = new ArrayList<View>();
-		pageViewsList.add(inflater.inflate(R.layout.gridview, null));
-		mPageView.setAdapter(new GuidePageAdapter());
-		mPageView.setOnPageChangeListener(new GuidePageChangeListener());
-	}
-
-	public void init(int page) {
-
-		mGridView = (GridView) layout.findViewById(R.id.gridview);
-		mGridView.setAdapter(mImageItems);
-		mGridView.setOnItemClickListener(tableItemClickListener);
-
-	}
-
-	/**
-	 * 更新当前页码
-	 */
-	public void setCurPage(int page) {
-		switch (page) {
-		case 0:
-			imgCur.setText("全部");
-			break;
-
-		default:
-			imgCur.setText(page - EXTERN_PAGE_NUM + 1 + "楼");
-			break;
-		}
-		currentPage = page;
-	}
-
 	private void setHandler() {
 		setTableHandler(tableHandler);
 		mNotificationHandler = notificationHandler;
@@ -215,6 +171,7 @@ public class TableActivity extends TableBaseActivity {
 
 	Handler notificationTypeHandler = new Handler() {
 		public void handleMessage(Message msg) {
+			mpDialog.cancel();
 			if (msg.what < 0) {
 				toastText(R.string.notificationTypeWarning);
 			}
@@ -292,6 +249,48 @@ public class TableActivity extends TableBaseActivity {
 			}
 		}
 	};
+
+	private void initViewPager() {
+		imgCur.setTextColor(0xFF4D2412);
+		imgCur.setTextSize(22);
+		layoutBottom.addView(imgCur);
+		setCurPage(0);
+		mPageView.getLayoutParams().height = this.getWindowManager()
+				.getDefaultDisplay().getHeight() * 4 / 5;
+		
+		mImageItems = new SimpleAdapter(TableActivity.this, mTableItem,
+				R.layout.table_item, new String[] { IMAGE_ITEM, ITEM_TEXT },
+				new int[] { R.id.ItemImage, R.id.ItemText }) {
+		};
+		
+		inflater = getLayoutInflater();
+		pageViewsList = new ArrayList<View>();
+		pageViewsList.add(inflater.inflate(R.layout.gridview, null));
+		mPageView.setAdapter(new GuidePageAdapter());
+		mPageView.setOnPageChangeListener(new GuidePageChangeListener());
+	}
+
+	public void init(int page) {
+		mGridView = (GridView) layout.findViewById(R.id.gridview);
+		mGridView.setAdapter(mImageItems);
+		mGridView.setOnItemClickListener(tableItemClickListener);
+	}
+
+	/**
+	 * 更新当前页码
+	 */
+	public void setCurPage(int page) {
+		switch (page) {
+		case 0:
+			imgCur.setText("全部");
+			break;
+
+		default:
+			imgCur.setText(page - EXTERN_PAGE_NUM + 1 + "楼");
+			break;
+		}
+		currentPage = page;
+	}
 
 	private void updateGrid(int page) {
 		updateGridViewAdapter(page);

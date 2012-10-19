@@ -1,6 +1,7 @@
 package com.htb.cnk;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -104,6 +105,8 @@ public class CheckOutActivity extends TableBaseActivity{
 		public void onClick(View arg0) {
 			checkOut(selectedTable, tableName, mTotalPrice,
 					mIncome, mChange);
+			mSubmitBtn.setEnabled(true);
+			mSubmitBtn.setTextColor(Color.GRAY);
 		}
 
 	};

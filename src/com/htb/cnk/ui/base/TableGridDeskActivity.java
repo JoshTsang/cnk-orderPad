@@ -48,6 +48,7 @@ import com.htb.constant.Table;
 
 public class TableGridDeskActivity extends BaseActivity {
 
+	private final static String TAG = "TableGridDeskActivity";
 	protected final int UPDATE_TABLE_INFOS = 500;
 	protected final int DISABLE_GRIDVIEW = 1000;
 	protected final int CHECKOUT_LIST = 1;
@@ -308,13 +309,10 @@ public class TableGridDeskActivity extends BaseActivity {
 				int arg2,// The position of the view in the adapter
 				long arg3// The row id of the item that was clicked
 		) {
-			Log.d("table", "arg2:" + arg2 + " floorCurrent:"
-					+ currentPage);
 			if (isNameIdStatusLegal(arg2)) {
 				Info.setTableName(mTableInfo.getName(arg2));
 				Info.setTableId(mTableInfo.getId(arg2));
 				tableItemChioceDialog(arg2, mTableInfo.getStatus(arg2));
-				Log.d("table", mTableInfo.getStatus(arg2)+":status");
 			} else {
 				toastText("不能获取信息，请检查设备！");
 			}
@@ -551,7 +549,6 @@ public class TableGridDeskActivity extends BaseActivity {
 	}
 
 	protected void NotificationType() {
-		mpDialog.show();
 		new Thread() {
 			public void run() {
 				try {

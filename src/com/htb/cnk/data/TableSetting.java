@@ -149,7 +149,6 @@ public class TableSetting implements Serializable {
 
 	public String getName(int tableId) {
 		TableSettingItem item = mTableIndexForId.get(tableId);
-		
 		return item==null?null:item.getName();
 	}
 
@@ -657,7 +656,6 @@ public class TableSetting implements Serializable {
 		// return -1;
 		// }
 		floorNum = Integer.parseInt(floorCategoryPkg);
-		Log.d(TAG, floorNum + ":num");
 		return 0;
 	}
 
