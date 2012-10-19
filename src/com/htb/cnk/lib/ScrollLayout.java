@@ -2,6 +2,7 @@ package com.htb.cnk.lib;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
@@ -95,8 +96,13 @@ public class ScrollLayout extends ViewGroup {
 	 */
 	public void snapToDestination() {
 		final int screenWidth = getWidth();
-		final int destScreen = (getScrollX() + screenWidth / 2) / screenWidth;
+		int destScreen = (getScrollX() + screenWidth / 2) / screenWidth;
+		destScreen = Math.max(0, Math.min(destScreen, getChildCount() - 1));
 		snapToScreen(destScreen);
+		if (destScreen != page) {
+			page = destScreen;
+			pageListener.page(page);
+		}
 	}
 
 	public void snapToScreen(int whichScreen) {
@@ -174,13 +180,16 @@ public class ScrollLayout extends ViewGroup {
 				snapToScreen(mCurScreen - 1);
 				--page;
 				pageListener.page(page);
+				Log.d(TAG, "move left");
 			} else if (velocityX < -SNAP_VELOCITY && mCurScreen < getChildCount() - 1) {
 				// Fling enough to move right
 				snapToScreen(mCurScreen + 1);
 				++page;
 				pageListener.page(page);
+				Log.d(TAG, "move right");
 			} else {
 				snapToDestination();
+				Log.d(TAG, "stay");
 			}
 			if (mVelocityTracker != null) {
 				mVelocityTracker.recycle();
