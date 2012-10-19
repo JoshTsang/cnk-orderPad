@@ -1,31 +1,24 @@
 package com.htb.cnk;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
-import android.app.LauncherActivity.ListItem;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.GridView;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
-import com.hp.hpl.sparta.Text;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.TableInfo;
 import com.htb.cnk.lib.ScrollLayout;
 import com.htb.cnk.ui.base.TableBaseActivity;
-import com.htb.constant.Table;
 
 public class TableActivity extends TableBaseActivity {
 
@@ -40,7 +33,6 @@ public class TableActivity extends TableBaseActivity {
 	protected Button mManageBtn;
 	protected GridView mGridView;
 
-	private int PageCount;
 	private ScrollLayout curPage;
 	private LinearLayout layoutBottom;
 	private List<TableInfo> lstDate = new ArrayList<TableInfo>();
@@ -67,12 +59,10 @@ public class TableActivity extends TableBaseActivity {
 		setContentView(R.layout.table_activity);
 		findViews();
 		setClickListeners();
-		handler();
+		setHandler();
 	}
 
 	private void setGridView() {
-		curPage = (ScrollLayout) findViewById(R.id.scr);
-		layoutBottom = (LinearLayout) findViewById(R.id.layout_scr_bottom);
 		imgCur.setText("1楼");
 		layoutBottom.addView(imgCur);
 		curPage.getLayoutParams().height = this.getWindowManager()
@@ -101,7 +91,7 @@ public class TableActivity extends TableBaseActivity {
 		getSettings().setFloorCurrent(page);
 	}
 
-	private void handler() {
+	private void setHandler() {
 		setTableHandler(tableHandler);
 		mNotificationHandler = notificationHandler;
 		setRingtoneHandler(ringtoneHandler);
@@ -117,6 +107,9 @@ public class TableActivity extends TableBaseActivity {
 		mUpdateBtn = (Button) findViewById(R.id.checkOutTable);
 		mStatisticsBtn = (Button) findViewById(R.id.logout);
 		mManageBtn = (Button) findViewById(R.id.management);
+		curPage = (ScrollLayout) findViewById(R.id.scr);
+		layoutBottom = (LinearLayout) findViewById(R.id.layout_scr_bottom);
+		
 		imgCur = new TextView(TableActivity.this);
 	}
 
@@ -274,17 +267,16 @@ public class TableActivity extends TableBaseActivity {
 
 	private void updateGrid(int page) {
 		mGridView = (GridView) curPage.getChildAt(page);
-		Log.d(TAG, "page:" + page);
 		setGridViewAdapter(page);
 	}
 
 	protected void setTableInfos() {
-		PageCount = getSettings().getFloorNum();
+		int pageCount = getSettings().getFloorNum();
 		if (mGridView != null) {
 			curPage.removeAllViews();
 		}
 		TableInfo tableInfo = new TableInfo();
-		for (int floorNum = 0; floorNum < PageCount; floorNum++) {
+		for (int floorNum = 0; floorNum < pageCount; floorNum++) {
 			mGridView = new GridView(TableActivity.this);
 			tableInfo.addGridItem(floorNum, mNotificaion);
 			lstDate.add(tableInfo);
@@ -300,7 +292,6 @@ public class TableActivity extends TableBaseActivity {
 			mGridView.setHorizontalSpacing(10);
 			mGridView.setVisibility(View.VISIBLE);
 			mGridView.setOnItemClickListener(tableItemClickListener);
-			mGridView.setTag(floorNum);
 			curPage.addView(mGridView);
 		}
 		getSettings().setFloorCurrent(0);
@@ -310,7 +301,6 @@ public class TableActivity extends TableBaseActivity {
 	 * @param page
 	 */
 	private void setGridViewAdapter(int page) {
-
 		lstDate.get(page).addGridItem(page, mNotificaion);
 		mGridView.setOnItemClickListener(tableItemClickListener);
 		SimpleAdapter currentPageAdapter = mAdapterList.get(page);
