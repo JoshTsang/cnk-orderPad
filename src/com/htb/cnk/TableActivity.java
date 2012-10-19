@@ -69,7 +69,7 @@ public class TableActivity extends TableBaseActivity {
 		mpDialog.show();
 		setClickListeners();
 		setHandler();
-		mTableInfo = new TableAdapter(mTableItem, mNotification);
+		mTableInfo = new TableAdapter(mTableItem, mNotification, mSettings);
 	}
 
 	private void initViewPager() {
@@ -143,7 +143,6 @@ public class TableActivity extends TableBaseActivity {
 		mStatisticsBtn.setOnClickListener(logoutClicked);
 		mManageBtn.setOnClickListener(manageClicked);
 		mNetWrorkAlertDialog = networkDialog();
-
 	}
 
 	Handler changeTIdHandler = new Handler() {

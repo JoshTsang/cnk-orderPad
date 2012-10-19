@@ -69,7 +69,7 @@ public class TableGridDeskActivity extends BaseActivity {
 	protected List<Integer> selectedTable = new ArrayList<Integer>();
 
 	protected PhoneOrder mPhoneOrder;
-	private TableSetting mSettings;
+	protected TableSetting mSettings;
 	protected Ringtone mRingtone;
 	protected SimpleAdapter mImageItems;
 
@@ -520,6 +520,7 @@ public class TableGridDeskActivity extends BaseActivity {
 	}
 
 	private void changeTable(final int destTId, final int persons) {
+		mpDialog.show();
 		new Thread() {
 			public void run() {
 				try {
@@ -536,6 +537,7 @@ public class TableGridDeskActivity extends BaseActivity {
 	}
 
 	private void copyTable(final int srcTId) {
+		mpDialog.show();
 		new Thread() {
 			public void run() {
 				try {
@@ -549,6 +551,7 @@ public class TableGridDeskActivity extends BaseActivity {
 	}
 
 	protected void NotificationType() {
+		mpDialog.show();
 		new Thread() {
 			public void run() {
 				try {
