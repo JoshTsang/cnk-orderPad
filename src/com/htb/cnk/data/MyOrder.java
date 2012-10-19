@@ -20,6 +20,7 @@ import android.util.Log;
 import com.htb.cnk.lib.ErrorPHP;
 import com.htb.cnk.lib.Http;
 import com.htb.constant.Server;
+import com.htb.constant.Table;
 
 public class MyOrder {
 	protected final static String TAG = "MyOrder";
@@ -239,7 +240,7 @@ public class MyOrder {
 		return 0;
 	}
 
-	public int submit() {
+	public int submit(int tableStatus) {
 		JSONObject order = new JSONObject();
 		Date date = new Date();
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -287,7 +288,13 @@ public class MyOrder {
 			e.printStackTrace();
 			return -1;
 		}
-		String response = Http.post(Server.SUBMIT_ORDER, order.toString());
+		
+		String response;
+		if (tableStatus == Table.OPEN_TABLE_STATUS) {
+			response = Http.post(Server.SUBMIT_ORDER+"?action=add", order.toString());
+		} else {
+			response = Http.post(Server.SUBMIT_ORDER, order.toString());
+		}
 		if (!ErrorPHP.isSucc(response, TAG)) {
 			return -1;
 		}

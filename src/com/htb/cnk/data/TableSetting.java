@@ -152,6 +152,12 @@ public class TableSetting implements Serializable {
 		
 		return item==null?null:item.getName();
 	}
+	
+	public int getStatusById(int tableId) {
+		TableSettingItem item = mTableIndexForId.get(tableId);
+		
+		return item==null?0:item.getStatus();
+	}
 
 	public ArrayList<HashMap<String, Object>> getTableOpen() {
 		ArrayList<HashMap<String, Object>> tableOpen = new ArrayList<HashMap<String, Object>>();
