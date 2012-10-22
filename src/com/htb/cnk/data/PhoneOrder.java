@@ -3,13 +3,13 @@ package com.htb.cnk.data;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.htb.cnk.lib.ErrorPHP;
-import com.htb.cnk.lib.Http;
-import com.htb.constant.Server;
-
 import android.content.Context;
 import android.database.Cursor;
 import android.util.Log;
+
+import com.htb.cnk.lib.ErrorPHP;
+import com.htb.cnk.lib.Http;
+import com.htb.constant.Server;
 
 public class PhoneOrder extends MyOrder {
 
@@ -18,7 +18,7 @@ public class PhoneOrder extends MyOrder {
 		// TODO Auto-generated constructor stub
 	}
 
-	public int getPhoneQuantity(int position) {
+	public float getPhoneQuantity(int position) {
 		return mOrder.get(position).phoneQuantity;
 	}
 

@@ -186,7 +186,6 @@ public class TableActivity extends TableBaseActivity {
 						+ getResources()
 								.getString(R.string.networkErrorWarning));
 			} else {
-				mTotalPrice = (double) msg.what;
 				if (mTotalPrice <= 0) {
 					toastText(R.string.dishNull);
 				} else {

@@ -18,5 +18,9 @@
         <item>查看顾客已点的菜</item>
         <item>取消顾客已点的菜</item>
     </array>
+    <array name = "cashType">
+        <item>正常收费</item>
+        <item>打折</item>
+    </array>
 
 </resources>

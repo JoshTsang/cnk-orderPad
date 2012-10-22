@@ -118,4 +118,7 @@
     <string name="islogOut">确认交班</string>
     <string name="notificationTypeWarning">服务功能出现问题，暂时不能使用此功能，请联系技术开发人员来解决</string>
 	<string name="notificationWarning">呼叫服务员不成功！</string>
+	
+	<string name="rebate">打折</string>
+	<string name="cashType">计算方式</string>
 </resources>

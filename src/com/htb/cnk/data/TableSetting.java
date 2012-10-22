@@ -31,7 +31,7 @@ public class TableSetting implements Serializable {
 	public static final int MY_ORDER = 2;
 	public static final int SUBMIT = 0;
 	private int floorNum;
-	//private int FLOOR_NUM_CURRENT = 10;
+	// private int FLOOR_NUM_CURRENT = 10;
 	private Context mContext;
 
 	public class TableSettingItem {
@@ -57,7 +57,7 @@ public class TableSetting implements Serializable {
 		public void update(int status) {
 			mStatus = status;
 		}
-		
+
 		public void setStatus(int status) {
 			mStatus = status;
 		}
@@ -95,9 +95,9 @@ public class TableSetting implements Serializable {
 	private static ArrayList<List<TableSettingItem>> mTableFloor = new ArrayList<List<TableSettingItem>>();
 	private static SparseArray<TableSettingItem> mTableIndexForId = new SparseArray<TableSetting.TableSettingItem>();
 	private static HashMap<String, TableSettingItem> mTableIndexForName = new HashMap<String, TableSetting.TableSettingItem>();
-	
+
 	private static List<String> checkOutPrinter = new ArrayList<String>();
-	
+
 	public TableSetting(Context context) {
 		mContext = context;
 	}
@@ -141,15 +141,14 @@ public class TableSetting implements Serializable {
 		return mTableSettings.get(i).getStatus();
 	}
 
-
 	public int getId(String tableName) {
 		TableSettingItem item = mTableIndexForName.get(tableName);
-		return item==null?(-1):item.getId();
+		return item == null ? (-1) : item.getId();
 	}
 
 	public String getName(int tableId) {
 		TableSettingItem item = mTableIndexForId.get(tableId);
-		return item==null?null:item.getName();
+		return item == null ? null : item.getName();
 	}
 
 	public ArrayList<HashMap<String, Object>> getTableOpen() {
@@ -157,8 +156,7 @@ public class TableSetting implements Serializable {
 		for (int i = 0; i < mTableSettings.size(); i++) {
 			if (mTableSettings.get(i).getStatus() == 1) {
 				HashMap<String, Object> map = new HashMap<String, Object>();
-				map.put("name", mTableSettings.get(i)
-						.getName());
+				map.put("name", mTableSettings.get(i).getName());
 				map.put("id", mTableSettings.get(i).getId());
 				tableOpen.add(map);
 			}
@@ -203,12 +201,11 @@ public class TableSetting implements Serializable {
 		return -1;
 	}
 
-	private void createTables(JSONArray tableList)
-			throws JSONException {
+	private void createTables(JSONArray tableList) throws JSONException {
 		TableSettingItem asItem;
 		phoneOrderPending = false;
 		int length = tableList.length();
-		
+
 		for (int i = 0; i < length; i++) {
 			JSONObject item = tableList.getJSONObject(i);
 			int id = item.getInt("id");
@@ -221,8 +218,8 @@ public class TableSetting implements Serializable {
 			int index = item.getInt("index");
 			int area = item.getInt("area");
 			int floor = item.getInt("floor");
-			asItem = new TableSettingItem(status, name, id, category,
-					index, area, floor);
+			asItem = new TableSettingItem(status, name, id, category, index,
+					area, floor);
 			add(asItem, mTableSettings);
 		}
 		floorCategory();
@@ -231,19 +228,18 @@ public class TableSetting implements Serializable {
 	}
 
 	private void updateIndex() {
-		for (TableSettingItem item:mTableSettings) {
+		for (TableSettingItem item : mTableSettings) {
 			mTableIndexForId.put(item.getId(), item);
 			mTableIndexForName.put(item.getName(), item);
 		}
 	}
-	
-	private void updateTables(JSONArray tableList)
-			throws JSONException {
+
+	private void updateTables(JSONArray tableList) throws JSONException {
 		TableSettingItem asItem;
 		phoneOrderPending = false;
 		int length = tableList.length();
 		boolean isIndexUpdateNeed = false;
-		
+
 		for (int i = 0; i < length; i++) {
 			JSONObject item = tableList.getJSONObject(i);
 			int id = item.getInt("id");
@@ -272,11 +268,11 @@ public class TableSetting implements Serializable {
 			updateIndex();
 		}
 	}
-	
+
 	private TableSettingItem findTableItemById(int id) {
 		return mTableIndexForId.get(id);
 	}
-	
+
 	public boolean hasPendedPhoneOrder() {
 		return phoneOrderPending;
 	}
@@ -284,11 +280,11 @@ public class TableSetting implements Serializable {
 	public List<TableSettingItem> getTables() {
 		return mTableSettings;
 	}
-	
+
 	public List<TableSettingItem> getTablesByFloor(int floor) {
 		return mTableFloor.get(floor);
 	}
-	
+
 	public int getItemTableStatus(int tableId) {
 		String tableStatusPkg = Http.get(Server.GET_ITEM_TABLE_STATUS, "TSI="
 				+ tableId);
@@ -344,6 +340,7 @@ public class TableSetting implements Serializable {
 		String time = getCurrentTime();
 		JSONObject orderALL = new JSONObject();
 		JSONArray order = new JSONArray();
+		Log.d(TAG, tableIdList.size()+":size");
 		for (Integer item : tableIdList) {
 			JSONObject tId = new JSONObject();
 			try {
@@ -359,7 +356,7 @@ public class TableSetting implements Serializable {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-
+		Log.d(TAG, orderALL.toString()+"aaa");
 		String tableCleanPkg = Http.post(Server.CLEAN_TABLE,
 				orderALL.toString());
 		if (!ErrorPHP.isSucc(tableCleanPkg, TAG)) {
@@ -528,8 +525,8 @@ public class TableSetting implements Serializable {
 				float tatolPrice = 0;
 				for (int i = 0; i < jsonArrary.length(); i++) {
 					JSONObject jsonItem = (JSONObject) jsonArrary.get(i);
-					float quan = jsonItem.getInt("quan");
-					float price = jsonItem.getInt("price");
+					float quan = (float) jsonItem.getDouble("quan");
+					float price = (float) jsonItem.getDouble("price");
 					String name = jsonItem.getString("name");
 					String dish;
 					tatolPrice = tatolPrice + (quan * price);

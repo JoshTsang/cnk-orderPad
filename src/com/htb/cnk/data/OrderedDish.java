@@ -5,7 +5,7 @@ public class OrderedDish {
 	//private final MyOrder OrderedDish;
 	Dish dish;
 	float padQuantity;
-	int phoneQuantity;
+	float phoneQuantity;
 	int status;
 	int tableId;
 	boolean []flavor;

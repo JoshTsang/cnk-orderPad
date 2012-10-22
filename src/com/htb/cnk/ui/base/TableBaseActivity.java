@@ -119,6 +119,7 @@ public class TableBaseActivity extends TableGridDeskActivity {
 				try {
 					double ret = getSettings().getTotalPriceTable(
 							selectedTable, tableName);
+					mTotalPrice = ret;
 					mTotalPriceTableHandler.sendEmptyMessage((int) ret);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -127,21 +128,6 @@ public class TableBaseActivity extends TableGridDeskActivity {
 		}.start();
 	}
 
-	public void checkOut(final List<Integer> destIId,
-			final List<String> tableName, final Double receivable,
-			final Double income, final Double change) {
-		new Thread() {
-			public void run() {
-				try {
-					int ret = getSettings().checkOut(destIId, tableName,
-							receivable, income, change);
-					mCheckOutHandler.sendEmptyMessage(ret);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}.start();
-	}
 
 	protected OnClickListener checkOutClicked = new OnClickListener() {
 

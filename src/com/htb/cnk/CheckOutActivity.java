@@ -1,6 +1,12 @@
 package com.htb.cnk;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -8,6 +14,7 @@ import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -18,9 +25,12 @@ import android.widget.TextView;
 import com.htb.cnk.adapter.MyOrderAdapter;
 import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.Setting;
-import com.htb.cnk.ui.base.TableBaseActivity;
+import com.htb.cnk.data.TableSetting;
+import com.htb.cnk.dialog.CashContext;
+import com.htb.cnk.dialog.CashDialog;
+import com.htb.cnk.ui.base.BaseActivity;
 
-public class CheckOutActivity extends TableBaseActivity{
+public class CheckOutActivity extends BaseActivity {
 	protected Button mBackBtn;
 	protected Button mSubmitBtn;
 	protected Button mLeftBtn;
@@ -37,13 +47,22 @@ public class CheckOutActivity extends TableBaseActivity{
 	protected MyOrderAdapter mMyOrderAdapter;
 	protected MyOrder mMyOrder;
 	private Intent checkOutIntent;
+	protected double mIncome;
+	protected double mChange;
+	protected double mTotalPrice;
+	protected List<String> tableName = new ArrayList<String>();
+	protected List<Integer> selectedTable = new ArrayList<Integer>();
+	protected TableSetting mSettings;
+	protected AlertDialog.Builder mNetWrorkAlertDialog;
 	
+	private final String TAG = "CheckOutActivity";
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.checkout_activity);
 		checkOutIntent = this.getIntent();
-		mCheckOutHandler = checkOutHandler;
+		mSettings = new TableSetting(CheckOutActivity.this);
 		mMyOrder = new MyOrder(CheckOutActivity.this);
 		checkfindViews();
 		setCheckOutView();
@@ -59,13 +78,13 @@ public class CheckOutActivity extends TableBaseActivity{
 		mLeftBtn = (Button) findViewById(R.id.left_btn);
 		mRefreshBtn = (Button) findViewById(R.id.refresh);
 		mComment = (Button) findViewById(R.id.comment);
-		mReceivableText = (TextView)findViewById(R.id.receivableQuan);
-		mIncomeEdit = (EditText)findViewById(R.id.incomeEdit);
-		mChangeText = (TextView)findViewById(R.id.changeQuan);
+		mReceivableText = (TextView) findViewById(R.id.receivableQuan);
+		mIncomeEdit = (EditText) findViewById(R.id.incomeEdit);
+		mChangeText = (TextView) findViewById(R.id.changeQuan);
 		mCheckOutPrinte = (TextView) findViewById(R.id.checkOutPrinter);
 	}
-	
-	private void setCheckOutView(){
+
+	private void setCheckOutView() {
 		mSubmitBtn.setText("结账");
 		mLeftBtn.setVisibility(View.GONE);
 		mRefreshBtn.setVisibility(View.GONE);
@@ -73,21 +92,35 @@ public class CheckOutActivity extends TableBaseActivity{
 		mBackBtn.setOnClickListener(backBtnClicked);
 		mSubmitBtn.setOnClickListener(submitClicked);
 		mIncomeEdit.addTextChangedListener(watcher);
-		mCheckOutPrinte.setMovementMethod(ScrollingMovementMethod.getInstance());
+		mCheckOutPrinte
+				.setMovementMethod(ScrollingMovementMethod.getInstance());
 		getTableValue();
 		updateTabelInfos();
 	}
-	
+
 	private void updateTabelInfos() {
-		mCheckOutPrinte.setText(getSettings().checkOutJson());
-		mReceivableText.setText(String.valueOf(mTotalPrice));
+		mCheckOutPrinte.setText(mSettings.checkOutJson());
+		mReceivableText.setText(String.valueOf(MyOrder.convertFloat((float)mTotalPrice)));
 	}
-	
-	private void getTableValue(){
+
+	private void getTableValue() {
 		Bundle bundle = checkOutIntent.getExtras();
 		mTotalPrice = bundle.getDouble("price");
 		selectedTable = bundle.getIntegerArrayList("tableId");
 		tableName = bundle.getStringArrayList("tableName");
+	}
+
+	/**
+	 * 
+	 */
+	private void cashRebate() {
+		SharedPreferences sharedPre = getSharedPreferences("cashInfo",
+				Context.MODE_PRIVATE);
+		String cashType = sharedPre.getString("cashType", "");
+		String cashRebate = sharedPre.getString("cashRebate", "");
+		Log.d(TAG, cashType);
+		CashContext cashContext = new CashContext(cashType, cashRebate);
+		mTotalPrice = cashContext.getResult(mTotalPrice);
 	}
 
 	private OnClickListener backBtnClicked = new OnClickListener() {
@@ -98,19 +131,28 @@ public class CheckOutActivity extends TableBaseActivity{
 			finish();
 		}
 	};
-	
+
+	private OnClickListener leftBtnClicked = new OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+
+			CashDialog cashDialog = new CashDialog(CheckOutActivity.this);
+			cashDialog.show();
+		}
+	};
+
 	private OnClickListener submitClicked = new OnClickListener() {
 
 		@Override
 		public void onClick(View arg0) {
-			checkOut(selectedTable, tableName, mTotalPrice,
-					mIncome, mChange);
+			checkOut(selectedTable, tableName, mTotalPrice, mIncome, mChange);
 			mSubmitBtn.setEnabled(true);
 			mSubmitBtn.setTextColor(Color.GRAY);
 		}
 
 	};
-	
+
 	TextWatcher watcher = new TextWatcher() {
 
 		String tempStr;
@@ -119,20 +161,20 @@ public class CheckOutActivity extends TableBaseActivity{
 		public void onTextChanged(CharSequence s, int start, int before,
 				int count) {
 			tempStr = s.toString();
-			if(tempStr.indexOf("0") == 0){
-				tempStr = tempStr.substring(1,tempStr.length());
+			if (tempStr.indexOf("0") == 0) {
+				tempStr = tempStr.substring(1, tempStr.length());
 				mIncomeEdit.setText(tempStr);
-			} 
+			}
 			if (tempStr.length() > 0) {
 				mIncome = Double.valueOf(tempStr).doubleValue();
 				mChange = mIncome - mTotalPrice;
-				mChangeText.setText(String.valueOf(mChange));
+				mChangeText.setText(String.valueOf(MyOrder.convertFloat((float)mChange)));
 			}
 		}
 
 		@Override
 		public void afterTextChanged(Editable arg0) {
-			
+
 		}
 
 		@Override
@@ -141,26 +183,74 @@ public class CheckOutActivity extends TableBaseActivity{
 		}
 
 	};
-	
+
+	public void checkOut(final List<Integer> destIId,
+			final List<String> tableName, final Double receivable,
+			final Double income, final Double change) {
+		new Thread() {
+			public void run() {
+				try {
+					int ret = mSettings.checkOut(destIId, tableName,
+							receivable, income, change);
+					checkOutHandler.sendEmptyMessage(ret);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}.start();
+	}
 	
 	Handler checkOutHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			if (msg.what == -2) {
 				toastText(R.string.checkOutWarning);
 			} else if (msg.what == -1) {
-				netWorkDialogShow("收银出错，请检查连接网络重试");
+				mNetWrorkAlertDialog.setMessage("收银出错，请检查连接网络重试").show();
 			} else if (isPrinterError(msg)) {
 				toastText("退菜订单失败");
 			} else {
 				if (Setting.enabledCleanTableAfterCheckout()) {
 					cleanTableThread(selectedTable);
-				} else {
-					binderStart();
+				}else{
+					toastText(R.string.checkOutSucc);
+					finish();
 				}
+			}
+		}
+	};
+	
+	protected void cleanTableThread(final List<Integer> tableId) {
+		new Thread() {
+			public void run() {
+				try {
+					int ret = mSettings.cleanTalble(tableId);
+					mTableHandler.sendEmptyMessage(ret);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}.start();
+	}
+	
+	Handler mTableHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			mpDialog.cancel();
+			if (msg.what < 0) {
+				toastText("清台不成功");
+			}else{
 				toastText(R.string.checkOutSucc);
 				finish();
 			}
 		}
 	};
 	
+	Handler notificationTypeHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			mpDialog.cancel();
+			if (msg.what < 0) {
+				toastText(R.string.notificationTypeWarning);
+			}
+		}
+	};
+
 }

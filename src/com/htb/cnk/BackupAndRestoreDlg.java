@@ -17,20 +17,19 @@ import java.util.Date;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 
-import com.htb.cnk.lib.DBFile;
-import com.htb.constant.ErrorNum;
-import com.htb.constant.Server;
-
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+
+import com.htb.cnk.lib.DBFile;
+import com.htb.constant.ErrorNum;
+import com.htb.constant.Server;
 
 public class BackupAndRestoreDlg {
 	public final static int ACTION_BACKUP = 10;
@@ -319,14 +318,7 @@ public class BackupAndRestoreDlg {
 		.setCancelable(false)
 		.setMessage(msg)
 		.setPositiveButton("确定",
-				new DialogInterface.OnClickListener() {
-
-					@Override
-					public void onClick(DialogInterface dialog,
-							int which) {
-						
-					}
-				})
+				null)
 		.show();
 	}
 	
