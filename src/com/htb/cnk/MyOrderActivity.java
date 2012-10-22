@@ -210,7 +210,7 @@ public class MyOrderActivity extends OrderBaseActivity {
 							Info.setMode(Info.WORK_MODE_WAITER);
 							Intent intent = new Intent();
 							intent.setClass(MyOrderActivity.this,
-									TableBaseActivity.class);
+									TableActivity.class);
 							startActivity(intent);
 						}
 					}

@@ -32,6 +32,7 @@ import com.htb.cnk.PhoneActivity;
 import com.htb.cnk.QueryOrderActivity;
 import com.htb.cnk.QuickMenuActivity;
 import com.htb.cnk.R;
+import com.htb.cnk.TableActivity;
 import com.htb.cnk.adapter.TableAdapter;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.NotificationTypes;
@@ -45,7 +46,7 @@ import com.htb.cnk.service.NotificationTableService;
 import com.htb.cnk.service.NotificationTableService.MyBinder;
 import com.htb.constant.Table;
 
-public class TableGridDeskActivity extends BaseActivity {
+public abstract class TableGridDeskActivity extends BaseActivity {
 
 	private final static String TAG = "TableGridDeskActivity";
 	protected final int UPDATE_TABLE_INFOS = 500;
@@ -247,7 +248,7 @@ public class TableGridDeskActivity extends BaseActivity {
 			Info.setMode(Info.WORK_MODE_CUSTOMER);
 			Info.setNewCustomer(true);
 			setClassToActivity(MenuActivity.class);
-			TableGridDeskActivity.this.finish();
+			finish();
 			break;
 		case 1:
 			if (Info.getMenu() == Info.ORDER_QUCIK_MENU) {

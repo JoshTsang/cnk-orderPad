@@ -26,6 +26,7 @@ import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.PhoneOrder;
 import com.htb.cnk.data.Setting;
 import com.htb.cnk.data.TableSetting;
+import com.htb.cnk.data.UserData;
 import com.htb.cnk.dialog.LoginDlg;
 import com.htb.cnk.dialog.TitleAndMessageDialog;
 import com.htb.cnk.ui.base.BaseActivity;
@@ -192,7 +193,7 @@ public class OrderBaseActivity extends BaseActivity {
 		showProgressDlg("正在提交订单...");
 		new Thread() {
 			public void run() {
-				int ret = mMyOrder.submit();
+				int ret = mMyOrder.submit(mSettings.getStatusById(Info.getTableId()));
 				mSubmitHandler.sendEmptyMessage(ret);
 			}
 		}.start();

@@ -295,6 +295,7 @@ public class TableActivity extends TableBaseActivity {
 		updateGridViewAdapter(page);
 	}
 
+	
 	/**
 	 * @param page
 	 */
