@@ -82,7 +82,6 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 	protected Handler mChangeTIdHandler;
 	protected Handler mCombineTIdHandler;
 	protected Handler mCopyTIdHandler;
-	protected Handler mNotificationTypeHandler;
 
 	protected int currentPage;
 	protected TableAdapter mTableInfo;
@@ -95,10 +94,17 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 
 	@Override
 	protected void onDestroy() {
-		super.onDestroy();
+		TableGridDeskActivity.this.stopService(new Intent(TableGridDeskActivity.this,NotificationTableService.class));
 		unbindService(conn);
 		unregisterReceiver(mReceiver);
+		super.onDestroy();
 	}
+	
+	@Override
+	protected void onStop() {
+		super.onStop();
+	}
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -552,14 +558,21 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 			public void run() {
 				try {
 					int ret = mNotificationType.getNotifiycationsType();
-					mNotificationTypeHandler.sendEmptyMessage(ret);
+					notificationTypeHandler.sendEmptyMessage(ret);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		}.start();
 	}
-
+	Handler notificationTypeHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			mpDialog.cancel();
+			if (msg.what < 0) {
+				toastText(R.string.notificationTypeWarning);
+			}
+		}
+	};
 	private int getTableStatusFromServer() {
 		int ret = getSettings().getTableStatusFromServerActivity();
 		if (ret < 0) {

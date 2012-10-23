@@ -10,20 +10,20 @@ import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.htb.cnk.R;
-import com.htb.cnk.dialog.ItemDialog;
-import com.htb.cnk.dialog.MultiChoiceItemsDialog;
-import com.htb.cnk.dialog.TitleAndMessageDialog;
-import com.htb.cnk.dialog.ViewDialog;
+import com.htb.cnk.dialog.ItemDlg;
+import com.htb.cnk.dialog.MultiChoiceItemsDlg;
+import com.htb.cnk.dialog.TitleAndMessageDlg;
+import com.htb.cnk.dialog.ViewDlg;
 import com.htb.constant.ErrorNum;
 import com.umeng.analytics.MobclickAgent;
 
 public abstract class BaseActivity extends Activity {
 
 	private final static boolean enableUmeng = false;
-	protected TitleAndMessageDialog mTitleAndMessageDialog;
-	protected ItemDialog mItemDialog;
-	protected ViewDialog mViewDialog;
-	protected MultiChoiceItemsDialog mMultiChoiceItemsDialog;
+	protected TitleAndMessageDlg mTitleAndMessageDialog;
+	protected ItemDlg mItemDialog;
+	protected ViewDlg mViewDialog;
+	protected MultiChoiceItemsDlg mMultiChoiceItemsDialog;
 	protected ProgressDialog mpDialog;
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -41,11 +41,11 @@ public abstract class BaseActivity extends Activity {
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		mTitleAndMessageDialog = new TitleAndMessageDialog(
+		mTitleAndMessageDialog = new TitleAndMessageDlg(
 				BaseActivity.this);
-		mItemDialog = new ItemDialog(BaseActivity.this);
-		mViewDialog = new ViewDialog(BaseActivity.this);
-		mMultiChoiceItemsDialog = new MultiChoiceItemsDialog(
+		mItemDialog = new ItemDlg(BaseActivity.this);
+		mViewDialog = new ViewDlg(BaseActivity.this);
+		mMultiChoiceItemsDialog = new MultiChoiceItemsDlg(
 				BaseActivity.this);
 		if (enableUmeng) {
 			MobclickAgent.onError(this);

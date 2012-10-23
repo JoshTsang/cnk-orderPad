@@ -7,11 +7,11 @@ import android.content.DialogInterface;
 import com.htb.cnk.R;
 import com.htb.cnk.lib.BaseDialog;
 
-public class TitleAndMessageDialog extends BaseDialog {
+public class TitleAndMessageDlg extends BaseDialog {
 
 	private Context mActivity;
 
-	public TitleAndMessageDialog(Context context) {
+	public TitleAndMessageDlg(Context context) {
 		super(context);
 		mActivity = context;
 	}

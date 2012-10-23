@@ -62,7 +62,6 @@ public class TableActivity extends TableBaseActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
 		Info.setMode(Info.WORK_MODE_WAITER);
 		setContentView(R.layout.table_activity);
 		findViews();
@@ -80,7 +79,6 @@ public class TableActivity extends TableBaseActivity {
 		mChangeTIdHandler = changeTIdHandler;
 		mCopyTIdHandler = copyTIdHandler;
 		mCombineTIdHandler = combineTIdHandler;
-		mNotificationTypeHandler = notificationTypeHandler;
 	}
 
 	private void findViews() {
@@ -295,7 +293,6 @@ public class TableActivity extends TableBaseActivity {
 		updateGridViewAdapter(page);
 	}
 
-	
 	/**
 	 * @param page
 	 */
@@ -329,6 +326,7 @@ public class TableActivity extends TableBaseActivity {
 
 		public void onPageSelected(int arg0) {
 			setCurPage(arg0);
+			mTableInfo.clearLstImageItem();
 			updateGridViewAdapter(arg0);
 		}
 
