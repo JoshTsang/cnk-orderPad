@@ -181,6 +181,7 @@ public class TableSetting implements Serializable {
 
 	public static String getTableStatusFromServer() {
 		String tableStatusPkg = Http.get(Server.GET_TABLE_STATUS, "UUID="+Lisence.getDeviceId());
+		Log.d(TAG, tableStatusPkg);
 		if (tableStatusPkg == null) {
 			Log.e(TAG, "getTableStatusFromServer.timeout");
 			return null;
