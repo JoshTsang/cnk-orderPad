@@ -24,6 +24,7 @@ public class Dishes {
 	final static int PIC_COLUMN = 3;
 	final static int PRINTER_COLUMN = 4;
 	final static int UNIT_NAME = 5;
+	final static int SHORTCUT = 6;
 	
 	private List<Dish> mDishes = new ArrayList<Dish>();
 	private List<Integer> mSoldOutItemsId = new ArrayList<Integer>();
@@ -129,7 +130,28 @@ public class Dishes {
 						CnkDbHelper.TABLE_UNIT, "id", CnkDbHelper.UNIT_ID);
 		return mDb.rawQuery(sql, null);
 	}
-
+	
+	public Cursor getDishesFromDB() {
+		int ret = connectDB();
+		if (ret < 0) {
+			return null;
+		}
+		
+		String sql = String
+				.format("SELECT %s.%s, %s, %s, %s, %s, %s, %s FROM %s, %s Where %s.%s=%s",
+						CnkDbHelper.TABLE_DISH_INFO, CnkDbHelper.DISH_ID,
+						CnkDbHelper.DISH_NAME,
+						CnkDbHelper.DISH_PRICE,
+						CnkDbHelper.DISH_PIC,
+						CnkDbHelper.DISH_PRINTER,
+						CnkDbHelper.UNIT_NAME,
+						CnkDbHelper.SHORTCUT,
+						CnkDbHelper.TABLE_DISH_INFO,
+						CnkDbHelper.TABLE_UNIT,
+						CnkDbHelper.TABLE_UNIT, "id", CnkDbHelper.UNIT_ID);
+		return mDb.rawQuery(sql, null);
+	}
+	
 	private int removeSoldOutItems(int id) {
 		int ret;
 		ret = loadSoldOutItems(id);

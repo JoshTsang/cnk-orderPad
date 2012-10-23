@@ -2,8 +2,8 @@ package com.htb.cnk.data;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
+import android.database.sqlite.SQLiteOpenHelper;
 
 /**
  * @author josh
@@ -44,6 +44,8 @@ public class CnkDbHelper extends SQLiteOpenHelper {
 	
 	public final static String UNIT_ID = "unitID";
 	public final static String UNIT_NAME = "unitName";
+	
+	public final static String SHORTCUT = "shortcut";
 	
 	public CnkDbHelper(Context context, String name, CursorFactory factory,
 			int version) {

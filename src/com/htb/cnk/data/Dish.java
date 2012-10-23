@@ -11,6 +11,7 @@ public class Dish {
 	private String mPic;
 	private int mPrinter;
 	private String mUnit;
+	private String mShortcut;
 	
 	public Dish(int id, String name, float price, String pic, String unit, int printer) {
 		mId = id;
@@ -19,6 +20,16 @@ public class Dish {
 		mPic = pic;
 		mPrinter = printer;
 		mUnit = unit;
+	}
+	
+	public Dish(int id, String name, float price, String pic, String unit, int printer, String shortcut) {
+		mId = id;
+		mName = name;
+		mPrice = price;
+		mPic = pic;
+		mPrinter = printer;
+		mUnit = unit;
+		mShortcut = shortcut;
 	}
 	
 	public Dish(int id, String name, float price, String pic, String unit) {
@@ -48,6 +59,10 @@ public class Dish {
 	
 	public String getUnit() {
 		return mUnit;
+	}
+	
+	public String getShortcut() {
+		return mShortcut;
 	}
 	
 	public int getPrinter() {

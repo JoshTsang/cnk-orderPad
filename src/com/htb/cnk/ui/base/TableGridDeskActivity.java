@@ -32,7 +32,6 @@ import com.htb.cnk.PhoneActivity;
 import com.htb.cnk.QueryOrderActivity;
 import com.htb.cnk.QuickMenuActivity;
 import com.htb.cnk.R;
-import com.htb.cnk.TableActivity;
 import com.htb.cnk.adapter.TableAdapter;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.NotificationTypes;
