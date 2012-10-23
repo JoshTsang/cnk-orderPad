@@ -87,7 +87,8 @@
             android:inputType="textUri|textMultiLine"
             android:singleLine="false"
             android:textColor="#652A25"
-            android:textSize="27dip" >
+            android:textSize="27dip" 
+            android:digits="1234567890qazwsxedcrfvtgbyhnujmikolpQAZWSXEDCRFVTGBYHNUJMIKOLP">
         </EditText>
 
         <TextView

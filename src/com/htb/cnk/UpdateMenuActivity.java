@@ -102,17 +102,19 @@ public class UpdateMenuActivity extends BaseActivity {
 				
 				handler.sendEmptyMessage(DOWNLOAD_PIC);
 				ret = downloadHugePic();
+				if (ret == ErrorNum.DOWNLOAD_PIC_FAILED || ret >= 0) {
+					mSharedPre = getSharedPreferences("menuDB",
+							Context.MODE_WORLD_WRITEABLE
+									| Context.MODE_WORLD_READABLE);
+					Editor editor = mSharedPre.edit();
+					editor.putInt("ver", mMenuVer);
+					editor.commit();
+				}
 				if (ret < 0) {
 					handler.sendEmptyMessage(ret);
 					return ;
 				}
-				
-				mSharedPre = getSharedPreferences("menuDB",
-						Context.MODE_WORLD_WRITEABLE
-								| Context.MODE_WORLD_READABLE);
-				Editor editor = mSharedPre.edit();
-				editor.putInt("ver", mMenuVer);
-				editor.commit();
+
 				handler.sendEmptyMessage(0);
 			}
 		};

@@ -100,8 +100,6 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 	
 	@Override
 	protected void onStop() {
-		unbindService(conn);
-		unregisterReceiver(mReceiver);
 		super.onStop();
 	}
 

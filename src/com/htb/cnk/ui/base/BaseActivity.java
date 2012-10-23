@@ -17,7 +17,7 @@ import com.htb.cnk.dialog.ViewDlg;
 import com.htb.constant.ErrorNum;
 import com.umeng.analytics.MobclickAgent;
 
-public class BaseActivity extends Activity {
+public abstract class BaseActivity extends Activity {
 
 	private final static boolean enableUmeng = false;
 	protected TitleAndMessageDlg mTitleAndMessageDialog;

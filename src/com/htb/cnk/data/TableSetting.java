@@ -180,8 +180,7 @@ public class TableSetting implements Serializable {
 	}
 
 	public static String getTableStatusFromServer() {
-		String tableStatusPkg = Http.get(Server.GET_TABLE_STATUS, null);
-		Log.d(TAG, tableStatusPkg);
+		String tableStatusPkg = Http.get(Server.GET_TABLE_STATUS, "UUID="+Lisence.getDeviceId());
 		if (tableStatusPkg == null) {
 			Log.e(TAG, "getTableStatusFromServer.timeout");
 			return null;
@@ -203,6 +202,7 @@ public class TableSetting implements Serializable {
 			}
 			return 0;
 		} catch (Exception e) {
+			Log.e(TAG, "tableStatusResponse:" + tableStatusPkg);
 			e.printStackTrace();
 		}
 		return -1;

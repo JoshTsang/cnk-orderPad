@@ -37,14 +37,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.htb.cnk.data.Info;
+import com.htb.cnk.data.Lisence;
 import com.htb.cnk.data.Setting;
 import com.htb.cnk.data.Version;
 import com.htb.cnk.data.WifiAdmin;
 import com.htb.cnk.dialog.LoginDlg;
 import com.htb.cnk.dialog.TitleAndMessageDlg;
 import com.htb.cnk.lib.Http;
+import com.htb.cnk.service.NotificationTableService;
 import com.htb.cnk.ui.base.BaseActivity;
-import com.htb.cnk.ui.base.TableBaseActivity;
 import com.htb.constant.Permission;
 import com.htb.constant.Server;
 
@@ -101,6 +102,13 @@ public class Cnk_orderPadActivity extends BaseActivity {
 		mpDialog.setIndeterminate(false);
 		mpDialog.setCancelable(false);
 		setmNetWrorkAlertDialog(wifiDialog());
+		new Thread() {
+			public void run() {
+				int ret = Lisence.validateDevice(getBaseContext());
+				Log.d(TAG, "lisence" + ret);
+				LisenceHandle.sendEmptyMessage(-ret);
+			}
+		}.start();
 	}
 
 	private void findViews() {
@@ -430,11 +438,48 @@ public class Cnk_orderPadActivity extends BaseActivity {
 		}
 	};
 
+	private Handler LisenceHandle = new Handler() {
+		public void handleMessage(Message msg) {
+			
+			if (msg.what < 0) {
+				mpDialog.cancel();
+				LisenceErrDlg("当前许可协议只允许使用"+(-msg.what)+ "台Pad");
+			} else if (msg.what > 0) {
+				mpDialog.cancel();
+				LisenceErrDlg("无法验证当前Pad合法性，请检查服务器！");
+			}
+		}
+	};
+	
+	private void LisenceErrDlg(String msg) {
+		new AlertDialog.Builder(Cnk_orderPadActivity.this)
+		.setTitle("注意")
+		.setCancelable(false)
+		.setMessage(msg)
+		.setPositiveButton("确定",
+				new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog,
+							int which) {
+						finish();
+					}
+				}).show();
+	}
+	
 	private void startLock() {
 		mWifiAdmin.creatWifiLock();
 		mWifiAdmin.acquireWifiLock();
 	}
 	
+	@Override
+	public void finish() {
+		Intent i  = new Intent();  
+        i.setClass(Cnk_orderPadActivity.this, NotificationTableService.class);  
+        Cnk_orderPadActivity.this.stopService(i); 
+		super.finish();
+	}
+
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
