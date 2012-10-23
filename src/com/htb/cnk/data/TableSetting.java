@@ -195,11 +195,16 @@ public class TableSetting implements Serializable {
 	public int parseTableSetting(String tableStatusPkg) {
 		try {
 			JSONArray tableList = new JSONArray(tableStatusPkg);
-			if (mTableSettings.size() <= 0) {
-				createTables(tableList);
-			} else {
-				updateTables(tableList);
-			}
+//			if (mTableSettings.size() <= 0) {
+//				createTables(tableList);
+//			} else {
+//				updateTables(tableList);
+//			}
+			//TODO find good solution for table status update
+			mTableSettings.clear();
+			createTables(tableList);
+			///////////////////////////////////////
+			
 			return 0;
 		} catch (Exception e) {
 			Log.e(TAG, "tableStatusResponse:" + tableStatusPkg);
