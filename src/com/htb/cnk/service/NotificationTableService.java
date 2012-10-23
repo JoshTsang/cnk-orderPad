@@ -6,17 +6,14 @@ import android.os.Binder;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
 
 import com.htb.cnk.data.Notifications;
 import com.htb.cnk.data.TableSetting;
 
 public class NotificationTableService extends Service {
 
-	private final int DISABLE_GRIDVIEW = 1000;
 	private final int MILLISECONDS = 1000 * 15;
 	private Notifications mNotificaion = new Notifications();
-	private final int UPDATE_TABLE_INFOS = 500;
 	private Intent intent = new Intent(SERVICE_IDENTIFIER);
 	private Bundle bundle = new Bundle();
 	private static Handler objHandler = new Handler();

@@ -7,10 +7,10 @@ import android.content.DialogInterface;
 import com.htb.cnk.R;
 import com.htb.cnk.lib.BaseDialog;
 
-public class ItemDialog extends BaseDialog {
+public class ItemDlg extends BaseDialog {
 	private Context mActivity;
 
-	public ItemDialog(Context context) {
+	public ItemDlg(Context context) {
 		super(context);
 		mActivity = context;
 	}

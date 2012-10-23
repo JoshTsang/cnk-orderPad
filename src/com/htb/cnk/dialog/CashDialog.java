@@ -15,7 +15,7 @@ import android.widget.Spinner;
 
 import com.htb.cnk.R;
 
-public class CashDialog extends ViewDialog {
+public class CashDialog extends ViewDlg {
 
 	private final String TAG = "CashDialog";
 	private Context mActivity;

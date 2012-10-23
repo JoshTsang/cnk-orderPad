@@ -28,7 +28,7 @@ import com.htb.cnk.data.Setting;
 import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.data.UserData;
 import com.htb.cnk.dialog.LoginDlg;
-import com.htb.cnk.dialog.TitleAndMessageDialog;
+import com.htb.cnk.dialog.TitleAndMessageDlg;
 import com.htb.cnk.ui.base.BaseActivity;
 import com.htb.constant.Permission;
 
@@ -52,13 +52,13 @@ public class OrderBaseActivity extends BaseActivity {
 	protected MyOrderAdapter mMyOrderAdapter;
 	protected int persons;
 	private TableSetting mSettings;
-	protected TitleAndMessageDialog mNetworkDialog;
+	protected TitleAndMessageDlg mNetworkDialog;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.myorder_activity);
 		mMyOrder = new PhoneOrder(OrderBaseActivity.this);
-		mNetworkDialog = new TitleAndMessageDialog(OrderBaseActivity.this);
+		mNetworkDialog = new TitleAndMessageDlg(OrderBaseActivity.this);
 		mSettings = new TableSetting(OrderBaseActivity.this);
 		getPersons();
 		getFLavor();

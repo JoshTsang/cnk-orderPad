@@ -8,10 +8,10 @@ import android.view.View;
 import com.htb.cnk.R;
 import com.htb.cnk.lib.BaseDialog;
 
-public class ViewDialog extends BaseDialog {
+public class ViewDlg extends BaseDialog {
 	private Context mActivity;
 
-	public ViewDialog(Context context) {
+	public ViewDlg(Context context) {
 		super(context);
 		mActivity = context;
 	}

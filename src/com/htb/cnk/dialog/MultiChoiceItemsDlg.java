@@ -6,10 +6,10 @@ import android.content.DialogInterface;
 
 import com.htb.cnk.lib.BaseDialog;
 
-public class MultiChoiceItemsDialog extends BaseDialog {
+public class MultiChoiceItemsDlg extends BaseDialog {
 	private Context mActivity;
 
-	public MultiChoiceItemsDialog(Context context) {
+	public MultiChoiceItemsDlg(Context context) {
 		super(context);
 		mActivity = context;
 	}

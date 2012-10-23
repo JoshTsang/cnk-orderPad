@@ -18,47 +18,52 @@ public class TableAdapter {
 
 	public static final int FILTER_NONE = 0;
 	public static final int FILTER_FLOOR = 1;
-	
+
 	private int mImageItem;
 	private int mTextItem;
 	private TableSetting mSetting;
 	private Notifications mNotification;
 	private ArrayList<HashMap<String, Object>> lstImageItem;
 	private List<TableSetting.TableSettingItem> resultSet;
-	
-	public TableAdapter(ArrayList<HashMap<String, Object>> lst, Notifications notification, TableSetting ts) {
+
+	public TableAdapter(ArrayList<HashMap<String, Object>> lst,
+			Notifications notification, TableSetting ts) {
 		lstImageItem = lst;
 		mNotification = notification;
 		mSetting = ts;
 	}
-	
+
 	public void filterTables(int arg, int filterType) {
 		setStatusAndIcon(arg, filterType);
 	}
-	
+
 	public String getName(int index) {
 		return resultSet.get(index).getName();
 	}
-	
+
 	public int getId(int index) {
 		return resultSet.get(index).getId();
 	}
-	
+
 	public int getStatus(int index) {
 		return resultSet.get(index).getStatus();
 	}
-	
+
 	public void setStatus(int index, int status) {
 		resultSet.get(index).setStatus(status);
 	}
-	
-	private void setStatusAndIcon(int floorNum, int filterType) {
+
+	public void clearLstImageItem() {
 		lstImageItem.clear();
+	}
+
+	private void setStatusAndIcon(int floorNum, int filterType) {
+		// lstImageItem.clear();
 		switch (filterType) {
 		case FILTER_FLOOR:
 			resultSet = mSetting.getTablesByFloor(floorNum);
 			break;
-			
+
 		default:
 			resultSet = mSetting.getTables();
 			break;
@@ -91,7 +96,7 @@ public class TableAdapter {
 		}
 	}
 
-	//TODO define belows
+	// TODO define belows
 	private void imageItemSwitch(int floor, int position, int status,
 			HashMap<String, Object> map) {
 		switch (status) {
@@ -120,7 +125,12 @@ public class TableAdapter {
 			break;
 		default:
 			map.put(IMAGE_ITEM, R.drawable.table_red);
-			Log.e(TAG, "unknown status:"+status+";"+(new Exception()).getStackTrace()[2].getLineNumber());
+			Log.e(TAG,
+					"unknown status:"
+							+ status
+							+ ";"
+							+ (new Exception()).getStackTrace()[2]
+									.getLineNumber());
 			break;
 		}
 	}

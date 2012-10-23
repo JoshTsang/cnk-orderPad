@@ -32,7 +32,6 @@ import com.htb.cnk.PhoneActivity;
 import com.htb.cnk.QueryOrderActivity;
 import com.htb.cnk.QuickMenuActivity;
 import com.htb.cnk.R;
-import com.htb.cnk.TableActivity;
 import com.htb.cnk.adapter.TableAdapter;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.NotificationTypes;
@@ -83,7 +82,6 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 	protected Handler mChangeTIdHandler;
 	protected Handler mCombineTIdHandler;
 	protected Handler mCopyTIdHandler;
-	protected Handler mNotificationTypeHandler;
 
 	protected int currentPage;
 	protected TableAdapter mTableInfo;
@@ -96,10 +94,17 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 
 	@Override
 	protected void onDestroy() {
+		TableGridDeskActivity.this.stopService(new Intent(TableGridDeskActivity.this,NotificationTableService.class));
 		super.onDestroy();
+	}
+	
+	@Override
+	protected void onStop() {
 		unbindService(conn);
 		unregisterReceiver(mReceiver);
+		super.onStop();
 	}
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -553,14 +558,21 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 			public void run() {
 				try {
 					int ret = mNotificationType.getNotifiycationsType();
-					mNotificationTypeHandler.sendEmptyMessage(ret);
+					notificationTypeHandler.sendEmptyMessage(ret);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		}.start();
 	}
-
+	Handler notificationTypeHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			mpDialog.cancel();
+			if (msg.what < 0) {
+				toastText(R.string.notificationTypeWarning);
+			}
+		}
+	};
 	private int getTableStatusFromServer() {
 		int ret = getSettings().getTableStatusFromServerActivity();
 		if (ret < 0) {
