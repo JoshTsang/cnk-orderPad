@@ -190,7 +190,6 @@ public class TableActivity extends TableBaseActivity {
 					sendPriceToCheckout();
 				}
 			}
-			mpDialog.cancel();
 		}
 	};
 

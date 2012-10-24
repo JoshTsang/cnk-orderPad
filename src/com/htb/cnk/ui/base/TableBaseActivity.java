@@ -15,7 +15,7 @@ import com.htb.cnk.ManageActivity;
 import com.htb.cnk.R;
 import com.htb.cnk.data.Info;
 
-public class TableBaseActivity extends TableGridDeskActivity {
+public abstract class TableBaseActivity extends TableGridDeskActivity {
 
 	static final String TAG = "TablesActivity";
 	protected int NETWORK_ARERTDIALOG = 0;

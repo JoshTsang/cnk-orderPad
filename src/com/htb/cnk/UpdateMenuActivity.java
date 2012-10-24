@@ -139,6 +139,7 @@ public class UpdateMenuActivity extends BaseActivity {
 			}
 		}
 		if (mMenuVer == currentMenuVer) {
+			Log.i(TAG, "serverMenuVer:" + mMenuVer);
 			return false;
 		} else {
 			Log.d(TAG, "MenuVer =" + mMenuVer + "current:" + currentMenuVer);
