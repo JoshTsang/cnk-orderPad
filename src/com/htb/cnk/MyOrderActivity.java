@@ -21,7 +21,6 @@ import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.OrderedDish;
 import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.lib.OrderBaseActivity;
-import com.htb.cnk.ui.base.TableBaseActivity;
 import com.htb.constant.ErrorNum;
 
 /**
@@ -210,7 +209,7 @@ public class MyOrderActivity extends OrderBaseActivity {
 							Info.setMode(Info.WORK_MODE_WAITER);
 							Intent intent = new Intent();
 							intent.setClass(MyOrderActivity.this,
-									TableBaseActivity.class);
+									TableActivity.class);
 							startActivity(intent);
 						}
 					}
