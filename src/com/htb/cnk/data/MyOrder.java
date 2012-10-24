@@ -371,6 +371,7 @@ public class MyOrder {
 
 	public int getOrderFromServer(int tableId) {
 		String response = Http.get(Server.GET_MYORDER, "TID=" + tableId);
+		Log.d(TAG, response);
 		if ("null".equals(response)) {
 			Log.w(TAG, "getOrderFromServer.null");
 			return -2;

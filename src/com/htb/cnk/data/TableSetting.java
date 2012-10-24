@@ -181,7 +181,6 @@ public class TableSetting implements Serializable {
 
 	public static String getTableStatusFromServer() {
 		String tableStatusPkg = Http.get(Server.GET_TABLE_STATUS, "UUID="+Lisence.getDeviceId());
-		Log.d(TAG, tableStatusPkg);
 		if (tableStatusPkg == null) {
 			Log.e(TAG, "getTableStatusFromServer.timeout");
 			return null;
@@ -353,7 +352,6 @@ public class TableSetting implements Serializable {
 		String time = getCurrentTime();
 		JSONObject orderALL = new JSONObject();
 		JSONArray order = new JSONArray();
-		Log.d(TAG, tableIdList.size()+":size");
 		for (Integer item : tableIdList) {
 			JSONObject tId = new JSONObject();
 			try {
@@ -662,6 +660,9 @@ public class TableSetting implements Serializable {
 
 	public int floorCategory() {
 		String floorCategoryPkg = Http.get(Server.GET_FLOORNUM, null);
+		if(floorCategoryPkg == null){
+			return -1;
+		}
 		floorNum = Integer.parseInt(floorCategoryPkg);
 		return 0;
 	}

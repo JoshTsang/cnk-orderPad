@@ -119,6 +119,7 @@ public class TableBaseActivity extends TableGridDeskActivity {
 				try {
 					double ret = getSettings().getTotalPriceTable(
 							selectedTable, tableName);
+					mTotalPrice = ret;
 					mTotalPriceTableHandler.sendEmptyMessage((int) ret);
 				} catch (Exception e) {
 					e.printStackTrace();

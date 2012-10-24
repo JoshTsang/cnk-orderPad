@@ -17,7 +17,7 @@ public class QuickOrder extends MyOrder {
 
 	private static List<Map<String, Object>> quickTotaPinYinlItems = new ArrayList<Map<String, Object>>();
 	private static List<Map<String, Object>> quickTotaNumlItems = new ArrayList<Map<String, Object>>();
-	private static List<Dish> mMatchedDishes = new ArrayList<Dish>();
+	private List<Dish> mMatchedDishes = new ArrayList<Dish>();
 	private Dishes mDishes;
 
 	public QuickOrder(Context context) {
