@@ -9,6 +9,13 @@ public class Setting {
 	private static boolean debug = false;
 	private static SharedPreferences Perference;
 	
+	public static final String[] TITLES = 
+	    {
+	            "基本设置",   
+	            "铃声设置",
+	            "区域设置",       
+	    };
+	
 	public Setting(Context context) {
 		Perference = context.getSharedPreferences(SettingPerferenceName,
 			Context.MODE_PRIVATE);
