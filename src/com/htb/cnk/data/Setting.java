@@ -45,6 +45,9 @@ public class Setting {
 		commitPerference("Ringtone", enable);
 	}
 	
+	public static boolean enabledAreaRingtone() {
+		return Perference.getBoolean("RingtoneArea", false);
+	}
 	
 	public static boolean enabledPWDCheck() {
 		return Perference.getBoolean("pwdCheck", true);

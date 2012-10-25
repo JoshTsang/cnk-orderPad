@@ -111,6 +111,16 @@ public class Notifications {
 		return temp;
 	}
 
+	public static boolean hasNotificationPendedForChargedArea() {
+		for (NotificationItem notification:notifications) {
+			if (TableSetting.isTableUnderCharge(notification.getId())) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
 	public int cleanNotifications(int index) {
 		String notificationPkg = Http.get(Server.CLEANNOTIFICATION, "TID="
 				+ index);

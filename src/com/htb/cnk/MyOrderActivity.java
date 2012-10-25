@@ -154,7 +154,7 @@ public class MyOrderActivity extends OrderBaseActivity {
 				errMsg(msg);
 			} else {
 				updateItemStatus();
-				submitSucceed();
+				submitSucceed("订单已提交");
 			}
 		}
 
@@ -182,7 +182,8 @@ public class MyOrderActivity extends OrderBaseActivity {
 			}
 			new AlertDialog.Builder(MyOrderActivity.this).setCancelable(false)
 					.setTitle("出错了").setMessage(errMsg)
-					.setPositiveButton("确定", null).show();
+					.setPositiveButton("确定", null)
+					.setNegativeButton("添加到后台提交", pendOrder).show();
 		}
 	};
 
@@ -195,9 +196,9 @@ public class MyOrderActivity extends OrderBaseActivity {
 		return ret;
 	}
 
-	private void submitSucceed() {
+	private void submitSucceed(String msg) {
 		new AlertDialog.Builder(MyOrderActivity.this).setCancelable(false)
-				.setTitle("提示").setMessage("订单已提交")
+				.setTitle("提示").setMessage(msg)
 				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 
 					@Override
@@ -216,6 +217,15 @@ public class MyOrderActivity extends OrderBaseActivity {
 				}).show();
 	}
 
+	DialogInterface.OnClickListener pendOrder = new DialogInterface.OnClickListener() {
+
+		@Override
+		public void onClick(DialogInterface dialog, int which) {
+			submitToService();
+			submitSucceed("系统稍候会尝试重新提交订单");
+		}
+	};
+	
 	class ItemViewHolder {
 		TextView dishName;
 		TextView dishPrice;

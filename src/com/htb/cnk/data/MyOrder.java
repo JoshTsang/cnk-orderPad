@@ -241,11 +241,6 @@ public class MyOrder {
 	}
 
 	public int submit(int tableStatus) {
-		JSONObject order = new JSONObject();
-		Date date = new Date();
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		String time = df.format(date);
-
 		if (mOrder.size() <= 0) {
 			return -1;
 		}
@@ -254,7 +249,49 @@ public class MyOrder {
 		if (ret < 0) {
 			return ret;
 		}
+		
+		String orderJson = getOrderJson();
+		if (orderJson == null) {
+			return -1;
+		}
+		
+		String response;
+		if (tableStatus == Table.OPEN_TABLE_STATUS) {
+			response = Http.post(Server.SUBMIT_ORDER+"?action=add", orderJson);
+		} else {
+			response = Http.post(Server.SUBMIT_ORDER, orderJson);
+		}
+		if (!ErrorPHP.isSucc(response, TAG)) {
+			return -1;
+		}
+		return 0;
 
+	}
+	
+	public static int submitPendedOrder(String order, int tableStatus) {
+		String response;
+		
+		int ret = Http.getPrinterStatus(Server.PRINTER_CONTENT_TYPE_ORDER);
+		if (ret < 0) {
+			return ret;
+		}
+		if (tableStatus == Table.OPEN_TABLE_STATUS) {
+			response = Http.post(Server.SUBMIT_ORDER+"?action=add", order);
+		} else {
+			response = Http.post(Server.SUBMIT_ORDER, order);
+		}
+		if (!ErrorPHP.isSucc(response, TAG)) {
+			return -1;
+		}
+		return 0;
+	}
+	
+	public String getOrderJson() {
+		JSONObject order = new JSONObject();
+		Date date = new Date();
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String time = df.format(date);
+		
 		try {
 			order.put("waiter", UserData.getUserName());
 			order.put("waiterId", UserData.getUID());
@@ -268,7 +305,7 @@ public class MyOrder {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-
+		
 		JSONArray dishes = new JSONArray();
 		try {
 			for (int i = 0; i < mOrder.size(); i++) {
@@ -286,20 +323,10 @@ public class MyOrder {
 			order.put("order", dishes);
 		} catch (JSONException e) {
 			e.printStackTrace();
-			return -1;
+			return null;
 		}
 		
-		String response;
-		if (tableStatus == Table.OPEN_TABLE_STATUS) {
-			response = Http.post(Server.SUBMIT_ORDER+"?action=add", order.toString());
-		} else {
-			response = Http.post(Server.SUBMIT_ORDER, order.toString());
-		}
-		if (!ErrorPHP.isSucc(response, TAG)) {
-			return -1;
-		}
-		return 0;
-
+		return order.toString();
 	}
 
 	private String getFlavorNameToSubmit(int i, String flavorStr) {
@@ -390,6 +417,7 @@ public class MyOrder {
 				int status = item.getInt("status");
 				Float dishPrice = (float) item.getDouble("price");
 				Cursor cur = getDishInfoFromDB(dishId);
+				
 				String name = cur.getString(NAME_COLUMN);
 				String pic = cur.getString(PIC_COLUMN);
 				int printer = cur.getInt(PRINTER_COLUMN);
