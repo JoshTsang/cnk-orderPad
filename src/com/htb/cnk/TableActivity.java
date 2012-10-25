@@ -67,7 +67,7 @@ public class TableActivity extends TableBaseActivity {
 		mpDialog.show();
 		setClickListeners();
 		setHandler();
-		mTableInfo = new TableAdapter(mTableItem, mNotification, mSettings);
+		mTableInfo = new TableAdapter(mTableItem, mNotification, mSettings,TableActivity.this);
 	}
 
 	private void setHandler() {
@@ -277,7 +277,7 @@ public class TableActivity extends TableBaseActivity {
 	public void setCurPage(int page) {
 		switch (page) {
 		case 0:
-			imgCur.setText("全部");
+			imgCur.setText("负责区域");
 			break;
 
 		default:
@@ -298,7 +298,7 @@ public class TableActivity extends TableBaseActivity {
 		mGridView.setOnItemClickListener(tableItemClickListener);
 		switch (page) {
 		case 0:
-			mTableInfo.filterTables(page, TableAdapter.FILTER_NONE);
+			mTableInfo.filterTables(page, TableAdapter.FILTER_SCOPE);
 			break;
 
 		default:

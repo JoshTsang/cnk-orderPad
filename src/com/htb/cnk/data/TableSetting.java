@@ -13,6 +13,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 import android.util.SparseArray;
 
@@ -95,7 +96,7 @@ public class TableSetting implements Serializable {
 	private static ArrayList<List<TableSettingItem>> mTableFloor = new ArrayList<List<TableSettingItem>>();
 	private static SparseArray<TableSettingItem> mTableIndexForId = new SparseArray<TableSetting.TableSettingItem>();
 	private static HashMap<String, TableSettingItem> mTableIndexForName = new HashMap<String, TableSetting.TableSettingItem>();
-
+	private static List<TableSettingItem> mTableScope = new ArrayList<TableSettingItem>();
 	private static List<String> checkOutPrinter = new ArrayList<String>();
 
 	public TableSetting(Context context) {
@@ -146,15 +147,36 @@ public class TableSetting implements Serializable {
 		return item == null ? (-1) : item.getId();
 	}
 
+	public int getIdByAllIndex(int index) {
+		TableSettingItem item = mTableSettings.get(index);
+		return item == null ? (-1) : item.getId();
+	}
+
 	public String getName(int tableId) {
 		TableSettingItem item = mTableIndexForId.get(tableId);
 		return item == null ? null : item.getName();
 	}
-	
+
+	public String getNameByAllIndex(int index) {
+		TableSettingItem item = mTableSettings.get(index);
+		return item == null ? null : item.getName();
+	}
+
 	public int getStatusById(int tableId) {
 		TableSettingItem item = mTableIndexForId.get(tableId);
-		
-		return item==null?0:item.getStatus();
+
+		return item == null ? 0 : item.getStatus();
+	}
+
+	public int getIndexByAllId(int tableId) {
+		int index = 0;
+		for (TableSettingItem item : mTableSettings) {
+			if (item.getId() == tableId) {
+				return index;
+			}
+			index++;
+		}
+		return -1;
 	}
 
 	public ArrayList<HashMap<String, Object>> getTableOpen() {
@@ -180,7 +202,8 @@ public class TableSetting implements Serializable {
 	}
 
 	public static String getTableStatusFromServer() {
-		String tableStatusPkg = Http.get(Server.GET_TABLE_STATUS, "UUID="+Lisence.getDeviceId());
+		String tableStatusPkg = Http.get(Server.GET_TABLE_STATUS, "UUID="
+				+ Lisence.getDeviceId());
 		if (tableStatusPkg == null) {
 			Log.e(TAG, "getTableStatusFromServer.timeout");
 			return null;
@@ -195,16 +218,16 @@ public class TableSetting implements Serializable {
 	public int parseTableSetting(String tableStatusPkg) {
 		try {
 			JSONArray tableList = new JSONArray(tableStatusPkg);
-//			if (mTableSettings.size() <= 0) {
-//				createTables(tableList);
-//			} else {
-//				updateTables(tableList);
-//			}
-			//TODO find good solution for table status update
+			// if (mTableSettings.size() <= 0) {
+			// createTables(tableList);
+			// } else {
+			// updateTables(tableList);
+			// }
+			// TODO find good solution for table status update
 			mTableSettings.clear();
 			createTables(tableList);
-			///////////////////////////////////////
-			
+			// /////////////////////////////////////
+
 			return 0;
 		} catch (Exception e) {
 			Log.e(TAG, "tableStatusResponse:" + tableStatusPkg);
@@ -293,8 +316,34 @@ public class TableSetting implements Serializable {
 		return mTableSettings;
 	}
 
+	private TableSettingItem getItem(int tableId) {
+		for (TableSettingItem item : mTableSettings) {
+			if (item.getId() == tableId) {
+				return item;
+			}
+		}
+		return null;
+	}
+
 	public List<TableSettingItem> getTablesByFloor(int floor) {
 		return mTableFloor.get(floor);
+	}
+
+	public List<TableSettingItem> getTablesByScope(Context context) {
+		mTableScope.clear();
+		SharedPreferences sharedPre = context.getSharedPreferences(
+				"waiterSetting", Context.MODE_PRIVATE);
+		String waiterScopeString = sharedPre.getString("waiterScope", "");
+		String stringTemp[] = null;
+		stringTemp = waiterScopeString.split(",");
+		Log.d(TAG, waiterScopeString);
+		for (int i = 0 ; i < stringTemp.length; i++) {
+			if (getItem(Integer.parseInt(stringTemp[i])) != null) {
+				mTableScope.add(getItem(Integer.parseInt(stringTemp[i])));
+				Log.d(TAG, stringTemp[i]+" Scope.size:" + mTableScope.size());
+			}
+		}
+		return mTableScope;
 	}
 
 	public int getItemTableStatus(int tableId) {
@@ -367,7 +416,7 @@ public class TableSetting implements Serializable {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		Log.d(TAG, orderALL.toString()+"aaa");
+		Log.d(TAG, orderALL.toString() + "aaa");
 		String tableCleanPkg = Http.post(Server.CLEAN_TABLE,
 				orderALL.toString());
 		if (!ErrorPHP.isSucc(tableCleanPkg, TAG)) {
@@ -660,7 +709,7 @@ public class TableSetting implements Serializable {
 
 	public int floorCategory() {
 		String floorCategoryPkg = Http.get(Server.GET_FLOORNUM, null);
-		if(floorCategoryPkg == null){
+		if (floorCategoryPkg == null) {
 			return -1;
 		}
 		floorNum = Integer.parseInt(floorCategoryPkg);

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.htb.cnk.R;
@@ -18,19 +19,20 @@ public class TableAdapter {
 
 	public static final int FILTER_NONE = 0;
 	public static final int FILTER_FLOOR = 1;
-
+	public static final int FILTER_SCOPE = 2;
 	private int mImageItem;
 	private int mTextItem;
 	private TableSetting mSetting;
 	private Notifications mNotification;
 	private ArrayList<HashMap<String, Object>> lstImageItem;
 	private List<TableSetting.TableSettingItem> resultSet;
-
+	private Context mContext;
 	public TableAdapter(ArrayList<HashMap<String, Object>> lst,
-			Notifications notification, TableSetting ts) {
+			Notifications notification, TableSetting ts,Context context) {
 		lstImageItem = lst;
 		mNotification = notification;
 		mSetting = ts;
+		mContext = context;
 	}
 
 	public void filterTables(int arg, int filterType) {
@@ -63,7 +65,9 @@ public class TableAdapter {
 		case FILTER_FLOOR:
 			resultSet = mSetting.getTablesByFloor(floorNum);
 			break;
-
+		case FILTER_SCOPE:
+			resultSet = mSetting.getTablesByScope(mContext);
+			break;
 		default:
 			resultSet = mSetting.getTables();
 			break;
