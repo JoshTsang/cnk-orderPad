@@ -3,13 +3,18 @@ package com.htb.cnk.lib;
 import java.text.DecimalFormat;
 
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
 import android.text.InputFilter;
 import android.text.method.DigitsKeyListener;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -26,9 +31,9 @@ import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.PhoneOrder;
 import com.htb.cnk.data.Setting;
 import com.htb.cnk.data.TableSetting;
-import com.htb.cnk.data.UserData;
 import com.htb.cnk.dialog.LoginDlg;
 import com.htb.cnk.dialog.TitleAndMessageDlg;
+import com.htb.cnk.service.NotificationTableService;
 import com.htb.cnk.ui.base.BaseActivity;
 import com.htb.constant.Permission;
 
@@ -37,6 +42,8 @@ import com.htb.constant.Permission;
  * 
  */
 public class OrderBaseActivity extends BaseActivity {
+	private final static String TAG = "OrderBaseActivity";
+	
 	protected static Boolean isFlvaorEnable = false;
 	protected Button mBackBtn;
 	protected Button mSubmitBtn;
@@ -53,6 +60,9 @@ public class OrderBaseActivity extends BaseActivity {
 	protected int persons;
 	private TableSetting mSettings;
 	protected TitleAndMessageDlg mNetworkDialog;
+	protected NotificationTableService.MyBinder pendOrderBinder;
+	protected boolean binded;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -66,8 +76,29 @@ public class OrderBaseActivity extends BaseActivity {
 		fillData();
 		setClickListener();
 
+		Intent intent = new Intent(this, NotificationTableService.class);  
+        startService(intent);   //如果先调用startService,则在多个服务绑定对象调用unbindService后服务仍不会被销毁  
+        bindService(intent, conn, Context.BIND_AUTO_CREATE);  
 	}
 
+	private ServiceConnection conn = new ServiceConnection() {
+		
+		@Override
+		public void onServiceDisconnected(ComponentName name) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		@Override
+		public void onServiceConnected(ComponentName name, IBinder service) {
+			// TODO Auto-generated method stub
+			if (service == null)
+				Log.d("TAG", "service==null");
+			pendOrderBinder = (NotificationTableService.MyBinder)service;
+			binded = true;
+		}
+	};
+	
 	public void getPersons() {
 		new Thread() {
 			public void run() {
@@ -249,6 +280,14 @@ public class OrderBaseActivity extends BaseActivity {
 		personSettingDlg.show();
 	}
 
+	public void submitToService() {
+		String order = mMyOrder.getOrderJson();
+		if (order == null) {
+			Log.e(TAG, "order==null");
+		}
+		pendOrderBinder.add(Info.getTableId(), Info.getTableName(), mSettings.getStatusById(Info.getTableId()), order);
+	}
+	
 	public void flavorDialog(final int position) {
 		final boolean[] selected = mMyOrder.slectedFlavor(position);
 		new AlertDialog.Builder(OrderBaseActivity.this)
@@ -357,6 +396,16 @@ public class OrderBaseActivity extends BaseActivity {
 			}
 		}
 	};
+
+	
+
+	@Override
+	protected void onDestroy() {
+		if (binded) {  
+            unbindService(conn);              
+        } 
+		super.onDestroy();
+	}
 
 	Handler flavorHandler = new Handler() {
 		public void handleMessage(Message msg) {
