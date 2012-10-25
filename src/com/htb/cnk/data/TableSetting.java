@@ -94,6 +94,7 @@ public class TableSetting implements Serializable {
 	private static List<TableSettingItem> mTableSettings = new ArrayList<TableSettingItem>();
 	private static ArrayList<List<TableSettingItem>> mTableFloor = new ArrayList<List<TableSettingItem>>();
 	private static SparseArray<TableSettingItem> mTableIndexForId = new SparseArray<TableSetting.TableSettingItem>();
+	private static SparseArray<TableSettingItem> mChargedAreaIndex = new SparseArray<TableSetting.TableSettingItem>();
 	private static HashMap<String, TableSettingItem> mTableIndexForName = new HashMap<String, TableSetting.TableSettingItem>();
 
 	private static List<String> checkOutPrinter = new ArrayList<String>();
@@ -240,12 +241,22 @@ public class TableSetting implements Serializable {
 	}
 
 	private void updateIndex() {
+		mChargedAreaIndex.clear();
+		mTableIndexForId.clear();
+		mTableIndexForName.clear();
 		for (TableSettingItem item : mTableSettings) {
 			mTableIndexForId.put(item.getId(), item);
 			mTableIndexForName.put(item.getName(), item);
+			if (isTableInCharge(item.getArea())) {
+				mChargedAreaIndex.put(item.getId(), item);
+			}
 		}
 	}
 
+	private boolean isTableInCharge(int area) {
+		return true;
+	}
+	
 	private void updateTables(JSONArray tableList) throws JSONException {
 		TableSettingItem asItem;
 		phoneOrderPending = false;
@@ -494,6 +505,26 @@ public class TableSetting implements Serializable {
 		return 0;
 	}
 
+	//TODO define
+	public static boolean hasPhoneOrderPendingForChargedTables() {
+		int status;
+		for (int i=mChargedAreaIndex.size()-1; i>=0; i--) {
+			status = mChargedAreaIndex.valueAt(i).getStatus();
+			if (status == 50 || status == 51) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public static boolean isTableUnderCharge(int tableId) {
+		if (mChargedAreaIndex.get(tableId) != null) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	public double getTotalPriceTable(List<Integer> srcTId,
 			List<String> tableName) {
 		double totalPrice = 0;
