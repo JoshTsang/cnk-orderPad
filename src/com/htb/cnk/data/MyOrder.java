@@ -417,6 +417,7 @@ public class MyOrder {
 				int status = item.getInt("status");
 				Float dishPrice = (float) item.getDouble("price");
 				Cursor cur = getDishInfoFromDB(dishId);
+				
 				String name = cur.getString(NAME_COLUMN);
 				String pic = cur.getString(PIC_COLUMN);
 				int printer = cur.getInt(PRINTER_COLUMN);
