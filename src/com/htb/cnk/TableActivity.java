@@ -89,6 +89,7 @@ public class TableActivity extends TableBaseActivity {
 		layoutBottom = (LinearLayout) findViewById(R.id.layout_scr_bottom);
 		imgCur = new TextView(TableActivity.this);
 		mPageView = (ViewPager) findViewById(R.id.scr);
+		mOrderNotification = (Button) findViewById(R.id.orderNotification);
 	}
 
 	protected void setClickListeners() {

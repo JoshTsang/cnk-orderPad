@@ -68,7 +68,7 @@ public class Cnk_orderPadActivity extends BaseActivity {
 	private String mUpdateAkpDir;
 	private Handler handler = new Handler();
 	private Version version;
-	private static int ARERTDIALOG = 0;
+	private int ARERTDIALOG = 0;
 	private AlertDialog mNetWrorkcancel;
 	private Setting mAppSetting;
 	private AlertDialog.Builder mNetWrorkAlertDialog;

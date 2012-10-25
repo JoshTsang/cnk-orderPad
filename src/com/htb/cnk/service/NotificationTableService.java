@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.os.IBinder;
 
 import com.htb.cnk.data.Notifications;
+import com.htb.cnk.data.PendedOrder;
 import com.htb.cnk.data.TableSetting;
 
 public class NotificationTableService extends Service {
@@ -20,13 +21,29 @@ public class NotificationTableService extends Service {
 	public static final String SERVICE_IDENTIFIER = "cainaoke.service";
 	public final static String SER_KEY = "cainaoke.ser";
 	private MyBinder myBinder = new MyBinder();
+	private PendedOrder pendedOrder = new PendedOrder();
 
 	public class MyBinder extends Binder {
 		public void start() {
 			new Thread(new tableThread()).start();
 		} 
+		public void add(int id, String name, int status, String order) {
+			pendedOrder.add(id, name, status, order);
+		}
+		
+		public void cancle(int id) {
+			pendedOrder.remove(id);
+		}
+		
+		public int count() {
+			return pendedOrder.count();
+		}
 	}
-
+//
+//	public class PendedOrderBinder extends Binder {
+//		
+//	}
+	
 	public Runnable mTasks = new Runnable() {
 		public void run() {
 			this.update();
@@ -47,6 +64,7 @@ public class NotificationTableService extends Service {
 				intent.putExtra("tableMessage", ret);
 				intent.putExtras(bundle);
 				sendBroadcast(intent);
+				pendedOrder.submit();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

@@ -4,9 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 
-import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.ui.base.TableGridDeskActivity;
 
 public class MyReceiver extends BroadcastReceiver {
@@ -30,5 +28,6 @@ public class MyReceiver extends BroadcastReceiver {
 		tableDeskReceiver.setRingtoneMsg(bundle.getInt("ringtoneMessage"));
 		tableDeskReceiver.setTableMsg(bundle.getString("tableMessage"));
 		tableDeskReceiver.sendRingtoneMsg();
+		tableDeskReceiver.checkPendedOrder();
 	}
 }

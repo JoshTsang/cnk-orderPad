@@ -18,11 +18,13 @@ import android.os.IBinder;
 import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.SimpleAdapter;
 
@@ -75,6 +77,7 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 
 	protected EditText tableIdEdit;
 	protected EditText personsEdit;
+	protected Button mOrderNotification;
 
 	protected Handler mNotificationHandler;
 	protected Handler mTableHandler = new Handler();
@@ -246,7 +249,20 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 			cleanNotification();
 		}
 	};
-
+	
+	Handler mPendedOrderNotificationHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			int ret = binder.count();
+			if (ret > 0) {
+				Log.d(TAG,	"has order Pending");
+				mOrderNotification.setVisibility(View.VISIBLE);
+				mOrderNotification.setText("有"+ret+"个订单挂起，系统正在重新提交");
+			} else {
+				mOrderNotification.setVisibility(View.INVISIBLE);
+			}
+		}
+	};
+	
 	private void addDialogChoiceMode(int which) {
 		switch (which) {
 		case 0:
@@ -739,4 +755,9 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 		getRingtoneHandler().sendEmptyMessage(getRingtoneMsg());
 	}
 
+	public void checkPendedOrder() {
+		if (mPendedOrderNotificationHandler != null) {
+			mPendedOrderNotificationHandler.sendEmptyMessage(0);
+		}
+	}
 }
