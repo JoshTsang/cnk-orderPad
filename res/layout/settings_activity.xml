@@ -37,56 +37,18 @@
 		    	android:textSize="35dip"
 		    	android:background="#00000000"/>
 	</LinearLayout>
-	<LinearLayout android:layout_width="match_parent"
-	    android:layout_height="match_parent"
-	    android:paddingLeft="10dp"
-	    android:paddingTop="10dp"
-	    android:orientation="vertical" >
-		<TextView android:layout_width="wrap_content"
-		    android:layout_height="wrap_content"
-    		android:textSize="30dip"
-    		android:textColor="#4D2412"
-		    android:text="人数："/>
-	    <Switch android:id="@+id/persons"
-	        	android:layout_width="wrap_content"
-	        	android:layout_height="wrap_content"
-	        	android:textOn="开"
-	        	android:textOff="关" 
-	    />
-	    <TextView android:layout_width="wrap_content"
-		    android:layout_height="wrap_content"
-    		android:textSize="30dip"
-    		android:textColor="#4D2412"
-		    android:text="提示音："/>
-	    <Switch android:id="@+id/ringtone"
-	        	android:layout_width="wrap_content"
-	        	android:layout_height="wrap_content"
-	        	android:textOn="开"
-	        	android:textOff="关" 
-	    />
-	    <TextView android:layout_width="wrap_content"
-		    android:layout_height="wrap_content"
-    		android:textSize="30dip"
-    		android:textColor="#4D2412"
-		    android:text="结账后清台："/>
-	    <Switch android:id="@+id/cleanTableAfterCheckout"
-	        	android:layout_width="wrap_content"
-	        	android:layout_height="wrap_content"
-	        	android:textOn="开"
-	        	android:textOff="关" 
-	    />
-	    <TextView android:id="@+id/pwdCheckTxt" 
-	        android:layout_width="wrap_content"
-		    android:layout_height="wrap_content"
-    		android:textSize="30dip"
-    		android:textColor="#4D2412"
-		    android:text="密码验证："/>
-	    <Switch android:id="@+id/pwdCheck"
-	        	android:layout_width="wrap_content"
-	        	android:layout_height="wrap_content"
-	        	android:textOn="开"
-	        	android:textOff="关" 
-	    />
+	<LinearLayout
+	    android:orientation="horizontal"
+	    android:layout_width="match_parent" android:layout_height="match_parent"
+	    android:background="#F8E9C1">
+	
+	    <fragment class="com.htb.cnk.SettingActivity$TitlesFragment"
+	            android:id="@+id/titles" android:layout_weight="2"
+	            android:layout_width="0px" android:layout_height="match_parent" />
+	
+	    <FrameLayout android:id="@+id/details" android:layout_weight="6"
+	            android:layout_width="0px" android:layout_height="match_parent"
+	            android:background="@drawable/right1"/>
+	    
 	</LinearLayout>
- 
 </LinearLayout>
