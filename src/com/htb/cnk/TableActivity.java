@@ -62,7 +62,6 @@ public class TableActivity extends TableBaseActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		Info.setMode(Info.WORK_MODE_WAITER);
 		setContentView(R.layout.table_activity);
 		findViews();
 		mpDialog.show();

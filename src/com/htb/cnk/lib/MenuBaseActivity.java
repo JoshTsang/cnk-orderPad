@@ -224,6 +224,15 @@ public class MenuBaseActivity extends BaseActivity {
 				}).show();
 	}
 
+	/**
+	 * @param position
+	 */
+	private void plusOne(int position) {
+		mMyOrder.add(mDishes.getDish(position), 1, Info.getTableId(), 0);
+		updateOrderedDishCount();
+		mDishLstAdapter.notifyDataSetChanged();
+	}
+
 	private OnClickListener thumbnailClicked = new Button.OnClickListener() {
 		public void onClick(View view) {
 			final int position = Integer.parseInt(view.getTag().toString());
@@ -268,9 +277,7 @@ public class MenuBaseActivity extends BaseActivity {
 
 		public void onClick(View v) {
 			final int position = Integer.parseInt(v.getTag().toString());
-			mMyOrder.add(mDishes.getDish(position), 1, Info.getTableId(), 0);
-			updateOrderedDishCount();
-			mDishLstAdapter.notifyDataSetChanged();
+			plusOne(position);
 		}
 	};
 	
@@ -279,9 +286,7 @@ public class MenuBaseActivity extends BaseActivity {
 		@Override
 		public void onItemClick(AdapterView<?> arg0, View arg1, int position,
 				long arg3) {
-			mMyOrder.add(mDishes.getDish(position), 1, Info.getTableId(), 0);
-			updateOrderedDishCount();
-			mDishLstAdapter.notifyDataSetChanged();
+			plusOne(position);
 		}
 		
 	};

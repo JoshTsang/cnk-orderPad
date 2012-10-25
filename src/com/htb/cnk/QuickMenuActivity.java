@@ -20,11 +20,11 @@ import com.htb.cnk.lib.MenuBaseActivity;
 
 public class QuickMenuActivity extends MenuBaseActivity {
 	private QuickOrder mQuickOrder;
-	private InputMethodManager imm;
+	
 	private EditText mEditQucik;
 	private TextView mTextQucik;
 	private int BUTTON_TEXT_CHANGED = 0;
-
+	private InputMethodManager imm;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		layout = R.layout.quick_activity;
@@ -65,6 +65,7 @@ public class QuickMenuActivity extends MenuBaseActivity {
 		mEditQucik = (EditText) findViewById(R.id.edit_quick);
 		mSettingsBtn.setText("普通");
 		mTextQucik = (TextView) findViewById(R.id.text_quick);
+		
 	}
 	
 	private void setListData() {
@@ -117,8 +118,8 @@ public class QuickMenuActivity extends MenuBaseActivity {
 	@Override
 	public void updateOrderedDishCount() {
 		BUTTON_TEXT_CHANGED = 1;
-		mEditQucik.setText("");
 		mOrderedDishCount.setText(Integer.toString(mMyOrder.getTotalQuantity()));
+		mEditQucik.setText(" ");
 	}
 	
 	private TextWatcher watcher = new TextWatcher() {

@@ -41,7 +41,6 @@ public class MenuActivity extends MenuBaseActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		
 		updateOrderedDishCount();
 		if (mDishLstAdapter != null) {
 			mDishLstAdapter.notifyDataSetChanged();

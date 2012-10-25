@@ -192,14 +192,25 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 			setClassToActivity(DelOrderActivity.class);
 			break;
 		case 4:
-			Info.setMode(Info.WORK_MODE_WAITER);
-			setClassToActivity(MenuActivity.class);
+			chooseTypeToMenu();
 			break;
 		case 5:
 			setClassToActivity(QueryOrderActivity.class);
 			break;
 		default:
 			break;
+		}
+	}
+
+	/**
+	 * 
+	 */
+	private void chooseTypeToMenu() {
+		if (Info.getMenu() == Info.ORDER_QUCIK_MENU) {
+			setClassToActivity(QuickMenuActivity.class);
+		} else {
+			Info.setMode(Info.WORK_MODE_WAITER);
+			setClassToActivity(MenuActivity.class);
 		}
 	}
 
@@ -256,12 +267,7 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 			finish();
 			break;
 		case 1:
-			if (Info.getMenu() == Info.ORDER_QUCIK_MENU) {
-				setClassToActivity(QuickMenuActivity.class);
-			} else {
-				Info.setMode(Info.WORK_MODE_WAITER);
-				setClassToActivity(MenuActivity.class);
-			}
+			chooseTypeToMenu();
 			break;
 		case 2:
 			copyTableDialog().show();
@@ -369,8 +375,13 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 		}
 		tableIdEdit.addTextChangedListener(watcher(tableIdEdit));
 		personsEdit.addTextChangedListener(watcher(personsEdit));
-		changeTableAlertDialog.setTitle(getResources().getString(
-				R.string.pleaseInput));
+		if (type == CHANGE_DIALOG) {
+			changeTableAlertDialog.setTitle(getResources().getString(
+					R.string.pleaseInput)+"转入桌号");
+		} else if (type == COMBINE_DIALOG) {
+			changeTableAlertDialog.setTitle(getResources().getString(
+					R.string.pleaseInput)+"并入桌号");
+		}
 
 		DialogInterface.OnClickListener changeTablePositiveListener = new DialogInterface.OnClickListener() {
 			@Override
@@ -419,7 +430,7 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 		};
 
 		return mViewDialog.viewAndTitleAndButtonDialog(false, copyTableText,
-				getResources().getString(R.string.pleaseInput), null,
+				getResources().getString(R.string.pleaseInput)+"桌号", null,
 				copyTableListener);
 	}
 
