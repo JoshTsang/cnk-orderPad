@@ -375,6 +375,8 @@ public class MenuBaseActivity extends BaseActivity {
 		void setOnClickListener() {
 			plusBtn.setOnClickListener(plusClicked);
 			minusBtn.setOnClickListener(minusClicked);
+			minusBtn.setFocusable(false);
+			plusBtn.setFocusable(false);
 		}
 
 		void setTag(int position) {

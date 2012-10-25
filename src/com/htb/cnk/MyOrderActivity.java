@@ -110,7 +110,7 @@ public class MyOrderActivity extends OrderBaseActivity {
 	private OnClickListener backClicked = new OnClickListener() {
 		public void onClick(View v) {
 			Intent intent = new Intent();
-			if (Info.getMenu() == Info.ORDER_LIST_MENU) {
+			if (Info.getMode() == Info.WORK_MODE_CUSTOMER || Info.getMenu() == Info.ORDER_LIST_MENU) {
 				intent.setClass(MyOrderActivity.this, MenuActivity.class);
 			} else {
 				intent.setClass(MyOrderActivity.this, QuickMenuActivity.class);
