@@ -277,9 +277,51 @@ public class TableSetting implements Serializable {
 	}
 
 	private boolean isTableInCharge(int area) {
-		return true;
+		SharedPreferences sharedPre = mContext.getSharedPreferences(
+				"areaSetting", Context.MODE_PRIVATE);
+		String areaString = sharedPre.getString("areaName", "");
+		String stringTemp[] = null;
+		boolean flag = true;
+		stringTemp = areaString.split(",");
+		if (!areaString.equals("")) {
+			for (int i = 0; i < stringTemp.length; i++) {
+				if (stringTemp[i].equals(String.valueOf(area))) {
+					Log.d(TAG, "area:"+area);
+					return true;
+				}
+			}
+			flag = false;
+		}
+		return flag;
 	}
-	
+
+	public String[] getchargedAreaName() {
+		String[] areaString = null;
+		String response = Http.get(Server.GET_AREA, "");
+		Log.d(TAG, response);
+		if ("null".equals(response)) {
+			Log.w(TAG, "getOrderFromServer.null");
+			return null;
+		} else if (response == null) {
+			Log.e(TAG, "getOrderFromServer.timeOut");
+			return null;
+		}
+		try {
+			JSONArray tableList = new JSONArray(response);
+			int length = tableList.length();
+			areaString = new String[length];
+			for (int i = 0; i < length; i++) {
+				JSONObject item = tableList.getJSONObject(i);
+				int area = item.getInt("area");
+				areaString[i] = String.valueOf(area);
+			}
+		} catch (Exception e) {
+			Log.e(TAG, response);
+			e.printStackTrace();
+		}
+		return areaString;
+	}
+
 	private void updateTables(JSONArray tableList) throws JSONException {
 		TableSettingItem asItem;
 		phoneOrderPending = false;
@@ -340,6 +382,14 @@ public class TableSetting implements Serializable {
 		return mTableFloor.get(floor);
 	}
 
+	public List<TableSettingItem> getTablesByArea() {
+		List<TableSettingItem> item = new ArrayList<TableSetting.TableSettingItem>();
+		for (int i = 0; i < mChargedAreaIndex.size(); i++) {
+			item.add(mChargedAreaIndex.valueAt(i));
+		}
+		return item;
+	}
+
 	public List<TableSettingItem> getTablesByScope(Context context) {
 		mTableScope.clear();
 		SharedPreferences sharedPre = context.getSharedPreferences(
@@ -347,11 +397,11 @@ public class TableSetting implements Serializable {
 		String waiterScopeString = sharedPre.getString("waiterScope", "");
 		String stringTemp[] = null;
 		stringTemp = waiterScopeString.split(",");
-		Log.d(TAG, waiterScopeString);
-		for (int i = 0 ; i < stringTemp.length; i++) {
-			if (getItem(Integer.parseInt(stringTemp[i])) != null) {
-				mTableScope.add(getItem(Integer.parseInt(stringTemp[i])));
-				Log.d(TAG, stringTemp[i]+" Scope.size:" + mTableScope.size());
+		if (!waiterScopeString.equals("")) {
+			for (int i = 0; i < stringTemp.length; i++) {
+				if (getItem(Integer.parseInt(stringTemp[i])) != null) {
+					mTableScope.add(getItem(Integer.parseInt(stringTemp[i])));
+				}
 			}
 		}
 		return mTableScope;
@@ -553,10 +603,10 @@ public class TableSetting implements Serializable {
 		return 0;
 	}
 
-	//TODO define
+	// TODO define
 	public static boolean hasPhoneOrderPendingForChargedTables() {
 		int status;
-		for (int i=mChargedAreaIndex.size()-1; i>=0; i--) {
+		for (int i = mChargedAreaIndex.size() - 1; i >= 0; i--) {
 			status = mChargedAreaIndex.valueAt(i).getStatus();
 			if (status == 50 || status == 51) {
 				return true;
@@ -564,7 +614,7 @@ public class TableSetting implements Serializable {
 		}
 		return false;
 	}
-	
+
 	public static boolean isTableUnderCharge(int tableId) {
 		if (mChargedAreaIndex.get(tableId) != null) {
 			return true;
@@ -572,7 +622,7 @@ public class TableSetting implements Serializable {
 			return false;
 		}
 	}
-	
+
 	public double getTotalPriceTable(List<Integer> srcTId,
 			List<String> tableName) {
 		double totalPrice = 0;

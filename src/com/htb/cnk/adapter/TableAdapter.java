@@ -20,6 +20,7 @@ public class TableAdapter {
 	public static final int FILTER_NONE = 0;
 	public static final int FILTER_FLOOR = 1;
 	public static final int FILTER_SCOPE = 2;
+	public static final int FILTER_AREA = 3;
 	private int mImageItem;
 	private int mTextItem;
 	private TableSetting mSetting;
@@ -67,6 +68,9 @@ public class TableAdapter {
 			break;
 		case FILTER_SCOPE:
 			resultSet = mSetting.getTablesByScope(mContext);
+			break;
+		case FILTER_AREA:
+			resultSet = mSetting.getTablesByArea();
 			break;
 		default:
 			resultSet = mSetting.getTables();

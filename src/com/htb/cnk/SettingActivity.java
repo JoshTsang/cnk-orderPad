@@ -141,7 +141,7 @@ public class SettingActivity extends Activity {
 						details = new RingtoneSetting();
 						break;
 					case 2:
-						details = new ScopeSetting();
+						details = new ScopeSettingFragment();
 						break;
 					default:
 						break;

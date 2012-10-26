@@ -299,7 +299,7 @@ public class TableActivity extends TableBaseActivity {
 		mGridView.setOnItemClickListener(tableItemClickListener);
 		switch (page) {
 		case 0:
-			mTableInfo.filterTables(page, TableAdapter.FILTER_NONE);
+			mTableInfo.filterTables(page, TableAdapter.FILTER_SCOPE);
 			break;
 
 		default:
