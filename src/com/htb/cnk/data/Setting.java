@@ -41,8 +41,12 @@ public class Setting {
 		return Perference.getBoolean("Ringtone", false);
 	}
 	
-	public static void enableRingtone(boolean enable) {
+	public static void enableRingtong(boolean enable) {
 		commitPerference("Ringtone", enable);
+	}
+	
+	public static void enableAreaRingtone(boolean enable) {
+		commitPerference("RingtoneArea", enable);
 	}
 	
 	public static boolean enabledAreaRingtone() {
@@ -63,6 +67,14 @@ public class Setting {
 	
 	public static void enableCleanTableAfterCheckout(boolean enable) {
 		commitPerference("trigerCleanTable", enable);
+	}
+	
+	public static void enableCustomedRingtone(boolean enable) {
+		commitPerference("customRingtone", enable);
+	}
+	
+	public static boolean enabledCustomedRingtone() {
+		return Perference.getBoolean("customRingtone", false);
 	}
 	
 	private static void commitPerference(String key, boolean value) {

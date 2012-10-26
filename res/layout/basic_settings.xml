@@ -2,52 +2,80 @@
  <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
      	android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="20dp"
-    android:paddingTop="10dp"
     android:orientation="vertical" >
-	<TextView android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-   		android:textSize="30dip"
-   		android:textColor="#4D2412"
-	    android:text="人数："/>
-    <Switch android:id="@+id/persons"
-        	android:layout_width="wrap_content"
-        	android:layout_height="wrap_content"
-        	android:textOn="开"
-        	android:textOff="关" 
-    />
-    <TextView android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-   		android:textSize="30dip"
-   		android:textColor="#4D2412"
-	    android:text="提示音："/>
-    <Switch android:id="@+id/ringtone"
-        	android:layout_width="wrap_content"
-        	android:layout_height="wrap_content"
-        	android:textOn="开"
-        	android:textOff="关" 
-    />
-    <TextView android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-   		android:textSize="30dip"
-   		android:textColor="#4D2412"
-	    android:text="结账后清台："/>
-    <Switch android:id="@+id/cleanTableAfterCheckout"
-        	android:layout_width="wrap_content"
-        	android:layout_height="wrap_content"
-        	android:textOn="开"
-        	android:textOff="关" 
-    />
-    <TextView android:id="@+id/pwdCheckTxt" 
-        android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-   		android:textSize="30dip"
-   		android:textColor="#4D2412"
-	    android:text="密码验证："/>
-    <Switch android:id="@+id/pwdCheck"
-        	android:layout_width="wrap_content"
-        	android:layout_height="wrap_content"
-        	android:textOn="开"
-        	android:textOff="关" 
-    />
+    <TableLayout  
+        android:layout_width="fill_parent"  
+        android:layout_height="wrap_content"
+        android:paddingLeft="9dp" >
+        <TableRow style="@style/settingRow" > 
+            <LinearLayout 
+		     	android:layout_width="wrap_content"
+		    	android:layout_height="match_parent"
+		    	android:orientation="vertical"
+		    	android:layout_weight="3">
+					<TextView android:layout_width="wrap_content"
+					    android:layout_height="wrap_content"
+				   		android:textSize="30dip"
+				   		android:textColor="#4D2412"
+					    android:text="人数"/>
+					<TextView android:layout_width="wrap_content"
+					    android:layout_height="wrap_content"
+				   		android:textSize="15dip"
+				   		android:textColor="#4D2412"
+				   		android:text="订单人数设置"/>
+				</LinearLayout>
+			    <CheckBox android:id="@+id/persons"
+			        	android:layout_width="wrap_content"
+			        	android:layout_height="match_parent"
+			        	android:layout_weight="1"
+			    />
+		</TableRow>
+        <TableRow style="@style/settingRow" > 
+             <LinearLayout 
+		     	android:layout_width="wrap_content"
+		    	android:layout_height="match_parent"
+		    	android:orientation="vertical"
+		    	android:layout_weight="3">
+			    <TextView android:layout_width="wrap_content"
+				    android:layout_height="wrap_content"
+			   		android:textSize="30dip"
+			   		android:textColor="#4D2412"
+				    android:text="结账后清台"/>
+			    <TextView android:layout_width="wrap_content"
+					    android:layout_height="wrap_content"
+				   		android:textSize="15dip"
+				   		android:textColor="#4D2412"
+				   		android:text="结账后将结账桌面清台"/>
+			</LinearLayout>
+		    <CheckBox android:id="@+id/cleanTableAfterCheckout"
+		        	android:layout_width="wrap_content"
+			        android:layout_height="match_parent"
+					android:layout_weight="1"
+		    />
+	    </TableRow>
+        <TableRow style="@style/settingRow" > 
+            <LinearLayout 
+		     	android:layout_width="wrap_content"
+		    	android:layout_height="wrap_content"
+		    	android:orientation="vertical"
+		    	android:layout_weight="3">
+			    <TextView android:id="@+id/pwdCheckTxt" 
+			        android:layout_width="wrap_content"
+				    android:layout_height="wrap_content"
+			   		android:textSize="30dip"
+			   		android:textColor="#4D2412"
+				    android:text="密码验证"/>
+			    <TextView android:layout_width="wrap_content"
+						    android:layout_height="wrap_content"
+					   		android:textSize="15dip"
+					   		android:textColor="#4D2412"
+					   		android:text="登陆密码验证"/>
+			</LinearLayout>
+		    <CheckBox android:id="@+id/pwdCheck"
+		        	android:layout_width="wrap_content"
+		        	android:layout_height="match_parent"
+		        	android:layout_weight="1"
+		    />
+	    </TableRow>
+    </TableLayout>
 </LinearLayout>

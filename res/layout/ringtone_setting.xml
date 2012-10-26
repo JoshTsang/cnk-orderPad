@@ -1,8 +1,96 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+ <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+     	android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
-    
-
+    <TableLayout  
+        android:layout_width="fill_parent"  
+        android:layout_height="wrap_content"
+        android:paddingLeft="9dp" >
+        <TableRow style="@style/settingRow" >
+            <LinearLayout 
+		     	android:layout_width="wrap_content"
+		    	android:layout_height="match_parent"
+		    	android:orientation="vertical"
+		    	android:layout_weight="3">
+			    <TextView android:layout_width="wrap_content"
+				    android:layout_height="wrap_content"
+			   		android:textSize="30dip"
+			   		android:textColor="#4D2412"
+				    android:text="提示音"/>
+			    <TextView android:layout_width="wrap_content"
+					    android:layout_height="wrap_content"
+				   		android:textSize="15dip"
+				   		android:textColor="#4D2412"
+				   		android:text="通知提示音"/>
+		    </LinearLayout>
+		    <CheckBox android:id="@+id/ringtone"
+		        	android:layout_width="wrap_content"
+			        android:layout_height="match_parent"
+		        	android:layout_weight="1"
+		    />
+		</TableRow>
+        <TableRow style="@style/settingRow" > 
+             <LinearLayout 
+		     	android:layout_width="wrap_content"
+		    	android:layout_height="match_parent"
+		    	android:orientation="vertical"
+		    	android:paddingLeft="70dp"
+		    	android:layout_weight="3">
+			    <TextView android:layout_width="wrap_content"
+				    android:layout_height="wrap_content"
+			   		android:textSize="30dip"
+			   		android:textColor="#4D2412"
+				    android:text="仅管辖区域"/>
+			    <TextView android:layout_width="wrap_content"
+					    android:layout_height="wrap_content"
+				   		android:textSize="15dip"
+				   		android:textColor="#4D2412"
+				   		android:text="当管辖范围的桌面有消息时发出提示音"/>
+			</LinearLayout>
+		    <CheckBox android:id="@+id/notifyOnlyForCharged"
+		        	android:layout_width="wrap_content"
+			        android:layout_height="match_parent"
+					android:layout_weight="1"
+		    />
+	    </TableRow>
+        <TableRow style="@style/settingRow" > 
+            <LinearLayout 
+		     	android:layout_width="wrap_content"
+		    	android:layout_height="match_parent"
+		    	android:orientation="vertical"
+		    	android:layout_weight="3">
+			    <TextView android:id="@+id/pwdCheckTxt" 
+			        android:layout_width="wrap_content"
+				    android:layout_height="wrap_content"
+			   		android:textSize="30dip"
+			   		android:textColor="#4D2412"
+				    android:text="提示音"/>
+			    <TextView android:layout_width="wrap_content"
+						    android:layout_height="wrap_content"
+					   		android:textSize="15dip"
+					   		android:textColor="#4D2412"
+					   		android:text="选择提示音"/>
+			</LinearLayout>
+			<TextView android:id="@+id/ringtoneSetting"
+			    	android:layout_width="wrap_content"
+				    android:layout_height="match_parent"
+			   		android:textSize="15dip"
+			   		android:textColor="#4D2412"
+			   		android:gravity="center_vertical"
+			   		android:layout_weight="2" />
+			<Button android:id="@+id/PlayRingtone"
+		        	android:layout_width="wrap_content"
+		        	android:layout_height="match_parent"
+		        	android:layout_weight="2"
+		        	android:text="播放"
+		    />
+		    <Button android:id="@+id/chooseRingtone"
+		        	android:layout_width="wrap_content"
+		        	android:layout_height="match_parent"
+		        	android:layout_weight="2"
+		        	android:text="选择"
+		    />
+	    </TableRow>
+    </TableLayout>
 </LinearLayout>

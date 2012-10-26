@@ -24,4 +24,10 @@
         <!-- 设置Dialog标题栏文字颜色。 -->
         <item name="android:textColor">#000</item>
     </style>
+    <style name="settingRow">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:padding">15dp</item>
+        <item name="android:background">@drawable/setting_table_row</item>
+    </style>
 </resources>

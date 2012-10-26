@@ -178,12 +178,13 @@ public class MyOrderActivity extends OrderBaseActivity {
 			String errMsg = "提交订单失败";
 			if (msg.what == ErrorNum.PRINTER_ERR_CONNECT_TIMEOUT
 					|| msg.what == ErrorNum.PRINTER_ERR_NO_PAPER) {
-				errMsg += ":无法连接打印机或打印机缺纸";
+				errMsg += ":无法连接打印机或打印机缺纸。";
 			}
+			
+			errMsg += "系统稍候将重试！";
 			new AlertDialog.Builder(MyOrderActivity.this).setCancelable(false)
 					.setTitle("出错了").setMessage(errMsg)
-					.setPositiveButton("确定", null)
-					.setNegativeButton("添加到后台提交", pendOrder).show();
+					.setPositiveButton("确定", pendOrder).show();
 		}
 	};
 
@@ -222,7 +223,16 @@ public class MyOrderActivity extends OrderBaseActivity {
 		@Override
 		public void onClick(DialogInterface dialog, int which) {
 			submitToService();
-			submitSucceed("系统稍候会尝试重新提交订单");
+			mMyOrder.clear();
+			mMyOrderAdapter.notifyDataSetChanged();
+			finish();
+			if (Info.getMode() == Info.WORK_MODE_CUSTOMER) {
+				Info.setMode(Info.WORK_MODE_WAITER);
+				Intent intent = new Intent();
+				intent.setClass(MyOrderActivity.this,
+						TableActivity.class);
+				startActivity(intent);
+			}
 		}
 	};
 	
