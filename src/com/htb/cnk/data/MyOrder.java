@@ -106,12 +106,13 @@ public class MyOrder {
 	}
 
 	public int getTotalQuantity() {
-		int count = 0;
-
-		for (OrderedDish item : mOrder) {
-			count += (item.padQuantity + item.phoneQuantity);
-		}
-		return count;
+//		int count = 0;
+//
+//		for (OrderedDish item : mOrder) {
+//			count += (item.padQuantity + item.phoneQuantity);
+//		}
+//		return count;
+		return count();
 	}
 
 	public int getDishId(int position) {
