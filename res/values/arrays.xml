@@ -22,5 +22,8 @@
         <item>正常收费</item>
         <item>打折</item>
     </array>
-
+	<array name = "ringtoneType">
+	    <item>系统默认</item>
+	    <item>选择文件</item>
+	</array>
 </resources>

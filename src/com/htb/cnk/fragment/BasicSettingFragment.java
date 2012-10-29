@@ -6,9 +6,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import com.htb.cnk.R;
@@ -16,6 +16,11 @@ import com.htb.cnk.data.Setting;
 import com.htb.cnk.data.UserData;
 
 public class BasicSettingFragment extends Fragment {
+
+	CheckBox persons;
+	CheckBox pwdCheck;
+	CheckBox cleanTableAfterCheckout;
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -32,55 +37,9 @@ public class BasicSettingFragment extends Fragment {
 
 		View v = inflater
 				.inflate(R.layout.basic_settings, container, false);
-		Switch persons;
-		Switch ringtone;
-		Switch pwdCheck;
-		Switch cleanTableAfterCheckout;
-		OnCheckedChangeListener personsCheckedChange = new OnCheckedChangeListener() {
-
-			@Override
-			public void onCheckedChanged(CompoundButton buttonView,
-					boolean isChecked) {
-				Setting.enablePersons(isChecked);
-			}
-
-		};
-
-		OnCheckedChangeListener ringtoneCheckedChange = new OnCheckedChangeListener() {
-
-			@Override
-			public void onCheckedChanged(CompoundButton buttonView,
-					boolean isChecked) {
-				Setting.enableRingtone(isChecked);
-			}
-
-		};
-
-		OnCheckedChangeListener cleanTableAfterCheckoutChange = new OnCheckedChangeListener() {
-
-			@Override
-			public void onCheckedChanged(CompoundButton buttonView,
-					boolean isChecked) {
-				Log.d("clean", "cleanchange");
-				Setting.enableCleanTableAfterCheckout(isChecked);
-			}
-
-		};
-
-		OnCheckedChangeListener pwdCheckedChange = new OnCheckedChangeListener() {
-
-			@Override
-			public void onCheckedChanged(CompoundButton buttonView,
-					boolean isChecked) {
-				Setting.enablePWDCheck(isChecked);
-				if (isChecked) {
-					UserData.debugMode();
-				}
-			}
-		};
-		persons = (Switch) v.findViewById(R.id.persons);
-		ringtone = (Switch) v.findViewById(R.id.ringtone);
-		pwdCheck = (Switch) v.findViewById(R.id.pwdCheck);
+		
+		persons = (CheckBox) v.findViewById(R.id.persons);
+		pwdCheck = (CheckBox) v.findViewById(R.id.pwdCheck);
 		if (!Setting.enabledDebug()) {
 			TextView checkPwdText = (TextView) v
 					.findViewById(R.id.pwdCheckTxt);
@@ -88,19 +47,50 @@ public class BasicSettingFragment extends Fragment {
 			checkPwdText.setVisibility(View.GONE);
 			pwdCheck.setVisibility(View.GONE);
 		}
-		cleanTableAfterCheckout = (Switch) v
+		cleanTableAfterCheckout = (CheckBox) v
 				.findViewById(R.id.cleanTableAfterCheckout);
 		persons.setChecked(Setting.enabledPersons());
-		ringtone.setChecked(Setting.enabledRingtong());
 		pwdCheck.setChecked(Setting.enabledPWDCheck());
 		cleanTableAfterCheckout.setChecked(Setting
 				.enabledCleanTableAfterCheckout());
 		persons.setOnCheckedChangeListener(personsCheckedChange);
-		ringtone.setOnCheckedChangeListener(ringtoneCheckedChange);
 		pwdCheck.setOnCheckedChangeListener(pwdCheckedChange);
 		cleanTableAfterCheckout
 				.setOnCheckedChangeListener(cleanTableAfterCheckoutChange);
 
 		return v;
 	}
+	
+	OnCheckedChangeListener personsCheckedChange = new OnCheckedChangeListener() {
+
+		@Override
+		public void onCheckedChanged(CompoundButton buttonView,
+				boolean isChecked) {
+			Setting.enablePersons(isChecked);
+		}
+
+	};
+
+	OnCheckedChangeListener cleanTableAfterCheckoutChange = new OnCheckedChangeListener() {
+
+		@Override
+		public void onCheckedChanged(CompoundButton buttonView,
+				boolean isChecked) {
+			Log.d("clean", "cleanchange");
+			Setting.enableCleanTableAfterCheckout(isChecked);
+		}
+
+	};
+
+	OnCheckedChangeListener pwdCheckedChange = new OnCheckedChangeListener() {
+
+		@Override
+		public void onCheckedChanged(CompoundButton buttonView,
+				boolean isChecked) {
+			Setting.enablePWDCheck(isChecked);
+			if (isChecked) {
+				UserData.debugMode();
+			}
+		}
+	};
 }
