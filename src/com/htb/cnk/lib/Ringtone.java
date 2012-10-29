@@ -32,7 +32,9 @@ public class Ringtone {
 				return ;
 			}
 		}
-		mediaPlayer.stop();
+		if (mediaPlayer.isPlaying()) {
+			mediaPlayer.stop();
+		}
         try {
 			mediaPlayer.prepare();
 		} catch (IllegalStateException e) {
