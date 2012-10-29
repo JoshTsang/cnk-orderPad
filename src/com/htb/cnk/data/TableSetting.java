@@ -270,9 +270,13 @@ public class TableSetting implements Serializable {
 		for (TableSettingItem item : mTableSettings) {
 			mTableIndexForId.put(item.getId(), item);
 			mTableIndexForName.put(item.getName(), item);
-			if (isTableInCharge(item.getArea())) {
-				mChargedAreaIndex.put(item.getId(), item);
-			}
+//			if (isTableInCharge(item.getArea())) {
+//				mChargedAreaIndex.put(item.getId(), item);
+//			}
+		}
+		getTablesByScope();
+		for (TableSettingItem item:mTableScope) {
+			mChargedAreaIndex.put(item.getId(), item);
 		}
 	}
 
@@ -390,9 +394,9 @@ public class TableSetting implements Serializable {
 		return item;
 	}
 
-	public List<TableSettingItem> getTablesByScope(Context context) {
+	public List<TableSettingItem> getTablesByScope() {
 		mTableScope.clear();
-		SharedPreferences sharedPre = context.getSharedPreferences(
+		SharedPreferences sharedPre = mContext.getSharedPreferences(
 				"waiterSetting", Context.MODE_PRIVATE);
 		String waiterScopeString = sharedPre.getString("waiterScope", "");
 		String stringTemp[] = null;
@@ -603,12 +607,11 @@ public class TableSetting implements Serializable {
 		return 0;
 	}
 
-	// TODO define
 	public static boolean hasPhoneOrderPendingForChargedTables() {
 		int status;
 		for (int i = mChargedAreaIndex.size() - 1; i >= 0; i--) {
 			status = mChargedAreaIndex.valueAt(i).getStatus();
-			if (status == 50 || status == 51) {
+			if (status == Table.PHONE_STATUS || status == Table.PHONE_STATUS+Table.OPEN_TABLE_STATUS) {
 				return true;
 			}
 		}

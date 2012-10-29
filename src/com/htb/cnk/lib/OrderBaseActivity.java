@@ -85,13 +85,10 @@ public class OrderBaseActivity extends BaseActivity {
 		
 		@Override
 		public void onServiceDisconnected(ComponentName name) {
-			// TODO Auto-generated method stub
-			
 		}
 		
 		@Override
 		public void onServiceConnected(ComponentName name, IBinder service) {
-			// TODO Auto-generated method stub
 			if (service == null)
 				Log.d("TAG", "service==null");
 			pendOrderBinder = (NotificationTableService.MyBinder)service;
