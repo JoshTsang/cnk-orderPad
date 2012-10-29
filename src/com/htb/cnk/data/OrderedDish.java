@@ -1,8 +1,6 @@
 package com.htb.cnk.data;
 
 public class OrderedDish {
-	//FIXME find out why orderedDish is needed here 
-	//private final MyOrder OrderedDish;
 	Dish dish;
 	float padQuantity;
 	float phoneQuantity;

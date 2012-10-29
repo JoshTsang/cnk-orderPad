@@ -52,11 +52,14 @@ public class RingtoneSettingFragment extends Fragment {
 		ringtoneSetting = (TextView) v.findViewById(R.id.ringtoneSetting);
 		
 		setRingtoneType(Setting.enabledCustomedRingtone());
+		ringtone.setChecked(Setting.enabledRingtong());
+		notifyOnlyCharged.setChecked(Setting.enabledAreaRingtone());
+		enableNotifyOnlyCharged(Setting.enabledRingtong());
+		
 		play.setOnClickListener(playClicked);
 		chooseRingtone.setOnClickListener(chooseRingtoneClicked);
-		ringtone.setChecked(Setting.enabledRingtong());
-		enableNotifyOnlyCharged(Setting.enabledRingtong());
 		ringtone.setOnCheckedChangeListener(ringtoneCheckedChange);
+		notifyOnlyCharged.setOnCheckedChangeListener(notifyOnlyChargedCheckedChange);
 		
 		ringtonePlayer = new Ringtone(getActivity());
 		return v;
@@ -98,7 +101,6 @@ public class RingtoneSettingFragment extends Fragment {
 		public void onCheckedChanged(CompoundButton buttonView,
 				boolean isChecked) {
 			Setting.enableAreaRingtone(isChecked);
-			notifyOnlyCharged.setClickable(isChecked);
 		}
 
 	};
@@ -148,7 +150,6 @@ public class RingtoneSettingFragment extends Fragment {
 				  Toast.makeText(getActivity(),
 						  "请选择mp3格式的音频文件", Toast.LENGTH_LONG).show();
 			  } else {
-				  //TODO cp ringtone
 				try {
 					if (saveRingtone(path) < 0) {
 						Toast.makeText(getActivity(),
