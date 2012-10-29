@@ -125,7 +125,7 @@ public class RingtoneSettingFragment extends Fragment {
 			case 0:
 				Setting.enableCustomedRingtone(false);
 				setRingtoneType(false);
-				ringtonePlayer.update();
+				ringtonePlayer.setUpdate(true);
 				break;
 			case 1:
 				Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -156,7 +156,7 @@ public class RingtoneSettingFragment extends Fragment {
 					} else {
 					    Setting.enableCustomedRingtone(true);
 					    setRingtoneType(true);
-					    ringtonePlayer.update();
+					    ringtonePlayer.setUpdate(true);
 					    Toast.makeText(getActivity(),
 							      "设置成功", Toast.LENGTH_LONG).show();
 					}

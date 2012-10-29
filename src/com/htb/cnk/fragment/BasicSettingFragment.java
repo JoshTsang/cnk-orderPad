@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.TextView;
+import android.widget.TableRow;
 
 import com.htb.cnk.R;
 import com.htb.cnk.data.Setting;
@@ -41,11 +41,8 @@ public class BasicSettingFragment extends Fragment {
 		persons = (CheckBox) v.findViewById(R.id.persons);
 		pwdCheck = (CheckBox) v.findViewById(R.id.pwdCheck);
 		if (!Setting.enabledDebug()) {
-			TextView checkPwdText = (TextView) v
-					.findViewById(R.id.pwdCheckTxt);
-
-			checkPwdText.setVisibility(View.GONE);
-			pwdCheck.setVisibility(View.GONE);
+			TableRow pwdSetting = (TableRow) v.findViewById(R.id.pwdSetting);
+			pwdSetting.setVisibility(View.GONE);
 		}
 		cleanTableAfterCheckout = (CheckBox) v
 				.findViewById(R.id.cleanTableAfterCheckout);
