@@ -16,10 +16,11 @@ public class Ringtone {
 	
 	protected MediaPlayer mediaPlayer;
 	protected Context mContext;
+	protected boolean prepared = false;
+	protected static boolean needsUpdate = false; 
 	
 	public Ringtone(Context context) {
 		mContext = context;
-		mediaPlayer=MediaPlayer.create(mContext, R.raw.ringtone);
 		update();
 	}
 	
@@ -32,26 +33,24 @@ public class Ringtone {
 				return ;
 			}
 		}
-		if (mediaPlayer.isPlaying()) {
-			mediaPlayer.stop();
-		}
-        try {
-			mediaPlayer.prepare();
-		} catch (IllegalStateException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		mediaPlayer.start();
-		mediaPlayer.start();
+		
+		playForSetting();
+		needsUpdate = false;
 	}
 	
 	public void playForSetting() {
+		if (needsUpdate) {
+			update();
+		}
+		
 		if (mediaPlayer.isPlaying()) {
 			mediaPlayer.stop();
 		}
         try {
-			mediaPlayer.prepare();
+        	if (!prepared) {
+        		mediaPlayer.prepare();
+        		prepared = true;
+        	}
 		} catch (IllegalStateException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -64,12 +63,21 @@ public class Ringtone {
 		mediaPlayer.stop();
 	}
 
-	public void update() {
+	public void setUpdate(boolean v) {
+		needsUpdate = v;
+	}
+	
+	private void update() {
 		if (Setting.enabledCustomedRingtone()) {
+			if (mediaPlayer == null) {
+				mediaPlayer = MediaPlayer.create(mContext, R.raw.ringtone);
+				prepared = true;
+			}
 			boolean err = false;
 			try {
 				Log.d(TAG, mContext.getFilesDir() + "/ringtone.mp3");
 				mediaPlayer.reset();
+				prepared = false;
 				mediaPlayer.setDataSource(mContext.getFilesDir() + "/ringtone.mp3");
 			} catch (IllegalArgumentException e) {
 				err = true;
@@ -87,11 +95,15 @@ public class Ringtone {
 				if (err) {
 					mediaPlayer.release();
 					mediaPlayer = MediaPlayer.create(mContext, R.raw.ringtone);
+					prepared = false;
 				}
 			}
 		} else {
-			mediaPlayer.release();
+			if (mediaPlayer != null) {
+				mediaPlayer.release();
+			}
 			mediaPlayer = MediaPlayer.create(mContext, R.raw.ringtone);
+			prepared = true;
 		}
 	}
 	

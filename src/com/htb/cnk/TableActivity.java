@@ -48,7 +48,6 @@ public class TableActivity extends TableBaseActivity {
 	private ArrayList<View> pageViewsList;
 	private LayoutInflater inflater;
 	protected SimpleAdapter mImageItems;
-	private GuidePageAdapter gpa;
 
 	@Override
 	protected void onResume() {
@@ -61,8 +60,7 @@ public class TableActivity extends TableBaseActivity {
 
 		if (mImageItems != null) {
 			mTableInfo.clearLstImageItem();
-			layoutBottom.removeAllViews();
-			initViewPager();
+			updateGridViewAdapter(currentPage);
 		}
 	}
 
@@ -70,15 +68,12 @@ public class TableActivity extends TableBaseActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.table_activity);
-		Log.d(TAG, "teableItem.size0:"+mTableItem.size());
 		mTableInfo = new TableAdapter(mTableItem, mNotification, mSettings,
 				TableActivity.this);
-		Log.d(TAG, "teableItem.size1:"+mTableItem.size());
 		findViews();
 		mpDialog.show();
 		setClickListeners();
 		setHandler();
-		gpa = new GuidePageAdapter();
 	}
 
 	private void setHandler() {
@@ -271,7 +266,7 @@ public class TableActivity extends TableBaseActivity {
 		inflater = getLayoutInflater();
 		pageViewsList = new ArrayList<View>();
 		pageViewsList.add(inflater.inflate(R.layout.gridview, null));
-		mPageView.setAdapter(gpa);
+		mPageView.setAdapter(new GuidePageAdapter());
 		mPageView.setOnPageChangeListener(new GuidePageChangeListener());
 	}
 
@@ -299,7 +294,7 @@ public class TableActivity extends TableBaseActivity {
 	 * @param page
 	 */
 	private void updateGridViewAdapter(int page) {
-//		mGridView.setOnItemClickListener(tableItemClickListener);
+		mGridView.setOnItemClickListener(tableItemClickListener);
 		switch (page) {
 		case 0:
 			mTableInfo.filterTables(page, TableAdapter.FILTER_SCOPE);

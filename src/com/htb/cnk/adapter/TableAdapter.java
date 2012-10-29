@@ -66,7 +66,7 @@ public class TableAdapter {
 			resultSet = mSetting.getTablesByFloor(floorNum);
 			break;
 		case FILTER_SCOPE:
-			resultSet = mSetting.getTablesByScope(mContext);
+			resultSet = mSetting.getTablesByScope();
 			break;
 		case FILTER_AREA:
 			resultSet = mSetting.getTablesByArea();
