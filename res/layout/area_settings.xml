@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <TableLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="9dp" >
+
+        <TableRow style="@style/settingRow" >
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="3"
+                android:orientation="vertical" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="选择设置"
+                    android:textColor="#4D2412"
+                    android:textSize="30dip" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="选择区域范围"
+                    android:textColor="#4D2412"
+                    android:textSize="15dip" />
+            </LinearLayout>
+
+            <CheckBox
+                android:id="@+id/area"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+        </TableRow>
+
+        <GridView
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/areaAridview"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:columnWidth="30dip"
+            android:gravity="center"
+            android:horizontalSpacing="5dip"
+            android:listSelector="@drawable/grid_selector_background"
+            android:numColumns="6"
+            android:paddingTop="5dip"
+            android:stretchMode="columnWidth"
+            android:verticalSpacing="10dip" >
+        </GridView>
+    </TableLayout>
+
+</LinearLayout>

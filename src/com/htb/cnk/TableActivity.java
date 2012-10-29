@@ -23,6 +23,7 @@ import android.widget.TextView;
 
 import com.htb.cnk.adapter.TableAdapter;
 import com.htb.cnk.data.Info;
+import com.htb.cnk.data.Setting;
 import com.htb.cnk.ui.base.TableBaseActivity;
 
 public class TableActivity extends TableBaseActivity {
@@ -262,7 +263,7 @@ public class TableActivity extends TableBaseActivity {
 				R.layout.table_item, new String[] { IMAGE_ITEM, ITEM_TEXT },
 				new int[] { R.id.ItemImage, R.id.ItemText }) {
 		};
-		
+
 		inflater = getLayoutInflater();
 		pageViewsList = new ArrayList<View>();
 		pageViewsList.add(inflater.inflate(R.layout.gridview, null));
@@ -276,7 +277,11 @@ public class TableActivity extends TableBaseActivity {
 	public void setCurPage(int page) {
 		switch (page) {
 		case 0:
-			imgCur.setText("负责区域");
+			if (!Setting.enableChargedAreaCheckout()) {
+				imgCur.setText("全部");
+			} else {
+				imgCur.setText("负责区域");
+			}
 			break;
 
 		default:
@@ -297,7 +302,13 @@ public class TableActivity extends TableBaseActivity {
 		mGridView.setOnItemClickListener(tableItemClickListener);
 		switch (page) {
 		case 0:
-			mTableInfo.filterTables(page, TableAdapter.FILTER_SCOPE);
+			if(!Setting.enableChargedAreaCheckout()){
+				mTableInfo.filterTables(page, TableAdapter.FILTER_NONE);
+				imgCur.setText("全部");
+			}else{
+				mTableInfo.filterTables(page, TableAdapter.FILTER_SCOPE);
+				imgCur.setText("负责区域");
+			}
 			break;
 
 		default:
