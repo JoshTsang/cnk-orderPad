@@ -43,11 +43,12 @@ public class TableActivity extends TableBaseActivity {
 	private TextView imgCur;
 	private boolean flag = false;
 
-	private ViewGroup layout;
 	private ViewPager mPageView;
 	private GridView mGridView;
 	private ArrayList<View> pageViewsList;
 	private LayoutInflater inflater;
+	protected SimpleAdapter mImageItems;
+	private GuidePageAdapter gpa;
 
 	@Override
 	protected void onResume() {
@@ -57,17 +58,27 @@ public class TableActivity extends TableBaseActivity {
 			NETWORK_ARERTDIALOG = 0;
 		}
 		showProgressDlg(getResources().getString(R.string.getStatus));
+
+		if (mImageItems != null) {
+			mTableInfo.clearLstImageItem();
+			layoutBottom.removeAllViews();
+			initViewPager();
+		}
 	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.table_activity);
+		Log.d(TAG, "teableItem.size0:"+mTableItem.size());
+		mTableInfo = new TableAdapter(mTableItem, mNotification, mSettings,
+				TableActivity.this);
+		Log.d(TAG, "teableItem.size1:"+mTableItem.size());
 		findViews();
 		mpDialog.show();
 		setClickListeners();
 		setHandler();
-		mTableInfo = new TableAdapter(mTableItem, mNotification, mSettings,TableActivity.this);
+		gpa = new GuidePageAdapter();
 	}
 
 	private void setHandler() {
@@ -224,7 +235,6 @@ public class TableActivity extends TableBaseActivity {
 						initViewPager();
 					}
 					updateGrid(currentPage);
-
 					flag = true;
 					if (getSettings().hasPendedPhoneOrder()) {
 						ringtoneHandler.sendEmptyMessage(1);
@@ -253,7 +263,6 @@ public class TableActivity extends TableBaseActivity {
 		setCurPage(0);
 		mPageView.getLayoutParams().height = this.getWindowManager()
 				.getDefaultDisplay().getHeight() * 4 / 5;
-		
 		mImageItems = new SimpleAdapter(TableActivity.this, mTableItem,
 				R.layout.table_item, new String[] { IMAGE_ITEM, ITEM_TEXT },
 				new int[] { R.id.ItemImage, R.id.ItemText }) {
@@ -262,14 +271,8 @@ public class TableActivity extends TableBaseActivity {
 		inflater = getLayoutInflater();
 		pageViewsList = new ArrayList<View>();
 		pageViewsList.add(inflater.inflate(R.layout.gridview, null));
-		mPageView.setAdapter(new GuidePageAdapter());
+		mPageView.setAdapter(gpa);
 		mPageView.setOnPageChangeListener(new GuidePageChangeListener());
-	}
-
-	public void init(int page) {
-		mGridView = (GridView) layout.findViewById(R.id.gridview);
-		mGridView.setAdapter(mImageItems);
-		mGridView.setOnItemClickListener(tableItemClickListener);
 	}
 
 	/**
@@ -296,7 +299,7 @@ public class TableActivity extends TableBaseActivity {
 	 * @param page
 	 */
 	private void updateGridViewAdapter(int page) {
-		mGridView.setOnItemClickListener(tableItemClickListener);
+//		mGridView.setOnItemClickListener(tableItemClickListener);
 		switch (page) {
 		case 0:
 			mTableInfo.filterTables(page, TableAdapter.FILTER_SCOPE);
@@ -333,6 +336,14 @@ public class TableActivity extends TableBaseActivity {
 
 	/** 指引页面Adapter */
 	class GuidePageAdapter extends PagerAdapter {
+		private ViewGroup layout;
+
+		public void init() {
+			mGridView = (GridView) layout.findViewById(R.id.gridview);
+			mGridView.setAdapter(mImageItems);
+			mGridView.setOnItemClickListener(tableItemClickListener);
+		}
+
 		@Override
 		public int getCount() {
 			return getSettings().getFloorNum() + EXTERN_PAGE_NUM;
@@ -361,8 +372,9 @@ public class TableActivity extends TableBaseActivity {
 		public Object instantiateItem(View arg0, int arg1) {
 			LayoutInflater inflate = getLayoutInflater();
 			layout = (ViewGroup) inflater.inflate(R.layout.gridview, null);
-			init(arg1);
+			init();
 			((ViewPager) arg0).addView(layout);
+			layout.setTag(arg1);
 			return layout;
 		}
 

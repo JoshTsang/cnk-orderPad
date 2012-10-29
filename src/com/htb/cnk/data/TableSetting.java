@@ -267,6 +267,7 @@ public class TableSetting implements Serializable {
 		mChargedAreaIndex.clear();
 		mTableIndexForId.clear();
 		mTableIndexForName.clear();
+		mTableScope.clear();
 		for (TableSettingItem item : mTableSettings) {
 			mTableIndexForId.put(item.getId(), item);
 			mTableIndexForName.put(item.getName(), item);
@@ -286,7 +287,6 @@ public class TableSetting implements Serializable {
 		if (!areaString.equals("")) {
 			for (int i = 0; i < stringTemp.length; i++) {
 				if (stringTemp[i].equals(String.valueOf(area))) {
-					Log.d(TAG, "area:"+area);
 					return true;
 				}
 			}

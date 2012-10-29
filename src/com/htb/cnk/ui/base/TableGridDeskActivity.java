@@ -26,7 +26,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.SimpleAdapter;
 
 import com.htb.cnk.DelOrderActivity;
 import com.htb.cnk.MenuActivity;
@@ -73,7 +72,6 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 	protected PhoneOrder mPhoneOrder;
 	protected TableSetting mSettings;
 	protected Ringtone mRingtone;
-	protected SimpleAdapter mImageItems;
 
 	protected EditText tableIdEdit;
 	protected EditText personsEdit;
@@ -94,6 +92,7 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 		super.onResume();
 		TableGridDeskActivity.this.stopService(new Intent(TableGridDeskActivity.this,NotificationTableService.class));
 		binderStart();
+		
 	}
 
 	@Override

@@ -61,7 +61,6 @@ public class TableAdapter {
 	}
 
 	private void setStatusAndIcon(int floorNum, int filterType) {
-		// lstImageItem.clear();
 		switch (filterType) {
 		case FILTER_FLOOR:
 			resultSet = mSetting.getTablesByFloor(floorNum);
@@ -76,6 +75,7 @@ public class TableAdapter {
 			resultSet = mSetting.getTables();
 			break;
 		}
+		
 		int tableSize = resultSet.size();
 		for (int i = 0, n = 0; i < tableSize; i++) {
 			int status = resultSet.get(i).getStatus();
