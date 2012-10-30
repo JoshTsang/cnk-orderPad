@@ -792,6 +792,14 @@ public class TableSetting implements Serializable {
 		return ret;
 	}
 
+	public int getLocalTableStatusById(int tid) {
+		return mTableIndexForId.get(tid).getStatus();
+	}
+	
+	public void setLocalTableStatusById(int tid, int status) {
+		mTableIndexForId.get(tid).setStatus(status);
+	}
+	
 	public int floorCategory() {
 		String floorCategoryPkg = Http.get(Server.GET_FLOORNUM, null);
 		if (floorCategoryPkg == null) {

@@ -37,6 +37,7 @@ import com.htb.cnk.dialog.TitleAndMessageDlg;
 import com.htb.cnk.service.NotificationTableService;
 import com.htb.cnk.ui.base.BaseActivity;
 import com.htb.constant.Permission;
+import com.htb.constant.Table;
 
 /**
  * @author josh
@@ -294,6 +295,10 @@ public class OrderBaseActivity extends BaseActivity {
 			Log.e(TAG, "order==null");
 		}
 		pendOrderBinder.add(Info.getTableId(), Info.getTableName(), mSettings.getStatusById(Info.getTableId()), order);
+		int tableStatus = mSettings.getLocalTableStatusById(Info.getTableId());
+		if (tableStatus%10 == 0) {
+			mSettings.setLocalTableStatusById(Info.getTableId(), tableStatus + Table.OPEN_TABLE_STATUS);
+		}
 	}
 	
 	public void flavorDialog(final int position) {
