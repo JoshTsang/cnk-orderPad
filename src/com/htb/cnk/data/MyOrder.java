@@ -29,21 +29,21 @@ public class MyOrder {
 	public final static int RET_MINUS_SUCC = -2;
 	public final static int DEL_ALL_ORDER = -1;
 	public final static int NOTHING_TO_DEL = -4;
-	
+
 	public final static int UPDATE_ORDER = 1;
 	public final static int DEL_ITEM_ORDER = 2;
-	
+
 	final static int MODE_PAD = 0;
 	protected final static int MODE_PHONE = 1;
-	
+
 	protected final static int TIME_OUT = -1;
-	
+
 	final static int NAME_COLUMN = 0;
 	final static int PRICE_COLUMN = 1;
 	final static int PIC_COLUMN = 2;
 	final static int PRINTER_COLUMN = 3;
 	final static int UNIT_NAME = 4;
-	
+
 	protected CnkDbHelper mCnkDbHelper;
 	protected SQLiteDatabase mDb;
 	protected Context mContext;
@@ -147,7 +147,7 @@ public class MyOrder {
 	public float getQuantity(int index) {
 		return mOrder.get(index).getQuantity();
 	}
-	
+
 	public int getPrinter(int index) {
 		return mOrder.get(index).getPrinter();
 	}
@@ -249,15 +249,16 @@ public class MyOrder {
 		if (ret < 0) {
 			return ret;
 		}
-		
+
 		String orderJson = getOrderJson();
 		if (orderJson == null) {
 			return -1;
 		}
-		
+
 		String response;
 		if (tableStatus == Table.OPEN_TABLE_STATUS) {
-			response = Http.post(Server.SUBMIT_ORDER+"?action=add", orderJson);
+			response = Http
+					.post(Server.SUBMIT_ORDER + "?action=add", orderJson);
 		} else {
 			response = Http.post(Server.SUBMIT_ORDER, orderJson);
 		}
@@ -267,16 +268,16 @@ public class MyOrder {
 		return 0;
 
 	}
-	
+
 	public static int submitPendedOrder(String order, int tableStatus) {
 		String response;
-		
+
 		int ret = Http.getPrinterStatus(Server.PRINTER_CONTENT_TYPE_ORDER);
 		if (ret < 0) {
 			return ret;
 		}
 		if (tableStatus == Table.OPEN_TABLE_STATUS) {
-			response = Http.post(Server.SUBMIT_ORDER+"?action=add", order);
+			response = Http.post(Server.SUBMIT_ORDER + "?action=add", order);
 		} else {
 			response = Http.post(Server.SUBMIT_ORDER, order);
 		}
@@ -285,13 +286,13 @@ public class MyOrder {
 		}
 		return 0;
 	}
-	
+
 	public String getOrderJson() {
 		JSONObject order = new JSONObject();
 		Date date = new Date();
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String time = df.format(date);
-		
+
 		try {
 			order.put("waiter", UserData.getUserName());
 			order.put("waiterId", UserData.getUID());
@@ -305,7 +306,7 @@ public class MyOrder {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		
+
 		JSONArray dishes = new JSONArray();
 		try {
 			for (int i = 0; i < mOrder.size(); i++) {
@@ -325,7 +326,7 @@ public class MyOrder {
 			e.printStackTrace();
 			return null;
 		}
-		
+
 		return order.toString();
 	}
 
@@ -374,6 +375,28 @@ public class MyOrder {
 
 	public int getFLavorFromServer() {
 		String response = Http.get(Server.GET_FLAVOR, "");
+		return getFlavorName(response);
+	}
+
+	public int getFlaovorFromSetting() {
+		String response = Setting.enabledGetFlavor();
+		return getFlavorName(response);
+	}
+
+	public int saveFlavorToSetting() {
+		JSONArray flavor = new JSONArray();
+		for (int i = 0; i < mFlavorName.length; i++) {
+			flavor.put(mFlavorName[i].toString());
+		}
+		Log.d(TAG, flavor.toString());
+		Setting.enableSaveFlavor(flavor.toString());
+		return 0;
+	}
+
+	/**
+	 * @param response
+	 */
+	private int getFlavorName(String response) {
 		if ("null".equals(response)) {
 			Log.w(TAG, "getFLavorFromServer.null");
 			return -2;
@@ -417,12 +440,18 @@ public class MyOrder {
 				int status = item.getInt("status");
 				Float dishPrice = (float) item.getDouble("price");
 				Cursor cur = getDishInfoFromDB(dishId);
-				
-				String name = cur.getString(NAME_COLUMN);
-				String pic = cur.getString(PIC_COLUMN);
-				int printer = cur.getInt(PRINTER_COLUMN);
-				String unit = cur.getString(UNIT_NAME);
-				Dish mDish = new Dish(dishId, name, dishPrice, pic, unit, printer);
+				String name = null;
+				String pic = null;
+				int printer = 0;
+				String unit = null;
+				if (cur != null) {
+					name = cur.getString(NAME_COLUMN);
+					pic = cur.getString(PIC_COLUMN);
+					printer = cur.getInt(PRINTER_COLUMN);
+					unit = cur.getString(UNIT_NAME);
+				}
+				Dish mDish = new Dish(dishId, name, dishPrice, pic, unit,
+						printer);
 				addOrder(mDish, quantity, tableId, status, MODE_PAD);
 			}
 			return 0;
@@ -489,7 +518,8 @@ public class MyOrder {
 					dish.put("dishId", mOrder.get(i).dish.getId());
 					dish.put("name", mOrder.get(i).dish.getName());
 					dish.put("price", mOrder.get(i).dish.getPrice());
-					dish.put("quan",
+					dish.put(
+							"quan",
 							(mOrder.get(i).padQuantity + mOrder.get(i).phoneQuantity));
 					dish.put("printer", mOrder.get(i).getPrinter());
 					dishes.put(dish);
@@ -531,7 +561,7 @@ public class MyOrder {
 		return 0;
 
 	}
-	
+
 	private String getDishNameFromDB(int id) {
 		Cursor cur = mDb.query(CnkDbHelper.TABLE_DISH_INFO,
 				new String[] { CnkDbHelper.DISH_NAME }, CnkDbHelper.DISH_ID
@@ -546,16 +576,13 @@ public class MyOrder {
 	protected Cursor getDishInfoFromDB(int id) {
 		String sql = String
 				.format("SELECT %s, %s, %s, %s, %s FROM %s,%s,%s Where %s.%s=%s and %s.%s=%d",
-						CnkDbHelper.DISH_NAME,
-						CnkDbHelper.DISH_PRICE,
-						CnkDbHelper.DISH_PIC,
-						CnkDbHelper.DISH_PRINTER,
-						CnkDbHelper.UNIT_NAME,
-						CnkDbHelper.TABLE_DISH_INFO,
+						CnkDbHelper.DISH_NAME, CnkDbHelper.DISH_PRICE,
+						CnkDbHelper.DISH_PIC, CnkDbHelper.DISH_PRINTER,
+						CnkDbHelper.UNIT_NAME, CnkDbHelper.TABLE_DISH_INFO,
 						CnkDbHelper.TABLE_DISH_CATEGORY,
-						CnkDbHelper.TABLE_UNIT,
-						CnkDbHelper.TABLE_UNIT, "id", CnkDbHelper.UNIT_ID,
-						CnkDbHelper.TABLE_DISH_INFO, CnkDbHelper.DISH_ID, id);
+						CnkDbHelper.TABLE_UNIT, CnkDbHelper.TABLE_UNIT, "id",
+						CnkDbHelper.UNIT_ID, CnkDbHelper.TABLE_DISH_INFO,
+						CnkDbHelper.DISH_ID, id);
 		Cursor cur = mDb.rawQuery(sql, null);
 
 		if (cur.moveToNext()) {

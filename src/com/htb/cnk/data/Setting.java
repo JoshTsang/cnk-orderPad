@@ -29,7 +29,7 @@ public class Setting {
 	}
 
 	public static void enablePersons(boolean enable) {
-		commitPerference("persons", enable);
+		commitPerferenceBoolean("persons", enable);
 	}
 
 	public static boolean enabledRingtong() {
@@ -37,11 +37,11 @@ public class Setting {
 	}
 
 	public static void enableRingtong(boolean enable) {
-		commitPerference("Ringtone", enable);
+		commitPerferenceBoolean("Ringtone", enable);
 	}
 	
 	public static void enableAreaRingtone(boolean enable) {
-		commitPerference("RingtoneArea", enable);
+		commitPerferenceBoolean("RingtoneArea", enable);
 	}
 	
 	public static boolean enabledAreaRingtone() {
@@ -53,7 +53,7 @@ public class Setting {
 	}
 
 	public static void enablePWDCheck(boolean enable) {
-		commitPerference("pwdCheck", enable);
+		commitPerferenceBoolean("pwdCheck", enable);
 	}
 
 	public static boolean enabledCleanTableAfterCheckout() {
@@ -61,7 +61,7 @@ public class Setting {
 	}
 
 	public static void enableCleanTableAfterCheckout(boolean enable) {
-		commitPerference("trigerCleanTable", enable);
+		commitPerferenceBoolean("trigerCleanTable", enable);
 	}
 
 	public static boolean enableChargedAreaCheckout() {
@@ -69,21 +69,35 @@ public class Setting {
 	}
 
 	public static void enableChargedAreaAfterCheckout(boolean enable) {
-		commitPerference("chargedArea", enable);
+		commitPerferenceBoolean("chargedArea", enable);
 	}
 
 	
 	public static void enableCustomedRingtone(boolean enable) {
-		commitPerference("customRingtone", enable);
+		commitPerferenceBoolean("customRingtone", enable);
 	}
 	
 	public static boolean enabledCustomedRingtone() {
 		return Perference.getBoolean("customRingtone", false);
 	}
 	
-	private static void commitPerference(String key, boolean value) {
+	public static void enableSaveFlavor(String flavor) {
+		commitPerferenceString("flavor", flavor);
+	}
+	
+	public static String enabledGetFlavor() {
+		return Perference.getString("flavor", "");
+	}
+	
+	private static void commitPerferenceBoolean(String key, boolean value) {
 		Editor editor = Perference.edit();
 		editor.putBoolean(key, value);
+		editor.commit();
+	}
+	
+	private static void commitPerferenceString(String key, String value){
+		Editor editor = Perference.edit();
+		editor.putString(key, value);
 		editor.commit();
 	}
 
