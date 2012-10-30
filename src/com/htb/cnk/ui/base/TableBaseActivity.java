@@ -23,7 +23,7 @@ public abstract class TableBaseActivity extends TableGridDeskActivity {
 	protected double mChange;
 	protected double mTotalPrice;
 	protected AlertDialog.Builder mChangeDialog;
-	protected AlertDialog mNetWrorkcancel;
+//	protected AlertDialog mNetWrorkcancel;
 	protected AlertDialog.Builder mNetWrorkAlertDialog;
 	protected Handler mTotalPriceTableHandler;
 	protected Handler mCheckOutHandler;
@@ -51,9 +51,18 @@ public abstract class TableBaseActivity extends TableGridDeskActivity {
 		}
 	};
 
-	protected void netWorkDialogShow(String messages) {
+	protected void showNetworkErrStatus(String messages) {
 		NETWORK_ARERTDIALOG = 1;
-		mNetWrorkcancel = mNetWrorkAlertDialog.setMessage(messages).show();
+		networkStatus = false;
+		//mNetWrorkcancel = mNetWrorkAlertDialog.setMessage(messages).show();
+		if (mStatusBar != null) {
+			mStatusBar.setVisibility(View.VISIBLE);
+			mStatusBar.setText(messages);
+		}
+	}
+	
+	protected void showNetworkErrDlg(String msg) {
+		mNetWrorkAlertDialog.setMessage(msg).show();
 	}
 
 	protected Builder listTableNameDialog(final int type) {

@@ -33,7 +33,7 @@ public class Setting {
 	}
 
 	public static boolean enabledRingtong() {
-		return Perference.getBoolean("Ringtone", false);
+		return Perference.getBoolean("Ringtone", true);
 	}
 
 	public static void enableRingtong(boolean enable) {
@@ -57,7 +57,7 @@ public class Setting {
 	}
 
 	public static boolean enabledCleanTableAfterCheckout() {
-		return Perference.getBoolean("trigerCleanTable", false);
+		return Perference.getBoolean("trigerCleanTable", true);
 	}
 
 	public static void enableCleanTableAfterCheckout(boolean enable) {

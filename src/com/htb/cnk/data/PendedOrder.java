@@ -35,7 +35,8 @@ public class PendedOrder {
 	}
 	
 	private List<PendedOrderDetail> pendedOrders = new ArrayList<PendedOrder.PendedOrderDetail>();
-	
+	public static final Object lock = new Object();
+
 	public void add(int id, String name, int status, String order) {
 		PendedOrderDetail porder = new PendedOrderDetail(id, name, status, order);
 		
@@ -51,14 +52,20 @@ public class PendedOrder {
 		}
 	}
 	
-	public void submit() {
-		int count = count();
-		for (int i=0; i<count; i++) {
-			int ret = MyOrder.submitPendedOrder(pendedOrders.get(i).getOrder(), pendedOrders.get(i).getStatus());
-			if (ret >= 0) {
-				pendedOrders.remove(i);
-				break;
+	public int submit() {
+		synchronized (lock) {
+			int count = count();
+			for (int i = 0; i < count; i++) {
+				int ret = MyOrder.submitPendedOrder(pendedOrders.get(i)
+						.getOrder(), pendedOrders.get(i).getStatus());
+				if (ret >= 0) {
+					pendedOrders.remove(i);
+					break;
+				} else {
+					return -1;
+				}
 			}
+			return 0;
 		}
 	}
 	

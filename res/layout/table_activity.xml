@@ -2,6 +2,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    android:background="#F8E9C1"
     android:orientation="vertical">
 <LinearLayout 
     android:layout_width="fill_parent"
@@ -53,6 +54,8 @@
             android:textSize="35dip" />
     </LinearLayout>
 
+    
+    
     <android.support.v4.view.ViewPager
         android:id="@+id/scr"
         android:layout_width="match_parent"
@@ -68,6 +71,21 @@
         android:layout_marginBottom="4dip"
         android:gravity="center" >
     </LinearLayout>
+
+</LinearLayout>
+<LinearLayout android:layout_height="37dip"
+        android:layout_width="fill_parent"
+        android:layout_gravity="bottom" >
+	<TextView android:id="@+id/statusBar"
+	        android:layout_width="fill_parent"
+	    	android:layout_height = "37dp"
+	    	android:gravity="center"
+	    	android:textColor="#FF0000"
+	    	android:background="#50FF0000"
+	    	android:textSize="20dp"
+	    	android:visibility="gone"
+	    	android:text="网络连接失败，请检查网络"
+    />
 
 </LinearLayout>
 <LinearLayout android:layout_height="30dip"
