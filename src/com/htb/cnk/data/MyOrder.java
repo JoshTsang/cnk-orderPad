@@ -374,29 +374,29 @@ public class MyOrder {
 		return -1;
 	}
 
-	public int getFLavorFromServer() {
+	public static int getFLavorFromServer() {
 		String response = Http.get(Server.GET_FLAVOR, "");
 		return getFlavorName(response);
 	}
 
-	public int getFlaovorFromSetting() {
-		String response = Setting.enabledGetFlavor();
+	public static int getFlaovorFromSetting() {
+		String response = Setting.getFlavor();
 		return getFlavorName(response);
 	}
 
-	public int saveFlavorToSetting() {
+	public static int saveFlavorToSetting() {
 		JSONArray flavor = new JSONArray();
 		for (int i = 0; i < mFlavorName.length; i++) {
 			flavor.put(mFlavorName[i].toString());
 		}
-		Setting.enableSaveFlavor(flavor.toString());
+		Setting.saveFlavor(flavor.toString());
 		return 0;
 	}
 
 	/**
 	 * @param response
 	 */
-	private int getFlavorName(String response) {
+	private static int getFlavorName(String response) {
 		if ("null".equals(response)) {
 			Log.w(TAG, "getFLavorFromServer.null");
 			return -2;

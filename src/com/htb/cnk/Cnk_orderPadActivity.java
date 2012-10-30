@@ -77,7 +77,6 @@ public class Cnk_orderPadActivity extends BaseActivity {
 	private Setting mAppSetting;
 	private AlertDialog.Builder mNetWrorkAlertDialog;
 	private TitleAndMessageDlg mNetworkDialog;
-	private MyOrder mMyOrder;
 
 	protected NotificationTableService.MyBinder pendOrderBinder;
 	protected boolean binded;
@@ -99,7 +98,6 @@ public class Cnk_orderPadActivity extends BaseActivity {
 		setContentView(R.layout.main);
 		version = new Version(Cnk_orderPadActivity.this);
 		mNetworkDialog = new TitleAndMessageDlg(Cnk_orderPadActivity.this);
-		mMyOrder = new MyOrder(Cnk_orderPadActivity.this);
 		findViews();
 		setClickListeners();
 		Info.setNewCustomer(true);
@@ -496,7 +494,7 @@ public class Cnk_orderPadActivity extends BaseActivity {
 	public void getFLavor() {
 		new Thread() {
 			public void run() {
-				int ret = mMyOrder.getFLavorFromServer();
+				int ret = MyOrder.getFLavorFromServer();
 				flavorHandler.sendEmptyMessage(ret);
 			}
 		}.start();
@@ -507,9 +505,9 @@ public class Cnk_orderPadActivity extends BaseActivity {
 			if (msg.what < 0) {
 //				Toast.makeText(getApplicationContext(), "点菜口味数据不对，亲不要使用口味功能",
 //						Toast.LENGTH_LONG).show();
-				mMyOrder.getFlaovorFromSetting();
+				MyOrder.getFlaovorFromSetting();
 			} else {
-				mMyOrder.saveFlavorToSetting();
+				MyOrder.saveFlavorToSetting();
 			}
 		}
 	};
