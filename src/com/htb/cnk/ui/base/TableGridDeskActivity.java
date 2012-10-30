@@ -95,22 +95,21 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 	protected void onResume() {
 		super.onResume();
 		binderStart();
-		
+
 	}
 
 	@Override
 	protected void onDestroy() {
-		
+
 		unbindService(conn);
 		unregisterReceiver(mReceiver);
 		super.onDestroy();
 	}
-	
+
 	@Override
 	protected void onStop() {
 		super.onStop();
 	}
-
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -141,14 +140,14 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 		public void onServiceDisconnected(ComponentName name) {
 		}
 	};
-	
+
 	protected void showNetworkErrStatus(String messages) {
 		if (mStatusBar != null) {
 			mStatusBar.setVisibility(View.VISIBLE);
 			mStatusBar.setText(messages);
 		}
 	}
-	
+
 	protected void registerReceiver(BroadcastReceiver receiver) {
 		IntentFilter filter = new IntentFilter(
 				NotificationTableService.SERVICE_IDENTIFIER);
@@ -282,32 +281,32 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 			cleanNotification();
 		}
 	};
-	
+
 	Handler mPendedOrderNotificationHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			int ret = binder.count();
 			if (ret > 0) {
-				Log.d(TAG,	"has order Pending");
+				Log.d(TAG, "has order Pending");
 				mOrderNotification.setVisibility(View.VISIBLE);
-				mOrderNotification.setText("有"+ret+"个订单挂起，系统正在重新提交");
+				mOrderNotification.setText("有" + ret + "个订单挂起，系统正在重新提交");
 				int err = binder.getErr();
 				if (err < 0) {
-//					if (!isPrinterErrShown) {
-//						new AlertDialog.Builder(TableGridDeskActivity.this)
-//						.setTitle("错误")
-//						.setMessage("无法连接打印机或打印机缺纸，请检查打印机")
-//						.setPositiveButton("确定", 
-//								new DialogInterface.OnClickListener() {
-//	
-//							@Override
-//							public void onClick(DialogInterface dialog,
-//									int which) {
-//								isPrinterErrShown = false;
-//								binder.cleanErr();
-//							}
-//						}).show();
-//						isPrinterErrShown = true;
-//					}
+					// if (!isPrinterErrShown) {
+					// new AlertDialog.Builder(TableGridDeskActivity.this)
+					// .setTitle("错误")
+					// .setMessage("无法连接打印机或打印机缺纸，请检查打印机")
+					// .setPositiveButton("确定",
+					// new DialogInterface.OnClickListener() {
+					//
+					// @Override
+					// public void onClick(DialogInterface dialog,
+					// int which) {
+					// isPrinterErrShown = false;
+					// binder.cleanErr();
+					// }
+					// }).show();
+					// isPrinterErrShown = true;
+					// }
 					binder.cleanErr();
 					Log.e(TAG, "submit order failed more than 10 times");
 				}
@@ -316,7 +315,7 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 			}
 		}
 	};
-	
+
 	private void addDialogChoiceMode(int which) {
 		switch (which) {
 		case 0:
@@ -367,8 +366,8 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 	}
 
 	private AlertDialog.Builder notificationDialog() {
-		List<String> add = mNotification
-				.getNotifiycationsType(Info.getTableId());
+		List<String> add = mNotification.getNotifiycationsType(Info
+				.getTableId());
 		String[] additems = (String[]) add.toArray(new String[add.size()]);
 		return mItemDialog.itemButtonDialog(false,
 				getResources().getString(R.string.customerCall), additems,
@@ -383,6 +382,10 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 				int arg2,// The position of the view in the adapter
 				long arg3// The row id of the item that was clicked
 		) {
+			Log.d(TAG,
+					"arg2:" + arg2 + " name: " + mTableInfo.getName(arg2)
+							+ "id: " + mTableInfo.getId(arg2) + " status:"
+							+ mTableInfo.getStatus(arg2));
 			if (isNameIdStatusLegal(arg2)) {
 				Info.setTableName(mTableInfo.getName(arg2));
 				Info.setTableId(mTableInfo.getId(arg2));
@@ -431,15 +434,15 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 		}
 
 	};
-	
+
 	private void networkErrDlg() {
-//		new AlertDialog.Builder(TableGridDeskActivity.this)
-//		.setTitle("错误")
-//		.setMessage("当前网络不可用")
-//		.setPositiveButton("确定", null).show();
+		// new AlertDialog.Builder(TableGridDeskActivity.this)
+		// .setTitle("错误")
+		// .setMessage("当前网络不可用")
+		// .setPositiveButton("确定", null).show();
 		toastText(R.string.functionDisableCauseNetworkUnavalialbe);
 	}
-	
+
 	private Builder changeOrCombineDialog(final int type) {
 		final AlertDialog.Builder changeTableAlertDialog;
 		View layout = getDialogLayout(R.layout.change_dialog,
@@ -456,10 +459,12 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 		personsEdit.addTextChangedListener(watcher(personsEdit));
 		if (type == CHANGE_DIALOG) {
 			changeTableAlertDialog.setTitle(getResources().getString(
-					R.string.pleaseInput)+"转入桌号");
+					R.string.pleaseInput)
+					+ "转入桌号");
 		} else if (type == COMBINE_DIALOG) {
 			changeTableAlertDialog.setTitle(getResources().getString(
-					R.string.pleaseInput)+"并入桌号");
+					R.string.pleaseInput)
+					+ "并入桌号");
 		}
 
 		DialogInterface.OnClickListener changeTablePositiveListener = new DialogInterface.OnClickListener() {
@@ -509,7 +514,7 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 		};
 
 		return mViewDialog.viewAndTitleAndButtonDialog(false, copyTableText,
-				getResources().getString(R.string.pleaseInput)+"桌号", null,
+				getResources().getString(R.string.pleaseInput) + "桌号", null,
 				copyTableListener);
 	}
 
@@ -532,8 +537,8 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 		new Thread() {
 			public void run() {
 				try {
-					int ret = mNotification
-							.cleanNotifications(Info.getTableId());
+					int ret = mNotification.cleanNotifications(Info
+							.getTableId());
 					mNotificationHandler.sendEmptyMessage(ret);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -600,8 +605,7 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 		new Thread() {
 			public void run() {
 				try {
-					int ret = getSettings().combineTable(
-							  Info.getTableId(),
+					int ret = getSettings().combineTable(Info.getTableId(),
 							destTId, mSettings.getName(Info.getTableId()),
 							mSettings.getName(destTId), persons);
 					mCombineTIdHandler.sendEmptyMessage(ret);
@@ -617,8 +621,7 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 		new Thread() {
 			public void run() {
 				try {
-					int ret = getSettings().changeTable(
-							  Info.getTableId(),
+					int ret = getSettings().changeTable(Info.getTableId(),
 							destTId, getSettings().getName(Info.getTableId()),
 							getSettings().getName(destTId), persons);
 					mChangeTIdHandler.sendEmptyMessage(ret);
@@ -655,7 +658,7 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 			}
 		}.start();
 	}
-	
+
 	Handler notificationTypeHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
@@ -664,7 +667,7 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 			}
 		}
 	};
-	
+
 	private int getTableStatusFromServer() {
 		int ret = getSettings().getTableStatusFromServerActivity();
 		if (ret < 0) {
@@ -680,8 +683,8 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 					mTableHandler.sendEmptyMessage(DISABLE_GRIDVIEW);
 					int ret = getSettings().parseTableSetting(msg);
 					if (ret < 0) {
-						//FIXME
-						//mTableHandler.sendEmptyMessage(ret);
+						// FIXME
+						// mTableHandler.sendEmptyMessage(ret);
 					} else {
 						mTableHandler.sendEmptyMessage(UPDATE_TABLE_INFOS);
 					}
@@ -818,7 +821,7 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 		}
 		networkStatus = status;
 	}
-	
+
 	public Handler getTableHandler() {
 		return mTableHandler;
 	}
