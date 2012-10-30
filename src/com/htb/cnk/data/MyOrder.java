@@ -106,12 +106,13 @@ public class MyOrder {
 	}
 
 	public int getTotalQuantity() {
-		int count = 0;
-
-		for (OrderedDish item : mOrder) {
-			count += (item.padQuantity + item.phoneQuantity);
-		}
-		return count;
+//		int count = 0;
+//
+//		for (OrderedDish item : mOrder) {
+//			count += (item.padQuantity + item.phoneQuantity);
+//		}
+//		return count;
+		return count();
 	}
 
 	public int getDishId(int position) {
@@ -388,7 +389,6 @@ public class MyOrder {
 		for (int i = 0; i < mFlavorName.length; i++) {
 			flavor.put(mFlavorName[i].toString());
 		}
-		Log.d(TAG, flavor.toString());
 		Setting.enableSaveFlavor(flavor.toString());
 		return 0;
 	}
