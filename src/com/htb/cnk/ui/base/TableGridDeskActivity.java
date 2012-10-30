@@ -292,22 +292,24 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 				mOrderNotification.setText("有"+ret+"个订单挂起，系统正在重新提交");
 				int err = binder.getErr();
 				if (err < 0) {
-					if (!isPrinterErrShown) {
-						new AlertDialog.Builder(TableGridDeskActivity.this)
-						.setTitle("错误")
-						.setMessage("无法连接打印机或打印机缺纸，请检查打印机")
-						.setPositiveButton("确定", 
-								new DialogInterface.OnClickListener() {
-	
-							@Override
-							public void onClick(DialogInterface dialog,
-									int which) {
-								isPrinterErrShown = false;
-								binder.cleanErr();
-							}
-						}).show();
-						isPrinterErrShown = true;
-					}
+//					if (!isPrinterErrShown) {
+//						new AlertDialog.Builder(TableGridDeskActivity.this)
+//						.setTitle("错误")
+//						.setMessage("无法连接打印机或打印机缺纸，请检查打印机")
+//						.setPositiveButton("确定", 
+//								new DialogInterface.OnClickListener() {
+//	
+//							@Override
+//							public void onClick(DialogInterface dialog,
+//									int which) {
+//								isPrinterErrShown = false;
+//								binder.cleanErr();
+//							}
+//						}).show();
+//						isPrinterErrShown = true;
+//					}
+					binder.cleanErr();
+					Log.e(TAG, "submit order failed more than 10 times");
 				}
 			} else {
 				mOrderNotification.setVisibility(View.INVISIBLE);
