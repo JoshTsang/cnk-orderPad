@@ -38,6 +38,7 @@ import android.widget.Toast;
 
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.Lisence;
+import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.Setting;
 import com.htb.cnk.data.Version;
 import com.htb.cnk.data.WifiAdmin;
@@ -73,6 +74,8 @@ public class Cnk_orderPadActivity extends BaseActivity {
 	private Setting mAppSetting;
 	private AlertDialog.Builder mNetWrorkAlertDialog;
 	private TitleAndMessageDlg mNetworkDialog;
+	private MyOrder mMyOrder;
+
 	@Override
 	protected void onResume() {
 		if (ARERTDIALOG == 1) {
@@ -90,6 +93,7 @@ public class Cnk_orderPadActivity extends BaseActivity {
 		setContentView(R.layout.main);
 		version = new Version(Cnk_orderPadActivity.this);
 		mNetworkDialog = new TitleAndMessageDlg(Cnk_orderPadActivity.this);
+		mMyOrder = new MyOrder(Cnk_orderPadActivity.this);
 		findViews();
 		setClickListeners();
 		Info.setNewCustomer(true);
@@ -159,6 +163,8 @@ public class Cnk_orderPadActivity extends BaseActivity {
 				}
 			}
 		}.start();
+
+		getFLavor();
 	}
 
 	private OnClickListener menuClicked = new OnClickListener() {
@@ -191,7 +197,7 @@ public class Cnk_orderPadActivity extends BaseActivity {
 	};
 
 	private OnLongClickListener versionClicked = new OnLongClickListener() {
-		
+
 		@Override
 		public boolean onLongClick(View v) {
 			Setting.enableDebug(true);
@@ -250,31 +256,32 @@ public class Cnk_orderPadActivity extends BaseActivity {
 	}
 
 	private AlertDialog.Builder wifiDialog() {
-//		final AlertDialog.Builder mAlertDialog = new AlertDialog.Builder(
-//				Cnk_orderPadActivity.this);
-//		mAlertDialog.setTitle("错误");// 设置对话框标题
-//		mAlertDialog.setMessage("网络连接失败，请检查网络后重试");// 设置对话框内容
-//		mAlertDialog.setCancelable(false);
-//		mAlertDialog.setPositiveButton("连接",
-//				new DialogInterface.OnClickListener() {
-//
-//					@Override
-//					public void onClick(DialogInterface dialog, int i) {
-//						mpDialog.setMessage("正在连接wifi，请稍等");
-//						mpDialog.show();
-//						new Thread(new wifiConnect()).start();
-//					}
-//				});
-//		mAlertDialog.setNegativeButton("退出",
-//				new DialogInterface.OnClickListener() {
-//
-//					@Override
-//					public void onClick(DialogInterface dialog, int i) {
-//						finish();
-//					}
-//				});
+		// final AlertDialog.Builder mAlertDialog = new AlertDialog.Builder(
+		// Cnk_orderPadActivity.this);
+		// mAlertDialog.setTitle("错误");// 设置对话框标题
+		// mAlertDialog.setMessage("网络连接失败，请检查网络后重试");// 设置对话框内容
+		// mAlertDialog.setCancelable(false);
+		// mAlertDialog.setPositiveButton("连接",
+		// new DialogInterface.OnClickListener() {
+		//
+		// @Override
+		// public void onClick(DialogInterface dialog, int i) {
+		// mpDialog.setMessage("正在连接wifi，请稍等");
+		// mpDialog.show();
+		// new Thread(new wifiConnect()).start();
+		// }
+		// });
+		// mAlertDialog.setNegativeButton("退出",
+		// new DialogInterface.OnClickListener() {
+		//
+		// @Override
+		// public void onClick(DialogInterface dialog, int i) {
+		// finish();
+		// }
+		// });
 
-		return mNetworkDialog.networkDialog(new DialogInterface.OnClickListener() {
+		return mNetworkDialog.networkDialog(
+				new DialogInterface.OnClickListener() {
 
 					@Override
 					public void onClick(DialogInterface dialog, int i) {
@@ -400,8 +407,7 @@ public class Cnk_orderPadActivity extends BaseActivity {
 
 	void popErrorDlg(int err) {
 		new AlertDialog.Builder(Cnk_orderPadActivity.this).setTitle("错误")
-				.setMessage("更新软件失败！")
-				.setPositiveButton("确定", null).show();
+				.setMessage("更新软件失败！").setPositiveButton("确定", null).show();
 
 	}
 
@@ -432,7 +438,7 @@ public class Cnk_orderPadActivity extends BaseActivity {
 				ARERTDIALOG = 1;
 				mNetWrorkcancel = wifiDialog().show();
 			} else {
-				Toast.makeText(Cnk_orderPadActivity.this, "当前wifi状态已经连接", 
+				Toast.makeText(Cnk_orderPadActivity.this, "当前wifi状态已经连接",
 						Toast.LENGTH_SHORT).show();
 			}
 		}
@@ -440,43 +446,60 @@ public class Cnk_orderPadActivity extends BaseActivity {
 
 	private Handler LisenceHandle = new Handler() {
 		public void handleMessage(Message msg) {
-			
+
 			if (msg.what < 0) {
 				mpDialog.cancel();
-				LisenceErrDlg("当前许可协议只允许使用"+(-msg.what)+ "台Pad");
+				LisenceErrDlg("当前许可协议只允许使用" + (-msg.what) + "台Pad");
 			} else if (msg.what > 0) {
 				mpDialog.cancel();
 				LisenceErrDlg("无法验证当前Pad合法性，请检查服务器！");
 			}
 		}
 	};
-	
+
 	private void LisenceErrDlg(String msg) {
-		new AlertDialog.Builder(Cnk_orderPadActivity.this)
-		.setTitle("注意")
-		.setCancelable(false)
-		.setMessage(msg)
-		.setPositiveButton("确定",
-				new DialogInterface.OnClickListener() {
+		new AlertDialog.Builder(Cnk_orderPadActivity.this).setTitle("注意")
+				.setCancelable(false).setMessage(msg)
+				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 
 					@Override
-					public void onClick(DialogInterface dialog,
-							int which) {
+					public void onClick(DialogInterface dialog, int which) {
 						finish();
 					}
 				}).show();
 	}
-	
+
+	public void getFLavor() {
+		new Thread() {
+			public void run() {
+				int ret = mMyOrder.getFLavorFromServer();
+				flavorHandler.sendEmptyMessage(ret);
+			}
+		}.start();
+	}
+
+	Handler flavorHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			if (msg.what < 0) {
+//				Toast.makeText(getApplicationContext(), "点菜口味数据不对，亲不要使用口味功能",
+//						Toast.LENGTH_LONG).show();
+				mMyOrder.getFlaovorFromSetting();
+			} else {
+				mMyOrder.saveFlavorToSetting();
+			}
+		}
+	};
+
 	private void startLock() {
 		mWifiAdmin.creatWifiLock();
 		mWifiAdmin.acquireWifiLock();
 	}
-	
+
 	@Override
 	public void finish() {
-		Intent i  = new Intent();  
-        i.setClass(Cnk_orderPadActivity.this, NotificationTableService.class);  
-        Cnk_orderPadActivity.this.stopService(i); 
+		Intent i = new Intent();
+		i.setClass(Cnk_orderPadActivity.this, NotificationTableService.class);
+		Cnk_orderPadActivity.this.stopService(i);
 		super.finish();
 	}
 
@@ -484,19 +507,18 @@ public class Cnk_orderPadActivity extends BaseActivity {
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
 			new AlertDialog.Builder(Cnk_orderPadActivity.this)
-			.setTitle("注意")
-			.setCancelable(false)
-			.setMessage("确认退出菜脑壳点菜系统？")
-			.setPositiveButton("确定",
-					new DialogInterface.OnClickListener() {
+					.setTitle("注意")
+					.setCancelable(false)
+					.setMessage("确认退出菜脑壳点菜系统？")
+					.setPositiveButton("确定",
+							new DialogInterface.OnClickListener() {
 
-						@Override
-						public void onClick(DialogInterface dialog,
-								int which) {
-							finish();
-						}
-					})
-			.setNegativeButton("取消", null).show();
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+									finish();
+								}
+							}).setNegativeButton("取消", null).show();
 			return true;
 		} else {
 			return super.onKeyDown(keyCode, event);

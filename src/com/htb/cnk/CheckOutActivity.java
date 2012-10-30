@@ -147,7 +147,7 @@ public class CheckOutActivity extends BaseActivity {
 		@Override
 		public void onClick(View arg0) {
 			checkOut(selectedTable, tableName, mTotalPrice, mIncome, mChange);
-			mSubmitBtn.setEnabled(true);
+			mSubmitBtn.setEnabled(false);
 			mSubmitBtn.setTextColor(Color.GRAY);
 		}
 

@@ -11,7 +11,6 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
 import android.text.InputFilter;
 import android.text.method.DigitsKeyListener;
 import android.util.Log;
@@ -22,7 +21,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.htb.cnk.R;
 import com.htb.cnk.TableActivity;
@@ -46,7 +44,6 @@ import com.htb.constant.Table;
 public class OrderBaseActivity extends BaseActivity {
 	private final static String TAG = "OrderBaseActivity";
 	
-	protected static Boolean isFlvaorEnable = false;
 	protected Button mBackBtn;
 	protected Button mSubmitBtn;
 	protected Button mLeftBtn;
@@ -73,7 +70,6 @@ public class OrderBaseActivity extends BaseActivity {
 		mNetworkDialog = new TitleAndMessageDlg(OrderBaseActivity.this);
 		mSettings = new TableSetting(OrderBaseActivity.this);
 		getPersons();
-		getFLavor();
 		findViews();
 		fillData();
 		setClickListener();
@@ -107,15 +103,6 @@ public class OrderBaseActivity extends BaseActivity {
 				} else {
 					persons = ret;
 				}
-			}
-		}.start();
-	}
-
-	public void getFLavor() {
-		new Thread() {
-			public void run() {
-				int ret = mMyOrder.getFLavorFromServer();
-				flavorHandler.sendEmptyMessage(ret);
 			}
 		}.start();
 	}
@@ -401,12 +388,10 @@ public class OrderBaseActivity extends BaseActivity {
 
 		@Override
 		public void onClick(View v) {
-			if (isFlvaorEnable == true) {
 				Button text = (Button) v.findViewById(R.id.flavor);
 				text.setTextColor(android.graphics.Color.WHITE);
 				final int position = Integer.parseInt(v.getTag().toString());
 				flavorDialog(position);
-			}
 		}
 	};
 
@@ -419,17 +404,5 @@ public class OrderBaseActivity extends BaseActivity {
         } 
 		super.onDestroy();
 	}
-
-	Handler flavorHandler = new Handler() {
-		public void handleMessage(Message msg) {
-			if (msg.what < 0) {
-				Toast.makeText(getApplicationContext(),
-						"点菜口味数据不对，亲不要使用口味功能", Toast.LENGTH_LONG).show();
-				isFlvaorEnable = false;
-			} else {
-				isFlvaorEnable = true;
-			}
-		}
-	};
 
 }
