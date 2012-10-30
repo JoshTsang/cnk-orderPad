@@ -141,7 +141,14 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 		public void onServiceDisconnected(ComponentName name) {
 		}
 	};
-
+	
+	protected void showNetworkErrStatus(String messages) {
+		if (mStatusBar != null) {
+			mStatusBar.setVisibility(View.VISIBLE);
+			mStatusBar.setText(messages);
+		}
+	}
+	
 	protected void registerReceiver(BroadcastReceiver receiver) {
 		IntentFilter filter = new IntentFilter(
 				NotificationTableService.SERVICE_IDENTIFIER);
@@ -186,13 +193,25 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 	private void cleanChioceMode(int which) {
 		switch (which) {
 		case 0:
-			cleanTableDialog().show();
+			if (networkStatus) {
+				cleanTableDialog().show();
+			} else {
+				networkErrDlg();
+			}
 			break;
 		case 1:
-			changeOrCombineDialog(CHANGE_DIALOG).show();
+			if (networkStatus) {
+				changeOrCombineDialog(CHANGE_DIALOG).show();
+			} else {
+				networkErrDlg();
+			}
 			break;
 		case 2:
-			changeOrCombineDialog(COMBINE_DIALOG).show();
+			if (networkStatus) {
+				changeOrCombineDialog(COMBINE_DIALOG).show();
+			} else {
+				networkErrDlg();
+			}
 			break;
 		case 3:
 			setClassToActivity(DelOrderActivity.class);
@@ -308,7 +327,11 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 			chooseTypeToMenu();
 			break;
 		case 2:
-			copyTableDialog().show();
+			if (networkStatus) {
+				copyTableDialog().show();
+			} else {
+				networkErrDlg();
+			}
 			break;
 		default:
 			break;
@@ -383,13 +406,21 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 				break;
 			case 50:
 			case 51:
-				addPhoneDialog(arg2).show();
+				if (networkStatus) {
+					addPhoneDialog(arg2).show();
+				} else {
+					networkErrDlg();
+				}
 				break;
 			case 100:
 			case 101:
 			case 150:
 			case 151:
-				notificationDialog().show();
+				if (networkStatus) {
+					notificationDialog().show();
+				} else {
+					networkErrDlg();
+				}
 				break;
 			default:
 				addDialog().show();
@@ -398,7 +429,15 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 		}
 
 	};
-
+	
+	private void networkErrDlg() {
+//		new AlertDialog.Builder(TableGridDeskActivity.this)
+//		.setTitle("错误")
+//		.setMessage("当前网络不可用")
+//		.setPositiveButton("确定", null).show();
+		toastText(R.string.functionDisableCauseNetworkUnavalialbe);
+	}
+	
 	private Builder changeOrCombineDialog(final int type) {
 		final AlertDialog.Builder changeTableAlertDialog;
 		View layout = getDialogLayout(R.layout.change_dialog,
@@ -639,7 +678,8 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 					mTableHandler.sendEmptyMessage(DISABLE_GRIDVIEW);
 					int ret = getSettings().parseTableSetting(msg);
 					if (ret < 0) {
-						mTableHandler.sendEmptyMessage(ret);
+						//FIXME
+						//mTableHandler.sendEmptyMessage(ret);
 					} else {
 						mTableHandler.sendEmptyMessage(UPDATE_TABLE_INFOS);
 					}
@@ -765,6 +805,18 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 		getParseTableSetting(mTableMsg);
 	}
 
+	public void setNetworkStatus(boolean status) {
+		if (!status) {
+			showNetworkErrStatus(getResources().getString(
+					R.string.networkErrorWarning));
+		} else {
+			if (mStatusBar != null) {
+				mStatusBar.setVisibility(View.INVISIBLE);
+			}
+		}
+		networkStatus = status;
+	}
+	
 	public Handler getTableHandler() {
 		return mTableHandler;
 	}

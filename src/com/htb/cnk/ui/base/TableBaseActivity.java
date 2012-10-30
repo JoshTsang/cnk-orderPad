@@ -51,16 +51,6 @@ public abstract class TableBaseActivity extends TableGridDeskActivity {
 		}
 	};
 
-	protected void showNetworkErrStatus(String messages) {
-		NETWORK_ARERTDIALOG = 1;
-		networkStatus = false;
-		//mNetWrorkcancel = mNetWrorkAlertDialog.setMessage(messages).show();
-		if (mStatusBar != null) {
-			mStatusBar.setVisibility(View.VISIBLE);
-			mStatusBar.setText(messages);
-		}
-	}
-	
 	protected void showNetworkErrDlg(String msg) {
 		mNetWrorkAlertDialog.setMessage(msg).show();
 	}
