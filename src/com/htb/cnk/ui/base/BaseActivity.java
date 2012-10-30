@@ -74,7 +74,7 @@ public abstract class BaseActivity extends Activity {
 		super.onPause();
 	}
 
-	protected boolean isPrinterError(Message msg) {
+	protected boolean isPrinterError(Message msg) { 
 		return msg.what == ErrorNum.PRINTER_ERR_CONNECT_TIMEOUT
 				|| msg.what == ErrorNum.PRINTER_ERR_NO_PAPER;
 	}

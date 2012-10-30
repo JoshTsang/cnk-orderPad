@@ -104,17 +104,25 @@ public class TableActivity extends TableBaseActivity {
 
 	Handler changeTIdHandler = new Handler() {
 		public void handleMessage(Message msg) {
-			if (msg.what == -2) {
+			mpDialog.cancel();
+			switch (msg.what) {
+			case -10:
+				toastText("本地数据库出错，请从网络重新更新数据库");
+				break;
+			case -2:
 				toastText(R.string.changeTIdWarning);
-			} else if (msg.what == -1) {
+				break;
+			case -1:
 				showNetworkErrDlg("转台失败，"
 						+ getResources()
 								.getString(R.string.networkErrorWarning));
-			} else if (isPrinterError(msg)) {
+				break;
+			default:
+				if (!isPrinterError(msg)) {
+					binderStart();
+				}
 				toastText(R.string.changeSucc);
-			} else {
-				binderStart();
-				toastText(R.string.changeSucc);
+				break;
 			}
 		}
 	};
@@ -122,33 +130,50 @@ public class TableActivity extends TableBaseActivity {
 	Handler copyTIdHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
-			if (msg.what == -2) {
+			switch (msg.what) {
+			case -10:
+				toastText("本地数据库出错，请从网络重新更新数据库");
+				break;
+			case -2:
 				toastText(R.string.copyTIdwarning);
-			} else if (msg.what == -1) {
+				break;
+			case -1:
 				showNetworkErrDlg("复制失败，"
 						+ getResources()
 								.getString(R.string.networkErrorWarning));
-			} else {
+				break;
+			default:
 				intent.setClass(TableActivity.this, MyOrderActivity.class);
 				Info.setMode(Info.WORK_MODE_WAITER);
 				TableActivity.this.startActivity(intent);
+				break;
 			}
 		}
 	};
 
 	Handler combineTIdHandler = new Handler() {
 		public void handleMessage(Message msg) {
-			if (msg.what == -2) {
+			mpDialog.cancel();
+			switch (msg.what) {
+			case -10:
+				toastText("本地数据库出错，请从网络重新更新数据库");
+				break;
+			case -2:
 				toastText(R.string.checkOutWarning);
-			} else if (msg.what == -1) {
+				break;
+			case -1:
 				showNetworkErrDlg("合并出错，"
 						+ getResources()
 								.getString(R.string.networkErrorWarning));
-			} else if (isPrinterError(msg)) {
-				toastText(R.string.combineError);
-			} else {
-				binderStart();
-				toastText(R.string.combineSucc);
+				break;
+			default:
+				if (isPrinterError(msg)) {
+					toastText(R.string.combineError);
+				} else {
+					binderStart();
+					toastText(R.string.combineSucc);
+				}
+				break;
 			}
 		}
 	};
@@ -216,9 +241,9 @@ public class TableActivity extends TableBaseActivity {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
 			if (msg.what < 0) {
-//				if (NETWORK_ARERTDIALOG == 1) {
-//					mNetWrorkcancel.cancel();
-//				}
+				// if (NETWORK_ARERTDIALOG == 1) {
+				// mNetWrorkcancel.cancel();
+				// }
 				showNetworkErrStatus(getResources().getString(
 						R.string.networkErrorWarning));
 			} else {
@@ -303,10 +328,10 @@ public class TableActivity extends TableBaseActivity {
 		mGridView.setOnItemClickListener(tableItemClickListener);
 		switch (page) {
 		case 0:
-			if(!Setting.enableChargedAreaCheckout()){
+			if (!Setting.enableChargedAreaCheckout()) {
 				mTableInfo.filterTables(page, TableAdapter.FILTER_NONE);
 				imgCur.setText("全部");
-			}else{
+			} else {
 				mTableInfo.filterTables(page, TableAdapter.FILTER_SCOPE);
 				imgCur.setText("负责区域");
 			}

@@ -44,6 +44,8 @@ public class MyOrder {
 	final static int PRINTER_COLUMN = 3;
 	final static int UNIT_NAME = 4;
 
+	final static int DbError = -10;
+
 	protected CnkDbHelper mCnkDbHelper;
 	protected SQLiteDatabase mDb;
 	protected Context mContext;
@@ -106,12 +108,12 @@ public class MyOrder {
 	}
 
 	public int getTotalQuantity() {
-//		int count = 0;
-//
-//		for (OrderedDish item : mOrder) {
-//			count += (item.padQuantity + item.phoneQuantity);
-//		}
-//		return count;
+		// int count = 0;
+		//
+		// for (OrderedDish item : mOrder) {
+		// count += (item.padQuantity + item.phoneQuantity);
+		// }
+		// return count;
 		return count();
 	}
 
@@ -440,16 +442,13 @@ public class MyOrder {
 				int status = item.getInt("status");
 				Float dishPrice = (float) item.getDouble("price");
 				Cursor cur = getDishInfoFromDB(dishId);
-				String name = null;
-				String pic = null;
-				int printer = 0;
-				String unit = null;
-				if (cur != null) {
-					name = cur.getString(NAME_COLUMN);
-					pic = cur.getString(PIC_COLUMN);
-					printer = cur.getInt(PRINTER_COLUMN);
-					unit = cur.getString(UNIT_NAME);
+				if(cur == null){
+					return DbError;
 				}
+				String name = cur.getString(NAME_COLUMN);
+				String pic = cur.getString(PIC_COLUMN);
+				int printer = cur.getInt(PRINTER_COLUMN);
+				String unit = cur.getString(UNIT_NAME);
 				Dish mDish = new Dish(dishId, name, dishPrice, pic, unit,
 						printer);
 				addOrder(mDish, quantity, tableId, status, MODE_PAD);

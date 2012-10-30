@@ -119,14 +119,15 @@ public class DelOrderActivity extends OrderBaseActivity {
 
 	private void delDishAlert(final int position) {
 		String messages;
-		
+
 		if (position == CLEANALL) {
 			messages = "确认退掉所有菜品";
 		} else {
 			if ("斤".equals(mMyOrder.getOrderedDish(position).getUnit())) {
-				new AlertDialog.Builder(DelOrderActivity.this).setCancelable(false)
-				.setTitle("提示").setMessage("该菜品无法退回！")
-				.setPositiveButton("确定", null).show();
+				new AlertDialog.Builder(DelOrderActivity.this)
+						.setCancelable(false).setTitle("提示")
+						.setMessage("该菜品无法退回！").setPositiveButton("确定", null)
+						.show();
 				return;
 			}
 			messages = "确认退菜：" + mMyOrder.getOrderedDish(position).getName();
@@ -167,18 +168,25 @@ public class DelOrderActivity extends OrderBaseActivity {
 	Handler getOrderHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
-			if (msg.what == -2) {
+			switch (msg.what) {
+			case -10:
+				toastText("本地数据库出错，请从网络重新更新数据库");
+				break;
+			case -2:
 				toastText(R.string.delWarning);
-			} else if (msg.what == -1) {
+				break;
+			case -1:
 				if (NETWORK_ARERTDIALOG == 1) {
 					mNetWrorkcancel.cancel();
 				}
 				NETWORK_ARERTDIALOG = 1;
 				mNetWrorkcancel = mNetWrorkAlertDialog.show();
-			} else {
+				break;
+			default:
 				mMyOrder.removeServedDishes();
 				fillDelData();
 				mMyOrderAdapter.notifyDataSetChanged();
+				break;
 			}
 		}
 	};
@@ -254,8 +262,8 @@ public class DelOrderActivity extends OrderBaseActivity {
 	}
 
 	protected AlertDialog.Builder networkDialog() {
-		return mNetworkDialog.networkDialog(
-				networkPositiveListener,networkNegativeListener);
+		return mNetworkDialog.networkDialog(networkPositiveListener,
+				networkNegativeListener);
 	}
 
 	DialogInterface.OnClickListener networkPositiveListener = new DialogInterface.OnClickListener() {
@@ -273,7 +281,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 			finish();
 		}
 	};
-	
+
 	private OnClickListener cleanBtnClicked = new OnClickListener() {
 
 		@Override

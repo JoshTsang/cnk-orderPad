@@ -202,6 +202,7 @@ public class CheckOutActivity extends BaseActivity {
 	
 	Handler checkOutHandler = new Handler() {
 		public void handleMessage(Message msg) {
+			
 			if (msg.what == -2) {
 				toastText(R.string.checkOutWarning);
 			} else if (msg.what == -1) {

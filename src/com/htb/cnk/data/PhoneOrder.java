@@ -53,8 +53,10 @@ public class PhoneOrder extends MyOrder {
 				int quantity = item.getInt("quantity");
 				int dishId = item.getInt("dish_id");
 				// int status = item.getInt("status");
-	//TODO handle cur == null
 				Cursor cur = getDishInfoFromDB(dishId);
+				if(cur == null){
+					return DbError;
+				}
 				String name = cur.getString(NAME_COLUMN);
 				float dishPrice = cur.getFloat(PRICE_COLUMN);
 				int printer = cur.getInt(PRINTER_COLUMN);
