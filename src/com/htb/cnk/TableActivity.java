@@ -102,6 +102,7 @@ public class TableActivity extends TableBaseActivity {
 		mNetWrorkAlertDialog = networkDialog();
 	}
 
+	//TODO define
 	Handler changeTIdHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
@@ -127,6 +128,7 @@ public class TableActivity extends TableBaseActivity {
 		}
 	};
 
+	//TODO define
 	Handler copyTIdHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
@@ -244,13 +246,9 @@ public class TableActivity extends TableBaseActivity {
 				// if (NETWORK_ARERTDIALOG == 1) {
 				// mNetWrorkcancel.cancel();
 				// }
-				showNetworkErrStatus(getResources().getString(
+				showNetworkErrDlg(getResources().getString(
 						R.string.networkErrorWarning));
 			} else {
-				networkStatus = true;
-				if (mStatusBar != null) {
-					mStatusBar.setVisibility(View.GONE);
-				}
 				switch (msg.what) {
 				case UPDATE_TABLE_INFOS:
 					if (!flag) {

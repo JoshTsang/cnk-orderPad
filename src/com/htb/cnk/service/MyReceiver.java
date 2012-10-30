@@ -27,6 +27,7 @@ public class MyReceiver extends BroadcastReceiver {
 		Bundle bundle = intent.getExtras();
 		tableDeskReceiver.setRingtoneMsg(bundle.getInt("ringtoneMessage"));
 		tableDeskReceiver.setTableMsg(bundle.getString("tableMessage"));
+		tableDeskReceiver.setNetworkStatus(bundle.getBoolean("networkStatus"));
 		tableDeskReceiver.sendRingtoneMsg();
 		tableDeskReceiver.checkPendedOrder();
 	}

@@ -13,7 +13,8 @@ import com.htb.cnk.data.TableSetting;
 
 public class NotificationTableService extends Service {
 
-	private final int MILLISECONDS = 1000 * 15;
+	private final int MILLISECONDS = 1000 * 3;
+	private final static int UPDATE_TABLE_STATUS_COUNT = 5;
 	private Notifications mNotificaion = new Notifications();
 	private Intent intent = new Intent(SERVICE_IDENTIFIER);
 	private Bundle bundle = new Bundle();
@@ -23,9 +24,11 @@ public class NotificationTableService extends Service {
 	private MyBinder myBinder = new MyBinder();
 	private PendedOrder pendedOrder = new PendedOrder();
 	private int count;
+	private int updateTableStatusCount = 0;
 
 	public class MyBinder extends Binder {
 		public void start() {
+			updateTableStatusCount = UPDATE_TABLE_STATUS_COUNT;
 			new Thread(new tableThread()).start();
 		} 
 		public void add(int id, String name, int status, String order) {
@@ -70,9 +73,16 @@ public class NotificationTableService extends Service {
 	class tableThread implements Runnable {
 		public void run() {
 			try {
-				int notification = mNotificaion.getNotifiycations();
+				int notification = mNotificaion.getNotifiycations();;
+				String ret = null;
+				
+				if (updateTableStatusCount >= UPDATE_TABLE_STATUS_COUNT) {
+					ret = TableSetting.getTableStatusFromServer();
+					updateTableStatusCount = 0;
+				}
+				
+				intent.putExtra("networkStatus", notification==-1?false:true);
 				intent.putExtra("ringtoneMessage", notification);
-				String ret = TableSetting.getTableStatusFromServer();
 				intent.putExtra("tableMessage", ret);
 				intent.putExtras(bundle);
 				if (pendedOrder.submit() < 0) {
@@ -81,6 +91,7 @@ public class NotificationTableService extends Service {
 					count = 0;
 				}
 				sendBroadcast(intent);
+				updateTableStatusCount++;
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
