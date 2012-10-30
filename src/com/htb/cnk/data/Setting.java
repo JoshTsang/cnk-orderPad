@@ -81,11 +81,11 @@ public class Setting {
 		return Perference.getBoolean("customRingtone", false);
 	}
 	
-	public static void enableSaveFlavor(String flavor) {
+	public static void saveFlavor(String flavor) {
 		commitPerferenceString("flavor", flavor);
 	}
 	
-	public static String enabledGetFlavor() {
+	public static String getFlavor() {
 		return Perference.getString("flavor", "");
 	}
 	
