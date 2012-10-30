@@ -122,14 +122,7 @@ public class ManageActivity extends BaseActivity {
 							}
 						}
 					})
-			.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-
-				@Override
-				public void onClick(DialogInterface dialog,
-						int which) {
-
-				}
-			}).show();
+			.setNegativeButton("取消", null).show();
 		} 
 	};
 	
@@ -159,14 +152,7 @@ public class ManageActivity extends BaseActivity {
 							}
 						}
 					})
-			.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-
-				@Override
-				public void onClick(DialogInterface dialog,
-						int which) {
-
-				}
-			}).show();
+			.setNegativeButton("取消", null).show();
 		}
 	};
 	

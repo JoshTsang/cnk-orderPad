@@ -217,8 +217,9 @@ public class TableSetting implements Serializable {
 	 * @return
 	 */
 	public int parseTableSetting(String tableStatusPkg) {
+		if(tableStatusPkg == null)
+			return -1;
 		try {
-			//TODO tableStatusPkg might be null
 			JSONArray tableList = new JSONArray(tableStatusPkg);
 			// if (mTableSettings.size() <= 0) {
 			// createTables(tableList);

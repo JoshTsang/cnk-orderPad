@@ -53,12 +53,7 @@ public class TableActivity extends TableBaseActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-//		if (NETWORK_ARERTDIALOG == 1) {
-//			mNetWrorkcancel.cancel();
-//			NETWORK_ARERTDIALOG = 0;
-//		}
 		showProgressDlg(getResources().getString(R.string.getStatus));
-
 		if (mImageItems != null) {
 			mTableInfo.clearLstImageItem();
 			updateGridViewAdapter(currentPage);
@@ -126,6 +121,7 @@ public class TableActivity extends TableBaseActivity {
 
 	Handler copyTIdHandler = new Handler() {
 		public void handleMessage(Message msg) {
+			mpDialog.cancel();
 			if (msg.what == -2) {
 				toastText(R.string.copyTIdwarning);
 			} else if (msg.what == -1) {
