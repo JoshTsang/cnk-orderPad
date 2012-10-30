@@ -53,10 +53,10 @@ public class TableActivity extends TableBaseActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		if (NETWORK_ARERTDIALOG == 1) {
-			mNetWrorkcancel.cancel();
-			NETWORK_ARERTDIALOG = 0;
-		}
+//		if (NETWORK_ARERTDIALOG == 1) {
+//			mNetWrorkcancel.cancel();
+//			NETWORK_ARERTDIALOG = 0;
+//		}
 		showProgressDlg(getResources().getString(R.string.getStatus));
 
 		if (mImageItems != null) {
@@ -96,6 +96,7 @@ public class TableActivity extends TableBaseActivity {
 		imgCur = new TextView(TableActivity.this);
 		mPageView = (ViewPager) findViewById(R.id.scr);
 		mOrderNotification = (Button) findViewById(R.id.orderNotification);
+		mStatusBar = (TextView) findViewById(R.id.statusBar);
 	}
 
 	protected void setClickListeners() {
@@ -111,7 +112,7 @@ public class TableActivity extends TableBaseActivity {
 			if (msg.what == -2) {
 				toastText(R.string.changeTIdWarning);
 			} else if (msg.what == -1) {
-				netWorkDialogShow("转台失败，"
+				showNetworkErrDlg("转台失败，"
 						+ getResources()
 								.getString(R.string.networkErrorWarning));
 			} else if (isPrinterError(msg)) {
@@ -128,7 +129,7 @@ public class TableActivity extends TableBaseActivity {
 			if (msg.what == -2) {
 				toastText(R.string.copyTIdwarning);
 			} else if (msg.what == -1) {
-				netWorkDialogShow("复制失败，"
+				showNetworkErrDlg("复制失败，"
 						+ getResources()
 								.getString(R.string.networkErrorWarning));
 			} else {
@@ -144,7 +145,7 @@ public class TableActivity extends TableBaseActivity {
 			if (msg.what == -2) {
 				toastText(R.string.checkOutWarning);
 			} else if (msg.what == -1) {
-				netWorkDialogShow("合并出错，"
+				showNetworkErrDlg("合并出错，"
 						+ getResources()
 								.getString(R.string.networkErrorWarning));
 			} else if (isPrinterError(msg)) {
@@ -187,7 +188,7 @@ public class TableActivity extends TableBaseActivity {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
 			if (msg.what < 0) {
-				netWorkDialogShow("统计失败，"
+				showNetworkErrDlg("统计失败，"
 						+ getResources()
 								.getString(R.string.networkErrorWarning));
 			} else {
@@ -219,12 +220,16 @@ public class TableActivity extends TableBaseActivity {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
 			if (msg.what < 0) {
-				if (NETWORK_ARERTDIALOG == 1) {
-					mNetWrorkcancel.cancel();
-				}
-				netWorkDialogShow(getResources().getString(
+//				if (NETWORK_ARERTDIALOG == 1) {
+//					mNetWrorkcancel.cancel();
+//				}
+				showNetworkErrStatus(getResources().getString(
 						R.string.networkErrorWarning));
 			} else {
+				networkStatus = true;
+				if (mStatusBar != null) {
+					mStatusBar.setVisibility(View.GONE);
+				}
 				switch (msg.what) {
 				case UPDATE_TABLE_INFOS:
 					if (!flag) {

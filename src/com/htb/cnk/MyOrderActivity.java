@@ -19,7 +19,6 @@ import com.htb.cnk.adapter.MyOrderAdapter;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.OrderedDish;
-import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.lib.OrderBaseActivity;
 import com.htb.constant.ErrorNum;
 
@@ -153,35 +152,35 @@ public class MyOrderActivity extends OrderBaseActivity {
 			if (msg.what < 0) {
 				errMsg(msg);
 			} else {
-				updateItemStatus();
+//				updateItemStatus();
 				submitSucceed("订单已提交");
 			}
 		}
 
-		private void updateItemStatus() {
-			new Thread() {
-				public void run() {
-					try {
-						int ret = updateStatus(Info.getTableId(),
-								TableSetting.MY_ORDER);
-						if (ret < 0) {
-							handler.sendEmptyMessage(ret);
-						}
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			}.start();
-		}
+//		private void updateItemStatus() {
+//			new Thread() {
+//				public void run() {
+//					try {
+//						int ret = updateStatus(Info.getTableId(),
+//								TableSetting.MY_ORDER);
+//						if (ret < 0) {
+//							handler.sendEmptyMessage(ret);
+//						}
+//					} catch (Exception e) {
+//						e.printStackTrace();
+//					}
+//				}
+//			}.start();
+//		}
 
 		private void errMsg(Message msg) {
 			String errMsg = "提交订单失败";
 			if (msg.what == ErrorNum.PRINTER_ERR_CONNECT_TIMEOUT
 					|| msg.what == ErrorNum.PRINTER_ERR_NO_PAPER) {
-				errMsg += ":无法连接打印机或打印机缺纸。";
+				errMsg += ":无法连接打印机或打印机缺纸";
 			}
 			
-			errMsg += "系统稍候将重试！";
+			errMsg += ".系统稍候将重试！";
 			new AlertDialog.Builder(MyOrderActivity.this).setCancelable(false)
 					.setTitle("出错了").setMessage(errMsg)
 					.setPositiveButton("确定", pendOrder).show();

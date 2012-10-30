@@ -22,6 +22,7 @@ public class NotificationTableService extends Service {
 	public final static String SER_KEY = "cainaoke.ser";
 	private MyBinder myBinder = new MyBinder();
 	private PendedOrder pendedOrder = new PendedOrder();
+	private int count;
 
 	public class MyBinder extends Binder {
 		public void start() {
@@ -37,6 +38,17 @@ public class NotificationTableService extends Service {
 		
 		public int count() {
 			return pendedOrder.count();
+		}
+		
+		public int getErr() {
+			if (count > 10) {
+				return -1;
+			}
+			return 0;
+		}
+		
+		public void cleanErr() {
+			count = 0;
 		}
 	}
 //
@@ -63,8 +75,12 @@ public class NotificationTableService extends Service {
 				String ret = TableSetting.getTableStatusFromServer();
 				intent.putExtra("tableMessage", ret);
 				intent.putExtras(bundle);
+				if (pendedOrder.submit() < 0) {
+					count++;
+				} else {
+					count = 0;
+				}
 				sendBroadcast(intent);
-				pendedOrder.submit();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

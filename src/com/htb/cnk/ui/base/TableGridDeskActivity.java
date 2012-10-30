@@ -26,6 +26,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.htb.cnk.DelOrderActivity;
 import com.htb.cnk.MenuActivity;
@@ -60,6 +61,7 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 
 	private int mTableMsg;
 	private int mRingtoneMsg;
+	protected boolean networkStatus;
 
 	private MyReceiver mReceiver;
 	protected NotificationTableService.MyBinder binder;
@@ -76,6 +78,7 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 	protected EditText tableIdEdit;
 	protected EditText personsEdit;
 	protected Button mOrderNotification;
+	protected TextView mStatusBar;
 
 	protected Handler mNotificationHandler;
 	protected Handler mTableHandler = new Handler();
@@ -85,6 +88,7 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 	protected Handler mCopyTIdHandler;
 
 	protected int currentPage;
+	protected boolean isPrinterErrShown = false;
 	protected TableAdapter mTableInfo;
 
 	@Override
@@ -268,6 +272,25 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 				Log.d(TAG,	"has order Pending");
 				mOrderNotification.setVisibility(View.VISIBLE);
 				mOrderNotification.setText("有"+ret+"个订单挂起，系统正在重新提交");
+				int err = binder.getErr();
+				if (err < 0) {
+					if (!isPrinterErrShown) {
+						new AlertDialog.Builder(TableGridDeskActivity.this)
+						.setTitle("错误")
+						.setMessage("无法连接打印机或打印机缺纸，请检查打印机")
+						.setPositiveButton("确定", 
+								new DialogInterface.OnClickListener() {
+	
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+								isPrinterErrShown = false;
+								binder.cleanErr();
+							}
+						}).show();
+						isPrinterErrShown = true;
+					}
+				}
 			} else {
 				mOrderNotification.setVisibility(View.INVISIBLE);
 			}
@@ -592,6 +615,7 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 			}
 		}.start();
 	}
+	
 	Handler notificationTypeHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
@@ -600,6 +624,7 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 			}
 		}
 	};
+	
 	private int getTableStatusFromServer() {
 		int ret = getSettings().getTableStatusFromServerActivity();
 		if (ret < 0) {

@@ -25,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.htb.cnk.R;
+import com.htb.cnk.TableActivity;
 import com.htb.cnk.adapter.MyOrderAdapter;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder;
@@ -218,11 +219,21 @@ public class OrderBaseActivity extends BaseActivity {
 	}
 
 	public void submitOrder() {
-		showProgressDlg("正在提交订单...");
 		new Thread() {
 			public void run() {
-				int ret = mMyOrder.submit(mSettings.getStatusById(Info.getTableId()));
-				mSubmitHandler.sendEmptyMessage(ret);
+				submitToService();
+				mMyOrder.clear();
+				if (Info.getMode() == Info.WORK_MODE_CUSTOMER) {
+					Info.setMode(Info.WORK_MODE_WAITER);
+					Intent intent = new Intent();
+					intent.setClass(OrderBaseActivity.this,
+							TableActivity.class);
+					startActivity(intent);
+				}
+
+				finish();
+//				int ret = mMyOrder.submit(mSettings.getStatusById(Info.getTableId()));
+//				mSubmitHandler.sendEmptyMessage(ret);
 			}
 		}.start();
 	}
