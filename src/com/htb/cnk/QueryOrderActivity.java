@@ -29,13 +29,13 @@ public class QueryOrderActivity extends OrderBaseActivity {
 
 	@Override
 	protected void onResume() {
+		super.onResume();
 		if (ARERTDIALOG == 1) {
 			mNetWrorkcancel.cancel();
 			ARERTDIALOG = 0;
 		}
 		showProgressDlg("正在获取菜品。。。");
 		queryThread();
-		super.onResume();
 	}
 
 	@Override

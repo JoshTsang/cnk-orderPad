@@ -94,14 +94,13 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		TableGridDeskActivity.this.stopService(new Intent(TableGridDeskActivity.this,NotificationTableService.class));
 		binderStart();
 		
 	}
 
 	@Override
 	protected void onDestroy() {
-		TableGridDeskActivity.this.stopService(new Intent(TableGridDeskActivity.this,NotificationTableService.class));
+		
 		unbindService(conn);
 		unregisterReceiver(mReceiver);
 		super.onDestroy();

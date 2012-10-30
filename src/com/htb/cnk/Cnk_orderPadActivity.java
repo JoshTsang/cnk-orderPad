@@ -18,14 +18,17 @@ import org.json.JSONObject;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -74,7 +77,9 @@ public class Cnk_orderPadActivity extends BaseActivity {
 	private Setting mAppSetting;
 	private AlertDialog.Builder mNetWrorkAlertDialog;
 	private TitleAndMessageDlg mNetworkDialog;
-	private MyOrder mMyOrder;
+
+	protected NotificationTableService.MyBinder pendOrderBinder;
+	protected boolean binded;
 
 	@Override
 	protected void onResume() {
@@ -93,7 +98,6 @@ public class Cnk_orderPadActivity extends BaseActivity {
 		setContentView(R.layout.main);
 		version = new Version(Cnk_orderPadActivity.this);
 		mNetworkDialog = new TitleAndMessageDlg(Cnk_orderPadActivity.this);
-		mMyOrder = new MyOrder(Cnk_orderPadActivity.this);
 		findViews();
 		setClickListeners();
 		Info.setNewCustomer(true);
@@ -106,6 +110,9 @@ public class Cnk_orderPadActivity extends BaseActivity {
 		mpDialog.setIndeterminate(false);
 		mpDialog.setCancelable(false);
 		setmNetWrorkAlertDialog(wifiDialog());
+		Intent intent = new Intent(this, NotificationTableService.class);  
+        startService(intent);   //如果先调用startService,则在多个服务绑定对象调用unbindService后服务仍不会被销毁  
+        bindService(intent, conn, Context.BIND_AUTO_CREATE);  
 		new Thread() {
 			public void run() {
 				int ret = Lisence.validateDevice(getBaseContext());
@@ -114,7 +121,22 @@ public class Cnk_orderPadActivity extends BaseActivity {
 			}
 		}.start();
 	}
-
+	
+	private ServiceConnection conn = new ServiceConnection() {
+		
+		@Override
+		public void onServiceDisconnected(ComponentName name) {
+		}
+		
+		@Override
+		public void onServiceConnected(ComponentName name, IBinder service) {
+			if (service == null)
+				Log.d("TAG", "service==null");
+			pendOrderBinder = (NotificationTableService.MyBinder)service;
+			binded = true;
+		}
+	};
+	
 	private void findViews() {
 		mMenuBtn = (ImageButton) findViewById(R.id.menu);
 		mMenuTxt = (TextView) findViewById(R.id.menuTxt);
@@ -472,7 +494,7 @@ public class Cnk_orderPadActivity extends BaseActivity {
 	public void getFLavor() {
 		new Thread() {
 			public void run() {
-				int ret = mMyOrder.getFLavorFromServer();
+				int ret = MyOrder.getFLavorFromServer();
 				flavorHandler.sendEmptyMessage(ret);
 			}
 		}.start();
@@ -483,9 +505,9 @@ public class Cnk_orderPadActivity extends BaseActivity {
 			if (msg.what < 0) {
 //				Toast.makeText(getApplicationContext(), "点菜口味数据不对，亲不要使用口味功能",
 //						Toast.LENGTH_LONG).show();
-				mMyOrder.getFlaovorFromSetting();
+				MyOrder.getFlaovorFromSetting();
 			} else {
-				mMyOrder.saveFlavorToSetting();
+				MyOrder.saveFlavorToSetting();
 			}
 		}
 	};
@@ -523,6 +545,15 @@ public class Cnk_orderPadActivity extends BaseActivity {
 		} else {
 			return super.onKeyDown(keyCode, event);
 		}
+	}
+
+	@Override
+	protected void onDestroy() {
+		if (binded) {  
+            unbindService(conn);              
+        } 
+		stopService(new Intent(Cnk_orderPadActivity.this, NotificationTableService.class));
+		super.onDestroy();
 	}
 
 	public AlertDialog.Builder getmNetWrorkAlertDialog() {
