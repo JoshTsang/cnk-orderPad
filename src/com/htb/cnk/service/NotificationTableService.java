@@ -12,7 +12,7 @@ import com.htb.cnk.data.PendedOrder;
 import com.htb.cnk.data.TableSetting;
 
 public class NotificationTableService extends Service {
-
+	private final static String TAG = "NotificationTableService";
 	private final int MILLISECONDS = 1000 * 3;
 	private final static int UPDATE_TABLE_STATUS_COUNT = 5;
 	private Notifications mNotificaion = new Notifications();
@@ -31,6 +31,7 @@ public class NotificationTableService extends Service {
 			updateTableStatusCount = UPDATE_TABLE_STATUS_COUNT;
 			new Thread(new tableThread()).start();
 		} 
+		
 		public void add(int id, String name, int status, String order) {
 			pendedOrder.add(id, name, status, order);
 		}
@@ -54,10 +55,6 @@ public class NotificationTableService extends Service {
 			count = 0;
 		}
 	}
-//
-//	public class PendedOrderBinder extends Binder {
-//		
-//	}
 	
 	public Runnable mTasks = new Runnable() {
 		public void run() {
@@ -111,7 +108,8 @@ public class NotificationTableService extends Service {
 	@Override
 	public void onStart(Intent intent, int startId) {
 		super.onStart(intent, startId);
-		objHandler.postDelayed(mTasks, 1);
+		updateTableStatusCount = UPDATE_TABLE_STATUS_COUNT;
+		mTasks.run();
 	}
 
 	@Override
@@ -122,7 +120,6 @@ public class NotificationTableService extends Service {
 
 	@Override
 	public IBinder onBind(Intent intent) {
-
 		return myBinder;
 	}
 

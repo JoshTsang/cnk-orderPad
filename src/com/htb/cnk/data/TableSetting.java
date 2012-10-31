@@ -217,8 +217,9 @@ public class TableSetting implements Serializable {
 	 * @return
 	 */
 	public int parseTableSetting(String tableStatusPkg) {
-		if(tableStatusPkg == null)
+		if (tableStatusPkg == null || tableStatusPkg == "")
 			return -1;
+//		Log.d(TAG, tableStatusPkg);
 		try {
 			JSONArray tableList = new JSONArray(tableStatusPkg);
 			// if (mTableSettings.size() <= 0) {
@@ -227,10 +228,8 @@ public class TableSetting implements Serializable {
 			// updateTables(tableList);
 			// }
 			// TODO find good solution for table status update
-			mTableSettings.clear();
 			createTables(tableList);
 			// /////////////////////////////////////
-
 			return 0;
 		} catch (Exception e) {
 			Log.e(TAG, "tableStatusResponse:" + tableStatusPkg);
@@ -239,27 +238,35 @@ public class TableSetting implements Serializable {
 		return -1;
 	}
 
-	private void createTables(JSONArray tableList) throws JSONException {
+	private void createTables(JSONArray tableList) {
+		mTableSettings.clear();
 		TableSettingItem asItem;
 		phoneOrderPending = false;
 		int length = tableList.length();
 
-		for (int i = 0; i < length; i++) {
-			JSONObject item = tableList.getJSONObject(i);
-			int id = item.getInt("id");
-			String name = item.getString("name");
-			int status = item.getInt("status");
-			if (status == 50 || status == 51) {
-				phoneOrderPending = true;
+		try {
+			for (int i = 0; i < length; i++) {
+				JSONObject item = tableList.getJSONObject(i);
+				int id = item.getInt("id");
+				String name = item.getString("name");
+				int status = item.getInt("status");
+				if (status == 50 || status == 51) {
+					phoneOrderPending = true;
+				}
+				int category;
+				category = item.getInt("category");
+				int index = item.getInt("index");
+				int area = item.getInt("area");
+				int floor = item.getInt("floor");
+				asItem = new TableSettingItem(status, name, id, category,
+						index, area, floor);
+				add(asItem, mTableSettings);
 			}
-			int category = item.getInt("category");
-			int index = item.getInt("index");
-			int area = item.getInt("area");
-			int floor = item.getInt("floor");
-			asItem = new TableSettingItem(status, name, id, category, index,
-					area, floor);
-			add(asItem, mTableSettings);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+
 		floorCategory();
 		addFloor();
 		updateIndex();
@@ -273,12 +280,12 @@ public class TableSetting implements Serializable {
 		for (TableSettingItem item : mTableSettings) {
 			mTableIndexForId.put(item.getId(), item);
 			mTableIndexForName.put(item.getName(), item);
-//			if (isTableInCharge(item.getArea())) {
-//				mChargedAreaIndex.put(item.getId(), item);
-//			}
+			// if (isTableInCharge(item.getArea())) {
+			// mChargedAreaIndex.put(item.getId(), item);
+			// }
 		}
 		getTablesByScope();
-		for (TableSettingItem item:mTableScope) {
+		for (TableSettingItem item : mTableScope) {
 			mChargedAreaIndex.put(item.getId(), item);
 		}
 	}
@@ -613,7 +620,8 @@ public class TableSetting implements Serializable {
 		int status;
 		for (int i = mChargedAreaIndex.size() - 1; i >= 0; i--) {
 			status = mChargedAreaIndex.valueAt(i).getStatus();
-			if (status == Table.PHONE_STATUS || status == Table.PHONE_STATUS+Table.OPEN_TABLE_STATUS) {
+			if (status == Table.PHONE_STATUS
+					|| status == Table.PHONE_STATUS + Table.OPEN_TABLE_STATUS) {
 				return true;
 			}
 		}
@@ -796,11 +804,11 @@ public class TableSetting implements Serializable {
 	public int getLocalTableStatusById(int tid) {
 		return mTableIndexForId.get(tid).getStatus();
 	}
-	
+
 	public void setLocalTableStatusById(int tid, int status) {
 		mTableIndexForId.get(tid).setStatus(status);
 	}
-	
+
 	public int floorCategory() {
 		String floorCategoryPkg = Http.get(Server.GET_FLOORNUM, null);
 		if (floorCategoryPkg == null) {

@@ -243,11 +243,11 @@ public class TableActivity extends TableBaseActivity {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
 			if (msg.what < 0) {
-				// if (NETWORK_ARERTDIALOG == 1) {
-				// mNetWrorkcancel.cancel();
-				// }
-				showNetworkErrDlg(getResources().getString(
-						R.string.networkErrorWarning));
+//				 if (NETWORK_ARERTDIALOG == 1) {
+//				 mNetWrorkcancel.cancel();
+//				 }
+//				showNetworkErrDlg(getResources().getString(
+//						R.string.networkErrorWarning));
 			} else {
 				switch (msg.what) {
 				case UPDATE_TABLE_INFOS:
@@ -259,10 +259,6 @@ public class TableActivity extends TableBaseActivity {
 					if (getSettings().hasPendedPhoneOrder()) {
 						ringtoneHandler.sendEmptyMessage(1);
 					}
-					break;
-				case DISABLE_GRIDVIEW:
-					if (mGridView != null)
-						mGridView.setOnItemClickListener(null);
 					break;
 				default:
 					Log.e(TAG,
@@ -323,6 +319,7 @@ public class TableActivity extends TableBaseActivity {
 	 * @param page
 	 */
 	private void updateGridViewAdapter(int page) {
+		mTableInfo.clearLstImageItem();
 		mGridView.setOnItemClickListener(tableItemClickListener);
 		switch (page) {
 		case 0:

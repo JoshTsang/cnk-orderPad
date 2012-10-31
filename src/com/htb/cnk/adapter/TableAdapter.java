@@ -28,8 +28,9 @@ public class TableAdapter {
 	private ArrayList<HashMap<String, Object>> lstImageItem;
 	private List<TableSetting.TableSettingItem> resultSet;
 	private Context mContext;
+
 	public TableAdapter(ArrayList<HashMap<String, Object>> lst,
-			Notifications notification, TableSetting ts,Context context) {
+			Notifications notification, TableSetting ts, Context context) {
 		lstImageItem = lst;
 		mNotification = notification;
 		mSetting = ts;
@@ -63,29 +64,46 @@ public class TableAdapter {
 	private void setStatusAndIcon(int floorNum, int filterType) {
 		switch (filterType) {
 		case FILTER_FLOOR:
+			if (mSetting.getTablesByFloor(floorNum).size() <= 0)
+				return;
 			resultSet = mSetting.getTablesByFloor(floorNum);
 			break;
 		case FILTER_SCOPE:
+			if(mSetting.getTablesByScope().size() <= 0)
+				return;
 			resultSet = mSetting.getTablesByScope();
 			break;
 		case FILTER_AREA:
+			if(mSetting.getTablesByArea().size() <= 0)
+				return;
 			resultSet = mSetting.getTablesByArea();
 			break;
 		default:
+			if(mSetting.getTables().size() <= 0)
+				return;
 			resultSet = mSetting.getTables();
 			break;
 		}
-		
 		int tableSize = resultSet.size();
-		for (int i = 0, n = 0; i < tableSize; i++) {
-			int status = resultSet.get(i).getStatus();
-			if (status < Table.NOTIFICATION_STATUS
-					&& mNotification.getId(n) == resultSet.get(i).getId()) {
-				status = status + Table.NOTIFICATION_STATUS;
-				n++;
+		if (tableSize > 0) {
+			for (int i = 0, n = 0; i < tableSize; i++) {
+				int status = resultSet.get(i).getStatus();
+				if (status < Table.NOTIFICATION_STATUS
+						&& mNotification.getId(n) == resultSet.get(i).getId()) {
+					status = status + Table.NOTIFICATION_STATUS;
+					n++;
+				}
+				setTableIcon(floorNum, i, status);
 			}
+		}
+	}
 
-			setTableIcon(floorNum, i, status);
+	/**
+	 * 
+	 */
+	private void clearResultSet() {
+		if (resultSet != null) {
+			resultSet.clear();
 		}
 	}
 

@@ -51,7 +51,6 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 
 	private final static String TAG = "TableGridDeskActivity";
 	protected final int UPDATE_TABLE_INFOS = 500;
-	protected final int DISABLE_GRIDVIEW = 1000;
 	protected final int CHECKOUT_LIST = 1;
 	protected final int COMBINE_DIALOG = 1;
 	protected final int CHANGE_DIALOG = 2;
@@ -94,13 +93,10 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		binderStart();
-
 	}
 
 	@Override
 	protected void onDestroy() {
-
 		unbindService(conn);
 		unregisterReceiver(mReceiver);
 		super.onDestroy();
@@ -319,10 +315,14 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 	private void addDialogChoiceMode(int which) {
 		switch (which) {
 		case 0:
-			Info.setMode(Info.WORK_MODE_CUSTOMER);
-			Info.setNewCustomer(true);
-			setClassToActivity(MenuActivity.class);
-			finish();
+			if (networkStatus) {
+				Info.setMode(Info.WORK_MODE_CUSTOMER);
+				Info.setNewCustomer(true);
+				setClassToActivity(MenuActivity.class);
+				finish();
+			} else {
+				networkErrDlg();
+			}
 			break;
 		case 1:
 			chooseTypeToMenu();
@@ -552,7 +552,6 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 			public void run() {
 				try {
 					Message msg = new Message();
-					mTableHandler.sendEmptyMessage(DISABLE_GRIDVIEW);
 					int ret = getSettings().cleanTalble(tableId);
 					if (ret < 0) {
 						mTableHandler.sendEmptyMessage(ret);
@@ -576,7 +575,6 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 			public void run() {
 				try {
 					Message msg = new Message();
-					mTableHandler.sendEmptyMessage(DISABLE_GRIDVIEW);
 					int ret = getSettings().updateStatus(tableId,
 							TableSetting.PHONE_ORDER);
 					if (ret < 0) {
@@ -680,11 +678,10 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 		new Thread() {
 			public void run() {
 				try {
-					mTableHandler.sendEmptyMessage(DISABLE_GRIDVIEW);
+//					mTableHandler.sendEmptyMessage(DISABLE_GRIDVIEW);
 					int ret = getSettings().parseTableSetting(msg);
 					if (ret < 0) {
-						// FIXME
-						// mTableHandler.sendEmptyMessage(ret);
+						 mTableHandler.sendEmptyMessage(ret);
 					} else {
 						mTableHandler.sendEmptyMessage(UPDATE_TABLE_INFOS);
 					}
