@@ -81,6 +81,10 @@ public class NotificationTableService extends Service {
 					updateTableStatusCount = 0;
 				}
 				
+				if (notification < 0) {
+					count--;
+				}
+				
 				intent.putExtra("networkStatus", notification==-1?false:true);
 				intent.putExtra("ringtoneMessage", notification);
 				intent.putExtra("tableMessage", ret);
