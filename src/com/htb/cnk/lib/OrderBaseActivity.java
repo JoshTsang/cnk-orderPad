@@ -121,6 +121,9 @@ public class OrderBaseActivity extends BaseActivity {
 
 	private void fillData() {
 		mTableNumTxt.setText(Info.getTableName());
+		if (Info.getTableId() < 0) {
+			mSubmitBtn.setText("清除菜单");
+		}
 		updateTabelInfos();
 	}
 
@@ -317,9 +320,8 @@ public class OrderBaseActivity extends BaseActivity {
 		@Override
 		public void onClick(View v) {
 			if (Info.getTableId() < 0) {
-				new AlertDialog.Builder(OrderBaseActivity.this).setTitle("请注意")
-						.setMessage("菜谱模式，不能提交订单！")
-						.setPositiveButton("确定", null).show();
+				mMyOrder.clear();
+				mMyOrderAdapter.notifyDataSetChanged();
 				return;
 			}
 			if (mMyOrder.count() <= 0) {

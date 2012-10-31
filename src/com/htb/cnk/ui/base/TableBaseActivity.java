@@ -182,8 +182,7 @@ public abstract class TableBaseActivity extends TableGridDeskActivity {
 	DialogInterface.OnClickListener logoutPositiveListener = new DialogInterface.OnClickListener() {
 		@Override
 		public void onClick(DialogInterface dialogInterface, int which) {
-			Info.setMode(Info.WORK_MODE_CUSTOMER);
-			Info.setTableId(-1);
+			Info.logout();
 			finish();
 		}
 	};

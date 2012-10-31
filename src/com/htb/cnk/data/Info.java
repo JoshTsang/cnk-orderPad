@@ -54,4 +54,10 @@ public class Info {
 	public static void setMenu(int menu){
 		Info.mMenu = menu;
 	}
+	
+	public static void logout() {
+		setMode(Info.WORK_MODE_CUSTOMER);
+		setTableId(-1);
+		setTableName(null);
+	}
 }
