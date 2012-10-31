@@ -147,8 +147,8 @@ public class Http {
 		HttpParams httpParameters1 = new BasicHttpParams();
 
 		// 超时设置
-		HttpConnectionParams.setConnectionTimeout(httpParameters1, 15 * 1000);
-		HttpConnectionParams.setSoTimeout(httpParameters1, 15 * 1000);
+		HttpConnectionParams.setConnectionTimeout(httpParameters1, 10 * 1000);
+		//HttpConnectionParams.setSoTimeout(httpParameters1, 60 * 1000);
 
 		List<NameValuePair> ls = constructHttpPkg(msg);
 

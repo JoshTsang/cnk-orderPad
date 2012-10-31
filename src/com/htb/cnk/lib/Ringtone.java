@@ -4,6 +4,8 @@ import java.io.IOException;
 
 import android.content.Context;
 import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
+import android.media.MediaPlayer.OnPreparedListener;
 import android.util.Log;
 
 import com.htb.cnk.R;
@@ -11,12 +13,11 @@ import com.htb.cnk.data.Notifications;
 import com.htb.cnk.data.Setting;
 import com.htb.cnk.data.TableSetting;
 
-public class Ringtone {
+public class Ringtone implements OnPreparedListener, OnCompletionListener{
 	public final static String TAG = "Ringtone";
 	
 	protected MediaPlayer mediaPlayer;
 	protected Context mContext;
-	protected boolean prepared = false;
 	protected static boolean needsUpdate = false; 
 	
 	public Ringtone(Context context) {
@@ -47,16 +48,12 @@ public class Ringtone {
 			mediaPlayer.stop();
 		}
         try {
-        	if (!prepared) {
-        		mediaPlayer.prepare();
-        		prepared = true;
-        	}
+        	mediaPlayer.prepare();
 		} catch (IllegalStateException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		mediaPlayer.start();
 	}
 	
 	public void stop() {
@@ -67,17 +64,21 @@ public class Ringtone {
 		needsUpdate = v;
 	}
 	
+	public void onPrepared(MediaPlayer player) {
+	    player.start();
+	}
+	
 	private void update() {
 		if (Setting.enabledCustomedRingtone()) {
 			if (mediaPlayer == null) {
 				mediaPlayer = MediaPlayer.create(mContext, R.raw.ringtone);
-				prepared = true;
+				setLiseners();
 			}
 			boolean err = false;
 			try {
 				Log.d(TAG, mContext.getFilesDir() + "/ringtone.mp3");
 				mediaPlayer.reset();
-				prepared = false;
+				setLiseners();
 				mediaPlayer.setDataSource(mContext.getFilesDir() + "/ringtone.mp3");
 			} catch (IllegalArgumentException e) {
 				err = true;
@@ -95,7 +96,7 @@ public class Ringtone {
 				if (err) {
 					mediaPlayer.release();
 					mediaPlayer = MediaPlayer.create(mContext, R.raw.ringtone);
-					prepared = false;
+					setLiseners();
 				}
 			}
 		} else {
@@ -103,8 +104,13 @@ public class Ringtone {
 				mediaPlayer.release();
 			}
 			mediaPlayer = MediaPlayer.create(mContext, R.raw.ringtone);
-			prepared = true;
+			setLiseners();
 		}
+	}
+	
+	private void setLiseners() {
+		mediaPlayer.setOnPreparedListener(this);
+		mediaPlayer.setOnCompletionListener(this);
 	}
 	
 	private boolean willRingForChargedArea() {
@@ -127,6 +133,10 @@ public class Ringtone {
 		}
 		super.finalize();
 	}
-	
+
+	@Override
+	public void onCompletion(MediaPlayer player) {
+		player.stop();
+	}
 	
 }
