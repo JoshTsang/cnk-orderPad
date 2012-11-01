@@ -27,7 +27,7 @@ public class TableSetting implements Serializable {
 	private static final String TAG = "tableSetting";
 	private static final long serialVersionUID = 1L;
 	private MyOrder mOrder;
-	boolean phoneOrderPending;
+	boolean phoneOrderPending = false;
 	public static final int PHONE_ORDER = 1;
 	public static final int MY_ORDER = 2;
 	public static final int SUBMIT = 0;
@@ -263,7 +263,6 @@ public class TableSetting implements Serializable {
 				add(asItem, mTableSettings);
 			}
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -287,6 +286,7 @@ public class TableSetting implements Serializable {
 			// mChargedAreaIndex.put(item.getId(), item);
 			// }
 		}
+		//TODO if scope is disabled, there is no need to build such index
 		getTablesByScope();
 		for (TableSettingItem table: mTableScope) {
 			mChargedAreaIndex.put(table.getId(), table);
@@ -406,6 +406,7 @@ public class TableSetting implements Serializable {
 		return item;
 	}
 
+	//TODO seems like there are some multi thread prombles, modified mSettings when accessing it
 	public List<TableSettingItem> getTablesByScope() {
 		mTableScope.clear();
 		SharedPreferences sharedPre = mContext.getSharedPreferences(

@@ -805,7 +805,9 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 	}
 
 	public void setTableMsg(String mTableMsg) {
-		getParseTableSetting(mTableMsg);
+		if (mTableMsg != null) {
+			getParseTableSetting(mTableMsg);
+		}
 	}
 
 	public void setNetworkStatus(boolean status) {
