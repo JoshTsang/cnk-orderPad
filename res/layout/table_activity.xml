@@ -3,105 +3,102 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:background="#F8E9C1"
-    android:orientation="vertical">
-<LinearLayout 
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:background="#F8E9C1"
     android:orientation="vertical" >
 
     <LinearLayout
-        android:id="@+id/titlebar"
-        android:layout_width="match_parent"
-        android:layout_height="50dip"
-        android:background="@drawable/statistics_titlebar"
-        android:orientation="horizontal" >
-
-        <Button
-            android:id="@+id/back"
-            android:layout_width="200dip"
-            android:layout_height="40dip"
-            android:background="#00000000"
-            android:text="@string/back"
-            android:textColor="#F9E8BB"
-            android:textSize="35dip" />
-
-        <Button
-            android:id="@+id/checkOutTable"
-            android:layout_width="200dip"
-            android:layout_height="40dip"
-            android:background="#00000000"
-            android:text="@string/checkout"
-            android:textColor="#F9E8BB"
-            android:textSize="35dip" />
-
-        <Button
-            android:id="@+id/logout"
-            android:layout_width="200dip"
-            android:layout_height="40dip"
-            android:background="#00000000"
-            android:text="@string/logout"
-            android:textColor="#F9E8BB"
-            android:textSize="35dip" />
-
-        <Button
-            android:id="@+id/management"
-            android:layout_width="200dip"
-            android:layout_height="40dip"
-            android:background="#00000000"
-            android:text="@string/mangement"
-            android:textColor="#F9E8BB"
-            android:textSize="35dip" />
-    </LinearLayout>
-
-    
-    
-    <android.support.v4.view.ViewPager
-        android:id="@+id/scr"
-        android:layout_width="match_parent"
+        android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp" >
-    </android.support.v4.view.ViewPager>
+        android:background="#F8E9C1"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:id="@+id/titlebar"
+            android:layout_width="match_parent"
+            android:layout_height="50dip"
+            android:background="@drawable/statistics_titlebar"
+            android:orientation="horizontal" >
+
+            <Button
+                android:id="@+id/back"
+                android:layout_width="200dip"
+                android:layout_height="40dip"
+                android:background="#00000000"
+                android:text="@string/back"
+                android:textColor="#F9E8BB"
+                android:textSize="35dip" />
+
+            <Button
+                android:id="@+id/checkOutTable"
+                android:layout_width="200dip"
+                android:layout_height="40dip"
+                android:background="#00000000"
+                android:text="@string/checkout"
+                android:textColor="#F9E8BB"
+                android:textSize="35dip" />
+
+            <Button
+                android:id="@+id/logout"
+                android:layout_width="200dip"
+                android:layout_height="40dip"
+                android:background="#00000000"
+                android:text="@string/logout"
+                android:textColor="#F9E8BB"
+                android:textSize="35dip" />
+
+            <Button
+                android:id="@+id/management"
+                android:layout_width="200dip"
+                android:layout_height="40dip"
+                android:background="#00000000"
+                android:text="@string/mangement"
+                android:textColor="#F9E8BB"
+                android:textSize="35dip" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/scr"
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp" >
+        </LinearLayout>
+
+       
+    </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/layout_scr_bottom"
-        android:layout_width="match_parent"
-        android:layout_height="40dip"
+        android:layout_width="wrap_content"
+        android:layout_height="30dip"
+        android:layout_gravity="center|bottom"
         android:layout_marginBottom="4dip"
-        android:gravity="center" >
+        android:layout_marginLeft="200dp" >
+
+        <Button
+            android:id="@+id/orderNotification"
+            android:layout_width="wrap_content"
+            android:layout_height="30dip"
+            android:background="#45000000"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:visibility="invisible" />
     </LinearLayout>
 
-</LinearLayout>
-
-<LinearLayout android:layout_height="30dip"
-        android:layout_width="wrap_content"
-        android:layout_marginBottom="4dip"
-        android:layout_marginLeft="200dp"
-        android:layout_gravity="center|bottom" >
-    <Button android:id="@+id/orderNotification"
-        android:layout_height="30dip"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:layout_width="wrap_content"
-        android:visibility="invisible"
-        android:background="#45000000"/>
-</LinearLayout>
-
-    <LinearLayout android:layout_height="wrap_content"
+    <LinearLayout
         android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
         android:layout_gravity="top|center"
         android:layout_marginTop="50dp" >
-		<TextView android:id="@+id/statusBar"
-		        android:layout_width="fill_parent"
-		    	android:layout_height = "28dp"
-		    	android:gravity="center"
-		    	android:textColor="#FFFFFF"
-		    	android:background="#A0FF0000"
-		    	android:textStyle="bold"
-		    	android:textSize="20dp"
-		    	android:visibility="invisible"
-	    />
-	
-	</LinearLayout>
+
+        <TextView
+            android:id="@+id/statusBar"
+            android:layout_width="fill_parent"
+            android:layout_height="28dp"
+            android:background="#A0FF0000"
+            android:gravity="center"
+            android:textColor="#FFFFFF"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            android:visibility="invisible" />
+    </LinearLayout>
+
 </FrameLayout>

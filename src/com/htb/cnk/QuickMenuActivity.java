@@ -16,7 +16,7 @@ import android.widget.TextView;
 import com.htb.cnk.adapter.DishListAdapter;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.QuickOrder;
-import com.htb.cnk.lib.MenuBaseActivity;
+import com.htb.cnk.ui.base.MenuBaseActivity;
 
 public class QuickMenuActivity extends MenuBaseActivity {
 	private QuickOrder mQuickOrder;

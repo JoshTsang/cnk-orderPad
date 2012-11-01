@@ -1,4 +1,4 @@
-package com.htb.cnk.lib;
+package com.htb.cnk.ui.base;
 
 import java.text.DecimalFormat;
 
@@ -33,7 +33,6 @@ import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.dialog.LoginDlg;
 import com.htb.cnk.dialog.TitleAndMessageDlg;
 import com.htb.cnk.service.NotificationTableService;
-import com.htb.cnk.ui.base.BaseActivity;
 import com.htb.constant.Permission;
 import com.htb.constant.Table;
 

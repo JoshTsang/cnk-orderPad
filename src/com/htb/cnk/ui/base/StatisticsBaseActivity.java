@@ -1,4 +1,4 @@
-package com.htb.cnk.lib;
+package com.htb.cnk.ui.base;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -25,7 +25,7 @@ import com.htb.cnk.adapter.StatisticsAdapter;
 import com.htb.cnk.data.CnkDbHelper;
 import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.Statistics;
-import com.htb.cnk.ui.base.BaseActivity;
+import com.htb.cnk.lib.Http;
 import com.htb.constant.ErrorNum;
 import com.htb.constant.Server;
 

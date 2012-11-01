@@ -79,12 +79,12 @@ public abstract class BaseActivity extends Activity {
 				|| msg.what == ErrorNum.PRINTER_ERR_NO_PAPER;
 	}
 
-	protected void toastText(int r) {
+	public void toastText(int r) {
 		Toast.makeText(getApplicationContext(), getResources().getString(r),
 				Toast.LENGTH_LONG).show();
 	}
 
-	protected void toastText(String r) {
+	public void toastText(String r) {
 		Toast.makeText(getApplicationContext(), r, Toast.LENGTH_LONG).show();
 	}
 	
@@ -99,6 +99,14 @@ public abstract class BaseActivity extends Activity {
 	public void showProgressDlg(String msg) {
 		mpDialog.setMessage(msg);
 		mpDialog.show();
+	}
+	
+	public void networkErrDlg() {
+		// new AlertDialog.Builder(TableGridDeskActivity.this)
+		// .setTitle("错误")
+		// .setMessage("当前网络不可用")
+		// .setPositiveButton("确定", null).show();
+		toastText(R.string.functionDisableCauseNetworkUnavalialbe);
 	}
 	
 }

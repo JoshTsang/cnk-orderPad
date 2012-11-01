@@ -9,7 +9,7 @@ import com.htb.cnk.adapter.StatisticsAdapter;
 import com.htb.cnk.data.CnkDbHelper;
 import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.lib.Http;
-import com.htb.cnk.lib.StatisticsBaseActivity;
+import com.htb.cnk.ui.base.StatisticsBaseActivity;
 import com.htb.constant.ErrorNum;
 import com.htb.constant.Server;
 

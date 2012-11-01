@@ -6,7 +6,7 @@ import android.content.DialogInterface;
 import android.view.View;
 
 import com.htb.cnk.R;
-import com.htb.cnk.lib.BaseDialog;
+import com.htb.cnk.ui.base.BaseDialog;
 
 public class ViewDlg extends BaseDialog {
 	private Context mActivity;

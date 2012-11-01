@@ -1,4 +1,4 @@
-package com.htb.cnk.lib;
+package com.htb.cnk.ui.base;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -37,7 +37,6 @@ import com.htb.cnk.data.Dishes;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.PhoneOrder;
-import com.htb.cnk.ui.base.BaseActivity;
 import com.htb.constant.ErrorNum;
 
 public class MenuBaseActivity extends BaseActivity {

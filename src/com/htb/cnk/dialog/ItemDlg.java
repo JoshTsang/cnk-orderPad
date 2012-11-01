@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 
 import com.htb.cnk.R;
-import com.htb.cnk.lib.BaseDialog;
+import com.htb.cnk.ui.base.BaseDialog;
 
 public class ItemDlg extends BaseDialog {
 	private Context mActivity;

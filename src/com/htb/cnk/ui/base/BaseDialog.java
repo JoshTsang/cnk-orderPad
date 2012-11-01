@@ -1,4 +1,4 @@
-package com.htb.cnk.lib;
+package com.htb.cnk.ui.base;
 
 import android.app.AlertDialog;
 import android.content.Context;

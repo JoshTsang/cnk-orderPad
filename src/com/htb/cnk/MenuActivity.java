@@ -16,7 +16,7 @@ import android.widget.ImageButton;
 import com.htb.cnk.adapter.CategoryListAdapter;
 import com.htb.cnk.adapter.DishListAdapter;
 import com.htb.cnk.data.Info;
-import com.htb.cnk.lib.MenuBaseActivity;
+import com.htb.cnk.ui.base.MenuBaseActivity;
 
 /**
  * @author josh

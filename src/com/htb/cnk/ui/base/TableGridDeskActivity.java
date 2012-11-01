@@ -1,6 +1,7 @@
 package com.htb.cnk.ui.base;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import android.app.AlertDialog;
@@ -16,6 +17,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.support.v4.view.ViewPager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -26,6 +28,8 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 import com.htb.cnk.DelOrderActivity;
@@ -34,6 +38,7 @@ import com.htb.cnk.PhoneActivity;
 import com.htb.cnk.QueryOrderActivity;
 import com.htb.cnk.QuickMenuActivity;
 import com.htb.cnk.R;
+import com.htb.cnk.adapter.GuidePageAdapter;
 import com.htb.cnk.adapter.TableAdapter;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.NotificationTypes;
@@ -41,11 +46,16 @@ import com.htb.cnk.data.Notifications;
 import com.htb.cnk.data.PhoneOrder;
 import com.htb.cnk.data.Setting;
 import com.htb.cnk.data.TableSetting;
+import com.htb.cnk.lib.GuidePageChangeListener;
 import com.htb.cnk.lib.Ringtone;
 import com.htb.cnk.service.MyReceiver;
 import com.htb.cnk.service.NotificationTableService;
 import com.htb.cnk.service.NotificationTableService.MyBinder;
 import com.htb.constant.Table;
+
+
+
+
 
 public abstract class TableGridDeskActivity extends BaseActivity {
 
@@ -80,8 +90,6 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 	protected TextView mStatusBar;
 
 	protected Handler mNotificationHandler;
-	protected Handler mTableHandler = new Handler();
-	protected Handler mRingtoneHandler = new Handler();
 	protected Handler mChangeTIdHandler;
 	protected Handler mCombineTIdHandler;
 	protected Handler mCopyTIdHandler;
@@ -89,11 +97,28 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 	protected int currentPage;
 	protected boolean isPrinterErrShown = false;
 	protected TableAdapter mTableInfo;
-
+	protected GuidePageAdapter guidePageAdapter;
 	@Override
 	protected void onResume() {
 		super.onResume();
+		showProgressDlg(getResources().getString(R.string.getStatus));
+		if (mImageItems != null) {
+			mTableInfo.clearLstImageItem();
+			updateGridViewAdapter(currentPage);
+		}
 	}
+
+	private final String IMAGE_ITEM = "imageItem";
+	private final String ITEM_TEXT = "ItemText";
+	public final static int EXTERN_PAGE_NUM = 1; // 除了楼层以外还有几个页面
+	ArrayList<HashMap<String, Object>> mTableItem = new ArrayList<HashMap<String, Object>>();
+	public boolean flag = false;
+	private ViewPager mPageView;
+	private ArrayList<View> pageViewsList;
+	protected SimpleAdapter mImageItems;
+	private View layout;
+	private TextView imgCur;
+	private LinearLayout layoutBottom;
 
 	@Override
 	protected void onDestroy() {
@@ -111,6 +136,7 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setNewClass();
+		findViews();
 		startService(NotificationTableService.class);
 		bindService(intent, conn, Context.BIND_AUTO_CREATE);
 		mReceiver = new MyReceiver(TableGridDeskActivity.this);
@@ -122,6 +148,100 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 		mPhoneOrder = new PhoneOrder(TableGridDeskActivity.this);
 		setSettings(new TableSetting(TableGridDeskActivity.this));
 		mRingtone = new Ringtone(TableGridDeskActivity.this);
+		
+		mTableInfo = new TableAdapter(mTableItem, mNotification, mSettings,
+				TableGridDeskActivity.this);
+	}
+
+	/**
+	 * 
+	 */
+	private void findViews() {
+		imgCur = new TextView(TableGridDeskActivity.this);
+		LayoutInflater inflater = (LayoutInflater) TableGridDeskActivity.this
+				.getSystemService(LAYOUT_INFLATER_SERVICE);
+		layout = inflater.inflate(R.layout.viewpage, null);
+		mPageView = (ViewPager) layout.findViewById(R.id.viewPager);
+		layoutBottom = (LinearLayout) layout
+				.findViewById(R.id.layout_scr_bottom);
+	}
+
+	protected View getPageView() {
+		return layout;
+	}
+
+	public void initViewPager() {
+		addLayoutBottom();
+		setCurPage(0);
+		mPageView.getLayoutParams().height = this.getWindowManager()
+				.getDefaultDisplay().getHeight() * 4 / 5;
+		pageViewsList = new ArrayList<View>();
+		pageViewsList.add(getLayoutInflater().inflate(R.layout.gridview, null));
+		guidePageAdapter = initPageAdapter();
+		mPageView.setAdapter(guidePageAdapter);
+		mPageView.setOnPageChangeListener(new GuidePageChangeListener(TableGridDeskActivity.this,mTableInfo));
+	}
+
+	/**
+	 * 
+	 */
+	private GuidePageAdapter initPageAdapter() {
+		mImageItems = new SimpleAdapter(TableGridDeskActivity.this, mTableItem,
+				R.layout.table_item, new String[] { IMAGE_ITEM, ITEM_TEXT },
+				new int[] { R.id.ItemImage, R.id.ItemText }) {
+		};
+		return new GuidePageAdapter(TableGridDeskActivity.this, mImageItems,mTableInfo);
+	}
+
+	/**
+	 * 
+	 */
+	private void addLayoutBottom() {
+		imgCur.setTextColor(0xFF4D2412);
+		imgCur.setTextSize(22);
+		layoutBottom.addView(imgCur);
+	}
+
+	/**
+	 * 更新当前页码
+	 */
+	public void setCurPage(int page) {
+		switch (page) {
+		case 0:
+			if (!Setting.enableChargedAreaCheckout()) {
+				imgCur.setText("全部");
+			} else {
+				imgCur.setText("负责区域");
+			}
+			break;
+		default:
+			imgCur.setText(page - EXTERN_PAGE_NUM + 1 + "楼");
+			break;
+		}
+		currentPage = page;
+	}
+
+	/**
+	 * @param page
+	 */
+	public void updateGridViewAdapter(int page) {
+		mTableInfo.clearLstImageItem();
+		switch (page) {
+		case 0:
+			if (!Setting.enableChargedAreaCheckout()) {
+				mTableInfo.filterTables(page, TableAdapter.FILTER_NONE);
+				imgCur.setText("全部");
+			} else {
+				mTableInfo.filterTables(page, TableAdapter.FILTER_SCOPE);
+				imgCur.setText("负责区域");
+			}
+			break;
+		default:
+			mTableInfo.filterTables(page - EXTERN_PAGE_NUM,
+					TableAdapter.FILTER_FLOOR);
+			break;
+		}
+		mImageItems.notifyDataSetChanged();
 	}
 
 	protected ServiceConnection conn = new ServiceConnection() {
@@ -169,7 +289,7 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 		}
 	}
 
-	private AlertDialog.Builder cleanDialog() {
+	public AlertDialog.Builder cleanDialog() {
 		final CharSequence[] cleanitems = getResources().getStringArray(
 				R.array.openStatus);
 		return mItemDialog.itemChooseFunctionDialog(cleanitems, cleanListener);
@@ -265,7 +385,7 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 				getResources().getString(R.string.no), null);
 	}
 
-	private AlertDialog.Builder addDialog() {
+	public AlertDialog.Builder addDialog() {
 		final CharSequence[] additems = getResources().getStringArray(
 				R.array.normalStatus);
 		return mItemDialog.itemChooseFunctionDialog(additems, addListener);
@@ -284,23 +404,24 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 			if (ret > 0) {
 				Log.d(TAG, "has order Pending");
 				mOrderNotification.setVisibility(View.VISIBLE);
-				mOrderNotification.setText("有"+ret+"个订单挂起，系统会自动提交");
+				mOrderNotification.setText("有" + ret + "个订单挂起，系统会自动提交");
 				int err = binder.getErr();
 				if (err < 0) {
 					if (!isPrinterErrShown) {
 						new AlertDialog.Builder(TableGridDeskActivity.this)
-						.setTitle("错误")
-						.setMessage("无法连接打印机或打印机缺纸，请检查打印机")
-						.setPositiveButton("确定", 
-								new DialogInterface.OnClickListener() {
-	
-							@Override
-							public void onClick(DialogInterface dialog,
-									int which) {
-								isPrinterErrShown = false;
-								binder.cleanErr();
-							}
-						}).show();
+								.setTitle("错误")
+								.setMessage("无法连接打印机或打印机缺纸，请检查打印机")
+								.setPositiveButton("确定",
+										new DialogInterface.OnClickListener() {
+
+											@Override
+											public void onClick(
+													DialogInterface dialog,
+													int which) {
+												isPrinterErrShown = false;
+												binder.cleanErr();
+											}
+										}).show();
 						isPrinterErrShown = true;
 					}
 					binder.cleanErr();
@@ -339,7 +460,7 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 		}
 	}
 
-	private AlertDialog.Builder addPhoneDialog(final int position) {
+	public AlertDialog.Builder addPhoneDialog(final int position) {
 		final CharSequence[] additems = getResources().getStringArray(
 				R.array.phoneStatus);
 		DialogInterface.OnClickListener addPhoneListener = new DialogInterface.OnClickListener() {
@@ -355,6 +476,7 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 	private void addPhoneChoiceMode(final int position, int which) {
 		switch (which) {
 		case 0:
+			Info.setMode(Info.WORK_MODE_WAITER);
 			setClassToActivity(PhoneActivity.class);
 			break;
 		case 1:
@@ -365,7 +487,7 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 		}
 	}
 
-	private AlertDialog.Builder notificationDialog() {
+	public AlertDialog.Builder notificationDialog() {
 		List<String> add = mNotification.getNotifiycationsType(Info
 				.getTableId());
 		String[] additems = (String[]) add.toArray(new String[add.size()]);
@@ -374,7 +496,7 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 				null, null, notificationListener);
 	}
 
-	protected OnItemClickListener tableItemClickListener = new OnItemClickListener() {
+	public OnItemClickListener tableItemClickListener = new OnItemClickListener() {
 
 		public void onItemClick(AdapterView<?> arg0,// The AdapterView where the
 													// click happened
@@ -434,14 +556,6 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 		}
 
 	};
-
-	private void networkErrDlg() {
-		// new AlertDialog.Builder(TableGridDeskActivity.this)
-		// .setTitle("错误")
-		// .setMessage("当前网络不可用")
-		// .setPositiveButton("确定", null).show();
-		toastText(R.string.functionDisableCauseNetworkUnavalialbe);
-	}
 
 	private Builder changeOrCombineDialog(final int type) {
 		final AlertDialog.Builder changeTableAlertDialog;
@@ -554,7 +668,7 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 					Message msg = new Message();
 					int ret = getSettings().cleanTalble(tableId);
 					if (ret < 0) {
-						mTableHandler.sendEmptyMessage(ret);
+						tableHandler.sendEmptyMessage(ret);
 						return;
 					}
 					if (getNotifiycations() < 0)
@@ -562,7 +676,7 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 					if (getTableStatusFromServer() < 0)
 						return;
 					msg.what = UPDATE_TABLE_INFOS;
-					mTableHandler.sendMessage(msg);
+					tableHandler.sendMessage(msg);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -578,12 +692,12 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 					int ret = getSettings().updateStatus(tableId,
 							TableSetting.PHONE_ORDER);
 					if (ret < 0) {
-						mTableHandler.sendEmptyMessage(ret);
+						tableHandler.sendEmptyMessage(ret);
 						return;
 					}
 					ret = mPhoneOrder.cleanServerPhoneOrder(tableId);
 					if (ret < 0) {
-						mTableHandler.sendEmptyMessage(ret);
+						tableHandler.sendEmptyMessage(ret);
 						return;
 					}
 					if (getNotifiycations() < 0)
@@ -591,7 +705,7 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 					if (getTableStatusFromServer() < 0)
 						return;
 					msg.what = UPDATE_TABLE_INFOS;
-					mTableHandler.sendMessage(msg);
+					tableHandler.sendMessage(msg);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -669,7 +783,7 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 	private int getTableStatusFromServer() {
 		int ret = getSettings().getTableStatusFromServerActivity();
 		if (ret < 0) {
-			mTableHandler.sendEmptyMessage(ret);
+			tableHandler.sendEmptyMessage(ret);
 		}
 		return ret;
 	}
@@ -678,12 +792,12 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 		new Thread() {
 			public void run() {
 				try {
-//					mTableHandler.sendEmptyMessage(DISABLE_GRIDVIEW);
+					// mTableHandler.sendEmptyMessage(DISABLE_GRIDVIEW);
 					int ret = getSettings().parseTableSetting(msg);
 					if (ret < 0) {
-						 mTableHandler.sendEmptyMessage(ret);
+						tableHandler.sendEmptyMessage(ret);
 					} else {
-						mTableHandler.sendEmptyMessage(UPDATE_TABLE_INFOS);
+						tableHandler.sendEmptyMessage(UPDATE_TABLE_INFOS);
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -692,6 +806,47 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 		}.start();
 
 	}
+
+	Handler tableHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			mpDialog.cancel();
+			if (msg.what < 0) {
+				// if (NETWORK_ARERTDIALOG == 1) {
+				// mNetWrorkcancel.cancel();
+				// }
+				// showNetworkErrDlg(getResources().getString(
+				// R.string.networkErrorWarning));
+			} else {
+				switch (msg.what) {
+				case UPDATE_TABLE_INFOS:
+					if (!flag) {
+						initViewPager();
+					}
+					updateGridViewAdapter(currentPage);
+					flag = true;
+					if (getSettings().hasPendedPhoneOrder()) {
+						ringtoneHandler.sendEmptyMessage(1);
+					}
+					break;
+				default:
+					Log.e(TAG,
+							"unhandled case:"
+									+ msg.what
+									+ (new Exception()).getStackTrace()[2]
+											.getLineNumber());
+					break;
+				}
+			}
+		}
+	};
+
+	Handler ringtoneHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			if (msg.what > 0) {
+				mRingtone.play();
+			}
+		}
+	};
 
 	private boolean isStatusLegal(String tableName, int status) {
 		return getSettings().getStatusTableId(getSettings().getId(tableName)) == status;
@@ -714,7 +869,7 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 
 	private int getNotifiycations() {
 		int ret = mNotification.getNotifiycations();
-		mRingtoneHandler.sendEmptyMessage(ret);
+		ringtoneHandler.sendEmptyMessage(ret);
 		return ret;
 	}
 
@@ -820,19 +975,19 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 	}
 
 	public Handler getTableHandler() {
-		return mTableHandler;
+		return tableHandler;
 	}
 
 	public void setTableHandler(Handler mTableHandler) {
-		this.mTableHandler = mTableHandler;
+		this.tableHandler = mTableHandler;
 	}
 
 	public Handler getRingtoneHandler() {
-		return mRingtoneHandler;
+		return ringtoneHandler;
 	}
 
 	public void setRingtoneHandler(Handler mRingtoneHandler) {
-		this.mRingtoneHandler = mRingtoneHandler;
+		this.ringtoneHandler = mRingtoneHandler;
 		sendRingtoneMsg();
 	}
 
@@ -848,5 +1003,10 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 		if (mPendedOrderNotificationHandler != null) {
 			mPendedOrderNotificationHandler.sendEmptyMessage(0);
 		}
+	}
+
+	public boolean isNetworkStatus() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }
