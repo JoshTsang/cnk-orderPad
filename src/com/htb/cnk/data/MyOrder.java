@@ -33,8 +33,8 @@ public class MyOrder {
 	public final static int UPDATE_ORDER = 1;
 	public final static int DEL_ITEM_ORDER = 2;
 
-	final static int MODE_PAD = 0;
-	protected final static int MODE_PHONE = 1;
+	public final static int MODE_PAD = 0;
+	public final static int MODE_PHONE = 1;
 
 	protected final static int TIME_OUT = -1;
 
@@ -45,6 +45,7 @@ public class MyOrder {
 	final static int UNIT_NAME = 4;
 
 	final static int DbError = -10;
+	public int orderType;
 
 	protected CnkDbHelper mCnkDbHelper;
 	protected SQLiteDatabase mDb;
@@ -60,7 +61,11 @@ public class MyOrder {
 		mDb = mCnkDbHelper.getReadableDatabase();
 		mContext = context;
 	}
-
+	
+	public void setOrderType(int type) {
+		orderType = type;
+	}
+	
 	public void setPersons(int persons) {
 		this.persons = persons;
 	}
@@ -302,6 +307,7 @@ public class MyOrder {
 			order.put("tableId", Info.getTableId());
 			order.put("persons", persons);
 			order.put("tableName", Info.getTableName());
+			order.put("type", orderType==MODE_PAD?"pad":"phone");
 			if (!"".equals(comment.trim())) {
 				order.put("comment", comment);
 			}
@@ -329,7 +335,7 @@ public class MyOrder {
 			e.printStackTrace();
 			return null;
 		}
-
+		Log.d(TAG, order.toString());
 		return order.toString();
 	}
 

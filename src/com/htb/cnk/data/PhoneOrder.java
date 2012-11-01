@@ -12,12 +12,14 @@ import com.htb.cnk.lib.Http;
 import com.htb.constant.Server;
 
 public class PhoneOrder extends MyOrder {
-
+	
 	public PhoneOrder(Context context) {
 		super(context);
 		// TODO Auto-generated constructor stub
 	}
 
+	
+	
 	public float getPhoneQuantity(int position) {
 		return mOrder.get(position).phoneQuantity;
 	}

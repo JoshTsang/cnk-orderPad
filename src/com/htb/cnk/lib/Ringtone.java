@@ -19,6 +19,7 @@ public class Ringtone implements OnPreparedListener, OnCompletionListener{
 	protected MediaPlayer mediaPlayer;
 	protected Context mContext;
 	protected static boolean needsUpdate = false; 
+	protected static boolean isDefault = true;
 	
 	public Ringtone(Context context) {
 		mContext = context;
@@ -45,19 +46,17 @@ public class Ringtone implements OnPreparedListener, OnCompletionListener{
 		}
 		
 		if (mediaPlayer.isPlaying()) {
-			mediaPlayer.stop();
+			return ;
 		}
         try {
         	mediaPlayer.prepare();
 		} catch (IllegalStateException e) {
 			e.printStackTrace();
+			update();
 		} catch (IOException e) {
 			e.printStackTrace();
+			update();
 		}
-	}
-	
-	public void stop() {
-		mediaPlayer.stop();
 	}
 
 	public void setUpdate(boolean v) {
@@ -72,12 +71,14 @@ public class Ringtone implements OnPreparedListener, OnCompletionListener{
 		if (Setting.enabledCustomedRingtone()) {
 			if (mediaPlayer == null) {
 				mediaPlayer = MediaPlayer.create(mContext, R.raw.ringtone);
+				isDefault = true;
 				setLiseners();
 			}
 			boolean err = false;
 			try {
 				Log.d(TAG, mContext.getFilesDir() + "/ringtone.mp3");
 				mediaPlayer.reset();
+				isDefault = false;
 				setLiseners();
 				mediaPlayer.setDataSource(mContext.getFilesDir() + "/ringtone.mp3");
 			} catch (IllegalArgumentException e) {
@@ -96,6 +97,7 @@ public class Ringtone implements OnPreparedListener, OnCompletionListener{
 				if (err) {
 					mediaPlayer.release();
 					mediaPlayer = MediaPlayer.create(mContext, R.raw.ringtone);
+					isDefault = true;
 					setLiseners();
 				}
 			}
@@ -104,6 +106,7 @@ public class Ringtone implements OnPreparedListener, OnCompletionListener{
 				mediaPlayer.release();
 			}
 			mediaPlayer = MediaPlayer.create(mContext, R.raw.ringtone);
+			isDefault = true;
 			setLiseners();
 		}
 	}
