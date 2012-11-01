@@ -355,6 +355,7 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 	private void addPhoneChoiceMode(final int position, int which) {
 		switch (which) {
 		case 0:
+			Info.setMode(Info.WORK_MODE_PHONE);
 			setClassToActivity(PhoneActivity.class);
 			break;
 		case 1:
