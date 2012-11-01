@@ -277,7 +277,10 @@ public class TableSetting implements Serializable {
 		mTableIndexForId.clear();
 		mTableIndexForName.clear();
 		mTableScope.clear();
-		for (TableSettingItem item : mTableSettings) {
+		int size = mTableSettings.size();
+		TableSettingItem item;
+		for (int i=0; i<size; i++) {
+			item = mTableSettings.get(i);
 			mTableIndexForId.put(item.getId(), item);
 			mTableIndexForName.put(item.getName(), item);
 			// if (isTableInCharge(item.getArea())) {
@@ -285,8 +288,8 @@ public class TableSetting implements Serializable {
 			// }
 		}
 		getTablesByScope();
-		for (TableSettingItem item : mTableScope) {
-			mChargedAreaIndex.put(item.getId(), item);
+		for (TableSettingItem table: mTableScope) {
+			mChargedAreaIndex.put(table.getId(), table);
 		}
 	}
 
