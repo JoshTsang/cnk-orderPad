@@ -25,6 +25,7 @@ public class NotificationTableService extends Service {
 	private PendedOrder pendedOrder = new PendedOrder();
 	private int count;
 	private int updateTableStatusCount = 0;
+	private boolean networkStatus = false;
 
 	public class MyBinder extends Binder {
 		public void start() {
@@ -54,6 +55,10 @@ public class NotificationTableService extends Service {
 		public void cleanErr() {
 			count = 0;
 		}
+		
+		public boolean getNetworkStatus() {
+			return networkStatus;
+		}
 	}
 	
 	public Runnable mTasks = new Runnable() {
@@ -81,8 +86,8 @@ public class NotificationTableService extends Service {
 				if (notification < 0) {
 					count--;
 				}
-				
-				intent.putExtra("networkStatus", notification==-1?false:true);
+				networkStatus = notification==-1?false:true;
+				intent.putExtra("networkStatus", networkStatus);
 				intent.putExtra("ringtoneMessage", notification);
 				intent.putExtra("tableMessage", ret);
 				intent.putExtras(bundle);
