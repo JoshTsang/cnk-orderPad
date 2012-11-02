@@ -53,7 +53,7 @@ public class TableActivity extends TableBaseActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		showProgressDlg(getResources().getString(R.string.getStatus));
+		//showProgressDlg(getResources().getString(R.string.getStatus));
 		if (mImageItems != null) {
 			mTableInfo.clearLstImageItem();
 			updateGridViewAdapter(currentPage);
