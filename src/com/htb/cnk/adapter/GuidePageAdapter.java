@@ -12,17 +12,24 @@ import android.widget.SimpleAdapter;
 import com.htb.cnk.R;
 import com.htb.cnk.lib.TableItemClickListener;
 import com.htb.cnk.ui.base.TableGridDeskActivity;
+import com.umeng.common.Log;
 
 public class GuidePageAdapter extends PagerAdapter {
 	private ViewGroup layout;
 	private GridView mGridView;
 	private final TableGridDeskActivity tableGridDesk;
-	protected SimpleAdapter mImageItems;
+	private SimpleAdapter mImageItems;
 	private TableAdapter mTableInfo;
-	public GuidePageAdapter(TableGridDeskActivity tableDeskActivity,SimpleAdapter imageItems,TableAdapter tableAdapter){
+	private final String IMAGE_ITEM = "imageItem";
+	private final String ITEM_TEXT = "ItemText";
+	public GuidePageAdapter(TableGridDeskActivity tableDeskActivity,TableAdapter tableAdapter){
 		tableGridDesk = tableDeskActivity;
-		mImageItems = imageItems;
 		mTableInfo = tableAdapter;
+		Log.e("a", "a"+mTableInfo.getLstImageItem().size());
+		mImageItems = new SimpleAdapter(tableGridDesk, mTableInfo.getLstImageItem(),
+				R.layout.table_item, new String[] { IMAGE_ITEM, ITEM_TEXT },
+				new int[] { R.id.ItemImage, R.id.ItemText }) {
+		};
 	}
 	
 	public void init() {
@@ -30,7 +37,12 @@ public class GuidePageAdapter extends PagerAdapter {
 		mGridView.setAdapter(mImageItems);
 		mGridView.setOnItemClickListener(new TableItemClickListener(tableGridDesk, mTableInfo));
 	}
-
+	public void NotifyimageItemDataSetChanged(){
+		mImageItems.notifyDataSetChanged();
+	}
+	public SimpleAdapter getImageItem(){
+		return this.mImageItems;
+	}
 	@Override
 	public int getCount() {
 		return tableGridDesk.getSettings().getFloorNum() + TableGridDeskActivity.EXTERN_PAGE_NUM;

@@ -25,13 +25,12 @@ public class TableAdapter {
 	private int mTextItem;
 	private TableSetting mSetting;
 	private Notifications mNotification;
-	private ArrayList<HashMap<String, Object>> lstImageItem;
+	private ArrayList<HashMap<String, Object>> lstImageItem = new ArrayList<HashMap<String,Object>>();
 	private List<TableSetting.TableSettingItem> resultSet;
 	private Context mContext;
 
-	public TableAdapter(ArrayList<HashMap<String, Object>> lst,
-			Notifications notification, TableSetting ts, Context context) {
-		lstImageItem = lst;
+	public TableAdapter(Notifications notification, TableSetting ts,
+			Context context) {
 		mNotification = notification;
 		mSetting = ts;
 		mContext = context;
@@ -69,17 +68,17 @@ public class TableAdapter {
 			resultSet = mSetting.getTablesByFloor(floorNum);
 			break;
 		case FILTER_SCOPE:
-			if(mSetting.getTablesByScope().size() <= 0)
+			if (mSetting.getTablesByScope().size() <= 0)
 				return;
 			resultSet = mSetting.getTablesByScope();
 			break;
 		case FILTER_AREA:
-			if(mSetting.getTablesByArea().size() <= 0)
+			if (mSetting.getTablesByArea().size() <= 0)
 				return;
 			resultSet = mSetting.getTablesByArea();
 			break;
 		default:
-			if(mSetting.getTables().size() <= 0)
+			if (mSetting.getTables().size() <= 0)
 				return;
 			resultSet = mSetting.getTables();
 			break;
@@ -175,6 +174,10 @@ public class TableAdapter {
 
 	public int getTextItem() {
 		return this.mTextItem;
+	}
+
+	public ArrayList<HashMap<String, Object>> getLstImageItem() {
+		return lstImageItem;
 	}
 
 }
