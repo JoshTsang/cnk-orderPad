@@ -33,6 +33,7 @@ public class PhoneActivity extends OrderBaseActivity {
 		super.onCreate(savedInstanceState);
 		setPhoneOrderClickListener();
 		fillPhoneOrderData();
+		mMyOrder.setOrderType(MyOrder.MODE_PHONE);
 		mSubmitHandler = handler;
 	}
 

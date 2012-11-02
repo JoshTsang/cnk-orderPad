@@ -34,6 +34,7 @@ public class MyOrderActivity extends OrderBaseActivity {
 		setOrderViews();
 		fillOrderData();
 		setOrderClickListener();
+		mMyOrder.setOrderType(MyOrder.MODE_PAD);
 		mSubmitHandler = handler;
 	}
 

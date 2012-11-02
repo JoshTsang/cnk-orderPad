@@ -15,6 +15,7 @@ public class PendedOrder {
 			tid = id;
 			this.name = name;
 			this.order = order;
+			this.status = status;
 		}
 		
 		public int getTableId() {
