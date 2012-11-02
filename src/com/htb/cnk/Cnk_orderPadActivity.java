@@ -46,7 +46,6 @@ import com.htb.cnk.data.Setting;
 import com.htb.cnk.data.Version;
 import com.htb.cnk.data.WifiAdmin;
 import com.htb.cnk.dialog.LoginDlg;
-import com.htb.cnk.dialog.TitleAndMessageDlg;
 import com.htb.cnk.lib.Http;
 import com.htb.cnk.service.NotificationTableService;
 import com.htb.cnk.ui.base.BaseActivity;
@@ -54,41 +53,51 @@ import com.htb.constant.Permission;
 import com.htb.constant.Server;
 
 public class Cnk_orderPadActivity extends BaseActivity {
-	final String TAG = "Cnk_orderPad";
-	/** Called when the activity is first created. */
+	public final static String TAG = "Cnk_orderPad";
+	
+	private final static int UPDATE_MENU = 0;
+	private final static int LATEST_MENU = 1;
+	private final static int DOWNLOAD_NEW_APP = 2;
+	private final static int DO_UPGRADE = 3;
+
 	private ImageButton mMenuBtn;
 	private TextView mMenuTxt;
 	private ImageButton mSettingsBtn;
 	private TextView mSettingsTxt;
 	private TextView mVersionTxt;
 	private ProgressDialog mpDialog;
-	private final static int UPDATE_MENU = 0;
-	private final static int LATEST_MENU = 1;
-	private final static int DOWNLOAD_NEW_APP = 2;
-	private final static int DO_UPGRADE = 3;
-
 	private String mUrl;
 	private WifiAdmin mWifiAdmin;
 	private String mUpdateAkpDir;
 	private Handler handler = new Handler();
 	private Version version;
-	private int ARERTDIALOG = 0;
-	private AlertDialog mNetWrorkcancel;
 	private Setting mAppSetting;
-	private AlertDialog.Builder mNetWrorkAlertDialog;
-	private TitleAndMessageDlg mNetworkDialog;
+
+	private int retry;
 
 	protected NotificationTableService.MyBinder pendOrderBinder;
 	protected boolean binded;
-	private int retry;
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.main);
+		version = new Version(Cnk_orderPadActivity.this);
+		mAppSetting = new Setting(Cnk_orderPadActivity.this);
+		mWifiAdmin = new WifiAdmin(Cnk_orderPadActivity.this);
+		
+		findViews();
+		initSyncProgressBar();
+		setClickListeners();
+		initInfo();
+		
+		Intent intent = new Intent(this, NotificationTableService.class);  
+	    startService(intent);
+	    bindService(intent, conn, Context.BIND_AUTO_CREATE);
+	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
-		if (ARERTDIALOG == 1) {
-			mNetWrorkcancel.cancel();
-			ARERTDIALOG = 0;
-		}
 		mpDialog.show();
 		initWifi();
 		retry = 0;
@@ -97,87 +106,6 @@ public class Cnk_orderPadActivity extends BaseActivity {
 		}
 	}
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.main);
-		version = new Version(Cnk_orderPadActivity.this);
-		mNetworkDialog = new TitleAndMessageDlg(Cnk_orderPadActivity.this);
-		mAppSetting = new Setting(Cnk_orderPadActivity.this);
-		mWifiAdmin = new WifiAdmin(Cnk_orderPadActivity.this);
-		findViews();
-		showSyncWithServerPB();
-		setClickListeners();
-		initInfo();
-	Intent intent = new Intent(this, NotificationTableService.class);  
-        startService(intent);   //如果先调用startService,则在多个服务绑定对象调用unbindService后服务仍不会被销毁  
-        bindService(intent, conn, Context.BIND_AUTO_CREATE);
-	}
-
-	private void initInfo() {
-		Info.setNewCustomer(true);
-		Info.setMode(Info.WORK_MODE_CUSTOMER);
-		Info.setTableId(-1);
-	}
-
-	private void validatePadWhenConnected() {
-		if (pendOrderBinder.getNetworkStatus()) {
-			validatePad();
-		} else {
-			if (retry > 10) {
-				new AlertDialog.Builder(Cnk_orderPadActivity.this)
-				.setTitle("错误")
-				.setMessage("网络连接不可用")
-				.setPositiveButton("重试",
-						new DialogInterface.OnClickListener() {
-	
-							@Override
-							public void onClick(DialogInterface dialog,
-									int which) {
-								validatePadWhenConnected();
-							}
-						})
-				.setNegativeButton("退出", new DialogInterface.OnClickListener() {
-					
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						finish();
-					}
-				}).show();
-			} else {
-				retry++;
-				validatePadWhenConnected();
-			}
-		}
-	}
-	
-	private void validatePad() {
-		new Thread() {
-			public void run() {
-				int ret = Lisence.validateDevice(getBaseContext());
-				Log.d(TAG, "lisence" + ret);
-				LisenceHandle.sendEmptyMessage(ret);
-			}
-		}.start();
-	}
-	
-	private ServiceConnection conn = new ServiceConnection() {
-		
-		@Override
-		public void onServiceDisconnected(ComponentName name) {
-		}
-		
-		@Override
-		public void onServiceConnected(ComponentName name, IBinder service) {
-			if (service == null)
-				Log.d("TAG", "service==null");
-			pendOrderBinder = (NotificationTableService.MyBinder)service;
-			binded = true;
-			pendOrderBinder.start();
-			validatePadWhenConnected();
-		}
-	};
-	
 	private void findViews() {
 		mMenuBtn = (ImageButton) findViewById(R.id.menu);
 		mMenuTxt = (TextView) findViewById(R.id.menuTxt);
@@ -195,26 +123,304 @@ public class Cnk_orderPadActivity extends BaseActivity {
 		mVersionTxt.setOnLongClickListener(versionClicked);
 	}
 
+	private void initInfo() {
+		Info.setNewCustomer(true);
+		Info.setMode(Info.WORK_MODE_CUSTOMER);
+		Info.setTableId(-1);
+		mUpdateAkpDir = Environment.getDataDirectory() + "/data/"
+				+ this.getPackageName() + "/files/";
+	}
+
+	private void validatePadWhenConnected() {
+		if (pendOrderBinder.getNetworkStatus()) {
+			validatePad();
+		} else {
+			new Thread() {
+				public void run() {
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					validateHandler.sendEmptyMessage(0);
+				}
+			}.start();
+		}
+	}
+	
+	private void validatePad() {
+		new Thread() {
+			public void run() {
+				int ret = Lisence.validateDevice(getBaseContext());
+				Log.d(TAG, "lisence" + ret);
+				LisenceHandle.sendEmptyMessage(ret);
+			}
+		}.start();
+	}
+	
 	private int getCurrentMenuVer() {
 		SharedPreferences sharedPre = getSharedPreferences("menuDB",
 				Context.MODE_PRIVATE);
 		return sharedPre.getInt("ver", -1);
 	}
 
-	private void showSyncWithServerPB() {
-		showSyncProgressBar();
-		mUpdateAkpDir = Environment.getDataDirectory() + "/data/"
-				+ this.getPackageName() + "/files/";
-	}
-
-	private void showSyncProgressBar() {
+	private void initSyncProgressBar() {
 		mpDialog = new ProgressDialog(Cnk_orderPadActivity.this);
 		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 		mpDialog.setMessage("正在与服务器同步...");
 		mpDialog.setIndeterminate(false);
 		mpDialog.setCancelable(false);
-		mpDialog.show();
 	}
+
+	private boolean getServerVerCode() {
+		String response = Http.get(Server.APK_VERSION, null);
+		if (response == null || "".equals(response)) {
+			Log.e(TAG, "server not response for version request");
+			return false;
+		} else {
+			try {
+				JSONObject versionInfo = new JSONObject(response);
+				String versionString = versionInfo.getString("ver");
+				Log.i(TAG, "ver:" + versionString);
+				String[] ver = versionString.split("\\.");
+				int major = Integer.parseInt(ver[0]);
+				int minor = Integer.parseInt(ver[1]);
+				int build = Integer.parseInt(ver[2]);
+				if (version.isUpdateNeed(major, minor, build)) {
+					String name = versionInfo.getString("name");
+					mUrl = Server.SERVER_DOMIN + "/" + Server.APK_DIR + name;
+					return true;
+				} else {
+					return false;
+				}
+			} catch (Exception e) {
+				Log.e(TAG, "APK ver response:" + response);
+				e.printStackTrace();
+			}
+		}
+		return false;
+	}
+
+	private void doNewVersionUpdate() {
+		handlerSync.sendEmptyMessage(DOWNLOAD_NEW_APP);
+		downFile(mUrl);
+	}
+
+	private void startLock() {
+		mWifiAdmin.creatWifiLock();
+		mWifiAdmin.acquireWifiLock();
+	}
+
+	private void LisenceErrDlg(String msg) {
+		new AlertDialog.Builder(Cnk_orderPadActivity.this).setTitle("注意")
+				.setCancelable(false).setMessage(msg)
+				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+	
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						finish();
+					}
+				}).show();
+	}
+
+	private void downFile(final String url) {
+		new Thread() {
+			public void run() {
+				Log.i(TAG, "download new version apk:" + url);
+				HttpParams httpParameters1 = new BasicHttpParams();
+	
+				HttpConnectionParams.setConnectionTimeout(httpParameters1,
+						10 * 1000);
+				HttpConnectionParams.setSoTimeout(httpParameters1, 10 * 1000);
+				HttpClient client = new DefaultHttpClient(httpParameters1);
+	
+				try {
+					HttpGet get = new HttpGet(url);
+					HttpResponse response;
+					response = client.execute(get);
+					HttpEntity entity = response.getEntity();
+					long length = entity.getContentLength();
+					Log.i(TAG, "update apk, size: " + length);
+					InputStream is = entity.getContent();
+					FileOutputStream fileOutputStream = null;
+					if (is != null) {
+						fileOutputStream = openFileOutput(
+								version.UPDATE_SAVENAME, MODE_WORLD_READABLE);
+	
+						byte[] buf = new byte[1024];
+						int ch = -1;
+						while ((ch = is.read(buf)) != -1) {
+							fileOutputStream.write(buf, 0, ch);
+							if (length > 0) {
+							}
+						}
+					}
+					fileOutputStream.flush();
+					if (fileOutputStream != null) {
+						fileOutputStream.close();
+					}
+					Log.i(TAG, "download apk done");
+					down();
+				} catch (ClientProtocolException e) {
+					e.printStackTrace();
+					errHandler.sendEmptyMessage(-1);
+				} catch (IOException e) {
+					e.printStackTrace();
+					errHandler.sendEmptyMessage(-1);
+				} catch (Exception e) {
+					e.printStackTrace();
+					errHandler.sendEmptyMessage(-1);
+				}
+			}
+	
+		}.start();
+	}
+
+	private void down() {
+		handler.post(new Runnable() {
+			public void run() {
+				update();
+			}
+		});
+	
+	}
+
+	private void popErrorDlg(int err) {
+		new AlertDialog.Builder(Cnk_orderPadActivity.this).setTitle("错误")
+				.setMessage("更新软件失败！").setPositiveButton("确定", null).show();
+	
+	}
+
+	private void update() {
+		handlerSync.sendEmptyMessage(DO_UPGRADE);
+	}
+
+	private void getFLavor() {
+		new Thread() {
+			public void run() {
+				int ret = MyOrder.getFLavorFromServer();
+				flavorHandler.sendEmptyMessage(ret);
+			}
+		}.start();
+	}
+
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_BACK) {
+			new AlertDialog.Builder(Cnk_orderPadActivity.this)
+					.setTitle("注意")
+					.setCancelable(false)
+					.setMessage("确认退出菜脑壳点菜系统？")
+					.setPositiveButton("确定",
+							new DialogInterface.OnClickListener() {
+	
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+									finish();
+								}
+							}).setNegativeButton("取消", null).show();
+			return true;
+		} else {
+			return super.onKeyDown(keyCode, event);
+		}
+	}
+
+	@Override
+	protected void onDestroy() {
+		if (binded) {  
+	        unbindService(conn);              
+	    } 
+		stopService(new Intent(Cnk_orderPadActivity.this, NotificationTableService.class));
+		super.onDestroy();
+	}
+
+	class wifiConnect implements Runnable {
+		public void run() {
+			try {
+				mWifiAdmin.openNetCard();
+				if (mWifiAdmin.checkNetCardState() == 0
+						|| mWifiAdmin.checkNetCardState() == 1) {
+					Thread.sleep(1000);
+					wifiConnectHandle.sendEmptyMessage(-1);
+				} else {
+					wifiConnectHandle.sendEmptyMessage(1);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	private ServiceConnection conn = new ServiceConnection() {
+		
+		@Override
+		public void onServiceDisconnected(ComponentName name) {
+		}
+		
+		@Override
+		public void onServiceConnected(ComponentName name, IBinder service) {
+			if (service == null)
+				Log.d("TAG", "service==null");
+			pendOrderBinder = (NotificationTableService.MyBinder)service;
+			binded = true;
+			pendOrderBinder.start();
+			validatePadWhenConnected();
+		}
+	};
+
+	private Handler flavorHandler = new Handler() {
+	/** Called when the activity is first created. */
+		public void handleMessage(Message msg) {
+			if (msg.what < 0) {
+				MyOrder.getFlaovorFromSetting();
+			} else {
+				MyOrder.saveFlavorToSetting();
+			}
+		}
+	};
+
+	private Handler validateHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			if (retry > 3) {
+				mpDialog.cancel();
+				new AlertDialog.Builder(Cnk_orderPadActivity.this)
+				.setTitle("错误")
+				.setMessage("网络连接不可用")
+				.setPositiveButton("重试",
+						new DialogInterface.OnClickListener() {
+	
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+								mpDialog.show();
+								validatePadWhenConnected();
+							}
+						})
+				.setNegativeButton("退出", new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						finish();
+					}
+				}).show();
+			} else {
+				retry++;
+				validatePadWhenConnected();
+			}
+		}
+	};
+	
+	private Handler errHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			if (msg.what < 0) {
+				mpDialog.cancel();
+				Log.e("fetch Data failed", "errno: " + msg.what);
+				popErrorDlg(msg.what);
+			}
+		}
+	
+	};
 
 	private OnClickListener menuClicked = new OnClickListener() {
 
@@ -299,143 +505,8 @@ public class Cnk_orderPadActivity extends BaseActivity {
 		startLock();
 	}
 
-	private boolean getServerVerCode() {
-		String response = Http.get(Server.APK_VERSION, null);
-		if (response == null || "".equals(response)) {
-			Log.e(TAG, "server not response for version request");
-			return false;
-		} else {
-			try {
-				JSONObject versionInfo = new JSONObject(response);
-				String versionString = versionInfo.getString("ver");
-				Log.i(TAG, "ver:" + versionString);
-				String[] ver = versionString.split("\\.");
-				int major = Integer.parseInt(ver[0]);
-				int minor = Integer.parseInt(ver[1]);
-				int build = Integer.parseInt(ver[2]);
-				if (version.isUpdateNeed(major, minor, build)) {
-					String name = versionInfo.getString("name");
-					mUrl = Server.SERVER_DOMIN + "/" + Server.APK_DIR + name;
-					return true;
-				} else {
-					return false;
-				}
-			} catch (Exception e) {
-				Log.e(TAG, "APK ver response:" + response);
-				e.printStackTrace();
-			}
-		}
-		return false;
-	}
-
-	private void doNewVersionUpdate() {
-		handlerSync.sendEmptyMessage(DOWNLOAD_NEW_APP);
-		downFile(mUrl);
-	}
-
-	void downFile(final String url) {
-		new Thread() {
-			public void run() {
-				Log.i(TAG, "download new version apk:" + url);
-				HttpParams httpParameters1 = new BasicHttpParams();
-
-				HttpConnectionParams.setConnectionTimeout(httpParameters1,
-						10 * 1000);
-				HttpConnectionParams.setSoTimeout(httpParameters1, 10 * 1000);
-				HttpClient client = new DefaultHttpClient(httpParameters1);
-
-				try {
-					HttpGet get = new HttpGet(url);
-					HttpResponse response;
-					response = client.execute(get);
-					HttpEntity entity = response.getEntity();
-					long length = entity.getContentLength();
-					Log.i(TAG, "update apk, size: " + length);
-					InputStream is = entity.getContent();
-					FileOutputStream fileOutputStream = null;
-					if (is != null) {
-						fileOutputStream = openFileOutput(
-								version.UPDATE_SAVENAME, MODE_WORLD_READABLE);
-
-						byte[] buf = new byte[1024];
-						int ch = -1;
-						while ((ch = is.read(buf)) != -1) {
-							fileOutputStream.write(buf, 0, ch);
-							if (length > 0) {
-							}
-						}
-					}
-					fileOutputStream.flush();
-					if (fileOutputStream != null) {
-						fileOutputStream.close();
-					}
-					Log.i(TAG, "download apk done");
-					down();
-				} catch (ClientProtocolException e) {
-					e.printStackTrace();
-					errHandler.sendEmptyMessage(-1);
-				} catch (IOException e) {
-					e.printStackTrace();
-					errHandler.sendEmptyMessage(-1);
-				} catch (Exception e) {
-					e.printStackTrace();
-					errHandler.sendEmptyMessage(-1);
-				}
-			}
-
-		}.start();
-	}
-
-	void down() {
-		handler.post(new Runnable() {
-			public void run() {
-				update();
-			}
-		});
-
-	}
-
-	private Handler errHandler = new Handler() {
-		public void handleMessage(Message msg) {
-			if (msg.what < 0) {
-				mpDialog.cancel();
-				Log.e("fetch Data failed", "errno: " + msg.what);
-				popErrorDlg(msg.what);
-			}
-		}
-
-	};
-
-	void popErrorDlg(int err) {
-		new AlertDialog.Builder(Cnk_orderPadActivity.this).setTitle("错误")
-				.setMessage("更新软件失败！").setPositiveButton("确定", null).show();
-
-	}
-
-	void update() {
-		handlerSync.sendEmptyMessage(DO_UPGRADE);
-	}
-
-	class wifiConnect implements Runnable {
-		public void run() {
-			try {
-				mWifiAdmin.openNetCard();
-				if (mWifiAdmin.checkNetCardState() == 0
-						|| mWifiAdmin.checkNetCardState() == 1) {
-					Thread.sleep(1000);
-					wifiConnectHandle.sendEmptyMessage(-1);
-				} else {
-					wifiConnectHandle.sendEmptyMessage(1);
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
 	private Handler wifiConnectHandle = new Handler() {
 		public void handleMessage(Message msg) {
-			mpDialog.cancel();
 			if (msg.what < 0) {
 				new Thread(new wifiConnect()).start();
 			} else {
@@ -476,77 +547,5 @@ public class Cnk_orderPadActivity extends BaseActivity {
 			}
 		}
 	};
-
-	private void LisenceErrDlg(String msg) {
-		new AlertDialog.Builder(Cnk_orderPadActivity.this).setTitle("注意")
-				.setCancelable(false).setMessage(msg)
-				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						finish();
-					}
-				}).show();
-	}
-
-	public void getFLavor() {
-		new Thread() {
-			public void run() {
-				int ret = MyOrder.getFLavorFromServer();
-				flavorHandler.sendEmptyMessage(ret);
-			}
-		}.start();
-	}
-
-	Handler flavorHandler = new Handler() {
-		public void handleMessage(Message msg) {
-			if (msg.what < 0) {
-				MyOrder.getFlaovorFromSetting();
-			} else {
-				MyOrder.saveFlavorToSetting();
-			}
-		}
-	};
-
-	private void startLock() {
-		mWifiAdmin.creatWifiLock();
-		mWifiAdmin.acquireWifiLock();
-	}
-
-	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if (keyCode == KeyEvent.KEYCODE_BACK) {
-			new AlertDialog.Builder(Cnk_orderPadActivity.this)
-					.setTitle("注意")
-					.setCancelable(false)
-					.setMessage("确认退出菜脑壳点菜系统？")
-					.setPositiveButton("确定",
-							new DialogInterface.OnClickListener() {
-
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
-									finish();
-								}
-							}).setNegativeButton("取消", null).show();
-			return true;
-		} else {
-			return super.onKeyDown(keyCode, event);
-		}
-	}
-
-	@Override
-	protected void onDestroy() {
-		if (binded) {  
-            unbindService(conn);              
-        } 
-		stopService(new Intent(Cnk_orderPadActivity.this, NotificationTableService.class));
-		super.onDestroy();
-	}
-
-
-	public void setmNetWrorkAlertDialog(AlertDialog.Builder mNetWrorkAlertDialog) {
-		this.mNetWrorkAlertDialog = mNetWrorkAlertDialog;
-	}
 
 }
