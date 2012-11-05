@@ -37,7 +37,7 @@ public class BackupAndRestoreDlg {
 
 	private String TAG = "BackupAndRestore";
 	private Context mActivity;
-	ProgressDialog pdialog;
+	private ProgressDialog pdialog;
 	private DBFile db;
 	private int mAction;
 	

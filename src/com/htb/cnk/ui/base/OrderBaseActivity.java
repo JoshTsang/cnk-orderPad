@@ -9,7 +9,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
 import android.text.InputFilter;
 import android.text.method.DigitsKeyListener;
@@ -53,13 +52,12 @@ public class OrderBaseActivity extends BaseActivity {
 	protected TextView mTotalPriceTxt;
 	protected ListView mMyOrderLst;
 	protected PhoneOrder mMyOrder;
-	protected Handler mSubmitHandler;
 	protected MyOrderAdapter mMyOrderAdapter;
-	protected int persons;
-	private TableSetting mSettings;
+	protected int mPersons;
+	protected TableSetting mSettings;
 	protected TitleAndMessageDlg mNetworkDialog;
-	protected NotificationTableService.MyBinder pendOrderBinder;
-	protected boolean binded;
+	protected NotificationTableService.MyBinder mPendOrderBinder;
+	protected boolean mBinded;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -74,62 +72,21 @@ public class OrderBaseActivity extends BaseActivity {
 		setClickListener();
 
 		Intent intent = new Intent(this, NotificationTableService.class);  
-        startService(intent);   //如果先调用startService,则在多个服务绑定对象调用unbindService后服务仍不会被销毁  
+        startService(intent); 
         bindService(intent, conn, Context.BIND_AUTO_CREATE);  
 	}
 
-	private ServiceConnection conn = new ServiceConnection() {
-		
-		@Override
-		public void onServiceDisconnected(ComponentName name) {
-		}
-		
-		@Override
-		public void onServiceConnected(ComponentName name, IBinder service) {
-			if (service == null)
-				Log.d("TAG", "service==null");
-			pendOrderBinder = (NotificationTableService.MyBinder)service;
-			binded = true;
-		}
-	};
-	
-	public void getPersons() {
+	protected void getPersons() {
 		new Thread() {
 			public void run() {
 				int ret = MyOrder.loodPersons(Info.getTableId());
 				if (ret < 0) {
-					persons = 0;
+					mPersons = 0;
 				} else {
-					persons = ret;
+					mPersons = ret;
 				}
 			}
 		}.start();
-	}
-
-	private void findViews() {
-		mBackBtn = (Button) findViewById(R.id.back_btn);
-		mSubmitBtn = (Button) findViewById(R.id.submit);
-		mTableNumTxt = (TextView) findViewById(R.id.tableNum);
-		mDishCountTxt = (TextView) findViewById(R.id.dishCount);
-		mTotalPriceTxt = (TextView) findViewById(R.id.totalPrice);
-		mMyOrderLst = (ListView) findViewById(R.id.myOrderList);
-		mLeftBtn = (Button) findViewById(R.id.left_btn);
-		mRefreshBtn = (Button) findViewById(R.id.refresh);
-		mComment = (Button) findViewById(R.id.comment);
-	}
-
-	private void fillData() {
-		mTableNumTxt.setText(Info.getTableName());
-		if (Info.getTableId() < 0) {
-			mSubmitBtn.setText("清除菜单");
-		}
-		updateTabelInfos();
-	}
-
-	private void setClickListener() {
-		mBackBtn.setOnClickListener(backBtnClicked);
-		mSubmitBtn.setOnClickListener(submitBtnClicked);
-		mComment.setOnClickListener(commentClicked);
 	}
 
 	protected void updateTabelInfos() {
@@ -152,8 +109,8 @@ public class OrderBaseActivity extends BaseActivity {
 		changeTableText.setKeyListener(new DigitsKeyListener(false, true));
 		changeTableText
 				.setFilters(new InputFilter[] { new InputFilter.LengthFilter(4) });
-		if (persons > 0) {
-			changeTableText.setText(Integer.toString(persons));
+		if (mPersons > 0) {
+			changeTableText.setText(Integer.toString(mPersons));
 		}
 		final AlertDialog.Builder quantitySettingDlg = new AlertDialog.Builder(
 				OrderBaseActivity.this);
@@ -194,21 +151,7 @@ public class OrderBaseActivity extends BaseActivity {
 		quantitySettingDlg.show();
 	}
 
-	private void customerSubmitOrderDlg() {
-		new AlertDialog.Builder(OrderBaseActivity.this).setTitle("提交订单")
-				.setMessage("呼叫服务员确认订单")
-				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						LoginDlg loginDlg = new LoginDlg(
-								OrderBaseActivity.this, LoginDlg.ACTION_SUBMIT);
-						loginDlg.show(Permission.STUFF);
-					}
-				}).setNegativeButton("继续点菜", null).show();
-	}
-
-	public void submitOrder() {
+	protected void submitOrder() {
 		new Thread() {
 			public void run() {
 				submitToService();
@@ -233,8 +176,8 @@ public class OrderBaseActivity extends BaseActivity {
 		changeTableText.setKeyListener(new DigitsKeyListener(false, true));
 		changeTableText
 				.setFilters(new InputFilter[] { new InputFilter.LengthFilter(3) });
-		if (persons > 0) {
-			changeTableText.setText(Integer.toString(persons));
+		if (mPersons > 0) {
+			changeTableText.setText(Integer.toString(mPersons));
 		}
 		final AlertDialog.Builder personSettingDlg = new AlertDialog.Builder(
 				OrderBaseActivity.this);
@@ -278,19 +221,65 @@ public class OrderBaseActivity extends BaseActivity {
 		personSettingDlg.show();
 	}
 
-	public void submitToService() {
+	protected void showComment() {
+		LayoutInflater factory = LayoutInflater.from(OrderBaseActivity.this);
+		final View DialogView = factory.inflate(R.layout.comment_dialog, null);
+	
+		final EditText commentET = (EditText) DialogView
+				.findViewById(R.id.comment);
+	
+		commentET.setText(mMyOrder.getComment());
+	
+		AlertDialog dlg = new AlertDialog.Builder(OrderBaseActivity.this)
+				.setTitle("备注").setView(DialogView)
+				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+	
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						mMyOrder.setComment(commentET.getText().toString());
+					}
+				})
+				.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+	
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+					}
+				}).setCancelable(false).create();
+		dlg.show();
+	}
+
+	protected OnClickListener flavorClicked = new OnClickListener() {
+	
+		@Override
+		public void onClick(View v) {
+				Button text = (Button) v.findViewById(R.id.flavor);
+				text.setTextColor(android.graphics.Color.WHITE);
+				final int position = Integer.parseInt(v.getTag().toString());
+				flavorDialog(position);
+		}
+	};
+
+	@Override
+	protected void onDestroy() {
+		if (mBinded) {  
+	        unbindService(conn);              
+	    } 
+		super.onDestroy();
+	}
+
+	protected void submitToService() {
 		String order = mMyOrder.getOrderJson();
 		if (order == null) {
 			Log.e(TAG, "order==null");
 		}
-		pendOrderBinder.add(Info.getTableId(), Info.getTableName(), mSettings.getStatusById(Info.getTableId()), order);
+		mPendOrderBinder.add(Info.getTableId(), Info.getTableName(), mSettings.getStatusById(Info.getTableId()), order);
 		int tableStatus = mSettings.getLocalTableStatusById(Info.getTableId());
 		if (tableStatus%10 == 0) {
 			mSettings.setLocalTableStatusById(Info.getTableId(), tableStatus + Table.OPEN_TABLE_STATUS);
 		}
 	}
 	
-	public void flavorDialog(final int position) {
+	protected void flavorDialog(final int position) {
 		final boolean[] selected = mMyOrder.slectedFlavor(position);
 		new AlertDialog.Builder(OrderBaseActivity.this)
 				.setTitle("口味选择")
@@ -313,6 +302,62 @@ public class OrderBaseActivity extends BaseActivity {
 					}
 				}).setNegativeButton("取消", null).show();
 	}
+
+	private void findViews() {
+		mBackBtn = (Button) findViewById(R.id.back_btn);
+		mSubmitBtn = (Button) findViewById(R.id.submit);
+		mTableNumTxt = (TextView) findViewById(R.id.tableNum);
+		mDishCountTxt = (TextView) findViewById(R.id.dishCount);
+		mTotalPriceTxt = (TextView) findViewById(R.id.totalPrice);
+		mMyOrderLst = (ListView) findViewById(R.id.myOrderList);
+		mLeftBtn = (Button) findViewById(R.id.left_btn);
+		mRefreshBtn = (Button) findViewById(R.id.refresh);
+		mComment = (Button) findViewById(R.id.comment);
+	}
+
+	private void fillData() {
+		mTableNumTxt.setText(Info.getTableName());
+		if (Info.getTableId() < 0) {
+			mSubmitBtn.setText("清除菜单");
+		}
+		updateTabelInfos();
+	}
+
+	private void setClickListener() {
+		mBackBtn.setOnClickListener(backBtnClicked);
+		mSubmitBtn.setOnClickListener(submitBtnClicked);
+		mComment.setOnClickListener(commentClicked);
+	}
+
+	private void customerSubmitOrderDlg() {
+		new AlertDialog.Builder(OrderBaseActivity.this).setTitle("提交订单")
+				.setMessage("呼叫服务员确认订单")
+				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+	
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						LoginDlg loginDlg = new LoginDlg(
+								OrderBaseActivity.this, LoginDlg.ACTION_SUBMIT);
+						loginDlg.show(Permission.STUFF);
+					}
+				}).setNegativeButton("继续点菜", null).show();
+	}
+
+	private ServiceConnection conn = new ServiceConnection() {
+		
+		@Override
+		public void onServiceDisconnected(ComponentName name) {
+		}
+		
+		@Override
+		public void onServiceConnected(ComponentName name, IBinder service) {
+			if (service == null) {
+				Log.d("TAG", "service==null");
+			}
+			mPendOrderBinder = (NotificationTableService.MyBinder)service;
+			mBinded = true;
+		}
+	};
 
 	private OnClickListener submitBtnClicked = new OnClickListener() {
 
@@ -350,60 +395,12 @@ public class OrderBaseActivity extends BaseActivity {
 		}
 	};
 
-	protected void showComment() {
-		LayoutInflater factory = LayoutInflater.from(OrderBaseActivity.this);
-		final View DialogView = factory.inflate(R.layout.comment_dialog, null);
-
-		final EditText commentET = (EditText) DialogView
-				.findViewById(R.id.comment);
-
-		commentET.setText(mMyOrder.getComment());
-
-		AlertDialog dlg = new AlertDialog.Builder(OrderBaseActivity.this)
-				.setTitle("备注").setView(DialogView)
-				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						mMyOrder.setComment(commentET.getText().toString());
-					}
-				})
-				.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-					}
-				}).setCancelable(false).create();
-		dlg.show();
-	}
-
 	private OnClickListener backBtnClicked = new OnClickListener() {
-
+	
 		@Override
 		public void onClick(View v) {
 			OrderBaseActivity.this.finish();
 		}
 	};
-
-	protected OnClickListener flavorClicked = new OnClickListener() {
-
-		@Override
-		public void onClick(View v) {
-				Button text = (Button) v.findViewById(R.id.flavor);
-				text.setTextColor(android.graphics.Color.WHITE);
-				final int position = Integer.parseInt(v.getTag().toString());
-				flavorDialog(position);
-		}
-	};
-
-	
-
-	@Override
-	protected void onDestroy() {
-		if (binded) {  
-            unbindService(conn);              
-        } 
-		super.onDestroy();
-	}
 
 }

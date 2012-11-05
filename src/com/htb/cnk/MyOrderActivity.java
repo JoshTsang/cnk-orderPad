@@ -4,8 +4,6 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,7 +18,6 @@ import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.OrderedDish;
 import com.htb.cnk.ui.base.OrderBaseActivity;
-import com.htb.constant.ErrorNum;
 
 /**
  * @author josh
@@ -35,7 +32,6 @@ public class MyOrderActivity extends OrderBaseActivity {
 		fillOrderData();
 		setOrderClickListener();
 		mMyOrder.setOrderType(MyOrder.MODE_PAD);
-		mSubmitHandler = handler;
 	}
 
 	private void setOrderViews() {
@@ -128,14 +124,6 @@ public class MyOrderActivity extends OrderBaseActivity {
 		}
 	};
 
-	private OnClickListener minus5Clicked = new OnClickListener() {
-
-		public void onClick(View v) {
-			final int position = Integer.parseInt(v.getTag().toString());
-			minusDishQuantity(position, 5);
-		}
-	};
-
 	private OnLongClickListener quantityClicked = new OnLongClickListener() {
 
 		@Override
@@ -147,47 +135,7 @@ public class MyOrderActivity extends OrderBaseActivity {
 
 	};
 
-	Handler handler = new Handler() {
-		public void handleMessage(Message msg) {
-			mpDialog.cancel();
-			if (msg.what < 0) {
-				errMsg(msg);
-			} else {
-//				updateItemStatus();
-				submitSucceed("订单已提交");
-			}
-		}
-
-//		private void updateItemStatus() {
-//			new Thread() {
-//				public void run() {
-//					try {
-//						int ret = updateStatus(Info.getTableId(),
-//								TableSetting.MY_ORDER);
-//						if (ret < 0) {
-//							handler.sendEmptyMessage(ret);
-//						}
-//					} catch (Exception e) {
-//						e.printStackTrace();
-//					}
-//				}
-//			}.start();
-//		}
-
-		private void errMsg(Message msg) {
-			String errMsg = "提交订单失败";
-			if (msg.what == ErrorNum.PRINTER_ERR_CONNECT_TIMEOUT
-					|| msg.what == ErrorNum.PRINTER_ERR_NO_PAPER) {
-				errMsg += ":无法连接打印机或打印机缺纸";
-			}
-			
-			errMsg += ".系统稍候将重试！";
-			new AlertDialog.Builder(MyOrderActivity.this).setCancelable(false)
-					.setTitle("出错了").setMessage(errMsg)
-					.setPositiveButton("确定", pendOrder).show();
-		}
-	};
-
+	
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		boolean ret = super.onKeyDown(keyCode, event);
@@ -197,53 +145,12 @@ public class MyOrderActivity extends OrderBaseActivity {
 		return ret;
 	}
 
-	private void submitSucceed(String msg) {
-		new AlertDialog.Builder(MyOrderActivity.this).setCancelable(false)
-				.setTitle("提示").setMessage(msg)
-				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						mMyOrder.clear();
-						mMyOrderAdapter.notifyDataSetChanged();
-						finish();
-						if (Info.getMode() == Info.WORK_MODE_CUSTOMER) {
-							Info.setMode(Info.WORK_MODE_WAITER);
-							Intent intent = new Intent();
-							intent.setClass(MyOrderActivity.this,
-									TableActivity.class);
-							startActivity(intent);
-						}
-					}
-				}).show();
-	}
-
-	DialogInterface.OnClickListener pendOrder = new DialogInterface.OnClickListener() {
-
-		@Override
-		public void onClick(DialogInterface dialog, int which) {
-			submitToService();
-			mMyOrder.clear();
-			mMyOrderAdapter.notifyDataSetChanged();
-			finish();
-			if (Info.getMode() == Info.WORK_MODE_CUSTOMER) {
-				Info.setMode(Info.WORK_MODE_WAITER);
-				Intent intent = new Intent();
-				intent.setClass(MyOrderActivity.this,
-						TableActivity.class);
-				startActivity(intent);
-			}
-		}
-	};
-	
 	class ItemViewHolder {
 		TextView dishName;
 		TextView dishPrice;
 		TextView dishQuantity;
 		Button plusBtn;
 		Button minusBtn;
-		// Button plus5Btn;
-		// Button minus5Btn;
 		Button flavorBtn;
 
 		public ItemViewHolder(View convertView) {
@@ -253,8 +160,6 @@ public class MyOrderActivity extends OrderBaseActivity {
 					.findViewById(R.id.dishQuantity);
 			plusBtn = (Button) convertView.findViewById(R.id.dishPlus);
 			minusBtn = (Button) convertView.findViewById(R.id.dishMinus);
-			// plus5Btn = (Button) convertView.findViewById(R.id.dishPlus5);
-			// minus5Btn = (Button) convertView.findViewById(R.id.dishMinus5);
 			flavorBtn = (Button) convertView.findViewById(R.id.flavor);
 		}
 
@@ -267,16 +172,7 @@ public class MyOrderActivity extends OrderBaseActivity {
 					updateDishQuantity(position, 1);
 				}
 			});
-			// plus5Btn.setOnClickListener(new OnClickListener() {
-			//
-			// public void onClick(View v) {
-			// final int position = Integer
-			// .parseInt(v.getTag().toString());
-			// updateDishQuantity(position, 5);
-			// }
-			// });
 			minusBtn.setOnClickListener(minusClicked);
-			// minus5Btn.setOnClickListener(minus5Clicked);
 
 			flavorBtn.setOnClickListener(flavorClicked);
 			dishQuantity.setOnLongClickListener(quantityClicked);
@@ -285,8 +181,6 @@ public class MyOrderActivity extends OrderBaseActivity {
 		public void setTag(int position) {
 			plusBtn.setTag(position);
 			minusBtn.setTag(position);
-			// plus5Btn.setTag(position);
-			// minus5Btn.setTag(position);
 			flavorBtn.setTag(position);
 			dishQuantity.setTag(position);
 		}
