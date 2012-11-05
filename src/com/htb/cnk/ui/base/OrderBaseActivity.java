@@ -76,6 +76,24 @@ public class OrderBaseActivity extends BaseActivity {
         bindService(intent, conn, Context.BIND_AUTO_CREATE);  
 	}
 
+	public void submitOrder() {
+			new Thread() {
+				public void run() {
+					submitToService();
+					mMyOrder.clear();
+					if (Info.getMode() == Info.WORK_MODE_CUSTOMER) {
+						Info.setMode(Info.WORK_MODE_WAITER);
+						Intent intent = new Intent();
+						intent.setClass(OrderBaseActivity.this,
+								TableActivity.class);
+						startActivity(intent);
+					}
+	
+					finish();
+				}
+			}.start();
+		}
+
 	protected void getPersons() {
 		new Thread() {
 			public void run() {
@@ -149,26 +167,6 @@ public class OrderBaseActivity extends BaseActivity {
 				});
 		quantitySettingDlg.setNegativeButton("取消", null);
 		quantitySettingDlg.show();
-	}
-
-	protected void submitOrder() {
-		new Thread() {
-			public void run() {
-				submitToService();
-				mMyOrder.clear();
-				if (Info.getMode() == Info.WORK_MODE_CUSTOMER) {
-					Info.setMode(Info.WORK_MODE_WAITER);
-					Intent intent = new Intent();
-					intent.setClass(OrderBaseActivity.this,
-							TableActivity.class);
-					startActivity(intent);
-				}
-
-				finish();
-//				int ret = mMyOrder.submit(mSettings.getStatusById(Info.getTableId()));
-//				mSubmitHandler.sendEmptyMessage(ret);
-			}
-		}.start();
 	}
 
 	protected void showSetPersonsDlg() {
