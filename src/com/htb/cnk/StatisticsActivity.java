@@ -5,19 +5,17 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.TextView;
+import android.widget.Toast;
+
 import com.htb.cnk.adapter.StatisticsAdapter;
 import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.ui.base.StatisticsBaseActivity;
-
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.View.OnClickListener;
-import android.widget.TextView;
-import android.widget.Toast;
 
 
 /**
@@ -25,7 +23,7 @@ import android.widget.Toast;
  * 
  */
 public class StatisticsActivity extends StatisticsBaseActivity {
-	final String TAG = "StatisticsActivity";
+	public final static String TAG = "StatisticsActivity";
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -88,7 +86,7 @@ public class StatisticsActivity extends StatisticsBaseActivity {
 		mPrintBtn.setOnClickListener(printClicked);
 	}
 	
-	OnClickListener queryTodayClicked = new OnClickListener() {
+	private OnClickListener queryTodayClicked = new OnClickListener() {
 
 		@Override
 		public void onClick(View v) {
@@ -112,7 +110,7 @@ public class StatisticsActivity extends StatisticsBaseActivity {
 		}
 	};
 
-	OnClickListener queryByTimeClicked = new OnClickListener() {
+	private OnClickListener queryByTimeClicked = new OnClickListener() {
 
 		@Override
 		public void onClick(View v) {
@@ -128,7 +126,7 @@ public class StatisticsActivity extends StatisticsBaseActivity {
 		}
 	};
 
-	OnClickListener printClicked = new OnClickListener() {
+	private OnClickListener printClicked = new OnClickListener() {
 
 		@Override
 		public void onClick(View v) {

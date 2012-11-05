@@ -59,14 +59,6 @@ public class StatisticsBaseActivity extends BaseActivity {
 	protected Statistics mStatistics;
 	protected StatisticsAdapter mStatisticsAdapter;
 
-	private OnClickListener backClicked = new OnClickListener() {
-
-		@Override
-		public void onClick(View v) {
-			StatisticsBaseActivity.this.finish();
-		}
-	};
-
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -76,6 +68,94 @@ public class StatisticsBaseActivity extends BaseActivity {
 		findViews();
 		setClickListener();
 		downloadDB();
+	}
+
+	protected void updateData(Calendar start, Calendar end) {
+		SimpleDateFormat time = new SimpleDateFormat("HH:mm");
+		SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
+		mStartDate.setText(date.format(start.getTime()));
+		mStartTime.setText(time.format(start.getTime()));
+		mEndDate.setText(date.format(end.getTime()));
+		mEndTime.setText(time.format(end.getTime()));
+		mTableUsage.setText(Integer.toString(mStatistics.getTableUsage()));
+		mPersons.setText(Integer.toString(mStatistics.getServedPersons()));
+		mTotalAmount.setText(MyOrder.convertFloat(mStatistics.getTotalAmount()));
+		mStatisticsAdapter.notifyDataSetChanged();
+	}
+
+	protected void updateLatestStatistics() {
+		new AlertDialog.Builder(StatisticsBaseActivity.this)
+				.setTitle("请注意")
+				.setMessage("是否清零销售记录")
+				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+	
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						new Thread() {
+							public void run() {
+								SimpleDateFormat time = new SimpleDateFormat(
+										"HH:mm");
+								SimpleDateFormat date = new SimpleDateFormat(
+										"yyyy-MM-dd");
+								mLatestStatistics = date.format(mEnd.getTime())
+										+ " " + time.format(mEnd.getTime());
+								Http.get(
+										Server.LATEST_STATISTICS,
+										"do=set&time="
+												+ time.format(mEnd.getTime())
+												+ "&date="
+												+ date.format(mEnd.getTime()));
+	
+							}
+						}.start();
+					}
+				})
+				.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+	
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+	
+					}
+				}).show();
+	}
+
+	protected void popUpDlg(String title, String msg,
+			final boolean finishActivity) {
+		new AlertDialog.Builder(StatisticsBaseActivity.this).setTitle(title)
+				.setMessage(msg)
+				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+	
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						if (finishActivity) {
+							finish();
+						}
+					}
+				}).show();
+	}
+
+	protected boolean isDateTimeSet() {
+		if (mStartDateBtn.getText().toString().indexOf("-") <= 0) {
+			DateTimeNotSetAlert("没有设置开始日期");
+			return false;
+		}
+	
+		if (mStartTimeBtn.getText().toString().indexOf(":") <= 0) {
+			DateTimeNotSetAlert("没有设置开始时间");
+			return false;
+		}
+	
+		if (mEndDateBtn.getText().toString().indexOf("-") <= 0) {
+			DateTimeNotSetAlert("没有设置结束日期");
+			return false;
+		}
+	
+		if (mEndTimeBtn.getText().toString().indexOf(":") <= 0) {
+			DateTimeNotSetAlert("没有设置结束时间");
+			return false;
+		}
+	
+		return true;
 	}
 
 	private void findViews() {
@@ -143,83 +223,17 @@ public class StatisticsBaseActivity extends BaseActivity {
 		}.start();
 	}
 
-	protected boolean isDateTimeSet() {
-		if (mStartDateBtn.getText().toString().indexOf("-") <= 0) {
-			DateTimeNotSetAlert("没有设置开始日期");
-			return false;
-		}
-
-		if (mStartTimeBtn.getText().toString().indexOf(":") <= 0) {
-			DateTimeNotSetAlert("没有设置开始时间");
-			return false;
-		}
-
-		if (mEndDateBtn.getText().toString().indexOf("-") <= 0) {
-			DateTimeNotSetAlert("没有设置结束日期");
-			return false;
-		}
-
-		if (mEndTimeBtn.getText().toString().indexOf(":") <= 0) {
-			DateTimeNotSetAlert("没有设置结束时间");
-			return false;
-		}
-
-		return true;
-	}
-
 	private void DateTimeNotSetAlert(String err) {
 		popUpDlg("请注意", err, false);
 	}
 
-	protected void updateLatestStatistics() {
-		new AlertDialog.Builder(StatisticsBaseActivity.this)
-				.setTitle("请注意")
-				.setMessage("是否清零销售记录")
-				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						new Thread() {
-							public void run() {
-								SimpleDateFormat time = new SimpleDateFormat(
-										"HH:mm");
-								SimpleDateFormat date = new SimpleDateFormat(
-										"yyyy-MM-dd");
-								mLatestStatistics = date.format(mEnd.getTime())
-										+ " " + time.format(mEnd.getTime());
-								Http.get(
-										Server.LATEST_STATISTICS,
-										"do=set&time="
-												+ time.format(mEnd.getTime())
-												+ "&date="
-												+ date.format(mEnd.getTime()));
-
-							}
-						}.start();
-					}
-				})
-				.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-
-					}
-				}).show();
-	}
-
-	protected void updateData(Calendar start, Calendar end) {
-		SimpleDateFormat time = new SimpleDateFormat("HH:mm");
-		SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
-		mStartDate.setText(date.format(start.getTime()));
-		mStartTime.setText(time.format(start.getTime()));
-		mEndDate.setText(date.format(end.getTime()));
-		mEndTime.setText(time.format(end.getTime()));
-		mTableUsage.setText(Integer.toString(mStatistics.getTableUsage()));
-		mPersons.setText(Integer.toString(mStatistics.getServedPersons()));
-		mTotalAmount.setText(MyOrder.convertFloat(mStatistics.getTotalAmount()));
-		mStatisticsAdapter.notifyDataSetChanged();
-	}
-
+	private OnClickListener backClicked = new OnClickListener() {
+	
+		@Override
+		public void onClick(View v) {
+			StatisticsBaseActivity.this.finish();
+		}
+	};
 	private OnClickListener startDateClicked = new OnClickListener() {
 
 		@Override
@@ -286,11 +300,6 @@ public class StatisticsBaseActivity extends BaseActivity {
 		}
 	};
 
-	public void showProgressDlg(String msg) {
-		mpDialog.setMessage(msg);
-		mpDialog.show();
-	}
-
 	private DatePickerDialog.OnDateSetListener endDateListener = new DatePickerDialog.OnDateSetListener() {
 
 		@Override
@@ -346,20 +355,5 @@ public class StatisticsBaseActivity extends BaseActivity {
 			}
 		}
 	};
-
-	protected void popUpDlg(String title, String msg,
-			final boolean finishActivity) {
-		new AlertDialog.Builder(StatisticsBaseActivity.this).setTitle(title)
-				.setMessage(msg)
-				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						if (finishActivity) {
-							finish();
-						}
-					}
-				}).show();
-	}
 
 }
