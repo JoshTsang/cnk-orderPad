@@ -1,12 +1,12 @@
 package com.htb.cnk.data;
 
 public class OrderedDish {
-	Dish dish;
-	float padQuantity;
-	float phoneQuantity;
-	int status;
-	int tableId;
-	boolean []flavor;
+	protected Dish dish;
+	protected float padQuantity;
+	protected float phoneQuantity;
+	protected int status;
+	protected int tableId;
+	protected boolean[] flavor;
 
 	public OrderedDish(MyOrder myOrder, Dish dish, float quantity, int tableId, int status,
 			int type) {

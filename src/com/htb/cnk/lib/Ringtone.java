@@ -52,10 +52,12 @@ public class Ringtone implements OnPreparedListener, OnCompletionListener{
 		try {
 			mediaPlayer.prepare();
 		} catch (IllegalStateException e) {
-			e.printStackTrace();
+			//TODO 
+			//e.printStackTrace();
 			update();
 		} catch (IOException e) {
-			e.printStackTrace();
+			//TODO
+			//e.printStackTrace();
 			update();
 		}
 	}
