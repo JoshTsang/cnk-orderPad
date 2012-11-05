@@ -345,7 +345,7 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 	DialogInterface.OnClickListener addListener = new DialogInterface.OnClickListener() {
 		@Override
 		public void onClick(DialogInterface dialog, int which) {
-			mPhoneOrder.clear();
+			//mPhoneOrder.clear();
 			addDialogChoiceMode(which);
 		}
 	};
