@@ -24,27 +24,29 @@ import com.htb.constant.Table;
 
 public class MyOrder {
 	protected final static String TAG = "MyOrder";
+	
+	/* Error Code */
 	public final static int ERR_GET_PHONE_ORDER_FAILED = -10;
 	public final static int RET_NULL_PHONE_ORDER = 1;
-	public final static int RET_MINUS_SUCC = -2;
-	public final static int DEL_ALL_ORDER = -1;
+	protected final static int TIME_OUT = -1;
 	public final static int NOTHING_TO_DEL = -4;
+	public final static int ERR_DB = -10;
 
-	public final static int UPDATE_ORDER = 1;
+	/* Del order mode */
+	public final static int DEL_ALL_ORDER = -1;
 	public final static int DEL_ITEM_ORDER = 2;
-
+	
+	/* current order mode */
 	public final static int MODE_PAD = 0;
 	public final static int MODE_PHONE = 1;
 
-	protected final static int TIME_OUT = -1;
-
+	/* DataBase query columns */
 	final static int NAME_COLUMN = 0;
 	final static int PRICE_COLUMN = 1;
 	final static int PIC_COLUMN = 2;
 	final static int PRINTER_COLUMN = 3;
 	final static int UNIT_NAME = 4;
 
-	final static int DbError = -10;
 	public int orderType;
 
 	protected CnkDbHelper mCnkDbHelper;
@@ -448,7 +450,7 @@ public class MyOrder {
 				Float dishPrice = (float) item.getDouble("price");
 				Cursor cur = getDishInfoFromDB(dishId);
 				if(cur == null){
-					return DbError;
+					return ERR_DB;
 				}
 				String name = cur.getString(NAME_COLUMN);
 				String pic = cur.getString(PIC_COLUMN);
