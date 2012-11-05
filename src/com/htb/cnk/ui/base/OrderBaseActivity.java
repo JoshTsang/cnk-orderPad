@@ -281,7 +281,7 @@ public class OrderBaseActivity extends BaseActivity {
 		final boolean[] selected = mMyOrder.slectedFlavor(position);
 		new AlertDialog.Builder(OrderBaseActivity.this)
 				.setTitle("口味选择")
-				.setMultiChoiceItems(MyOrder.mFlavorName, selected,
+				.setMultiChoiceItems(MyOrder.getFlavor(), selected,
 						new DialogInterface.OnMultiChoiceClickListener() {
 
 							@Override

@@ -187,7 +187,7 @@ public class MyOrderActivity extends OrderBaseActivity {
 
 		public void fillData(OrderedDish dishDetail) {
 			dishName.setText(dishDetail.getName());
-			dishPrice.setText(Double.toString(dishDetail.getPrice()) + " 元/份");
+			dishPrice.setText(Double.toString(dishDetail.getPrice()) + " 元/" + dishDetail.getUnit());
 			dishQuantity
 					.setText(MyOrder.convertFloat(dishDetail.getQuantity()));
 

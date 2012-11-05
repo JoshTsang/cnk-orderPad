@@ -23,12 +23,12 @@ import com.htb.constant.Server;
 import com.htb.constant.Table;
 
 public class MyOrder {
-	protected final static String TAG = "MyOrder";
+	public final static String TAG = "MyOrder";
 	
 	/* Error Code */
 	public final static int ERR_GET_PHONE_ORDER_FAILED = -10;
 	public final static int RET_NULL_PHONE_ORDER = 1;
-	protected final static int TIME_OUT = -1;
+	public final static int TIME_OUT = -1;
 	public final static int NOTHING_TO_DEL = -4;
 	public final static int ERR_DB = -10;
 
@@ -41,21 +41,21 @@ public class MyOrder {
 	public final static int MODE_PHONE = 1;
 
 	/* DataBase query columns */
-	final static int NAME_COLUMN = 0;
-	final static int PRICE_COLUMN = 1;
-	final static int PIC_COLUMN = 2;
-	final static int PRINTER_COLUMN = 3;
-	final static int UNIT_NAME = 4;
+	public static int NAME_COLUMN = 0;
+	public static int PRICE_COLUMN = 1;
+	public static int PIC_COLUMN = 2;
+	public static int PRINTER_COLUMN = 3;
+	public final static int UNIT_NAME = 4;
 
-	public int orderType;
+	protected int mOrderType;
 
 	protected CnkDbHelper mCnkDbHelper;
 	protected SQLiteDatabase mDb;
 	protected Context mContext;
 	protected static List<OrderedDish> mOrder = new ArrayList<OrderedDish>();
-	protected int persons;
-	public static String[] mFlavorName;
-	public static String comment = "";
+	protected int mPersons;
+	protected static String[] mFlavorName;
+	protected static String mComment = "";
 
 	public MyOrder(Context context) {
 		mCnkDbHelper = new CnkDbHelper(context, CnkDbHelper.DATABASE_NAME,
@@ -65,15 +65,15 @@ public class MyOrder {
 	}
 	
 	public void setOrderType(int type) {
-		orderType = type;
+		mOrderType = type;
 	}
 	
 	public void setPersons(int persons) {
-		this.persons = persons;
+		this.mPersons = persons;
 	}
 
 	public int getPersons() {
-		return persons;
+		return mPersons;
 	}
 
 	public int addOrder(Dish dish, float quantity, int tableId, int status,
@@ -170,12 +170,16 @@ public class MyOrder {
 		return mOrder.get(index).getTableId();
 	}
 
+	public static String[] getFlavor() {
+		return mFlavorName;
+	}
+	
 	public void setComment(String str) {
-		comment = str;
+		mComment = str;
 	}
 
 	public String getComment() {
-		return comment;
+		return mComment;
 	}
 
 	public int setDishStatus(int index) {
@@ -232,7 +236,7 @@ public class MyOrder {
 
 	public void clear() {
 		mOrder.clear();
-		comment = "";
+		mComment = "";
 	}
 
 	public void talbeClear() {
@@ -307,11 +311,11 @@ public class MyOrder {
 			order.put("waiter", UserData.getUserName());
 			order.put("waiterId", UserData.getUID());
 			order.put("tableId", Info.getTableId());
-			order.put("persons", persons);
+			order.put("persons", mPersons);
 			order.put("tableName", Info.getTableName());
-			order.put("type", orderType==MODE_PAD?"pad":"phone");
-			if (!"".equals(comment.trim())) {
-				order.put("comment", comment);
+			order.put("type", mOrderType==MODE_PAD?"pad":"phone");
+			if (!"".equals(mComment.trim())) {
+				order.put("comment", mComment);
 			}
 			order.put("timestamp", time);
 		} catch (JSONException e) {
@@ -339,22 +343,6 @@ public class MyOrder {
 		}
 
 		return order.toString();
-	}
-
-	private String getFlavorNameToSubmit(int i, String flavorStr) {
-		if (mOrder.get(i).flavor != null) {
-			StringBuffer flavorStrBuf = new StringBuffer();
-			for (int k = 0; k < mOrder.get(i).flavor.length; k++) {
-				if (mOrder.get(i).flavor[k] == true) {
-					flavorStrBuf.append(MyOrder.mFlavorName[k] + ",");
-				}
-			}
-			if (!flavorStrBuf.toString().equals("")) {
-				flavorStr = flavorStrBuf.toString().substring(0,
-						flavorStrBuf.length() - 1);
-			}
-		}
-		return flavorStr;
 	}
 
 	public static int loodPersons(int tableId) {
@@ -568,45 +556,6 @@ public class MyOrder {
 
 	}
 
-	private String getDishNameFromDB(int id) {
-		Cursor cur = mDb.query(CnkDbHelper.TABLE_DISH_INFO,
-				new String[] { CnkDbHelper.DISH_NAME }, CnkDbHelper.DISH_ID
-						+ "=" + id, null, null, null, null);
-
-		if (cur.moveToNext()) {
-			return cur.getString(0);
-		}
-		return null;
-	}
-
-	protected Cursor getDishInfoFromDB(int id) {
-		String sql = String
-				.format("SELECT %s, %s, %s, %s, %s FROM %s,%s,%s Where %s.%s=%s and %s.%s=%d",
-						CnkDbHelper.DISH_NAME, CnkDbHelper.DISH_PRICE,
-						CnkDbHelper.DISH_PIC, CnkDbHelper.DISH_PRINTER,
-						CnkDbHelper.UNIT_NAME, CnkDbHelper.TABLE_DISH_INFO,
-						CnkDbHelper.TABLE_DISH_CATEGORY,
-						CnkDbHelper.TABLE_UNIT, CnkDbHelper.TABLE_UNIT, "id",
-						CnkDbHelper.UNIT_ID, CnkDbHelper.TABLE_DISH_INFO,
-						CnkDbHelper.DISH_ID, id);
-		Cursor cur = mDb.rawQuery(sql, null);
-
-		if (cur.moveToNext()) {
-			return cur;
-		}
-		return null;
-	}
-
-	private int updateServerServedDish(int tableId, int dishId, int status) {
-		String dishStatusPkg = Http.get(Server.SERVE_ORDER, "TID=" + tableId
-				+ "&DID=" + dishId + "&STATUS=" + status);
-		if (ErrorPHP.isSucc(dishStatusPkg, TAG)) {
-			return 0;
-		} else {
-			return -1;
-		}
-	}
-
 	public void showServerDelProgress() {
 		Method showDelProcessDlg;
 		try {
@@ -624,14 +573,6 @@ public class MyOrder {
 		}
 	}
 
-	@Override
-	protected void finalize() throws Throwable {
-		if (mDb != null) {
-			mDb.close();
-		}
-		super.finalize();
-	}
-
 	public void removeServedDishes() {
 		for (int i = 0; i < mOrder.size(); i++) {
 			OrderedDish item = (OrderedDish) mOrder.get(i);
@@ -641,6 +582,69 @@ public class MyOrder {
 				i--;
 			}
 		}
+	}
+
+	protected Cursor getDishInfoFromDB(int id) {
+		String sql = String
+				.format("SELECT %s, %s, %s, %s, %s FROM %s,%s,%s Where %s.%s=%s and %s.%s=%d",
+						CnkDbHelper.DISH_NAME, CnkDbHelper.DISH_PRICE,
+						CnkDbHelper.DISH_PIC, CnkDbHelper.DISH_PRINTER,
+						CnkDbHelper.UNIT_NAME, CnkDbHelper.TABLE_DISH_INFO,
+						CnkDbHelper.TABLE_DISH_CATEGORY,
+						CnkDbHelper.TABLE_UNIT, CnkDbHelper.TABLE_UNIT, "id",
+						CnkDbHelper.UNIT_ID, CnkDbHelper.TABLE_DISH_INFO,
+						CnkDbHelper.DISH_ID, id);
+		Cursor cur = mDb.rawQuery(sql, null);
+	
+		if (cur.moveToNext()) {
+			return cur;
+		}
+		return null;
+	}
+
+	@Override
+	protected void finalize() throws Throwable {
+		if (mDb != null) {
+			mDb.close();
+		}
+		super.finalize();
+	}
+
+	private String getFlavorNameToSubmit(int i, String flavorStr) {
+		if (mOrder.get(i).flavor != null) {
+			StringBuffer flavorStrBuf = new StringBuffer();
+			for (int k = 0; k < mOrder.get(i).flavor.length; k++) {
+				if (mOrder.get(i).flavor[k] == true) {
+					flavorStrBuf.append(MyOrder.mFlavorName[k] + ",");
+				}
+			}
+			if (!flavorStrBuf.toString().equals("")) {
+				flavorStr = flavorStrBuf.toString().substring(0,
+						flavorStrBuf.length() - 1);
+			}
+		}
+		return flavorStr;
+	}
+
+	private int updateServerServedDish(int tableId, int dishId, int status) {
+		String dishStatusPkg = Http.get(Server.SERVE_ORDER, "TID=" + tableId
+				+ "&DID=" + dishId + "&STATUS=" + status);
+		if (ErrorPHP.isSucc(dishStatusPkg, TAG)) {
+			return 0;
+		} else {
+			return -1;
+		}
+	}
+
+	private String getDishNameFromDB(int id) {
+		Cursor cur = mDb.query(CnkDbHelper.TABLE_DISH_INFO,
+				new String[] { CnkDbHelper.DISH_NAME }, CnkDbHelper.DISH_ID
+						+ "=" + id, null, null, null, null);
+	
+		if (cur.moveToNext()) {
+			return cur.getString(0);
+		}
+		return null;
 	}
 
 }
