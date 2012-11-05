@@ -24,18 +24,18 @@ public class TableAdapter {
 	private int mImageItem;
 	private int mTextItem;
 	private TableSetting mSetting;
-	private Notifications mNotification;
+	private Notifications mNotification = new Notifications();
 	private ArrayList<HashMap<String, Object>> lstImageItem = new ArrayList<HashMap<String,Object>>();
 	private List<TableSetting.TableSettingItem> resultSet;
 	private Context mContext;
 
-	public TableAdapter(Notifications notification, TableSetting ts,
+	public TableAdapter(TableSetting ts,
 			Context context) {
-		mNotification = notification;
 		mSetting = ts;
 		mContext = context;
 	}
-
+	
+	
 	public void filterTables(int arg, int filterType) {
 		setStatusAndIcon(arg, filterType);
 	}

@@ -28,8 +28,15 @@ public class MyReceiver extends BroadcastReceiver {
 		tableDeskReceiver.setRingtoneMsg(bundle.getInt("ringtoneMessage"));
 		tableDeskReceiver.setTableMsg(bundle.getString("tableMessage"));
 		tableDeskReceiver.setNetworkStatus(bundle.getBoolean("networkStatus"));
-//		tableDeskReceiver.sendTableMsg();
 		tableDeskReceiver.sendRingtoneMsg();
 		tableDeskReceiver.checkPendedOrder();
+		if (bundle.getInt("tableHandler") > 0) {
+			tableDeskReceiver.sendTableHandler(bundle.getInt("tableHandler"));
+			tableDeskReceiver.setNetworkStatus(true);
+		}
+		if (bundle.getBoolean("binder")) {
+			tableDeskReceiver.sendbinderStart();
+		}
+
 	}
 }

@@ -1,5 +1,6 @@
 package com.htb.cnk.lib;
 
+import android.content.Context;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -7,14 +8,14 @@ import android.widget.AdapterView.OnItemClickListener;
 
 import com.htb.cnk.adapter.TableAdapter;
 import com.htb.cnk.data.Info;
-import com.htb.cnk.ui.base.TableGridDeskActivity;
+import com.htb.cnk.ui.base.GridBaseActivity;
 
 public class TableItemClickListener implements OnItemClickListener{ 
 	private final static String TAG = "TableItemClickListener";
-	private final TableGridDeskActivity tableGridDesk;
+	private  GridBaseActivity tableGridDesk;
 	protected TableAdapter mTableInfo;
-	public TableItemClickListener(TableGridDeskActivity activity,TableAdapter tableInfo){
-		tableGridDesk = activity;
+	public TableItemClickListener(Context context,TableAdapter tableInfo){
+		tableGridDesk = new GridBaseActivity(context){};
 		mTableInfo = tableInfo;
 	}
 	public void onItemClick(AdapterView<?> arg0,// The AdapterView where the
@@ -52,21 +53,23 @@ public class TableItemClickListener implements OnItemClickListener{
 			break;
 		case 50:
 		case 51:
-			if (tableGridDesk.isNetworkStatus()) {
-				tableGridDesk.addPhoneDialog(arg2).show();
-			} else {
-				tableGridDesk.networkErrDlg();
-			}
+//			if (tableGridDesk.isNetworkStatus()) {
+//				tableGridDesk.addPhoneDialog(arg2).show();
+//			} else {
+//				tableGridDesk.networkErrDlg();
+//			}
+			tableGridDesk.addPhoneDialog(arg2).show();
 			break;
 		case 100:
 		case 101:
 		case 150:
 		case 151:
-			if (tableGridDesk.isNetworkStatus()) {
-				tableGridDesk.notificationDialog().show();
-			} else {
-				tableGridDesk.networkErrDlg();
-			}
+//			if (tableGridDesk.isNetworkStatus()) {
+//				tableGridDesk.notificationDialog().show();
+//			} else {
+//				tableGridDesk.networkErrDlg();
+//			}
+			tableGridDesk.notificationDialog().show();
 			break;
 		default:
 			tableGridDesk.addDialog().show();
@@ -74,4 +77,4 @@ public class TableItemClickListener implements OnItemClickListener{
 		}
 	}
 
-};
+}
