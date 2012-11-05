@@ -121,7 +121,7 @@ public class QueryOrderActivity extends OrderBaseActivity {
 
 				TextView tableName = (TextView) findViewById(R.id.tableName);
 				tableName.setText("桌号/人数");
-				mTableNumTxt.setText(Info.getTableName() + "/" + persons);
+				mTableNumTxt.setText(Info.getTableName() + "/" + mPersons);
 			}
 
 		}

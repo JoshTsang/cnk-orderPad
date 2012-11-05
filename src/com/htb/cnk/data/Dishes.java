@@ -29,7 +29,6 @@ public class Dishes {
 	private List<Dish> mDishes = new ArrayList<Dish>();
 	private List<Integer> mSoldOutItemsId = new ArrayList<Integer>();
 	private int mCategoryId;
-	//private String mTableName = "";
 	private CnkDbHelper mCnkDbHelper;
 	private SQLiteDatabase mDb;
 	private Context mContext;
