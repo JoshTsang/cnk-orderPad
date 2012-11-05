@@ -30,6 +30,20 @@
     <string name="persons">人数</string>
  	<string name="connectServer">正在连接服务器...</string>
  	<string name="pleaseNote">请注意</string>
+ 	
+ 	<!--  Mangement Activity -->
+ 	<string name="backupAndRestore">备份/恢复</string>
+    <string name="updateMenu">更新菜谱</string>
+    <string name="statistics">统计</string>
+    <string name="mangement">管理</string>
+    <string name="backup">备份</string>
+    <string name="restore">恢复</string>
+    <string name="menuBackupTime">菜谱数据备份时间：</string>
+    <string name="menuPicBackupTime">菜谱图片备份时间：</string>
+    <string name="salesBackupTime">销售数据备份时间：</string>
+    <string name="performance">绩效</string>
+    <string name="menuMangement">后台管理</string>
+ 	
     <!-- StatisticsActivity -->
     <string name="setTime">设置时间</string>
     <string name="setDate">设置日期</string>
@@ -45,7 +59,6 @@
     <string name="salesAmount">销售额</string>
     <string name="percentage">销售百分比</string>
     <string name="manageUri">http://www.cainaoke.com/manage/index.php</string>
-    <string name="menuMangement">后台管理</string>
 
     <!-- delActivity -->
     <string name="cleanAll">全退</string>
@@ -54,6 +67,7 @@
     <string name="cleanAllWarning">亲：已经删除完了，不要再删了！</string>
 	<string name="notClean">菜都上完，不能再退了</string>
 	<string name="nothingToDel">没有可以退的菜</string>
+	
     <!-- order -->
     <string name="continueOrder">继续点菜</string>
     <string name="phoneOrder">手机点的菜</string>
@@ -66,11 +80,6 @@
     <string name="dishName">名称</string>
     
     <!-- table -->
-    <string name="updateMenu">更新菜谱</string>
-    <string name="statistics">统计</string>
-    <string name="mangement">管理</string>
-    <string name="backup">备份</string>
-    <string name="restore">恢复</string>
     <string name="queryId">选择桌号</string>
     <string name="userWarning">用户名密码不正确</string>
     <string name="tableNotSet">还未设定桌号</string>
@@ -79,9 +88,6 @@
     <string name="logout">交班</string>
     <string name="checkout">结账</string>
     <string name="phoneWarning">网络连接不上</string>
-    <string name="menuBackupTime">菜谱数据备份时间：</string>
-    <string name="menuPicBackupTime">菜谱图片备份时间：</string>
-    <string name="salesBackupTime">销售数据备份时间：</string>
     <string name="changeTIdWarning">转台不成功，请检查是否已经开台</string>
     <string name="changeSucc">转台成功</string>
     <string name="changeError">转台失败</string>
@@ -97,7 +103,6 @@
     <string name="idAndPersonsIsNull">请输入桌号或者人数!</string>
     <string name="settings">设置</string>
     <string name="flavor">口味</string>
-    <string name="performance">绩效</string>
     <string name="checkOutWarning">收银不成功，请检查是否开台</string>
     <string name="checkOutSucc">收银成功</string>
     <string name="servedPersons">服务人数：</string>
