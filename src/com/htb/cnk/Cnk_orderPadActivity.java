@@ -369,6 +369,54 @@ public class Cnk_orderPadActivity extends BaseActivity {
 		}
 	};
 
+	private OnClickListener menuClicked = new OnClickListener() {
+
+		@Override
+		public void onClick(View arg0) {
+			Intent intent = new Intent();
+			intent.setClass(Cnk_orderPadActivity.this, MenuActivity.class);
+			Info.setMode(Info.WORK_MODE_CUSTOMER);
+			startActivity(intent);
+		}
+
+	};
+
+	private OnClickListener settingsClicked = new OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+			if (Info.getMode() == Info.WORK_MODE_CUSTOMER) {
+				LoginDlg loginDlg = new LoginDlg(Cnk_orderPadActivity.this,
+						TableActivity.class);
+				loginDlg.show(Permission.STUFF);
+			} else {
+				Intent intent = new Intent();
+				intent.setClass(Cnk_orderPadActivity.this, TableActivity.class);
+				Cnk_orderPadActivity.this.startActivity(intent);
+			}
+		}
+
+	};
+
+	private OnLongClickListener versionClicked = new OnLongClickListener() {
+
+		@Override
+		public boolean onLongClick(View v) {
+			Setting.enableDebug(true);
+			Intent intent = new Intent();
+			intent.setClass(Cnk_orderPadActivity.this, SettingActivity.class);
+			Cnk_orderPadActivity.this.startActivity(intent);
+			return false;
+		}
+	};
+	public void initWifi() {
+		if (mWifiAdmin.checkNetCardState() == 0
+				|| mWifiAdmin.checkNetCardState() == 1) {
+			new Thread(new wifiConnect()).start();
+		}
+		startLock();
+	}
+
 	private Handler flavorHandler = new Handler() {
 	/** Called when the activity is first created. */
 		public void handleMessage(Message msg) {
@@ -410,58 +458,7 @@ public class Cnk_orderPadActivity extends BaseActivity {
 			}
 		}
 	};
-	
-	private Handler errHandler = new Handler() {
-		public void handleMessage(Message msg) {
-			if (msg.what < 0) {
-				mpDialog.cancel();
-				Log.e("fetch Data failed", "errno: " + msg.what);
-				popErrorDlg(msg.what);
-			}
-		}
-	
-	};
 
-	private OnClickListener menuClicked = new OnClickListener() {
-
-		@Override
-		public void onClick(View arg0) {
-			Intent intent = new Intent();
-			intent.setClass(Cnk_orderPadActivity.this, MenuActivity.class);
-			Info.setMode(Info.WORK_MODE_CUSTOMER);
-			startActivity(intent);
-		}
-
-	};
-
-	private OnClickListener settingsClicked = new OnClickListener() {
-
-		@Override
-		public void onClick(View v) {
-			if (Info.getMode() == Info.WORK_MODE_CUSTOMER) {
-				LoginDlg loginDlg = new LoginDlg(Cnk_orderPadActivity.this,
-						TableActivity.class);
-				loginDlg.show(Permission.STUFF);
-			} else {
-				Intent intent = new Intent();
-				intent.setClass(Cnk_orderPadActivity.this, TableActivity.class);
-				Cnk_orderPadActivity.this.startActivity(intent);
-			}
-		}
-
-	};
-
-	private OnLongClickListener versionClicked = new OnLongClickListener() {
-
-		@Override
-		public boolean onLongClick(View v) {
-			Setting.enableDebug(true);
-			Intent intent = new Intent();
-			intent.setClass(Cnk_orderPadActivity.this, SettingActivity.class);
-			Cnk_orderPadActivity.this.startActivity(intent);
-			return false;
-		}
-	};
 	private Handler handlerSync = new Handler() {
 		public void handleMessage(Message msg) {
 			if (msg.what == UPDATE_MENU) {
@@ -478,7 +475,7 @@ public class Cnk_orderPadActivity extends BaseActivity {
 						.setMessage("新版本软件已下载，点击确定升级")
 						.setPositiveButton("确定",
 								new DialogInterface.OnClickListener() {
-
+	
 									@Override
 									public void onClick(DialogInterface dialog,
 											int which) {
@@ -491,19 +488,22 @@ public class Cnk_orderPadActivity extends BaseActivity {
 										startActivity(intent);
 									}
 								}).show();
-
+	
 			}
 			mpDialog.cancel();
 		}
 	};
 
-	public void initWifi() {
-		if (mWifiAdmin.checkNetCardState() == 0
-				|| mWifiAdmin.checkNetCardState() == 1) {
-			new Thread(new wifiConnect()).start();
+	private Handler errHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			if (msg.what < 0) {
+				mpDialog.cancel();
+				Log.e("fetch Data failed", "errno: " + msg.what);
+				popErrorDlg(msg.what);
+			}
 		}
-		startLock();
-	}
+	
+	};
 
 	private Handler wifiConnectHandle = new Handler() {
 		public void handleMessage(Message msg) {

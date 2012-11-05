@@ -8,18 +8,19 @@ import com.htb.cnk.lib.Http;
 import com.htb.constant.Server;
 
 public class Lisence {
+	public static final String TAG = "Lisence";
+	
 	public final static int NETWORK_ERR = -1;
 	public final static int LEGAL_COPY = 0;
 	
-	private static final String TAG = "Lisence";
-	private static String did;
+	private static String mDid;
 	
 	public static int validateDevice(Context context) {
 		TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
 		
-		did = tm.getDeviceId();
-		Log.d(TAG, "uuid:"+did);
-		String response = Http.get(Server.PAD_VALIDATE, "UUID="+did);
+		mDid = tm.getDeviceId();
+		Log.d(TAG, "uuid:"+mDid);
+		String response = Http.get(Server.PAD_VALIDATE, "UUID="+mDid);
 		if (response == null || "".equals(response)) {
 			Log.e(TAG, "respons.null");
 			return -1;
@@ -37,6 +38,6 @@ public class Lisence {
 	}
 	
 	public static String getDeviceId() {
-		return did;
+		return mDid;
 	}
 }

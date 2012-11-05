@@ -55,7 +55,7 @@ public class PhoneOrder extends MyOrder {
 				// int status = item.getInt("status");
 				Cursor cur = getDishInfoFromDB(dishId);
 				if(cur == null){
-					return DbError;
+					return ERR_DB;
 				}
 				String name = cur.getString(NAME_COLUMN);
 				float dishPrice = cur.getFloat(PRICE_COLUMN);

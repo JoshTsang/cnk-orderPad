@@ -56,12 +56,11 @@ public class PendedOrder {
 	public int submit() {
 		synchronized (lock) {
 			int count = count();
-			for (int i = 0; i < count; i++) {
-				int ret = MyOrder.submitPendedOrder(pendedOrders.get(i)
-						.getOrder(), pendedOrders.get(i).getStatus());
+			if (count > 0) {
+				int ret = MyOrder.submitPendedOrder(pendedOrders.get(0)
+						.getOrder(), pendedOrders.get(0).getStatus());
 				if (ret >= 0) {
-					pendedOrders.remove(i);
-					break;
+					pendedOrders.remove(0);
 				} else {
 					return -1;
 				}

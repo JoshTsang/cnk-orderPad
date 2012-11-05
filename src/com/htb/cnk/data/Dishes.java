@@ -29,7 +29,6 @@ public class Dishes {
 	private List<Dish> mDishes = new ArrayList<Dish>();
 	private List<Integer> mSoldOutItemsId = new ArrayList<Integer>();
 	private int mCategoryId;
-	//private String mTableName = "";
 	private CnkDbHelper mCnkDbHelper;
 	private SQLiteDatabase mDb;
 	private Context mContext;
@@ -68,6 +67,27 @@ public class Dishes {
 		
 		mDishes.clear();
 		mDishes.addAll(list);
+	}
+
+	public Cursor getDishesFromDB() {
+		int ret = connectDB();
+		if (ret < 0) {
+			return null;
+		}
+		
+		String sql = String
+				.format("SELECT %s.%s, %s, %s, %s, %s, %s, %s FROM %s, %s Where %s.%s=%s",
+						CnkDbHelper.TABLE_DISH_INFO, CnkDbHelper.DISH_ID,
+						CnkDbHelper.DISH_NAME,
+						CnkDbHelper.DISH_PRICE,
+						CnkDbHelper.DISH_PIC,
+						CnkDbHelper.DISH_PRINTER,
+						CnkDbHelper.UNIT_NAME,
+						CnkDbHelper.SHORTCUT,
+						CnkDbHelper.TABLE_DISH_INFO,
+						CnkDbHelper.TABLE_UNIT,
+						CnkDbHelper.TABLE_UNIT, "id", CnkDbHelper.UNIT_ID);
+		return mDb.rawQuery(sql, null);
 	}
 
 	public void clear() {
@@ -127,27 +147,6 @@ public class Dishes {
 						CnkDbHelper.TABLE_DISH_INFO, CnkDbHelper.DISH_ID,
 						CnkDbHelper.TABLE_DISH_CATEGORY,CnkDbHelper.DC_DISH_ID,
 						CnkDbHelper.TABLE_DISH_CATEGORY, CnkDbHelper.CATEGORY_ID, categoryId,
-						CnkDbHelper.TABLE_UNIT, "id", CnkDbHelper.UNIT_ID);
-		return mDb.rawQuery(sql, null);
-	}
-	
-	public Cursor getDishesFromDB() {
-		int ret = connectDB();
-		if (ret < 0) {
-			return null;
-		}
-		
-		String sql = String
-				.format("SELECT %s.%s, %s, %s, %s, %s, %s, %s FROM %s, %s Where %s.%s=%s",
-						CnkDbHelper.TABLE_DISH_INFO, CnkDbHelper.DISH_ID,
-						CnkDbHelper.DISH_NAME,
-						CnkDbHelper.DISH_PRICE,
-						CnkDbHelper.DISH_PIC,
-						CnkDbHelper.DISH_PRINTER,
-						CnkDbHelper.UNIT_NAME,
-						CnkDbHelper.SHORTCUT,
-						CnkDbHelper.TABLE_DISH_INFO,
-						CnkDbHelper.TABLE_UNIT,
 						CnkDbHelper.TABLE_UNIT, "id", CnkDbHelper.UNIT_ID);
 		return mDb.rawQuery(sql, null);
 	}

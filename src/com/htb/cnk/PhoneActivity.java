@@ -16,7 +16,6 @@ import com.htb.cnk.adapter.MyOrderAdapter;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.OrderedDish;
-import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.ui.base.OrderBaseActivity;
 
 public class PhoneActivity extends OrderBaseActivity {
@@ -34,7 +33,6 @@ public class PhoneActivity extends OrderBaseActivity {
 		setPhoneOrderClickListener();
 		fillPhoneOrderData();
 		mMyOrder.setOrderType(MyOrder.MODE_PHONE);
-		mSubmitHandler = handler;
 	}
 
 	public void showDeletePhoneOrderProcessDlg() {
@@ -190,42 +188,6 @@ public class PhoneActivity extends OrderBaseActivity {
 				getResources().getString(R.string.cancel), null).show();
 	}
 
-	private void cleanThread() {
-		new Thread() {
-			public void run() {
-				try {
-					int ret = updateStatus(Info.getTableId(),
-							TableSetting.SUBMIT);
-					if (ret < 0) {
-						queryHandler.sendEmptyMessage(ret);
-						return;
-					}
-					ret = mMyOrder.cleanServerPhoneOrder(Info.getTableId());
-					if (ret < 0) {
-						queryHandler.sendEmptyMessage(ret);
-						return;
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}.start();
-	}
-
-	private void phoneWarningDialog() {
-		DialogInterface.OnClickListener phoneWarningPositiveListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				finish();
-			}
-
-		};
-		mTitleAndMessageDialog.titleAndMessageDialog(false, "提示", "订单已提交",
-				getResources().getString(R.string.ok),
-				phoneWarningPositiveListener, null, null).show();
-
-	}
-
 	private void queryWarningDialog() {
 		mTitleAndMessageDialog.titleAndMessageDialog(false, "请注意", "无法连接服务器",
 				getResources().getString(R.string.ok),
@@ -279,23 +241,6 @@ public class PhoneActivity extends OrderBaseActivity {
 		public void onClick(View v) {
 			showProgressDlg("正在更新数据，请稍等");
 			updatePhoneOrderInfos();
-		}
-	};
-
-	private Handler handler = new Handler() {
-		public void handleMessage(Message msg) {
-			mpDialog.cancel();
-			if (msg.what < 0) {
-				// TODO combine MyOrder
-				String errMsg = "提交订单失败";
-				if (isPrinterError(msg)) {
-					errMsg += ":无法连接打印机或打印机缺纸";
-				}
-				errMsgDialog(errMsg);
-			} else {
-				cleanThread();
-				phoneWarningDialog();
-			}
 		}
 	};
 

@@ -106,24 +106,7 @@ public class ServeOrderActivity extends OrderBaseActivity {
 		mMyOrderLst.setOnItemClickListener(servedClicked);
 	}
 
-	private OnItemClickListener servedClicked = new OnItemClickListener() {
-
-		@Override
-		public void onItemClick(AdapterView<?> arg0, View arg1, final int position,
-				long arg3) {
-			showProgressDlg("更新服务器状态...");
-			new Thread() {
-				public void run() {
-					int ret = mMyOrder.setDishStatus(postionToIndex.getIndex(position));
-					markServedHandle.sendEmptyMessage(ret);
-				}
-			}.start();
-			
-		}
-		
-	};
-	
-	Handler queryHandler = new Handler() {
+	private Handler queryHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
 			if (msg.what < 0) {
@@ -138,7 +121,7 @@ public class ServeOrderActivity extends OrderBaseActivity {
 		}
 	};
 	
-	Handler markServedHandle = new Handler() {
+	private Handler markServedHandle = new Handler() {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
 			if (msg.what < 0) {
@@ -152,6 +135,23 @@ public class ServeOrderActivity extends OrderBaseActivity {
 		}
 	};
 	
+	private OnItemClickListener servedClicked = new OnItemClickListener() {
+	
+		@Override
+		public void onItemClick(AdapterView<?> arg0, View arg1, final int position,
+				long arg3) {
+			showProgressDlg("更新服务器状态...");
+			new Thread() {
+				public void run() {
+					int ret = mMyOrder.setDishStatus(postionToIndex.getIndex(position));
+					markServedHandle.sendEmptyMessage(ret);
+				}
+			}.start();
+			
+		}
+		
+	};
+
 	class queryThread implements Runnable {
 		public void run() {
 			try {

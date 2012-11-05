@@ -5,11 +5,12 @@ package com.htb.cnk.data;
  *
  */
 public class Info {
-	final static public int WORK_MODE_CUSTOMER = 0;
-	final static public int WORK_MODE_WAITER = 1;
-	final static public int WORK_MODE_PHONE = 2;
-	final static public int ORDER_LIST_MENU = 0;
-	final static public int ORDER_QUCIK_MENU = 1;
+	public final static int WORK_MODE_CUSTOMER = 0;
+	public final static int WORK_MODE_WAITER = 1;
+	public final static int WORK_MODE_PHONE = 2;
+	public final static int ORDER_LIST_MENU = 0;
+	public final static int ORDER_QUCIK_MENU = 1;
+	
 	static private int mMode;
 	static private int mTableId;
 	static private String mTableName;

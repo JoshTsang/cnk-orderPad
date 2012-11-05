@@ -23,7 +23,7 @@ import com.htb.cnk.ui.base.MenuBaseActivity;
  * 
  */
 public class MenuActivity extends MenuBaseActivity {
-	private final String TAG = "MenuActivity";
+	public final String TAG = "MenuActivity";
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +61,7 @@ public class MenuActivity extends MenuBaseActivity {
 		mCategoriesLst.setOnItemClickListener(CategoryListClicked);
 	}
 	
-	public void updateDishes(final int position) {
+	private void updateDishes(final int position) {
 		mDishes.clear();
 		mDishLstAdapter.notifyDataSetChanged();
 		// new Thread() {
@@ -76,7 +76,7 @@ public class MenuActivity extends MenuBaseActivity {
 		mDishLstAdapter.notifyDataSetChanged();
 	}
 	
-	public void setListData() {
+	private void setListData() {
 		if (mCategories.count() <= 0) {
 			errorAccurDlg("菜谱数据损坏,请更新菜谱!", FINISH_ACTIVITY);
 			Log.e(TAG, "menu data base is broken, categories.count <= 0");
@@ -91,7 +91,7 @@ public class MenuActivity extends MenuBaseActivity {
 		mCategoriesLst.setAdapter(new CategoryListAdapter(this, mCategories));
 	}
 
-	public void setDishes() {
+	private void setDishes() {
 		mDishLstAdapter = new DishListAdapter(this, mDishes) {
 			@Override
 			public View getView(int position, View convertView, ViewGroup arg2) {
@@ -117,7 +117,7 @@ public class MenuActivity extends MenuBaseActivity {
 		updateDishes(0);
 	}
 
-	public void showGuide() {
+	private void showGuide() {
 		final Dialog dialog = new Dialog(MenuActivity.this,
 				R.style.FULLTANCStyle);
 
@@ -134,7 +134,7 @@ public class MenuActivity extends MenuBaseActivity {
 		dialog.show();
 	}
 
-	OnItemClickListener CategoryListClicked = new OnItemClickListener() {
+	private OnItemClickListener CategoryListClicked = new OnItemClickListener() {
 
 		@Override
 		public void onItemClick(AdapterView<?> arg0, View view, int position,
@@ -146,7 +146,7 @@ public class MenuActivity extends MenuBaseActivity {
 		}
 	};
 
-	OnClickListener backBtnClicked = new OnClickListener() {
+	private OnClickListener backBtnClicked = new OnClickListener() {
 
 		@Override
 		public void onClick(View v) {
@@ -154,7 +154,7 @@ public class MenuActivity extends MenuBaseActivity {
 		}
 	};
 
-	OnClickListener settingBtnClicked = new OnClickListener() {
+	private OnClickListener settingBtnClicked = new OnClickListener() {
 		@Override
 		public void onClick(View v) {
 			Intent intent = new Intent();

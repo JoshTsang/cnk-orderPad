@@ -143,7 +143,6 @@ public class Statistics {
 		mSalesData.clear();
 		mTotalAmount = 0;
 		try {
-			//Log.d("statictics timestamp", "start:" + startDT + " end:" + endDT);
 			Cursor resultSet = mDbSales.query(CnkDbHelper.SALES_DATA, new String[] {"dish_id",
 					  "sum(price*quantity)",
 					  "sum(quantity)"},
