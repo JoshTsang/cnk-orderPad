@@ -44,7 +44,7 @@ public class ManageActivity extends BaseActivity {
 		fillData();
 	}
 
-	private void fillData() {
+	public void fillData() {
 		SharedPreferences sharedPre = ManageActivity.this.getSharedPreferences("userInfo",
 				Context.MODE_PRIVATE);
 		String menuBackupTime = sharedPre.getString("menuBackupTime", "尚未备份");

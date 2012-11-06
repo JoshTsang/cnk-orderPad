@@ -106,9 +106,6 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 	 * 
 	 */
 	private void findViews() {
-		//TODO
-		
-		
 		LayoutInflater inflater = (LayoutInflater) TableGridDeskActivity.this
 				.getSystemService(LAYOUT_INFLATER_SERVICE);
 		layout = inflater.inflate(R.layout.viewpage, null);
@@ -123,6 +120,7 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 		return layout;
 	}
 
+	@SuppressWarnings("deprecation")
 	public void initPagerView() {
 		setCurPage(0);
 		mPageView.getLayoutParams().height = this.getWindowManager()

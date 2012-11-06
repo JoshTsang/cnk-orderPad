@@ -321,7 +321,7 @@ public class Statistics {
 		}
 		
 		if (mCnkDbUser != null) {
-			mDbSales.close();
+			mDbUser.close();
 		}
 		super.finalize();
 	}
