@@ -1,8 +1,5 @@
 package com.htb.cnk.ui.base;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -20,14 +17,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.htb.cnk.R;
 import com.htb.cnk.adapter.GuidePageAdapter;
 import com.htb.cnk.adapter.TableAdapter;
-import com.htb.cnk.data.PhoneOrder;
 import com.htb.cnk.data.Setting;
 import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.lib.GuidePageChangeListener;
@@ -39,46 +33,33 @@ import com.htb.cnk.service.NotificationTableService.MyBinder;
 public abstract class TableGridDeskActivity extends BaseActivity {
 
 	private final static String TAG = "TableGridDeskActivity";
-	protected final int UPDATE_TABLE_INFOS = 500;
-	protected final int CHECKOUT_LIST = 1;
-	protected final int COMBINE_DIALOG = 1;
-	protected final int CHANGE_DIALOG = 2;
-
-	protected boolean binderFlag;
-	protected Intent intent;
-
+	private final int UPDATE_TABLE_INFOS = 500;
+	private boolean binderFlag;
+	private Intent intent;
 	private int mTableMsg;
 	private int mRingtoneMsg;
 	public static boolean networkStatus = true;
 
 	private MyReceiver mReceiver;
-	protected NotificationTableService.MyBinder binder;
+	private NotificationTableService.MyBinder binder;
 
-	protected List<String> tableName = new ArrayList<String>();
-	protected List<Integer> selectedTable = new ArrayList<Integer>();
+	private TableSetting mSettings;
+	private Ringtone mRingtone;
 
-	protected PhoneOrder mPhoneOrder;
-	protected TableSetting mSettings;
-	protected Ringtone mRingtone;
+	private Button mOrderNotification;
+	private TextView mStatusBar;
 
-	protected EditText tableIdEdit;
-	protected EditText personsEdit;
-	protected Button mOrderNotification;
-	protected TextView mStatusBar;
-
-	protected int currentPage;
-	protected boolean isPrinterErrShown = false;
-	protected TableAdapter mTableInfo;
-	protected GuidePageAdapter guidePageAdapter;
+	private int currentPage;
+	private boolean isPrinterErrShown = false;
+	private TableAdapter mTableInfo;
+	private GuidePageAdapter guidePageAdapter;
 
 	public final static int EXTERN_PAGE_NUM = 1; // 除了楼层以外还有几个页面
-	public boolean flag = false;
+	private boolean flag = false;
 	private ViewPager mPageView;
-	private ArrayList<View> pageViewsList;
 	private View layout;
 	private TextView imgCur;
-	private LinearLayout layoutBottom;
-	protected AlertDialog.Builder mNetWrorkAlertDialog;
+	private AlertDialog.Builder mNetWrorkAlertDialog;
 
 	@Override
 	protected void onResume() {
@@ -114,7 +95,6 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 	}
 
 	private void setNewClass() {
-		mPhoneOrder = new PhoneOrder(TableGridDeskActivity.this);
 		setSettings(new TableSetting(TableGridDeskActivity.this));
 		mRingtone = new Ringtone(TableGridDeskActivity.this);
 		mTableInfo = new TableAdapter(mSettings, TableGridDeskActivity.this);
@@ -126,38 +106,30 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 	 * 
 	 */
 	private void findViews() {
-		imgCur = new TextView(TableGridDeskActivity.this);
+		//TODO
+		
+		
 		LayoutInflater inflater = (LayoutInflater) TableGridDeskActivity.this
 				.getSystemService(LAYOUT_INFLATER_SERVICE);
 		layout = inflater.inflate(R.layout.viewpage, null);
 		mPageView = (ViewPager) layout.findViewById(R.id.viewPager);
-		layoutBottom = (LinearLayout) layout
-				.findViewById(R.id.layout_scr_bottom);
+		mOrderNotification = (Button) layout.findViewById(R.id.orderNotification);
+		mStatusBar = (TextView) layout.findViewById(R.id.statusBar);
+		imgCur = (TextView)layout.findViewById(R.id.text);
+	
 	}
 
 	protected View getPageView() {
 		return layout;
 	}
 
-	public void initViewPager() {
-		addLayoutBottom();
+	public void initPagerView() {
 		setCurPage(0);
 		mPageView.getLayoutParams().height = this.getWindowManager()
 				.getDefaultDisplay().getHeight() * 4 / 5;
-		pageViewsList = new ArrayList<View>();
-		pageViewsList.add(getLayoutInflater().inflate(R.layout.gridview, null));
 		mPageView.setAdapter(guidePageAdapter);
 		mPageView.setOnPageChangeListener(new GuidePageChangeListener(
 				TableGridDeskActivity.this, mTableInfo));
-	}
-
-	/**
-	 * 
-	 */
-	private void addLayoutBottom() {
-		imgCur.setTextColor(0xFF4D2412);
-		imgCur.setTextSize(22);
-		layoutBottom.addView(imgCur);
 	}
 
 	/**
@@ -279,7 +251,6 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 		new Thread() {
 			public void run() {
 				try {
-					// mTableHandler.sendEmptyMessage(DISABLE_GRIDVIEW);
 					int ret = getSettings().parseTableSetting(msg);
 					if (ret < 0) {
 						tableHandler.sendEmptyMessage(ret);
@@ -305,13 +276,13 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 				// if (NETWORK_ARERTDIALOG == 1) {
 				// mNetWrorkcancel.cancel();
 				// }
-				showNetworkErrDlg(getResources().getString(
-						R.string.networkErrorWarning));
+//				showNetworkErrDlg(getResources().getString(
+//						R.string.networkErrorWarning));
 			} else {
 				switch (msg.what) {
 				case UPDATE_TABLE_INFOS:
 					if (!flag) {
-						initViewPager();
+						initPagerView();
 					}
 					updateGridViewAdapter(currentPage);
 					flag = true;
@@ -334,6 +305,7 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 	Handler ringtoneHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			if (msg.what > 0) {
+				Log.d(TAG, "ringtone");
 				mRingtone.play();
 			}
 		}
@@ -387,7 +359,6 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 	}
 
 	public void sendTableHandler(int what) {
-		Log.e(TAG, "what" + what);
 		tableHandler.sendEmptyMessage(what);
 	}
 
@@ -397,11 +368,6 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 
 	public Handler getRingtoneHandler() {
 		return ringtoneHandler;
-	}
-
-	public void setRingtoneHandler(Handler mRingtoneHandler) {
-		this.ringtoneHandler = mRingtoneHandler;
-		sendRingtoneMsg();
 	}
 
 	public void sendTableMsg() {
@@ -425,4 +391,5 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 	public static boolean isNetworkStatus() {
 		return networkStatus;
 	}
+
 }

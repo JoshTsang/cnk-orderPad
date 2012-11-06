@@ -55,50 +55,13 @@
                 android:textSize="35dip" />
         </LinearLayout>
 
-        <LinearLayout
+        <FrameLayout
             android:id="@+id/scr"
             android:layout_width="match_parent"
             android:layout_height="fill_parent"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp" >
-        </LinearLayout>
-
-       
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="30dip"
-        android:layout_gravity="center|bottom"
-        android:layout_marginBottom="4dip"
-        android:layout_marginLeft="200dp" >
-
-        <Button
-            android:id="@+id/orderNotification"
-            android:layout_width="wrap_content"
-            android:layout_height="30dip"
-            android:background="#45000000"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:visibility="invisible" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top|center"
-        android:layout_marginTop="50dp" >
-
-        <TextView
-            android:id="@+id/statusBar"
-            android:layout_width="fill_parent"
-            android:layout_height="28dp"
-            android:background="#A0FF0000"
-            android:gravity="center"
-            android:textColor="#FFFFFF"
-            android:textSize="20dp"
-            android:textStyle="bold"
-            android:visibility="invisible" />
+        </FrameLayout>
     </LinearLayout>
 
 </FrameLayout>

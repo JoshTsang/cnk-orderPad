@@ -90,7 +90,6 @@ public class GridBaseActivity extends Activity {
 				R.array.normalStatus);
 		if (mItemDialog != null)
 			return mItemDialog.itemChooseFunctionDialog(additems, addListener);
-		Log.e(TAG, "null");
 		return null;
 	}
 
@@ -610,7 +609,6 @@ public class GridBaseActivity extends Activity {
 			if (msg.what < 0) {
 
 			} else {
-				Log.d("Grid", msg.what+"msg");
 				Intent intent = new Intent(
 						NotificationTableService.SERVICE_IDENTIFIER);
 				Bundle bundle = new Bundle();
@@ -624,7 +622,7 @@ public class GridBaseActivity extends Activity {
 	Handler ringtoneHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			if (msg.what > 0) {
-				// mRingtone.play();
+				 mRingtone.play();
 			}
 		}
 	};
@@ -641,8 +639,8 @@ public class GridBaseActivity extends Activity {
 				break;
 			case -1:
 				showNetworkErrDlg("转台失败，"
-						+ getResources()
-								.getString(R.string.networkErrorWarning));
+						+ mContext.getResources().getString(
+								R.string.networkErrorWarning));
 				break;
 			default:
 				if (!isPrinterError(msg)) {
@@ -672,8 +670,8 @@ public class GridBaseActivity extends Activity {
 				break;
 			case -1:
 				showNetworkErrDlg("复制失败，"
-						+ getResources()
-								.getString(R.string.networkErrorWarning));
+						+ mContext.getResources().getString(
+								R.string.networkErrorWarning));
 				break;
 			default:
 				intent.setClass(mContext, MyOrderActivity.class);
@@ -696,8 +694,8 @@ public class GridBaseActivity extends Activity {
 				break;
 			case -1:
 				showNetworkErrDlg("合并出错，"
-						+ getResources()
-								.getString(R.string.networkErrorWarning));
+						+ mContext.getResources().getString(
+								R.string.networkErrorWarning));
 				break;
 			default:
 				if (isPrinterError(msg)) {

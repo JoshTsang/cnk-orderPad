@@ -14,8 +14,7 @@ import android.os.Message;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.widget.FrameLayout;
 
 import com.htb.cnk.data.Info;
 import com.htb.cnk.ui.base.TableGridDeskActivity;
@@ -23,19 +22,20 @@ import com.htb.cnk.ui.base.TableGridDeskActivity;
 public class TableActivity extends TableGridDeskActivity {
 
 	static final String TAG = "TableActivity";
-	protected int NETWORK_ARERTDIALOG = 0;
-	protected double mIncome;
-	protected double mChange;
-	protected double mTotalPrice;
-	protected AlertDialog.Builder mChangeDialog;
-	protected Handler mTotalPriceTableHandler;
-	protected Handler mCheckOutHandler;
-
-	protected Button mBackBtn;
-	protected Button mUpdateBtn;
-	protected Button mStatisticsBtn;
-	protected Button mManageBtn;
-	private LinearLayout layoutViewPager;
+	private int NETWORK_ARERTDIALOG = 0;
+	private double mTotalPrice;
+	private Handler mTotalPriceTableHandler;
+	private Handler mCheckOutHandler;
+	private List<String> tableName = new ArrayList<String>();
+	private List<Integer> selectedTable = new ArrayList<Integer>();
+	private Button mBackBtn;
+	private Button mUpdateBtn;
+	private Button mStatisticsBtn;
+	private Button mManageBtn;
+	private FrameLayout layoutViewPager;
+	private final int CHECKOUT_LIST = 1;
+	private AlertDialog.Builder mNetWrorkAlertDialog;
+	private Intent intent;
 
 	@Override
 	protected void onResume() {
@@ -47,29 +47,16 @@ public class TableActivity extends TableGridDeskActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.table_activity);
 		findViews();
-		mpDialog.show();
 		setClickListeners();
 		mTotalPriceTableHandler = totalPriceTableHandler;
-		// setHandler();
-
 	}
-
-	// private void setHandler() {
-	// mNotificationHandler = notificationHandler;
-	// mTotalPriceTableHandler = totalPriceTableHandler;
-	// mChangeTIdHandler = changeTIdHandler;
-	// mCopyTIdHandler = copyTIdHandler;
-	// mCombineTIdHandler = combineTIdHandler;
-	// }
 
 	private void findViews() {
 		mBackBtn = (Button) findViewById(R.id.back);
 		mUpdateBtn = (Button) findViewById(R.id.checkOutTable);
 		mStatisticsBtn = (Button) findViewById(R.id.logout);
 		mManageBtn = (Button) findViewById(R.id.management);
-		layoutViewPager = (LinearLayout) findViewById(R.id.scr);
-		mOrderNotification = (Button) findViewById(R.id.orderNotification);
-		mStatusBar = (TextView) findViewById(R.id.statusBar);
+		layoutViewPager = (FrameLayout) findViewById(R.id.scr);
 	}
 
 	protected void setClickListeners() {
