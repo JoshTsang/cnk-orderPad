@@ -24,7 +24,6 @@ public class TableActivity extends TableGridDeskActivity {
 	static final String TAG = "TableActivity";
 	private int NETWORK_ARERTDIALOG = 0;
 	private double mTotalPrice;
-	private Handler mTotalPriceTableHandler;
 	private Handler mCheckOutHandler;
 	private List<String> tableName = new ArrayList<String>();
 	private List<Integer> selectedTable = new ArrayList<Integer>();
@@ -35,12 +34,6 @@ public class TableActivity extends TableGridDeskActivity {
 	private FrameLayout layoutViewPager;
 	private final int CHECKOUT_LIST = 1;
 	private AlertDialog.Builder mNetWrorkAlertDialog;
-	private Intent intent;
-
-	@Override
-	protected void onResume() {
-		super.onResume();
-	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +41,6 @@ public class TableActivity extends TableGridDeskActivity {
 		setContentView(R.layout.table_activity);
 		findViews();
 		setClickListeners();
-		mTotalPriceTableHandler = totalPriceTableHandler;
 	}
 
 	private void findViews() {
@@ -67,103 +59,6 @@ public class TableActivity extends TableGridDeskActivity {
 		mNetWrorkAlertDialog = networkDialog();
 		layoutViewPager.addView(getPageView());
 	}
-
-	// TODO define
-	Handler changeTIdHandler = new Handler() {
-		public void handleMessage(Message msg) {
-			mpDialog.cancel();
-			switch (msg.what) {
-			case -10:
-				toastText("本地数据库出错，请从网络重新更新数据库");
-				break;
-			case -2:
-				toastText(R.string.changeTIdWarning);
-				break;
-			case -1:
-				showNetworkErrDlg("转台失败，"
-						+ getResources()
-								.getString(R.string.networkErrorWarning));
-				break;
-			default:
-				if (!isPrinterError(msg)) {
-					binderStart();
-				}
-				toastText(R.string.changeSucc);
-				break;
-			}
-		}
-	};
-
-	// TODO define
-	Handler copyTIdHandler = new Handler() {
-		public void handleMessage(Message msg) {
-			mpDialog.cancel();
-			switch (msg.what) {
-			case -10:
-				toastText("本地数据库出错，请从网络重新更新数据库");
-				break;
-			case -2:
-				toastText(R.string.copyTIdwarning);
-				break;
-			case -1:
-				showNetworkErrDlg("复制失败，"
-						+ getResources()
-								.getString(R.string.networkErrorWarning));
-				break;
-			default:
-				intent.setClass(TableActivity.this, MyOrderActivity.class);
-				Info.setMode(Info.WORK_MODE_WAITER);
-				TableActivity.this.startActivity(intent);
-				break;
-			}
-		}
-	};
-
-	Handler combineTIdHandler = new Handler() {
-		public void handleMessage(Message msg) {
-			mpDialog.cancel();
-			switch (msg.what) {
-			case -10:
-				toastText("本地数据库出错，请从网络重新更新数据库");
-				break;
-			case -2:
-				toastText(R.string.checkOutWarning);
-				break;
-			case -1:
-				showNetworkErrDlg("合并出错，"
-						+ getResources()
-								.getString(R.string.networkErrorWarning));
-				break;
-			default:
-				if (isPrinterError(msg)) {
-					toastText(R.string.combineError);
-				} else {
-					binderStart();
-					toastText(R.string.combineSucc);
-				}
-				break;
-			}
-		}
-	};
-
-	Handler notificationHandler = new Handler() {
-		public void handleMessage(Message msg) {
-			if (msg.what < 0) {
-				toastText(R.string.notificationWarning);
-			} else {
-				binderStart();
-			}
-		}
-	};
-
-	Handler notificationTypeHandler = new Handler() {
-		public void handleMessage(Message msg) {
-			mpDialog.cancel();
-			if (msg.what < 0) {
-				toastText(R.string.notificationTypeWarning);
-			}
-		}
-	};
 
 	Handler totalPriceTableHandler = new Handler() {
 		public void handleMessage(Message msg) {
@@ -279,14 +174,14 @@ public class TableActivity extends TableGridDeskActivity {
 		}
 	}
 
-	void getTotalPriceTable() {
+	private void getTotalPriceTable() {
 		new Thread() {
 			public void run() {
 				try {
 					double ret = getSettings().getTotalPriceTable(
 							selectedTable, tableName);
 					mTotalPrice = ret;
-					mTotalPriceTableHandler.sendEmptyMessage((int) ret);
+					totalPriceTableHandler.sendEmptyMessage((int) ret);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

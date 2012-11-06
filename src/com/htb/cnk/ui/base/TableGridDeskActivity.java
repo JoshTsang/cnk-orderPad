@@ -79,11 +79,6 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 	}
 
 	@Override
-	protected void onStop() {
-		super.onStop();
-	}
-
-	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setNewClass();
@@ -106,9 +101,6 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 	 * 
 	 */
 	private void findViews() {
-		//TODO
-		
-		
 		LayoutInflater inflater = (LayoutInflater) TableGridDeskActivity.this
 				.getSystemService(LAYOUT_INFLATER_SERVICE);
 		layout = inflater.inflate(R.layout.viewpage, null);
@@ -123,6 +115,7 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 		return layout;
 	}
 
+	@SuppressWarnings("deprecation")
 	public void initPagerView() {
 		setCurPage(0);
 		mPageView.getLayoutParams().height = this.getWindowManager()
@@ -305,7 +298,6 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 	Handler ringtoneHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			if (msg.what > 0) {
-				Log.d(TAG, "ringtone");
 				mRingtone.play();
 			}
 		}
@@ -360,10 +352,6 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 
 	public void sendTableHandler(int what) {
 		tableHandler.sendEmptyMessage(what);
-	}
-
-	public void setTableHandler(Handler mTableHandler) {
-		this.tableHandler = mTableHandler;
 	}
 
 	public Handler getRingtoneHandler() {

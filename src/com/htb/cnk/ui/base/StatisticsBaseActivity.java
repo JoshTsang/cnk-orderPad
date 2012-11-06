@@ -5,7 +5,6 @@ import java.util.Calendar;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
-import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -49,7 +48,6 @@ public class StatisticsBaseActivity extends BaseActivity {
 	protected TextView mPersons;
 	protected TextView mTotalAmount;
 	protected ListView mSalesData;
-	protected ProgressDialog mpDialog;
 	protected Calendar mStart = Calendar.getInstance();
 	protected Calendar mEnd = Calendar.getInstance();
 	protected Calendar mStartSet = Calendar.getInstance();
@@ -186,10 +184,6 @@ public class StatisticsBaseActivity extends BaseActivity {
 	}
 
 	private void downloadDB() {
-		mpDialog = new ProgressDialog(StatisticsBaseActivity.this);
-		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-		mpDialog.setIndeterminate(false);
-		mpDialog.setCancelable(false);
 		showProgressDlg("正在加载销售数据...");
 		new Thread() {
 			public void run() {
