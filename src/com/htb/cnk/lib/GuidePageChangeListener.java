@@ -13,9 +13,9 @@ public class GuidePageChangeListener implements OnPageChangeListener {
 		mActivity = activity;
 		mTableInfo = tableAdaoter;
 	}
+	
 	public void onPageScrollStateChanged(int arg0) {
 		// TODO Auto-generated method stub
-
 	}
 
 	public void onPageScrolled(int arg0, float arg1, int arg2) {

@@ -34,55 +34,55 @@ import com.htb.cnk.data.PhoneOrder;
 import com.htb.cnk.data.Setting;
 import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.dialog.ItemDlg;
-import com.htb.cnk.dialog.MultiChoiceItemsDlg;
 import com.htb.cnk.dialog.TitleAndMessageDlg;
 import com.htb.cnk.dialog.ViewDlg;
 import com.htb.cnk.lib.Ringtone;
 import com.htb.cnk.service.NotificationTableService;
 import com.htb.constant.ErrorNum;
 import com.htb.constant.Table;
-import com.umeng.common.Log;
 
 public class GridBaseActivity extends Activity {
 	private static final String TAG = "GridBaseActivity";
-	protected final int UPDATE_TABLE_INFOS = 500;
-	protected final int CHECKOUT_LIST = 1;
-	protected final int COMBINE_DIALOG = 1;
-	protected final int CHANGE_DIALOG = 2;
+	private final int UPDATE_TABLE_INFOS = 500;
+	private final int COMBINE_DIALOG = 1;
+	private final int CHANGE_DIALOG = 2;
 
-	protected Notifications mNotification = new Notifications();
-	protected NotificationTypes mNotificationType = new NotificationTypes();
-
-	protected List<String> tableName = new ArrayList<String>();
-	protected List<Integer> selectedTable = new ArrayList<Integer>();
-
-	protected PhoneOrder mPhoneOrder;
-	protected TableSetting mSettings;
-	protected Ringtone mRingtone;
-	protected EditText tableIdEdit;
-	protected EditText personsEdit;
-	protected Intent intent;
+	private Notifications mNotification = new Notifications();
+	private NotificationTypes mNotificationType = new NotificationTypes();
+	private List<Integer> selectedTable = new ArrayList<Integer>();
+	private PhoneOrder mPhoneOrder;
+	private TableSetting mSettings;
+	private Ringtone mRingtone;
+	private EditText tableIdEdit;
+	private EditText personsEdit;
+	private Intent intent;
 	private Context mContext;
-
-	protected TitleAndMessageDlg mTitleAndMessageDialog;
-	protected ItemDlg mItemDialog;
-	protected ViewDlg mViewDialog;
-	protected MultiChoiceItemsDlg mMultiChoiceItemsDialog;
-	protected ProgressDialog mpDialog;
-	protected AlertDialog.Builder mNetWrorkAlertDialog;
+	private TitleAndMessageDlg mTitleAndMessageDialog;
+	private ItemDlg mItemDialog;
+	private ViewDlg mViewDialog;
+	private ProgressDialog mpDialog;
+	private AlertDialog.Builder mNetWrorkAlertDialog;
 
 	public GridBaseActivity(Context context) {
 		super();
 		mTitleAndMessageDialog = new TitleAndMessageDlg(context);
 		mItemDialog = new ItemDlg(context);
 		mViewDialog = new ViewDlg(context);
-		mMultiChoiceItemsDialog = new MultiChoiceItemsDlg(context);
 		mContext = context;
 		mPhoneOrder = new PhoneOrder(context);
 		intent = new Intent();
 		initProgressDlg();
 		setSettings(new TableSetting(mContext));
 		NotificationType();
+	}
+
+	public void toastText(String r) {
+		Toast.makeText(mContext.getApplicationContext(), r, Toast.LENGTH_LONG)
+				.show();
+	}
+
+	public void networkErrDlg() {
+		toastText(R.string.functionDisableCauseNetworkUnavalialbe);
 	}
 
 	public AlertDialog.Builder addDialog() {
@@ -93,11 +93,13 @@ public class GridBaseActivity extends Activity {
 		return null;
 	}
 
-	public AlertDialog.Builder cleanTableDialog() {
-		return mTitleAndMessageDialog.messageDialog(false, mContext
-				.getResources().getString(R.string.isCleanTable), mContext
-				.getResources().getString(R.string.yes), cleanTableListener,
-				mContext.getResources().getString(R.string.no), null);
+	public AlertDialog.Builder notificationDialog() {
+		List<String> add = mNotification.getNotifiycationsType(Info
+				.getTableId());
+		String[] additems = (String[]) add.toArray(new String[add.size()]);
+		return mItemDialog.itemButtonDialog(false, mContext.getResources()
+				.getString(R.string.customerCall), additems, null, null,
+				notificationListener);
 	}
 
 	public AlertDialog.Builder cleanDialog() {
@@ -106,7 +108,27 @@ public class GridBaseActivity extends Activity {
 		return mItemDialog.itemChooseFunctionDialog(cleanitems, cleanListener);
 	}
 
-	DialogInterface.OnClickListener cleanListener = new DialogInterface.OnClickListener() {
+	public AlertDialog.Builder addPhoneDialog(final int position) {
+		final CharSequence[] additems = mContext.getResources().getStringArray(
+				R.array.phoneStatus);
+		DialogInterface.OnClickListener addPhoneListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				addPhoneChoiceMode(position, which);
+			}
+		};
+
+		return mItemDialog.itemChooseFunctionDialog(additems, addPhoneListener);
+	}
+
+	private AlertDialog.Builder cleanTableDialog() {
+		return mTitleAndMessageDialog.messageDialog(false, mContext
+				.getResources().getString(R.string.isCleanTable), mContext
+				.getResources().getString(R.string.yes), cleanTableListener,
+				mContext.getResources().getString(R.string.no), null);
+	}
+
+	private DialogInterface.OnClickListener cleanListener = new DialogInterface.OnClickListener() {
 		@Override
 		public void onClick(DialogInterface dialog, int which) {
 			cleanChioceMode(which);
@@ -150,21 +172,12 @@ public class GridBaseActivity extends Activity {
 		}
 	}
 
-	public void networkErrDlg() {
-		toastText(R.string.functionDisableCauseNetworkUnavalialbe);
-	}
-
-	public void toastText(int r) {
+	private void toastText(int r) {
 		Toast.makeText(mContext.getApplicationContext(),
 				mContext.getResources().getString(r), Toast.LENGTH_LONG).show();
 	}
 
-	public void toastText(String r) {
-		Toast.makeText(mContext.getApplicationContext(), r, Toast.LENGTH_LONG)
-				.show();
-	}
-
-	protected void initProgressDlg() {
+	private void initProgressDlg() {
 		mpDialog = new ProgressDialog(mContext);
 		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 		mpDialog.setIndeterminate(false);
@@ -173,7 +186,7 @@ public class GridBaseActivity extends Activity {
 				.getString(R.string.pleaseWait));
 	}
 
-	public void showProgressDlg(String msg) {
+	private void showProgressDlg(String msg) {
 		mpDialog.setMessage(msg);
 		mpDialog.show();
 	}
@@ -187,7 +200,7 @@ public class GridBaseActivity extends Activity {
 		}
 	}
 
-	DialogInterface.OnClickListener cleanTableListener = new DialogInterface.OnClickListener() {
+	private DialogInterface.OnClickListener cleanTableListener = new DialogInterface.OnClickListener() {
 		@Override
 		public void onClick(DialogInterface dialog, int i) {
 			showProgressDlg(mContext.getResources().getString(
@@ -198,10 +211,9 @@ public class GridBaseActivity extends Activity {
 		}
 	};
 
-	DialogInterface.OnClickListener addListener = new DialogInterface.OnClickListener() {
+	private DialogInterface.OnClickListener addListener = new DialogInterface.OnClickListener() {
 		@Override
 		public void onClick(DialogInterface dialog, int which) {
-			Log.d(TAG, "addListener");
 			mPhoneOrder.clear();
 			addDialogChoiceMode(which);
 		}
@@ -234,7 +246,7 @@ public class GridBaseActivity extends Activity {
 		}
 	}
 
-	public AlertDialog.Builder cleanPhoneDialog(final int position) {
+	private AlertDialog.Builder cleanPhoneDialog(final int position) {
 		DialogInterface.OnClickListener cleanPhoneListener = new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int i) {
@@ -248,19 +260,6 @@ public class GridBaseActivity extends Activity {
 				.getResources().getString(R.string.isCleanOrder), mContext
 				.getResources().getString(R.string.yes), cleanPhoneListener,
 				mContext.getResources().getString(R.string.no), null);
-	}
-
-	public AlertDialog.Builder addPhoneDialog(final int position) {
-		final CharSequence[] additems = mContext.getResources().getStringArray(
-				R.array.phoneStatus);
-		DialogInterface.OnClickListener addPhoneListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				addPhoneChoiceMode(position, which);
-			}
-		};
-
-		return mItemDialog.itemChooseFunctionDialog(additems, addPhoneListener);
 	}
 
 	private void addPhoneChoiceMode(final int position, int which) {
@@ -277,28 +276,19 @@ public class GridBaseActivity extends Activity {
 		}
 	}
 
-	protected void setClassToActivity(Class<?> setClass) {
+	private void setClassToActivity(Class<?> setClass) {
 		intent.setClass(mContext, setClass);
 		mContext.startActivity(intent);
 	}
 
-	public AlertDialog.Builder notificationDialog() {
-		List<String> add = mNotification.getNotifiycationsType(Info
-				.getTableId());
-		String[] additems = (String[]) add.toArray(new String[add.size()]);
-		return mItemDialog.itemButtonDialog(false, mContext.getResources()
-				.getString(R.string.customerCall), additems, null, null,
-				notificationListener);
-	}
-
-	DialogInterface.OnClickListener notificationListener = new DialogInterface.OnClickListener() {
+	private DialogInterface.OnClickListener notificationListener = new DialogInterface.OnClickListener() {
 		@Override
 		public void onClick(DialogInterface dialog, int which) {
 			cleanNotification();
 		}
 	};
 
-	protected Builder changeOrCombineDialog(final int type) {
+	private Builder changeOrCombineDialog(final int type) {
 		final AlertDialog.Builder changeTableAlertDialog;
 		View layout = getDialogLayout(R.layout.change_dialog,
 				R.id.change_dialog);
@@ -348,7 +338,7 @@ public class GridBaseActivity extends Activity {
 		return changeTableAlertDialog;
 	}
 
-	protected Builder copyTableDialog() {
+	private Builder copyTableDialog() {
 		final EditText copyTableText = editTextListener();
 		copyTableText.addTextChangedListener(watcher(copyTableText));
 
@@ -386,7 +376,7 @@ public class GridBaseActivity extends Activity {
 		return layout;
 	}
 
-	protected void cleanNotification() {
+	private void cleanNotification() {
 		new Thread() {
 			public void run() {
 				try {
@@ -400,7 +390,7 @@ public class GridBaseActivity extends Activity {
 		}.start();
 	}
 
-	protected void cleanTableThread(final List<Integer> tableId) {
+	private void cleanTableThread(final List<Integer> tableId) {
 		new Thread() {
 			public void run() {
 				try {
@@ -423,7 +413,7 @@ public class GridBaseActivity extends Activity {
 		}.start();
 	}
 
-	protected void cleanPhoneThread(final int position, final int tableId) {
+	private void cleanPhoneThread(final int position, final int tableId) {
 		new Thread() {
 			public void run() {
 				try {
@@ -497,7 +487,7 @@ public class GridBaseActivity extends Activity {
 		}.start();
 	}
 
-	protected void NotificationType() {
+	private void NotificationType() {
 		new Thread() {
 			public void run() {
 				try {
@@ -565,7 +555,7 @@ public class GridBaseActivity extends Activity {
 		}
 	}
 
-	public TextWatcher watcher(final EditText id) {
+	private TextWatcher watcher(final EditText id) {
 		TextWatcher watcher = new TextWatcher() {
 			String tempStr;
 			EditText edit;
@@ -595,7 +585,7 @@ public class GridBaseActivity extends Activity {
 		return watcher;
 	}
 
-	int getTableStatusFromServer() {
+	private int getTableStatusFromServer() {
 		int ret = getSettings().getTableStatusFromServerActivity();
 		if (ret < 0) {
 			tableHandler.sendEmptyMessage(ret);
@@ -603,7 +593,7 @@ public class GridBaseActivity extends Activity {
 		return ret;
 	}
 
-	Handler tableHandler = new Handler() {
+	private Handler tableHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
 			if (msg.what < 0) {
@@ -619,15 +609,15 @@ public class GridBaseActivity extends Activity {
 		}
 	};
 
-	Handler ringtoneHandler = new Handler() {
+	private Handler ringtoneHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			if (msg.what > 0) {
-				 mRingtone.play();
+				mRingtone.play();
 			}
 		}
 	};
 
-	Handler changeTIdHandler = new Handler() {
+	private Handler changeTIdHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
 			switch (msg.what) {
@@ -652,13 +642,13 @@ public class GridBaseActivity extends Activity {
 		}
 	};
 
-	protected boolean isPrinterError(Message msg) {
+	private boolean isPrinterError(Message msg) {
 		return msg.what == ErrorNum.PRINTER_ERR_CONNECT_TIMEOUT
 				|| msg.what == ErrorNum.PRINTER_ERR_NO_PAPER;
 	}
 
 	// TODO define
-	Handler copyTIdHandler = new Handler() {
+	private Handler copyTIdHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
 			switch (msg.what) {
@@ -682,7 +672,7 @@ public class GridBaseActivity extends Activity {
 		}
 	};
 
-	Handler combineTIdHandler = new Handler() {
+	private Handler combineTIdHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
 			switch (msg.what) {
@@ -709,11 +699,11 @@ public class GridBaseActivity extends Activity {
 		}
 	};
 
-	protected void showNetworkErrDlg(String msg) {
+	private void showNetworkErrDlg(String msg) {
 		mNetWrorkAlertDialog.setMessage(msg).show();
 	}
 
-	Handler notificationHandler = new Handler() {
+	private Handler notificationHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			if (msg.what < 0) {
 				toastText(R.string.notificationWarning);
@@ -723,7 +713,7 @@ public class GridBaseActivity extends Activity {
 		}
 	};
 
-	protected void binderStart() {
+	private void binderStart() {
 		Intent intent = new Intent(NotificationTableService.SERVICE_IDENTIFIER);
 		Bundle bundle = new Bundle();
 		intent.putExtra("binder", true);
@@ -731,7 +721,7 @@ public class GridBaseActivity extends Activity {
 		mContext.sendBroadcast(intent);
 	}
 
-	Handler notificationTypeHandler = new Handler() {
+	private Handler notificationTypeHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
 			if (msg.what < 0) {
@@ -740,11 +730,11 @@ public class GridBaseActivity extends Activity {
 		}
 	};
 
-	public TableSetting getSettings() {
+	private TableSetting getSettings() {
 		return mSettings;
 	}
 
-	public void setSettings(TableSetting mSettings) {
+	private void setSettings(TableSetting mSettings) {
 		this.mSettings = mSettings;
 	}
 

@@ -31,6 +31,8 @@ import com.htb.cnk.service.NotificationTableService;
 import com.htb.cnk.service.NotificationTableService.MyBinder;
 
 public abstract class TableGridDeskActivity extends BaseActivity {
+	public static boolean networkStatus = true;
+	public final static int EXTERN_PAGE_NUM = 1; // 除了楼层以外还有几个页面
 
 	private final static String TAG = "TableGridDeskActivity";
 	private final int UPDATE_TABLE_INFOS = 500;
@@ -38,96 +40,99 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 	private Intent intent;
 	private int mTableMsg;
 	private int mRingtoneMsg;
-	public static boolean networkStatus = true;
-
 	private MyReceiver mReceiver;
 	private NotificationTableService.MyBinder binder;
-
 	private TableSetting mSettings;
 	private Ringtone mRingtone;
-
 	private Button mOrderNotification;
 	private TextView mStatusBar;
-
 	private int currentPage;
 	private boolean isPrinterErrShown = false;
 	private TableAdapter mTableInfo;
 	private GuidePageAdapter guidePageAdapter;
-
-	public final static int EXTERN_PAGE_NUM = 1; // 除了楼层以外还有几个页面
 	private boolean flag = false;
 	private ViewPager mPageView;
 	private View layout;
 	private TextView imgCur;
 	private AlertDialog.Builder mNetWrorkAlertDialog;
 
-	@Override
-	protected void onResume() {
-		super.onResume();
-		if (guidePageAdapter.getImageItem() != null) {
-			mTableInfo.clearLstImageItem();
-			updateGridViewAdapter(currentPage);
+	public TableSetting getSettings() {
+		return mSettings;
+	}
+
+	public void setSettings(TableSetting mSettings) {
+		this.mSettings = mSettings;
+	}
+
+	public int getRingtoneMsg() {
+		return mRingtoneMsg;
+	}
+
+	public void setRingtoneMsg(int mRingtoneMsg) {
+		this.mRingtoneMsg = mRingtoneMsg;
+	}
+
+	public int getTableMsg() {
+		return mTableMsg;
+	}
+
+	public void setTableMsg(String mTableMsg) {
+		if (mTableMsg != null) {
+			getParseTableSetting(mTableMsg);
 		}
-
 	}
 
-	@Override
-	protected void onDestroy() {
-		unbindService(conn);
-		unregisterReceiver(mReceiver);
-		super.onDestroy();
+	public void setNetworkStatus(boolean status) {
+		if (!status) {
+			showNetworkErrStatus(getResources().getString(
+					R.string.networkErrorWarning));
+		} else {
+			if (mStatusBar != null) {
+				mStatusBar.setVisibility(View.INVISIBLE);
+			}
+		}
+		networkStatus = status;
 	}
 
-	@Override
-	protected void onStop() {
-		super.onStop();
+	public Handler getTableHandler() {
+		return tableHandler;
 	}
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setNewClass();
-		findViews();
-		startService(NotificationTableService.class);
-		bindService(intent, conn, Context.BIND_AUTO_CREATE);
-		mReceiver = new MyReceiver(TableGridDeskActivity.this);
-		registerReceiver(mReceiver);
+	public void sendTableHandler(int what) {
+		tableHandler.sendEmptyMessage(what);
 	}
 
-	private void setNewClass() {
-		setSettings(new TableSetting(TableGridDeskActivity.this));
-		mRingtone = new Ringtone(TableGridDeskActivity.this);
-		mTableInfo = new TableAdapter(mSettings, TableGridDeskActivity.this);
-		guidePageAdapter = new GuidePageAdapter(TableGridDeskActivity.this,
-				mTableInfo);
+	public Handler getRingtoneHandler() {
+		return ringtoneHandler;
 	}
 
-	/**
-	 * 
-	 */
-	private void findViews() {
-		LayoutInflater inflater = (LayoutInflater) TableGridDeskActivity.this
-				.getSystemService(LAYOUT_INFLATER_SERVICE);
-		layout = inflater.inflate(R.layout.viewpage, null);
-		mPageView = (ViewPager) layout.findViewById(R.id.viewPager);
-		mOrderNotification = (Button) layout.findViewById(R.id.orderNotification);
-		mStatusBar = (TextView) layout.findViewById(R.id.statusBar);
-		imgCur = (TextView)layout.findViewById(R.id.text);
-	
+	public void sendTableMsg() {
+		getTableHandler().sendEmptyMessage(getTableMsg());
 	}
 
-	protected View getPageView() {
-		return layout;
+	public void sendRingtoneMsg() {
+		getRingtoneHandler().sendEmptyMessage(getRingtoneMsg());
 	}
 
-	@SuppressWarnings("deprecation")
-	public void initPagerView() {
-		setCurPage(0);
-		mPageView.getLayoutParams().height = this.getWindowManager()
-				.getDefaultDisplay().getHeight() * 4 / 5;
-		mPageView.setAdapter(guidePageAdapter);
-		mPageView.setOnPageChangeListener(new GuidePageChangeListener(
-				TableGridDeskActivity.this, mTableInfo));
+	public void checkPendedOrder() {
+		if (mPendedOrderNotificationHandler != null) {
+			mPendedOrderNotificationHandler.sendEmptyMessage(0);
+		}
+	}
+
+	public void sendbinderStart() {
+		binderStart();
+	}
+
+	public void binderStart() {
+		if (binderFlag) {
+			binder.start();
+			return;
+		}
+	}
+
+	public static boolean isNetworkStatus() {
+		return networkStatus;
 	}
 
 	/**
@@ -172,7 +177,81 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 		guidePageAdapter.NotifyimageItemDataSetChanged();
 	}
 
-	protected ServiceConnection conn = new ServiceConnection() {
+	@Override
+	protected void onResume() {
+		super.onResume();
+		if (guidePageAdapter.getImageItem() != null) {
+			mTableInfo.clearLstImageItem();
+			updateGridViewAdapter(currentPage);
+		}
+
+	}
+
+	@Override
+	protected void onDestroy() {
+		unbindService(conn);
+		unregisterReceiver(mReceiver);
+		super.onDestroy();
+	}
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setNewClass();
+		findViews();
+		startService(NotificationTableService.class);
+		bindService(intent, conn, Context.BIND_AUTO_CREATE);
+		mReceiver = new MyReceiver(TableGridDeskActivity.this);
+		registerReceiver(mReceiver);
+	}
+
+	protected View getPageView() {
+		return layout;
+	}
+
+	protected void showNetworkErrDlg(String msg) {
+		mNetWrorkAlertDialog.setMessage(msg).show();
+	}
+
+	protected void setClassToActivity(Class<?> setClass) {
+		intent.setClass(TableGridDeskActivity.this, setClass);
+		TableGridDeskActivity.this.startActivity(intent);
+	}
+
+	private void setNewClass() {
+		setSettings(new TableSetting(TableGridDeskActivity.this));
+		mRingtone = new Ringtone(TableGridDeskActivity.this);
+		mTableInfo = new TableAdapter(mSettings, TableGridDeskActivity.this);
+		guidePageAdapter = new GuidePageAdapter(TableGridDeskActivity.this,
+				mTableInfo);
+	}
+
+	/**
+	 * 
+	 */
+	private void findViews() {
+		LayoutInflater inflater = (LayoutInflater) TableGridDeskActivity.this
+				.getSystemService(LAYOUT_INFLATER_SERVICE);
+		layout = inflater.inflate(R.layout.viewpage, null);
+		mPageView = (ViewPager) layout.findViewById(R.id.viewPager);
+		mOrderNotification = (Button) layout
+				.findViewById(R.id.orderNotification);
+		mStatusBar = (TextView) layout.findViewById(R.id.statusBar);
+		imgCur = (TextView) layout.findViewById(R.id.text);
+
+	}
+
+	@SuppressWarnings("deprecation")
+	private void initPagerView() {
+		setCurPage(0);
+		mPageView.getLayoutParams().height = this.getWindowManager()
+				.getDefaultDisplay().getHeight() * 4 / 5;
+		mPageView.setAdapter(guidePageAdapter);
+		mPageView.setOnPageChangeListener(new GuidePageChangeListener(
+				TableGridDeskActivity.this, mTableInfo));
+	}
+
+	private ServiceConnection conn = new ServiceConnection() {
 
 		@Override
 		public void onServiceConnected(ComponentName arg0, IBinder arg1) {
@@ -185,32 +264,25 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 		}
 	};
 
-	protected void showNetworkErrStatus(String messages) {
+	private void showNetworkErrStatus(String messages) {
 		if (mStatusBar != null) {
 			mStatusBar.setVisibility(View.VISIBLE);
 			mStatusBar.setText(messages);
 		}
 	}
 
-	protected void registerReceiver(BroadcastReceiver receiver) {
+	private void registerReceiver(BroadcastReceiver receiver) {
 		IntentFilter filter = new IntentFilter(
 				NotificationTableService.SERVICE_IDENTIFIER);
 		registerReceiver(receiver, filter);
 	}
 
-	protected void startService(Class<?> cla) {
+	private void startService(Class<?> cla) {
 		intent = new Intent(TableGridDeskActivity.this, cla);
 		startService(intent);
 	}
 
-	protected void binderStart() {
-		if (binderFlag) {
-			binder.start();
-			return;
-		}
-	}
-
-	Handler mPendedOrderNotificationHandler = new Handler() {
+	private Handler mPendedOrderNotificationHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			int ret = binder.count();
 			if (ret > 0) {
@@ -263,19 +335,15 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 
 	}
 
-	protected void showNetworkErrDlg(String msg) {
-		mNetWrorkAlertDialog.setMessage(msg).show();
-	}
-
-	public Handler tableHandler = new Handler() {
+	private Handler tableHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
 			if (msg.what < 0) {
 				// if (NETWORK_ARERTDIALOG == 1) {
 				// mNetWrorkcancel.cancel();
 				// }
-//				showNetworkErrDlg(getResources().getString(
-//						R.string.networkErrorWarning));
+				// showNetworkErrDlg(getResources().getString(
+				// R.string.networkErrorWarning));
 			} else {
 				switch (msg.what) {
 				case UPDATE_TABLE_INFOS:
@@ -300,94 +368,12 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 		}
 	};
 
-	Handler ringtoneHandler = new Handler() {
+	private Handler ringtoneHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			if (msg.what > 0) {
-				Log.d(TAG, "ringtone");
 				mRingtone.play();
 			}
 		}
 	};
-
-	protected void setClassToActivity(Class<?> setClass) {
-		intent.setClass(TableGridDeskActivity.this, setClass);
-		TableGridDeskActivity.this.startActivity(intent);
-	}
-
-	public TableSetting getSettings() {
-		return mSettings;
-	}
-
-	public void setSettings(TableSetting mSettings) {
-		this.mSettings = mSettings;
-	}
-
-	public int getRingtoneMsg() {
-		return mRingtoneMsg;
-	}
-
-	public void setRingtoneMsg(int mRingtoneMsg) {
-		this.mRingtoneMsg = mRingtoneMsg;
-	}
-
-	public int getTableMsg() {
-		return mTableMsg;
-	}
-
-	public void setTableMsg(String mTableMsg) {
-		if (mTableMsg != null) {
-			getParseTableSetting(mTableMsg);
-		}
-	}
-
-	public void setNetworkStatus(boolean status) {
-		if (!status) {
-			showNetworkErrStatus(getResources().getString(
-					R.string.networkErrorWarning));
-		} else {
-			if (mStatusBar != null) {
-				mStatusBar.setVisibility(View.INVISIBLE);
-			}
-		}
-		networkStatus = status;
-	}
-
-	public Handler getTableHandler() {
-		return tableHandler;
-	}
-
-	public void sendTableHandler(int what) {
-		tableHandler.sendEmptyMessage(what);
-	}
-
-	public void setTableHandler(Handler mTableHandler) {
-		this.tableHandler = mTableHandler;
-	}
-
-	public Handler getRingtoneHandler() {
-		return ringtoneHandler;
-	}
-
-	public void sendTableMsg() {
-		getTableHandler().sendEmptyMessage(getTableMsg());
-	}
-
-	public void sendRingtoneMsg() {
-		getRingtoneHandler().sendEmptyMessage(getRingtoneMsg());
-	}
-
-	public void checkPendedOrder() {
-		if (mPendedOrderNotificationHandler != null) {
-			mPendedOrderNotificationHandler.sendEmptyMessage(0);
-		}
-	}
-
-	public void sendbinderStart() {
-		binderStart();
-	}
-
-	public static boolean isNetworkStatus() {
-		return networkStatus;
-	}
 
 }

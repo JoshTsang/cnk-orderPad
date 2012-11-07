@@ -9,6 +9,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import com.htb.cnk.adapter.TableAdapter;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.ui.base.GridBaseActivity;
+import com.htb.cnk.ui.base.TableGridDeskActivity;
 
 public class TableItemClickListener implements OnItemClickListener{ 
 	private final static String TAG = "TableItemClickListener";
@@ -53,23 +54,21 @@ public class TableItemClickListener implements OnItemClickListener{
 			break;
 		case 50:
 		case 51:
-//			if (tableGridDesk.isNetworkStatus()) {
-//				tableGridDesk.addPhoneDialog(arg2).show();
-//			} else {
-//				tableGridDesk.networkErrDlg();
-//			}
-			tableGridDesk.addPhoneDialog(arg2).show();
+			if (TableGridDeskActivity.networkStatus) {
+				tableGridDesk.addPhoneDialog(arg2).show();
+			} else {
+				tableGridDesk.networkErrDlg();
+			}
 			break;
 		case 100:
 		case 101:
 		case 150:
 		case 151:
-//			if (tableGridDesk.isNetworkStatus()) {
-//				tableGridDesk.notificationDialog().show();
-//			} else {
-//				tableGridDesk.networkErrDlg();
-//			}
-			tableGridDesk.notificationDialog().show();
+			if (TableGridDeskActivity.networkStatus) {
+				tableGridDesk.notificationDialog().show();
+			} else {
+				tableGridDesk.networkErrDlg();
+			}
 			break;
 		default:
 			tableGridDesk.addDialog().show();

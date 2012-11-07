@@ -21,10 +21,11 @@ import com.htb.cnk.ui.base.TableGridDeskActivity;
 
 public class TableActivity extends TableGridDeskActivity {
 
-	static final String TAG = "TableActivity";
+	private static final String TAG = "TableActivity";
+	private final int CHECKOUT_LIST = 1;
+
 	private int NETWORK_ARERTDIALOG = 0;
 	private double mTotalPrice;
-	private Handler mTotalPriceTableHandler;
 	private Handler mCheckOutHandler;
 	private List<String> tableName = new ArrayList<String>();
 	private List<Integer> selectedTable = new ArrayList<Integer>();
@@ -33,14 +34,7 @@ public class TableActivity extends TableGridDeskActivity {
 	private Button mStatisticsBtn;
 	private Button mManageBtn;
 	private FrameLayout layoutViewPager;
-	private final int CHECKOUT_LIST = 1;
 	private AlertDialog.Builder mNetWrorkAlertDialog;
-	private Intent intent;
-
-	@Override
-	protected void onResume() {
-		super.onResume();
-	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +42,6 @@ public class TableActivity extends TableGridDeskActivity {
 		setContentView(R.layout.table_activity);
 		findViews();
 		setClickListeners();
-		mTotalPriceTableHandler = totalPriceTableHandler;
 	}
 
 	private void findViews() {
@@ -59,7 +52,7 @@ public class TableActivity extends TableGridDeskActivity {
 		layoutViewPager = (FrameLayout) findViewById(R.id.scr);
 	}
 
-	protected void setClickListeners() {
+	private void setClickListeners() {
 		mBackBtn.setOnClickListener(backClicked);
 		mUpdateBtn.setOnClickListener(checkOutClicked);
 		mStatisticsBtn.setOnClickListener(logoutClicked);
@@ -68,104 +61,7 @@ public class TableActivity extends TableGridDeskActivity {
 		layoutViewPager.addView(getPageView());
 	}
 
-	// TODO define
-	Handler changeTIdHandler = new Handler() {
-		public void handleMessage(Message msg) {
-			mpDialog.cancel();
-			switch (msg.what) {
-			case -10:
-				toastText("本地数据库出错，请从网络重新更新数据库");
-				break;
-			case -2:
-				toastText(R.string.changeTIdWarning);
-				break;
-			case -1:
-				showNetworkErrDlg("转台失败，"
-						+ getResources()
-								.getString(R.string.networkErrorWarning));
-				break;
-			default:
-				if (!isPrinterError(msg)) {
-					binderStart();
-				}
-				toastText(R.string.changeSucc);
-				break;
-			}
-		}
-	};
-
-	// TODO define
-	Handler copyTIdHandler = new Handler() {
-		public void handleMessage(Message msg) {
-			mpDialog.cancel();
-			switch (msg.what) {
-			case -10:
-				toastText("本地数据库出错，请从网络重新更新数据库");
-				break;
-			case -2:
-				toastText(R.string.copyTIdwarning);
-				break;
-			case -1:
-				showNetworkErrDlg("复制失败，"
-						+ getResources()
-								.getString(R.string.networkErrorWarning));
-				break;
-			default:
-				intent.setClass(TableActivity.this, MyOrderActivity.class);
-				Info.setMode(Info.WORK_MODE_WAITER);
-				TableActivity.this.startActivity(intent);
-				break;
-			}
-		}
-	};
-
-	Handler combineTIdHandler = new Handler() {
-		public void handleMessage(Message msg) {
-			mpDialog.cancel();
-			switch (msg.what) {
-			case -10:
-				toastText("本地数据库出错，请从网络重新更新数据库");
-				break;
-			case -2:
-				toastText(R.string.checkOutWarning);
-				break;
-			case -1:
-				showNetworkErrDlg("合并出错，"
-						+ getResources()
-								.getString(R.string.networkErrorWarning));
-				break;
-			default:
-				if (isPrinterError(msg)) {
-					toastText(R.string.combineError);
-				} else {
-					binderStart();
-					toastText(R.string.combineSucc);
-				}
-				break;
-			}
-		}
-	};
-
-	Handler notificationHandler = new Handler() {
-		public void handleMessage(Message msg) {
-			if (msg.what < 0) {
-				toastText(R.string.notificationWarning);
-			} else {
-				binderStart();
-			}
-		}
-	};
-
-	Handler notificationTypeHandler = new Handler() {
-		public void handleMessage(Message msg) {
-			mpDialog.cancel();
-			if (msg.what < 0) {
-				toastText(R.string.notificationTypeWarning);
-			}
-		}
-	};
-
-	Handler totalPriceTableHandler = new Handler() {
+	private Handler totalPriceTableHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
 			if (msg.what < 0) {
@@ -197,12 +93,12 @@ public class TableActivity extends TableGridDeskActivity {
 		TableActivity.this.startActivity(checkOutIntent);
 	}
 
-	protected AlertDialog.Builder networkDialog() {
+	private AlertDialog.Builder networkDialog() {
 		return mTitleAndMessageDialog.networkDialog(networkPositiveListener,
 				networkNegativeListener);
 	}
 
-	DialogInterface.OnClickListener networkPositiveListener = new DialogInterface.OnClickListener() {
+	private DialogInterface.OnClickListener networkPositiveListener = new DialogInterface.OnClickListener() {
 		@Override
 		public void onClick(DialogInterface dialog, int i) {
 			dialog.cancel();
@@ -212,7 +108,7 @@ public class TableActivity extends TableGridDeskActivity {
 		}
 	};
 
-	DialogInterface.OnClickListener networkNegativeListener = new DialogInterface.OnClickListener() {
+	private DialogInterface.OnClickListener networkNegativeListener = new DialogInterface.OnClickListener() {
 		@Override
 		public void onClick(DialogInterface dialog, int i) {
 			NETWORK_ARERTDIALOG = 0;
@@ -221,7 +117,7 @@ public class TableActivity extends TableGridDeskActivity {
 		}
 	};
 
-	protected Builder listTableNameDialog(final int type) {
+	private Builder listTableNameDialog(final int type) {
 		final List<Integer> tableId = new ArrayList<Integer>();
 		final List<String> tableNameStr = new ArrayList<String>();
 		ArrayList<HashMap<String, Object>> checkOut = getSettings()
@@ -279,14 +175,14 @@ public class TableActivity extends TableGridDeskActivity {
 		}
 	}
 
-	void getTotalPriceTable() {
+	private void getTotalPriceTable() {
 		new Thread() {
 			public void run() {
 				try {
 					double ret = getSettings().getTotalPriceTable(
 							selectedTable, tableName);
 					mTotalPrice = ret;
-					mTotalPriceTableHandler.sendEmptyMessage((int) ret);
+					totalPriceTableHandler.sendEmptyMessage((int) ret);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -294,7 +190,7 @@ public class TableActivity extends TableGridDeskActivity {
 		}.start();
 	}
 
-	public void checkOut(final List<Integer> destIId,
+	private void checkOut(final List<Integer> destIId,
 			final List<String> tableName, final Double receivable,
 			final Double income, final Double change) {
 		new Thread() {
@@ -310,7 +206,7 @@ public class TableActivity extends TableGridDeskActivity {
 		}.start();
 	}
 
-	protected OnClickListener checkOutClicked = new OnClickListener() {
+	private OnClickListener checkOutClicked = new OnClickListener() {
 
 		@Override
 		public void onClick(View v) {
@@ -318,7 +214,7 @@ public class TableActivity extends TableGridDeskActivity {
 		}
 	};
 
-	protected OnClickListener manageClicked = new OnClickListener() {
+	private OnClickListener manageClicked = new OnClickListener() {
 
 		@Override
 		public void onClick(View v) {
@@ -326,7 +222,7 @@ public class TableActivity extends TableGridDeskActivity {
 		}
 	};
 
-	protected OnClickListener backClicked = new OnClickListener() {
+	private OnClickListener backClicked = new OnClickListener() {
 
 		@Override
 		public void onClick(View v) {
@@ -334,7 +230,7 @@ public class TableActivity extends TableGridDeskActivity {
 		}
 	};
 
-	protected OnClickListener logoutClicked = new OnClickListener() {
+	private OnClickListener logoutClicked = new OnClickListener() {
 		@Override
 		public void onClick(View v) {
 			mTitleAndMessageDialog.titleAndMessageDialog(false,
@@ -346,7 +242,7 @@ public class TableActivity extends TableGridDeskActivity {
 		}
 	};
 
-	DialogInterface.OnClickListener logoutPositiveListener = new DialogInterface.OnClickListener() {
+	private DialogInterface.OnClickListener logoutPositiveListener = new DialogInterface.OnClickListener() {
 		@Override
 		public void onClick(DialogInterface dialogInterface, int which) {
 			Info.logout();
