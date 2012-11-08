@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -72,7 +73,7 @@ public class OrderBaseActivity extends BaseActivity {
 		setClickListener();
 
 		Intent intent = new Intent(this, NotificationTableService.class);  
-        startService(intent); 
+//        startService(intent); 
         bindService(intent, conn, Context.BIND_AUTO_CREATE);  
 	}
 
@@ -162,7 +163,6 @@ public class OrderBaseActivity extends BaseActivity {
 									.setMessage("数量不合法")
 									.setPositiveButton("确定", null).show();
 						}
-
 					}
 				});
 		quantitySettingDlg.setNegativeButton("取消", null);
@@ -306,7 +306,18 @@ public class OrderBaseActivity extends BaseActivity {
 					}
 				}).setNegativeButton("取消", null).show();
 	}
+	
+	protected OnLongClickListener quantityClicked = new OnLongClickListener() {
 
+		@Override
+		public boolean onLongClick(View v) {
+			final int position = Integer.parseInt(v.getTag().toString());
+			showUpdateQuantityDlg(position);
+			return false;
+		}
+
+	};
+	
 	private void findViews() {
 		mBackBtn = (Button) findViewById(R.id.back_btn);
 		mSubmitBtn = (Button) findViewById(R.id.submit);

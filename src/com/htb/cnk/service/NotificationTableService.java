@@ -57,6 +57,9 @@ public class NotificationTableService extends Service {
 		public boolean getNetworkStatus() {
 			return networkStatus;
 		}
+		public void setUPDATETABLESTATUSCOUNT(){
+			updateTableStatusCount = UPDATE_TABLE_STATUS_COUNT;
+		}
 	}
 	
 	public Runnable mTasks = new Runnable() {
@@ -97,6 +100,7 @@ public class NotificationTableService extends Service {
 				if (notification < 0) {
 					count--;
 				}
+				
 				networkStatus = notification==-1?false:true;
 				intent.putExtra("networkStatus", networkStatus);
 				intent.putExtra("ringtoneMessage", notification);

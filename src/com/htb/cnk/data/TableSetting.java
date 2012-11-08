@@ -219,7 +219,7 @@ public class TableSetting implements Serializable {
 	public int parseTableSetting(String tableStatusPkg) {
 		if (tableStatusPkg == null || tableStatusPkg == "")
 			return -1;
-//		Log.d(TAG, tableStatusPkg);
+		Log.d(TAG, tableStatusPkg);
 		try {
 			JSONArray tableList = new JSONArray(tableStatusPkg);
 			// if (mTableSettings.size() <= 0) {
