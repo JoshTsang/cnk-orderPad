@@ -7,6 +7,7 @@ import java.util.List;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.htb.cnk.lib.Http;
 import com.htb.constant.ErrorNum;
@@ -17,7 +18,8 @@ import com.htb.constant.Server;
  * 
  */
 public class Dishes {
-
+	public static final String TAG = "Dishes";
+	
 	final static int ID_COLUMN = 0;
 	final static int NAME_COLUMN = 1;
 	final static int PRICE_COLUMN = 2;
@@ -133,8 +135,9 @@ public class Dishes {
 	}
 
 	private Cursor getDishesFromDataBase(int categoryId) {
+		//TODO order by something
 		String sql = String
-				.format("SELECT %s.%s, %s, %s, %s, %s, %s FROM %s,%s,%s Where %s.%s=%s.%s and %s.%s=%d and %s.%s=%s",
+				.format("SELECT %s.%s, %s, %s, %s, %s, %s FROM %s,%s,%s Where %s.%s=%s.%s and %s.%s=%d and %s.%s=%s order by %s",
 						CnkDbHelper.TABLE_DISH_INFO, CnkDbHelper.DISH_ID,
 						CnkDbHelper.DISH_NAME,
 						CnkDbHelper.DISH_PRICE,
@@ -147,7 +150,8 @@ public class Dishes {
 						CnkDbHelper.TABLE_DISH_INFO, CnkDbHelper.DISH_ID,
 						CnkDbHelper.TABLE_DISH_CATEGORY,CnkDbHelper.DC_DISH_ID,
 						CnkDbHelper.TABLE_DISH_CATEGORY, CnkDbHelper.CATEGORY_ID, categoryId,
-						CnkDbHelper.TABLE_UNIT, "id", CnkDbHelper.UNIT_ID);
+						CnkDbHelper.TABLE_UNIT, "id", CnkDbHelper.UNIT_ID, "dishOrder");
+		Log.d(TAG, "sql:" + sql);
 		return mDb.rawQuery(sql, null);
 	}
 	
