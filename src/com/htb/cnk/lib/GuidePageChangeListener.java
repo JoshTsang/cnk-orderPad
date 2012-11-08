@@ -3,13 +3,13 @@ package com.htb.cnk.lib;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 
 import com.htb.cnk.adapter.TableAdapter;
-import com.htb.cnk.ui.base.TableGridDeskActivity;
+import com.htb.cnk.ui.base.TableGridActivity;
 
 /** 指引页面改监听器 */
 public class GuidePageChangeListener implements OnPageChangeListener {
-	private final TableGridDeskActivity mActivity;
+	private final TableGridActivity mActivity;
 	private TableAdapter mTableInfo;
-	public GuidePageChangeListener(TableGridDeskActivity activity,TableAdapter tableAdaoter){
+	public GuidePageChangeListener(TableGridActivity activity,TableAdapter tableAdaoter){
 		mActivity = activity;
 		mTableInfo = tableAdaoter;
 	}

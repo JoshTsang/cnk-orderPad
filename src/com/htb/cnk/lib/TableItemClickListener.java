@@ -1,5 +1,6 @@
 package com.htb.cnk.lib;
 
+import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 import android.view.View;
@@ -8,16 +9,16 @@ import android.widget.AdapterView.OnItemClickListener;
 
 import com.htb.cnk.adapter.TableAdapter;
 import com.htb.cnk.data.Info;
-import com.htb.cnk.ui.base.GridBaseActivity;
-import com.htb.cnk.ui.base.TableGridDeskActivity;
+import com.htb.cnk.ui.base.TableGridActivity;
 
-public class TableItemClickListener implements OnItemClickListener{ 
+public class TableItemClickListener extends Activity implements OnItemClickListener{ 
 	private final static String TAG = "TableItemClickListener";
-	private  GridBaseActivity tableGridDesk;
-	protected TableAdapter mTableInfo;
+	private  GridClick tableGridDesk;
+	private TableAdapter mTableInfo;
+	private Context mContext;
 	public TableItemClickListener(Context context,TableAdapter tableInfo){
-		tableGridDesk = new GridBaseActivity(context){};
 		mTableInfo = tableInfo;
+		mContext = context;
 	}
 	public void onItemClick(AdapterView<?> arg0,// The AdapterView where the
 												// click happened
@@ -47,15 +48,15 @@ public class TableItemClickListener implements OnItemClickListener{
 	private void tableItemChioceDialog(int arg2, int status) {
 		switch (status) {
 		case 0:
-			tableGridDesk.addDialog().show();
+			tableGridDesk = new GridClickAdd(mContext);
 			break;
 		case 1:
-			tableGridDesk.cleanDialog().show();
+			tableGridDesk = new GridClickClean(mContext);
 			break;
 		case 50:
 		case 51:
-			if (TableGridDeskActivity.networkStatus) {
-				tableGridDesk.addPhoneDialog(arg2).show();
+			if (TableGridActivity.networkStatus) {
+				tableGridDesk = new GridClickAddPhone(mContext,arg2);
 			} else {
 				tableGridDesk.networkErrDlg();
 			}
@@ -64,14 +65,14 @@ public class TableItemClickListener implements OnItemClickListener{
 		case 101:
 		case 150:
 		case 151:
-			if (TableGridDeskActivity.networkStatus) {
-				tableGridDesk.notificationDialog().show();
+			if (TableGridActivity.networkStatus) {
+				tableGridDesk = new GridClickNotification(mContext);
 			} else {
 				tableGridDesk.networkErrDlg();
 			}
 			break;
 		default:
-			tableGridDesk.addDialog().show();
+			tableGridDesk = new GridClickAdd(mContext);
 			break;
 		}
 	}

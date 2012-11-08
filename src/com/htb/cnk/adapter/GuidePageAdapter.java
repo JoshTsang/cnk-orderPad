@@ -11,21 +11,19 @@ import android.widget.SimpleAdapter;
 
 import com.htb.cnk.R;
 import com.htb.cnk.lib.TableItemClickListener;
-import com.htb.cnk.ui.base.TableGridDeskActivity;
-import com.umeng.common.Log;
+import com.htb.cnk.ui.base.TableGridActivity;
 
 public class GuidePageAdapter extends PagerAdapter {
 	private ViewGroup layout;
 	private GridView mGridView;
-	private final TableGridDeskActivity tableGridDesk;
+	private final TableGridActivity tableGridDesk;
 	private SimpleAdapter mImageItems;
 	private TableAdapter mTableInfo;
 	private final String IMAGE_ITEM = "imageItem";
 	private final String ITEM_TEXT = "ItemText";
-	public GuidePageAdapter(TableGridDeskActivity tableDeskActivity,TableAdapter tableAdapter){
+	public GuidePageAdapter(TableGridActivity tableDeskActivity,TableAdapter tableAdapter){
 		tableGridDesk = tableDeskActivity;
 		mTableInfo = tableAdapter;
-		Log.e("a", "a"+mTableInfo.getLstImageItem().size());
 		mImageItems = new SimpleAdapter(tableGridDesk, mTableInfo.getLstImageItem(),
 				R.layout.table_item, new String[] { IMAGE_ITEM, ITEM_TEXT },
 				new int[] { R.id.ItemImage, R.id.ItemText }) {
@@ -45,7 +43,7 @@ public class GuidePageAdapter extends PagerAdapter {
 	}
 	@Override
 	public int getCount() {
-		return tableGridDesk.getSettings().getFloorNum() + TableGridDeskActivity.EXTERN_PAGE_NUM;
+		return tableGridDesk.getSettings().getFloorNum() + TableGridActivity.EXTERN_PAGE_NUM;
 	}
 
 	@Override

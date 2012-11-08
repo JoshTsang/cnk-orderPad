@@ -87,7 +87,10 @@ public class PhoneActivity extends OrderBaseActivity {
 								+ " 元/" + dishDetail.getUnit());
 				holder1.dishQuantity.setText(MyOrder.convertFloat(dishDetail
 						.getQuantity()));
-
+				
+				holder1.dishQuantity.setTag(position);
+				holder1.dishQuantity.setOnLongClickListener(quantityClicked);
+				
 				holder1.plusBtn.setTag(position);
 				holder1.plusBtn.setOnClickListener(plusClicked);
 

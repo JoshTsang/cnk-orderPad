@@ -22,6 +22,7 @@ import android.widget.TextView;
 import com.htb.cnk.R;
 import com.htb.cnk.adapter.GuidePageAdapter;
 import com.htb.cnk.adapter.TableAdapter;
+import com.htb.cnk.data.NotificationTypes;
 import com.htb.cnk.data.Setting;
 import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.lib.GuidePageChangeListener;
@@ -30,9 +31,10 @@ import com.htb.cnk.service.MyReceiver;
 import com.htb.cnk.service.NotificationTableService;
 import com.htb.cnk.service.NotificationTableService.MyBinder;
 
-public abstract class TableGridDeskActivity extends BaseActivity {
+public abstract class TableGridActivity extends BaseActivity {
 	public static boolean networkStatus = true;
 	public final static int EXTERN_PAGE_NUM = 1; // 除了楼层以外还有几个页面
+	public static TableGridActivity instance;
 
 	private final static String TAG = "TableGridDeskActivity";
 	private final int UPDATE_TABLE_INFOS = 500;
@@ -55,7 +57,27 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 	private View layout;
 	private TextView imgCur;
 	private AlertDialog.Builder mNetWrorkAlertDialog;
+	private NotificationTypes mNotificationType = new NotificationTypes();
+	
+	@Override
+	protected void onDestroy() {
+		unbindService(conn);
+		unregisterReceiver(mReceiver);
+		super.onDestroy();
+	}
 
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setNewClass();
+		findViews();
+//		startService(NotificationTableService.class);
+		intent = new Intent(this,NotificationTableService.class);
+		bindService(intent, conn, Context.BIND_AUTO_CREATE);
+		NotificationType();
+		instance = this;
+	}
+	
 	public TableSetting getSettings() {
 		return mSettings;
 	}
@@ -187,24 +209,6 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 
 	}
 
-	@Override
-	protected void onDestroy() {
-		unbindService(conn);
-		unregisterReceiver(mReceiver);
-		super.onDestroy();
-	}
-
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setNewClass();
-		findViews();
-		startService(NotificationTableService.class);
-		bindService(intent, conn, Context.BIND_AUTO_CREATE);
-		mReceiver = new MyReceiver(TableGridDeskActivity.this);
-		registerReceiver(mReceiver);
-	}
-
 	protected View getPageView() {
 		return layout;
 	}
@@ -214,23 +218,46 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 	}
 
 	protected void setClassToActivity(Class<?> setClass) {
-		intent.setClass(TableGridDeskActivity.this, setClass);
-		TableGridDeskActivity.this.startActivity(intent);
+		intent.setClass(TableGridActivity.this, setClass);
+		TableGridActivity.this.startActivity(intent);
 	}
 
 	private void setNewClass() {
-		setSettings(new TableSetting(TableGridDeskActivity.this));
-		mRingtone = new Ringtone(TableGridDeskActivity.this);
-		mTableInfo = new TableAdapter(mSettings, TableGridDeskActivity.this);
-		guidePageAdapter = new GuidePageAdapter(TableGridDeskActivity.this,
+		setSettings(new TableSetting(TableGridActivity.this));
+		mRingtone = new Ringtone(TableGridActivity.this);
+		mTableInfo = new TableAdapter(mSettings, TableGridActivity.this);
+		guidePageAdapter = new GuidePageAdapter(TableGridActivity.this,
 				mTableInfo);
+		mReceiver = new MyReceiver(TableGridActivity.this);
+		registerReceiver(mReceiver);
 	}
 
+	private void NotificationType() {
+		new Thread() {
+			public void run() {
+				try {
+					int ret = mNotificationType.getNotifiycationsType();
+					notificationTypeHandler.sendEmptyMessage(ret);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}.start();
+	}
+	private Handler notificationTypeHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			mpDialog.cancel();
+			if (msg.what < 0) {
+				toastText(R.string.notificationTypeWarning);
+			}
+		}
+	};
+	
 	/**
 	 * 
 	 */
 	private void findViews() {
-		LayoutInflater inflater = (LayoutInflater) TableGridDeskActivity.this
+		LayoutInflater inflater = (LayoutInflater) TableGridActivity.this
 				.getSystemService(LAYOUT_INFLATER_SERVICE);
 		layout = inflater.inflate(R.layout.viewpage, null);
 		mPageView = (ViewPager) layout.findViewById(R.id.viewPager);
@@ -248,7 +275,7 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 				.getDefaultDisplay().getHeight() * 4 / 5;
 		mPageView.setAdapter(guidePageAdapter);
 		mPageView.setOnPageChangeListener(new GuidePageChangeListener(
-				TableGridDeskActivity.this, mTableInfo));
+				TableGridActivity.this, mTableInfo));
 	}
 
 	private ServiceConnection conn = new ServiceConnection() {
@@ -256,6 +283,9 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 		@Override
 		public void onServiceConnected(ComponentName arg0, IBinder arg1) {
 			binder = (MyBinder) arg1;
+			Log.e(TAG, "conn");
+			binder.setUPDATETABLESTATUSCOUNT();
+			binder.start();
 			binderFlag = true;
 		}
 
@@ -278,7 +308,7 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 	}
 
 	private void startService(Class<?> cla) {
-		intent = new Intent(TableGridDeskActivity.this, cla);
+		intent = new Intent(TableGridActivity.this, cla);
 		startService(intent);
 	}
 
@@ -292,7 +322,7 @@ public abstract class TableGridDeskActivity extends BaseActivity {
 				int err = binder.getErr();
 				if (err < 0) {
 					if (!isPrinterErrShown) {
-						new AlertDialog.Builder(TableGridDeskActivity.this)
+						new AlertDialog.Builder(TableGridActivity.this)
 								.setTitle("错误")
 								.setMessage("无法连接打印机或打印机缺纸，请检查打印机")
 								.setPositiveButton("确定",

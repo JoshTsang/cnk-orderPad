@@ -17,9 +17,9 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 
 import com.htb.cnk.data.Info;
-import com.htb.cnk.ui.base.TableGridDeskActivity;
+import com.htb.cnk.ui.base.TableGridActivity;
 
-public class TableActivity extends TableGridDeskActivity {
+public class TableActivity extends TableGridActivity {
 
 	private static final String TAG = "TableActivity";
 	private final int CHECKOUT_LIST = 1;

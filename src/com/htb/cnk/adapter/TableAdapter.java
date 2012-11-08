@@ -13,29 +13,27 @@ import com.htb.cnk.data.TableSetting;
 import com.htb.constant.Table;
 
 public class TableAdapter {
-	private static final String TAG = "TableAdapter";
 	public static final String IMAGE_ITEM = "imageItem";
 	public static final String ITEM_TEXT = "ItemText";
-
 	public static final int FILTER_NONE = 0;
 	public static final int FILTER_FLOOR = 1;
 	public static final int FILTER_SCOPE = 2;
 	public static final int FILTER_AREA = 3;
+
+	private static final String TAG = "TableAdapter";
 	private int mImageItem;
 	private int mTextItem;
 	private TableSetting mSetting;
 	private Notifications mNotification = new Notifications();
-	private ArrayList<HashMap<String, Object>> lstImageItem = new ArrayList<HashMap<String,Object>>();
+	private ArrayList<HashMap<String, Object>> lstImageItem = new ArrayList<HashMap<String, Object>>();
 	private List<TableSetting.TableSettingItem> resultSet;
 	private Context mContext;
 
-	public TableAdapter(TableSetting ts,
-			Context context) {
+	public TableAdapter(TableSetting ts, Context context) {
 		mSetting = ts;
 		mContext = context;
 	}
-	
-	
+
 	public void filterTables(int arg, int filterType) {
 		setStatusAndIcon(arg, filterType);
 	}
@@ -58,6 +56,26 @@ public class TableAdapter {
 
 	public void clearLstImageItem() {
 		lstImageItem.clear();
+	}
+
+	public void setImageItem(int imageItem) {
+		this.mImageItem = imageItem;
+	}
+
+	public int getImageItem() {
+		return this.mImageItem;
+	}
+
+	public void setTextItem(int textItem) {
+		this.mTextItem = textItem;
+	}
+
+	public int getTextItem() {
+		return this.mTextItem;
+	}
+
+	public ArrayList<HashMap<String, Object>> getLstImageItem() {
+		return lstImageItem;
 	}
 
 	private void setStatusAndIcon(int floorNum, int filterType) {
@@ -94,15 +112,6 @@ public class TableAdapter {
 				}
 				setTableIcon(floorNum, i, status);
 			}
-		}
-	}
-
-	/**
-	 * 
-	 */
-	private void clearResultSet() {
-		if (resultSet != null) {
-			resultSet.clear();
 		}
 	}
 
@@ -158,26 +167,6 @@ public class TableAdapter {
 									.getLineNumber());
 			break;
 		}
-	}
-
-	public void setImageItem(int imageItem) {
-		this.mImageItem = imageItem;
-	}
-
-	public int getImageItem() {
-		return this.mImageItem;
-	}
-
-	public void setTextItem(int textItem) {
-		this.mTextItem = textItem;
-	}
-
-	public int getTextItem() {
-		return this.mTextItem;
-	}
-
-	public ArrayList<HashMap<String, Object>> getLstImageItem() {
-		return lstImageItem;
 	}
 
 }

@@ -208,7 +208,7 @@ public class CheckOutActivity extends BaseActivity {
 			} else if (msg.what == -1) {
 				mNetWrorkAlertDialog.setMessage("收银出错，请检查连接网络重试").show();
 			} else if (isPrinterError(msg)) {
-				toastText("退菜订单失败");
+				toastText("无法连接打印机或打印机缺纸");
 			} else {
 				if (Setting.enabledCleanTableAfterCheckout()) {
 					cleanTableThread(selectedTable);
