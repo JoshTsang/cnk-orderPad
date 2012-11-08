@@ -194,7 +194,13 @@ public class OrderBaseActivity extends BaseActivity {
 							new AlertDialog.Builder(OrderBaseActivity.this)
 									.setCancelable(false).setTitle("注意")
 									.setMessage("人数不能为空")
-									.setPositiveButton("确定", null).show();
+									.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+										
+										@Override
+										public void onClick(DialogInterface dialog, int which) {
+											showSetPersonsDlg();
+										}
+									}).show();
 							return;
 						}
 

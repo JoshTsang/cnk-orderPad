@@ -36,7 +36,7 @@ public class GridViewImageAdapter extends BaseAdapter {
 		multiChoose = isMulti;
 		mTableSetting = new TableSetting(context);
 		for (int i = 0; i < mTableSetting.getTables().size(); i++) {
-			mImageIds.add(R.drawable.table_red);
+			mImageIds.add(R.drawable.table_notuse);
 			mImage_bs.add(false);
 		}
 		initState(context);

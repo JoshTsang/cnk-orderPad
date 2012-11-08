@@ -135,30 +135,30 @@ public class TableAdapter {
 			HashMap<String, Object> map) {
 		switch (status) {
 		case 0:
-			map.put(IMAGE_ITEM, R.drawable.table_red);
+			map.put(IMAGE_ITEM, R.drawable.table_notuse);
 			break;
 		case 1:
-			map.put(IMAGE_ITEM, R.drawable.table_blue);
+			map.put(IMAGE_ITEM, R.drawable.table_inuse);
 			break;
 		case 50:
 		case 51:
-			map.put(IMAGE_ITEM, R.drawable.table_yellow);
+			map.put(IMAGE_ITEM, R.drawable.table_phone);
 			break;
 		case 100:
-			map.put(IMAGE_ITEM, R.drawable.table_rednotification);
+			map.put(IMAGE_ITEM, R.drawable.table_notuse_notification);
 			setStatus(position, status);
 			break;
 		case 101:
-			map.put(IMAGE_ITEM, R.drawable.table_bluenotification);
+			map.put(IMAGE_ITEM, R.drawable.table_inuse_notification);
 			setStatus(position, status);
 			break;
 		case 150:
 		case 151:
-			map.put(IMAGE_ITEM, R.drawable.table_yellownotification);
+			map.put(IMAGE_ITEM, R.drawable.table_phone_notification);
 			setStatus(position, status);
 			break;
 		default:
-			map.put(IMAGE_ITEM, R.drawable.table_red);
+			map.put(IMAGE_ITEM, R.drawable.table_notuse);
 			Log.e(TAG,
 					"unknown status:"
 							+ status
