@@ -133,6 +133,7 @@ public class Dishes {
 	}
 
 	private Cursor getDishesFromDataBase(int categoryId) {
+		//TODO order by something
 		String sql = String
 				.format("SELECT %s.%s, %s, %s, %s, %s, %s FROM %s,%s,%s Where %s.%s=%s.%s and %s.%s=%d and %s.%s=%s",
 						CnkDbHelper.TABLE_DISH_INFO, CnkDbHelper.DISH_ID,

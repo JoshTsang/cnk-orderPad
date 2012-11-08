@@ -3,7 +3,6 @@ package com.htb.cnk.service;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 
@@ -17,7 +16,6 @@ public class NotificationTableService extends Service {
 	private final static int UPDATE_TABLE_STATUS_COUNT = 5;
 	private Notifications mNotificaion = new Notifications();
 	private Intent intent = new Intent(SERVICE_IDENTIFIER);
-	private Bundle bundle = new Bundle();
 	private static Handler objHandler = new Handler();
 	public static final String SERVICE_IDENTIFIER = "cainaoke.service";
 	public final static String SER_KEY = "cainaoke.ser";
@@ -68,16 +66,29 @@ public class NotificationTableService extends Service {
 
 		void update() {
 			new Thread(new tableThread()).start();
+			if (pendedOrder.count() > 0) {
+				new Thread(new submitThread()).start();
+			}
 			objHandler.postDelayed(mTasks, MILLISECONDS);
 		}
 	};
 
+	class submitThread implements Runnable {
+		public void run() {
+			if (pendedOrder.submit() < 0) {
+				count++;
+			} else {
+				count = 0;
+			}
+		}
+	}
+	
 	class tableThread implements Runnable {
 		public void run() {
 			try {
 				int notification = mNotificaion.getNotifiycations();;
 				String ret = null;
-				
+
 				if (updateTableStatusCount >= UPDATE_TABLE_STATUS_COUNT) {
 					ret = TableSetting.getTableStatusFromServer();
 					updateTableStatusCount = 0;
@@ -90,12 +101,7 @@ public class NotificationTableService extends Service {
 				intent.putExtra("networkStatus", networkStatus);
 				intent.putExtra("ringtoneMessage", notification);
 				intent.putExtra("tableMessage", ret);
-				intent.putExtras(bundle);
-				if (pendedOrder.submit() < 0) {
-					count++;
-				} else {
-					count = 0;
-				}
+				
 				sendBroadcast(intent);
 				updateTableStatusCount++;
 			} catch (Exception e) {
