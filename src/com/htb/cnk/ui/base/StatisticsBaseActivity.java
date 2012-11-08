@@ -119,8 +119,10 @@ public class StatisticsBaseActivity extends BaseActivity {
 
 	protected void popUpDlg(String title, String msg,
 			final boolean finishActivity) {
-		new AlertDialog.Builder(StatisticsBaseActivity.this).setTitle(title)
+		new AlertDialog.Builder(StatisticsBaseActivity.this)
+				.setTitle(title)
 				.setMessage(msg)
+				.setCancelable(false)
 				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 	
 					@Override

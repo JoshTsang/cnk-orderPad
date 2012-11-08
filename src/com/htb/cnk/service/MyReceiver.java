@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.htb.cnk.ui.base.TableGridDeskActivity;
+import com.htb.cnk.ui.base.TableGridActivity;
 
 public class MyReceiver extends BroadcastReceiver {
 	static final String TAG = "MyReceiver";
@@ -13,12 +13,12 @@ public class MyReceiver extends BroadcastReceiver {
 	/**
 	 * 
 	 */
-	private final TableGridDeskActivity tableDeskReceiver;
+	private final TableGridActivity tableDeskReceiver;
 
 	/**
 	 * @param tableDeskActivity
 	 */
-	public MyReceiver(TableGridDeskActivity tableDeskActivity) {
+	public MyReceiver(TableGridActivity tableDeskActivity) {
 		tableDeskReceiver = tableDeskActivity;
 	}
 
