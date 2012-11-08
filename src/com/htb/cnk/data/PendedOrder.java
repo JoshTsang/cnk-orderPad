@@ -3,6 +3,8 @@ package com.htb.cnk.data;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.htb.constant.Table;
+
 public class PendedOrder {
 
 	class PendedOrderDetail {
@@ -57,6 +59,7 @@ public class PendedOrder {
 		synchronized (lock) {
 			int count = count();
 			if (count > 0) {
+				TableSetting.setLocalTableStatusById(pendedOrders.get(0).tid, Table.OPEN_TABLE_STATUS);;
 				int ret = MyOrder.submitPendedOrder(pendedOrders.get(0)
 						.getOrder(), pendedOrders.get(0).getStatus());
 				if (ret >= 0) {

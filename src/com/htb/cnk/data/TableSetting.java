@@ -805,11 +805,11 @@ public class TableSetting implements Serializable {
 		return ret;
 	}
 
-	public int getLocalTableStatusById(int tid) {
+	public static int getLocalTableStatusById(int tid) {
 		return mTableIndexForId.get(tid).getStatus();
 	}
 
-	public void setLocalTableStatusById(int tid, int status) {
+	public static void setLocalTableStatusById(int tid, int status) {
 		mTableIndexForId.get(tid).setStatus(status);
 	}
 
