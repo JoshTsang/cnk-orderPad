@@ -381,6 +381,7 @@ public class OrderBaseActivity extends BaseActivity {
 			if (Info.getTableId() < 0) {
 				mMyOrder.clear();
 				mMyOrderAdapter.notifyDataSetChanged();
+				updateTabelInfos();
 				return;
 			}
 			if (mMyOrder.count() <= 0) {
