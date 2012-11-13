@@ -77,6 +77,7 @@ public class Cnk_orderPadActivity extends BaseActivity {
 
 	protected NotificationTableService.MyBinder pendOrderBinder;
 	protected boolean binded;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
