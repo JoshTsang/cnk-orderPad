@@ -277,9 +277,9 @@ public class OrderBaseActivity extends BaseActivity {
 			Log.e(TAG, "order==null");
 		}
 		mPendOrderBinder.add(Info.getTableId(), Info.getTableName(), mSettings.getStatusById(Info.getTableId()), order);
-		int tableStatus = mSettings.getLocalTableStatusById(Info.getTableId());
+		int tableStatus = TableSetting.getLocalTableStatusById(Info.getTableId());
 		if (tableStatus%10 == 0) {
-			mSettings.setLocalTableStatusById(Info.getTableId(), tableStatus + Table.OPEN_TABLE_STATUS);
+			TableSetting.setLocalTableStatusById(Info.getTableId(), tableStatus + Table.OPEN_TABLE_STATUS);
 		}
 	}
 	
