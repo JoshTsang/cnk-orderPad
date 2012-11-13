@@ -283,7 +283,6 @@ public abstract class TableGridActivity extends BaseActivity {
 		@Override
 		public void onServiceConnected(ComponentName arg0, IBinder arg1) {
 			binder = (MyBinder) arg1;
-			Log.e(TAG, "conn");
 			binder.setUPDATETABLESTATUSCOUNT();
 			binder.start();
 			binderFlag = true;
@@ -305,11 +304,6 @@ public abstract class TableGridActivity extends BaseActivity {
 		IntentFilter filter = new IntentFilter(
 				NotificationTableService.SERVICE_IDENTIFIER);
 		registerReceiver(receiver, filter);
-	}
-
-	private void startService(Class<?> cla) {
-		intent = new Intent(TableGridActivity.this, cla);
-		startService(intent);
 	}
 
 	private Handler mPendedOrderNotificationHandler = new Handler() {

@@ -219,14 +219,9 @@ public class TableSetting implements Serializable {
 	public int parseTableSetting(String tableStatusPkg) {
 		if (tableStatusPkg == null || tableStatusPkg == "")
 			return -1;
-		Log.d(TAG, tableStatusPkg);
+		// Log.d(TAG, tableStatusPkg);
 		try {
 			JSONArray tableList = new JSONArray(tableStatusPkg);
-			// if (mTableSettings.size() <= 0) {
-			// createTables(tableList);
-			// } else {
-			// updateTables(tableList);
-			// }
 			// TODO find good solution for table status update
 			createTables(tableList);
 			// /////////////////////////////////////
@@ -265,7 +260,6 @@ public class TableSetting implements Serializable {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-
 		floorCategory();
 		addFloor();
 		updateIndex();
@@ -275,21 +269,12 @@ public class TableSetting implements Serializable {
 		mChargedAreaIndex.clear();
 		mTableIndexForId.clear();
 		mTableIndexForName.clear();
-		mTableScope.clear();
 		int size = mTableSettings.size();
 		TableSettingItem item;
-		for (int i=0; i<size; i++) {
+		for (int i = 0; i < size; i++) {
 			item = mTableSettings.get(i);
 			mTableIndexForId.put(item.getId(), item);
 			mTableIndexForName.put(item.getName(), item);
-			// if (isTableInCharge(item.getArea())) {
-			// mChargedAreaIndex.put(item.getId(), item);
-			// }
-		}
-		//TODO if scope is disabled, there is no need to build such index
-		getTablesByScope();
-		for (TableSettingItem table: mTableScope) {
-			mChargedAreaIndex.put(table.getId(), table);
 		}
 	}
 
@@ -406,7 +391,8 @@ public class TableSetting implements Serializable {
 		return item;
 	}
 
-	//TODO seems like there are some multi thread prombles, modified mSettings when accessing it
+	// TODO seems like there are some multi thread prombles, modified mSettings
+	// when accessing it
 	public List<TableSettingItem> getTablesByScope() {
 		mTableScope.clear();
 		SharedPreferences sharedPre = mContext.getSharedPreferences(

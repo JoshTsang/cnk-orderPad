@@ -15,7 +15,6 @@ public class PhoneOrder extends MyOrder {
 
 	public PhoneOrder(Context context) {
 		super(context);
-		// TODO Auto-generated constructor stub
 	}
 
 	public float getPhoneQuantity(int position) {
@@ -52,7 +51,6 @@ public class PhoneOrder extends MyOrder {
 				JSONObject item = tableList.getJSONObject(i);
 				int quantity = item.getInt("quantity");
 				int dishId = item.getInt("dish_id");
-				// int status = item.getInt("status");
 				Cursor cur = getDishInfoFromDB(dishId);
 				if(cur == null){
 					return ERR_DB;
@@ -70,7 +68,6 @@ public class PhoneOrder extends MyOrder {
 			Log.e(TAG, response);
 			e.printStackTrace();
 		}
-	
 		return -1;
 	}
 
