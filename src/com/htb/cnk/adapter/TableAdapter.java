@@ -19,7 +19,14 @@ public class TableAdapter {
 	public static final int FILTER_FLOOR = 1;
 	public static final int FILTER_SCOPE = 2;
 	public static final int FILTER_AREA = 3;
-
+	
+	private static final int TABLE_NOTUSE = R.drawable.table_notuse;
+	private static final int TABLE_INUSE = R.drawable.table_inuse;
+	private static final int TABLE_PHONE = R.drawable.table_phone;
+	private static final int TABLE_NOTUSE_NOTIFICATION = R.drawable.table_notuse_notification;
+	private static final int TABLE_INUSE_NOTIFICATION = R.drawable.table_inuse_notification;
+	private static final int TABLE_PHONE_NOTIFICATION = R.drawable.table_phone_notification;
+	
 	private static final String TAG = "TableAdapter";
 	private int mImageItem;
 	private int mTextItem;
@@ -130,35 +137,34 @@ public class TableAdapter {
 		}
 	}
 
-	// TODO define belows
 	private void imageItemSwitch(int floor, int position, int status,
 			HashMap<String, Object> map) {
 		switch (status) {
 		case 0:
-			map.put(IMAGE_ITEM, R.drawable.table_notuse);
+			map.put(IMAGE_ITEM, TABLE_NOTUSE);
 			break;
 		case 1:
-			map.put(IMAGE_ITEM, R.drawable.table_inuse);
+			map.put(IMAGE_ITEM, TABLE_INUSE);
 			break;
 		case 50:
 		case 51:
-			map.put(IMAGE_ITEM, R.drawable.table_phone);
+			map.put(IMAGE_ITEM, TABLE_PHONE);
 			break;
 		case 100:
-			map.put(IMAGE_ITEM, R.drawable.table_notuse_notification);
+			map.put(IMAGE_ITEM, TABLE_NOTUSE_NOTIFICATION);
 			setStatus(position, status);
 			break;
 		case 101:
-			map.put(IMAGE_ITEM, R.drawable.table_inuse_notification);
+			map.put(IMAGE_ITEM, TABLE_INUSE_NOTIFICATION);
 			setStatus(position, status);
 			break;
 		case 150:
 		case 151:
-			map.put(IMAGE_ITEM, R.drawable.table_phone_notification);
+			map.put(IMAGE_ITEM, TABLE_PHONE_NOTIFICATION);
 			setStatus(position, status);
 			break;
 		default:
-			map.put(IMAGE_ITEM, R.drawable.table_notuse);
+			map.put(IMAGE_ITEM, TABLE_NOTUSE);
 			Log.e(TAG,
 					"unknown status:"
 							+ status
