@@ -419,7 +419,6 @@ public class Cnk_orderPadActivity extends BaseActivity {
 	}
 
 	private Handler flavorHandler = new Handler() {
-	/** Called when the activity is first created. */
 		public void handleMessage(Message msg) {
 			if (msg.what < 0) {
 				MyOrder.getFlaovorFromSetting();

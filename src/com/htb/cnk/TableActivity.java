@@ -21,7 +21,7 @@ import com.htb.cnk.ui.base.TableGridActivity;
 
 public class TableActivity extends TableGridActivity {
 
-	private static final String TAG = "TableActivity";
+	public static final String TAG = "TableActivity";
 	private final int CHECKOUT_LIST = 1;
 
 	private int NETWORK_ARERTDIALOG = 0;
@@ -78,9 +78,6 @@ public class TableActivity extends TableGridActivity {
 		}
 	};
 
-	/**
-	 * 
-	 */
 	private void sendPriceToCheckout() {
 		Intent checkOutIntent = new Intent();
 		Bundle bundle = new Bundle();
