@@ -62,16 +62,16 @@ public abstract class GridClick extends Activity {
 		initProgressDlg();
 	}
 
+	public void networkErrDlg() {
+		toastText(R.string.functionDisableCauseNetworkUnavalialbe);
+	}
+
 	public void toastText(String r) {
 		Toast.makeText(mContext.getApplicationContext(), r, Toast.LENGTH_LONG)
 				.show();
 	}
 
 	protected abstract AlertDialog.Builder resultDialog();
-
-	public void networkErrDlg() {
-		toastText(R.string.functionDisableCauseNetworkUnavalialbe);
-	}
 
 	protected void chooseTypeToMenu() {
 		if (Info.getMenu() == Info.ORDER_QUCIK_MENU) {
@@ -226,7 +226,8 @@ public abstract class GridClick extends Activity {
 		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 		mpDialog.setIndeterminate(false);
 		mpDialog.setCancelable(false);
-		mpDialog.setTitle(mContext.getResources().getString(R.string.pleaseWait));
+		mpDialog.setTitle(mContext.getResources()
+				.getString(R.string.pleaseWait));
 	}
 
 }
