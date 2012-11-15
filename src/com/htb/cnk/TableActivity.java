@@ -26,7 +26,6 @@ public class TableActivity extends TableGridActivity {
 
 	private int NETWORK_ARERTDIALOG = 0;
 	private double mTotalPrice;
-	private Handler mCheckOutHandler;
 	private List<String> tableName = new ArrayList<String>();
 	private List<Integer> selectedTable = new ArrayList<Integer>();
 	private Button mBackBtn;
@@ -183,22 +182,6 @@ public class TableActivity extends TableGridActivity {
 							selectedTable, tableName);
 					mTotalPrice = ret;
 					totalPriceTableHandler.sendEmptyMessage((int) ret);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}.start();
-	}
-
-	private void checkOut(final List<Integer> destIId,
-			final List<String> tableName, final Double receivable,
-			final Double income, final Double change) {
-		new Thread() {
-			public void run() {
-				try {
-					int ret = getSettings().checkOut(destIId, tableName,
-							receivable, income, change);
-					mCheckOutHandler.sendEmptyMessage(ret);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

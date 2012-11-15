@@ -205,9 +205,7 @@ public abstract class GridClick extends Activity {
 
 	protected void binderStart() {
 		Intent intent = new Intent(NotificationTableService.SERVICE_IDENTIFIER);
-		Bundle bundle = new Bundle();
 		intent.putExtra("binder", true);
-		intent.putExtras(bundle);
 		mContext.sendBroadcast(intent);
 	}
 
@@ -223,15 +221,12 @@ public abstract class GridClick extends Activity {
 		return getSettings().getStatusTableId(getSettings().getId(tableName)) == status;
 	}
 
-	
-
 	private void initProgressDlg() {
 		mpDialog = new ProgressDialog(mContext);
 		mpDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 		mpDialog.setIndeterminate(false);
 		mpDialog.setCancelable(false);
-		mpDialog.setTitle(mContext.getResources()
-				.getString(R.string.pleaseWait));
+		mpDialog.setTitle(mContext.getResources().getString(R.string.pleaseWait));
 	}
 
 }

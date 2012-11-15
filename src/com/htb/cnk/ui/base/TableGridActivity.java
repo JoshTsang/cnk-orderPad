@@ -71,7 +71,6 @@ public abstract class TableGridActivity extends BaseActivity {
 		super.onCreate(savedInstanceState);
 		setNewClass();
 		findViews();
-//		startService(NotificationTableService.class);
 		intent = new Intent(this,NotificationTableService.class);
 		bindService(intent, conn, Context.BIND_AUTO_CREATE);
 		NotificationType();
