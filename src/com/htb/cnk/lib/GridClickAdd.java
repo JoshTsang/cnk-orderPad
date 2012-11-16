@@ -38,7 +38,6 @@ public class GridClickAdd extends GridClick {
 	private DialogInterface.OnClickListener addListener = new DialogInterface.OnClickListener() {
 		@Override
 		public void onClick(DialogInterface dialog, int which) {
-			mPhoneOrder.clear();
 			addDialogChoiceMode(which);
 		}
 	};
