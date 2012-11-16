@@ -30,7 +30,7 @@ public class UserData {
 	}
 
 	public static void setUserName(String name) {
-		UserData.mName = name;
+		UserData.mName = name.trim();
 	}
 
 	public static void setUserPwd(String pwd) {

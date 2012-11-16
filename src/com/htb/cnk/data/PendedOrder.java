@@ -42,7 +42,6 @@ public class PendedOrder {
 
 	public void add(int id, String name, int status, String order) {
 		PendedOrderDetail porder = new PendedOrderDetail(id, name, status, order);
-		
 		pendedOrders.add(porder);
 	}
 	
