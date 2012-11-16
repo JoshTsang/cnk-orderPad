@@ -8,7 +8,6 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.Editable;
@@ -178,9 +177,7 @@ public abstract class GridClick extends Activity {
 			} else {
 				Intent intent = new Intent(
 						NotificationTableService.SERVICE_IDENTIFIER);
-				Bundle bundle = new Bundle();
 				intent.putExtra("tableHandler", msg.what);
-				intent.putExtras(bundle);
 				mContext.sendBroadcast(intent);
 			}
 		}
