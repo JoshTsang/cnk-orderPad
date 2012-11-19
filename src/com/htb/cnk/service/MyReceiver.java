@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.htb.cnk.ui.base.TableGridActivity;
-import com.umeng.common.Log;
 
 public class MyReceiver extends BroadcastReceiver {
 	static final String TAG = "MyReceiver";
@@ -35,14 +34,12 @@ public class MyReceiver extends BroadcastReceiver {
 		tableDeskReceiver.setNetworkStatus(bundle
 				.getBoolean("networkStatus"));
 		if (bundle.getInt("tableHandler") > 0) {
-			Log.d(TAG, ">0");
 			tableDeskReceiver.sendTableHandler(bundle.getInt("tableHandler"));
 			tableDeskReceiver.setNetworkStatus(true);
 		} 
 		if (bundle.getBoolean("binder")) {
 			tableDeskReceiver.sendbinderStart();
 			tableDeskReceiver.setNetworkStatus(true);
-			Log.e(TAG, "binder");
 		} 
 		
 		

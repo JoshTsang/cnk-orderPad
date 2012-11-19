@@ -45,7 +45,6 @@ public class GridClickClean extends GridClick {
 			cleanChioceMode(which);
 		}
 	};
-
 	private void cleanChioceMode(int which) {
 		switch (which) {
 		case 0:
@@ -205,6 +204,7 @@ public class GridClickClean extends GridClick {
 	}
 
 	private void changeTable(final int destTId, final int persons) {
+		mpDialog.setMessage("正在转台");
 		mpDialog.show();
 		new Thread() {
 			public void run() {
@@ -221,6 +221,8 @@ public class GridClickClean extends GridClick {
 	}
 
 	private void combineTable(final int destTId, final int persons) {
+		mpDialog.setMessage("正在并台");
+		mpDialog.show();
 		new Thread() {
 			public void run() {
 				try {
