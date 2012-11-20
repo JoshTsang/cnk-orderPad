@@ -45,6 +45,7 @@ public class GridClickClean extends GridClick {
 			cleanChioceMode(which);
 		}
 	};
+	
 	private void cleanChioceMode(int which) {
 		switch (which) {
 		case 0:
