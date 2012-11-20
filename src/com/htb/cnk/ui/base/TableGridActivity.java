@@ -60,6 +60,16 @@ public abstract class TableGridActivity extends BaseActivity {
 	private NotificationTypes mNotificationType = new NotificationTypes();
 	
 	@Override
+	protected void onResume() {
+		super.onResume();
+		if (guidePageAdapter.getImageItem() != null) {
+			mTableInfo.clearLstImageItem();
+			updateGridViewAdapter(currentPage);
+		}
+
+	}
+	
+	@Override
 	protected void onDestroy() {
 		unbindService(conn);
 		unregisterReceiver(mReceiver);
@@ -198,16 +208,6 @@ public abstract class TableGridActivity extends BaseActivity {
 		guidePageAdapter.NotifyimageItemDataSetChanged();
 	}
 
-	@Override
-	protected void onResume() {
-		super.onResume();
-		if (guidePageAdapter.getImageItem() != null) {
-			mTableInfo.clearLstImageItem();
-			updateGridViewAdapter(currentPage);
-		}
-
-	}
-
 	protected View getPageView() {
 		return layout;
 	}
@@ -243,6 +243,7 @@ public abstract class TableGridActivity extends BaseActivity {
 			}
 		}.start();
 	}
+	
 	private Handler notificationTypeHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
@@ -264,7 +265,6 @@ public abstract class TableGridActivity extends BaseActivity {
 				.findViewById(R.id.orderNotification);
 		mStatusBar = (TextView) layout.findViewById(R.id.statusBar);
 		imgCur = (TextView) layout.findViewById(R.id.text);
-
 	}
 
 	@SuppressWarnings("deprecation")

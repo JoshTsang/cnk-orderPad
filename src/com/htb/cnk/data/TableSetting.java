@@ -480,7 +480,7 @@ public class TableSetting implements Serializable {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		Log.d(TAG, orderALL.toString() + "aaa");
+		Log.d(TAG, orderALL.toString());
 		String tableCleanPkg = Http.post(Server.CLEAN_TABLE,
 				orderALL.toString());
 		if (!ErrorPHP.isSucc(tableCleanPkg, TAG)) {
@@ -549,14 +549,15 @@ public class TableSetting implements Serializable {
 				return TIME_OUT;
 			}
 			JSONObject orderObject = new JSONObject();
-			String time = getCurrentTime();
-			orderJson(item, orderObject, tableName.get(i), time, 0);
+//			String time = getCurrentTime();
+			orderJson(item, orderObject, tableName.get(i), null, 0);
 			nameStrBuf.append(tableName.get(i).toString() + ",");
 			orderArrary.put(orderObject.toString());
 			i++;
 		}
 		String flavorStr = nameStrBuf.toString().substring(0,
 				nameStrBuf.length() - 1);
+		String time = getCurrentTime();
 		try {
 			orderAll.put("waiter", UserData.getUserName());
 			orderAll.put("orderAll", orderArrary.toString());
@@ -564,9 +565,11 @@ public class TableSetting implements Serializable {
 			orderAll.put("income", income.toString());
 			orderAll.put("change", change.toString());
 			orderAll.put("tableName", flavorStr.toString());
+			orderAll.put("timestamp", time);
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
+		Log.d(TAG, orderAll.toString());
 		String tablecheckOutPkg = Http.post(Server.CHECK_OUT,
 				orderAll.toString());
 		if (!ErrorPHP.isSucc(tablecheckOutPkg, TAG)) {

@@ -55,7 +55,7 @@ public abstract class GridClick extends Activity {
 		mItemDialog = new ItemDlg(context);
 		mViewDialog = new ViewDlg(context);
 		mPhoneOrder = new PhoneOrder(context);
-
+		mRingtone = new Ringtone(context);
 		setSettings(new TableSetting(context));
 		mContext = context;
 		initProgressDlg();
