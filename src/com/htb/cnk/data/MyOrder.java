@@ -283,17 +283,19 @@ public class MyOrder {
 
 	}
 
-	public static int submitPendedOrder(String order, int tableStatus) {
-		String response;
+	public static int submitPendedOrder(String order, int tableStatus, String MD5) {
+		String response = null;
 
 		int ret = Http.getPrinterStatus(Server.PRINTER_CONTENT_TYPE_ORDER);
 		if (ret < 0) {
 			return ret;
 		}
-		if (tableStatus == Table.OPEN_TABLE_STATUS) {
-			response = Http.post(Server.SUBMIT_ORDER + "?action=add", order);
-		} else {
-			response = Http.post(Server.SUBMIT_ORDER, order);
+		for (int i=0; i<2; i++) {
+			if (tableStatus == Table.OPEN_TABLE_STATUS) {
+				response = Http.post(Server.SUBMIT_ORDER + "?action=add&MD5=" + MD5, order);
+			} else {
+				response = Http.post(Server.SUBMIT_ORDER + "?MD5=" + MD5, order);
+			}
 		}
 		if (!ErrorPHP.isSucc(response, TAG)) {
 			return -1;
