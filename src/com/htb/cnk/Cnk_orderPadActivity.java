@@ -72,6 +72,8 @@ public class Cnk_orderPadActivity extends BaseActivity {
 	private Handler handler = new Handler();
 	private Version version;
 	private Setting mAppSetting;
+	private AlertDialog mNetworkErrDlg;
+	private LoginDlg mLoginDlg;
 
 	private int retry;
 
@@ -99,6 +101,10 @@ public class Cnk_orderPadActivity extends BaseActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+		if (mNetworkErrDlg != null) {
+			mNetworkErrDlg.cancel();
+			mNetworkErrDlg = null;
+		}
 		mpDialog.show();
 		initWifi();
 		retry = 0;
@@ -386,15 +392,19 @@ public class Cnk_orderPadActivity extends BaseActivity {
 
 		@Override
 		public void onClick(View v) {
+			mSettingsBtn.setClickable(false);
 			if (Info.getMode() == Info.WORK_MODE_CUSTOMER) {
-				LoginDlg loginDlg = new LoginDlg(Cnk_orderPadActivity.this,
-						TableActivity.class);
-				loginDlg.show(Permission.STUFF);
+				if (mLoginDlg == null) {
+					mLoginDlg = new LoginDlg(Cnk_orderPadActivity.this,
+							TableActivity.class);
+				}
+				mLoginDlg.show(Permission.STUFF);
 			} else {
 				Intent intent = new Intent();
 				intent.setClass(Cnk_orderPadActivity.this, TableActivity.class);
 				Cnk_orderPadActivity.this.startActivity(intent);
 			}
+			mSettingsBtn.setClickable(true);
 		}
 
 	};
@@ -432,26 +442,30 @@ public class Cnk_orderPadActivity extends BaseActivity {
 		public void handleMessage(Message msg) {
 			if (retry > 3) {
 				mpDialog.cancel();
-				new AlertDialog.Builder(Cnk_orderPadActivity.this)
-				.setTitle("错误")
-				.setMessage("网络连接不可用")
-				.setPositiveButton("重试",
-						new DialogInterface.OnClickListener() {
-	
-							@Override
-							public void onClick(DialogInterface dialog,
-									int which) {
-								mpDialog.show();
-								validatePadWhenConnected();
-							}
-						})
-				.setNegativeButton("退出", new DialogInterface.OnClickListener() {
-					
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						finish();
-					}
-				}).show();
+				if (mNetworkErrDlg == null) {
+					mNetworkErrDlg = new AlertDialog.Builder(Cnk_orderPadActivity.this)
+					.setTitle("错误")
+					.setMessage("网络连接不可用")
+					.setPositiveButton("重试",
+							new DialogInterface.OnClickListener() {
+		
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+									mpDialog.show();
+									mNetworkErrDlg = null;
+									validatePadWhenConnected();
+								}
+							})
+					.setNegativeButton("退出", new DialogInterface.OnClickListener() {
+						
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							finish();
+						}
+					}).show();
+				}
+				
 			} else {
 				retry++;
 				validatePadWhenConnected();
