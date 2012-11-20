@@ -3,8 +3,6 @@ package com.htb.cnk.data;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.util.Log;
-
 import com.htb.constant.Table;
 
 public class PendedOrder {
@@ -23,7 +21,6 @@ public class PendedOrder {
 			this.order = order;
 			this.status = status;
 			MD5 = getMD5(order);
-			Log.d(TAG, MD5);
 		}
 		
 		public int getTableId() {

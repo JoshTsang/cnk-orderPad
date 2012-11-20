@@ -290,12 +290,10 @@ public class MyOrder {
 		if (ret < 0) {
 			return ret;
 		}
-		for (int i=0; i<2; i++) {
-			if (tableStatus == Table.OPEN_TABLE_STATUS) {
-				response = Http.post(Server.SUBMIT_ORDER + "?action=add&MD5=" + MD5, order);
-			} else {
-				response = Http.post(Server.SUBMIT_ORDER + "?MD5=" + MD5, order);
-			}
+		if (tableStatus == Table.OPEN_TABLE_STATUS) {
+			response = Http.post(Server.SUBMIT_ORDER + "?action=add&MD5=" + MD5, order);
+		} else {
+			response = Http.post(Server.SUBMIT_ORDER + "?MD5=" + MD5, order);
 		}
 		if (!ErrorPHP.isSucc(response, TAG)) {
 			return -1;
