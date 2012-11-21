@@ -2,10 +2,6 @@ package com.htb.cnk.dialog;
 
 import java.lang.reflect.Method;
 
-import com.htb.cnk.R;
-import com.htb.cnk.data.Setting;
-import com.htb.cnk.data.UserData;
-
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -21,6 +17,10 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.htb.cnk.R;
+import com.htb.cnk.data.Setting;
+import com.htb.cnk.data.UserData;
+
 public class LoginDlg {
 	private final String TAG = "LoginDlg";
 	public final static int ACTION_SUBMIT = 10;
@@ -28,6 +28,7 @@ public class LoginDlg {
 	private Class<?> mDestActivity;
 	ProgressDialog pdialog;
 	private int mAction;
+	private boolean shown;
 	
 	public LoginDlg(Context context, Class<?> dest) {
 		mActivity = context;
@@ -40,60 +41,65 @@ public class LoginDlg {
 	}
 	
 	public void show(final int permissionRequres) {
-		LayoutInflater factory = LayoutInflater.from(mActivity);
-		final View DialogView = factory.inflate(R.layout.setting_dialog, null);
-		SharedPreferences sharedPre = mActivity.getSharedPreferences("userInfo",
-				Context.MODE_PRIVATE);
-		String userName = sharedPre.getString("name", "");
-		EditText userNameET = (EditText) DialogView.findViewById(R.id.edit_username);
-		
-		if (!Setting.enabledPWDCheck()) {
-			UserData.debugMode();
-			login();
-			return ;
-		}
-		userNameET.setText(userName);
-		
-		AlertDialog dlg = new AlertDialog.Builder(mActivity)
-				.setTitle("登录框")
-				.setView(DialogView)
-				.setPositiveButton("确定",
-						new DialogInterface.OnClickListener() {
-
-							@Override
-							public void onClick(DialogInterface dialog,
-									int which) {
-								if (getUserNameAndPwd(DialogView) < 0) {
-									Toast.makeText(mActivity, "用户名密码不能为空", Toast.LENGTH_SHORT).show();
-								} else {
-									pdialog = new ProgressDialog(mActivity);
-									pdialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-									pdialog.setMessage("正在登陆...");
-									pdialog.setIndeterminate(false);
-									pdialog.setCancelable(false);
-									pdialog.show();
-									new Thread() {
-									public void run() {
-										try {
-											int ret = UserData.compare(permissionRequres);
-											userHandle.sendEmptyMessage(ret);
-										} catch (Exception e) {
-											userHandle.sendEmptyMessage(UserData.PWD_NETWORK_ERR);
-											e.printStackTrace();
-										}
-									}}.start();
+		if (!shown) {
+			shown = true;
+			LayoutInflater factory = LayoutInflater.from(mActivity);
+			final View DialogView = factory.inflate(R.layout.setting_dialog, null);
+			SharedPreferences sharedPre = mActivity.getSharedPreferences("userInfo",
+					Context.MODE_PRIVATE);
+			String userName = sharedPre.getString("name", "");
+			EditText userNameET = (EditText) DialogView.findViewById(R.id.edit_username);
+			
+			if (!Setting.enabledPWDCheck()) {
+				UserData.debugMode();
+				login();
+				return ;
+			}
+			userNameET.setText(userName);
+			
+			AlertDialog dlg = new AlertDialog.Builder(mActivity)
+					.setTitle("登录框")
+					.setView(DialogView)
+					.setPositiveButton("确定",
+							new DialogInterface.OnClickListener() {
+	
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+									shown = false;
+									if (getUserNameAndPwd(DialogView) < 0) {
+										Toast.makeText(mActivity, "用户名密码不能为空", Toast.LENGTH_SHORT).show();
+									} else {
+										pdialog = new ProgressDialog(mActivity);
+										pdialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+										pdialog.setMessage("正在登陆...");
+										pdialog.setIndeterminate(false);
+										pdialog.setCancelable(false);
+										pdialog.show();
+										new Thread() {
+										public void run() {
+											try {
+												int ret = UserData.compare(permissionRequres);
+												userHandle.sendEmptyMessage(ret);
+											} catch (Exception e) {
+												userHandle.sendEmptyMessage(UserData.PWD_NETWORK_ERR);
+												e.printStackTrace();
+											}
+										}}.start();
+									}
 								}
-							}
-						}).setNegativeButton("取消",
-						new DialogInterface.OnClickListener() {
-
-							@Override
-							public void onClick(DialogInterface dialog,
-									int which) {
-							}
-						})
-				.setCancelable(false).create();
-		dlg.show();
+							}).setNegativeButton("取消",
+							new DialogInterface.OnClickListener() {
+	
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+									shown = false;
+								}
+							})
+					.setCancelable(false).create();
+			dlg.show();
+		}
 	}
 	
 	private void login() {
