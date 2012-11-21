@@ -62,7 +62,7 @@ public class Dishes {
 	}
 
 	public int getDishId(int position) {
-		return mDishes.get(position).getId();
+		return mDishes.get(position).getDishId();
 	}
 
 	public void addAll(List<Dish> list) {
@@ -166,7 +166,7 @@ public class Dishes {
 			Iterator<Dish> iterator = mDishes.iterator();
 			while (iterator.hasNext()) {
 				Dish d = iterator.next();
-				if (d.getId() == i) {
+				if (d.getDishId() == i) {
 					iterator.remove();
 				}
 			}

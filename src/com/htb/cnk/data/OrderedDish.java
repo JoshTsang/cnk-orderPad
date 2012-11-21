@@ -7,7 +7,6 @@ public class OrderedDish {
 	protected int status;
 	protected int tableId;
 	protected boolean[] flavor;
-
 	public OrderedDish(MyOrder myOrder, Dish dish, float quantity, int tableId, int status,
 			int type) {
 		//OrderedDish = myOrder;
@@ -49,7 +48,7 @@ public class OrderedDish {
 	}
 
 	public int getDishId() {
-		return dish.getId();
+		return dish.getDishId();
 	}
 
 	public int getStatus() {

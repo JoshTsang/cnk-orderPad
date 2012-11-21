@@ -41,7 +41,7 @@ public class Dish {
 		mPrinter = 0;
 	}
 
-	public int getId() {
+	public int getDishId() {
 		return mId;
 	}
 	

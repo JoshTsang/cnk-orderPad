@@ -19,6 +19,7 @@ import com.htb.cnk.data.OrderedDish;
 import com.htb.cnk.ui.base.OrderBaseActivity;
 
 public class DelOrderActivity extends OrderBaseActivity {
+	static final String TAG = "DelOrderActivity";
 	private final int CLEANALL = -1;
 	private final int UPDATE_ORDER = 1;
 	private final int DEL_ITEM_ORDER = 2;
@@ -27,7 +28,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 	private AlertDialog mNetWrorkcancel;
 	private AlertDialog.Builder mNetWrorkAlertDialog;
 	private final int UPDATE_ORDER_QUAN = 1;
-
+//	private List<String> delOrder = new ArrayList<String>();
 	@Override
 	protected void onResume() {
 		if (NETWORK_ARERTDIALOG == 1) {
@@ -48,9 +49,10 @@ public class DelOrderActivity extends OrderBaseActivity {
 	}
 
 	private void setDelViews() {
-		mSubmitBtn.setVisibility(View.GONE);
+//		mSubmitBtn.setVisibility(View.GONE);
+		mSubmitBtn.setText("提交刪除");
 		mLeftBtn.setText(R.string.cleanAll);
-		mRefreshBtn.setVisibility(View.GONE);
+//		mRefreshBtn.setVisibility(View.GONE);
 		mComment.setVisibility(View.GONE);
 	}
 
@@ -95,33 +97,33 @@ public class DelOrderActivity extends OrderBaseActivity {
 
 	private void setDelClickListener() {
 		mLeftBtn.setOnClickListener(cleanBtnClicked);
+		mSubmitBtn.setOnClickListener(delSubmitBtnClicked);
+		mRefreshBtn.setOnClickListener(delRefreshClicked);
 	}
-
-	private void delDish(final int position, final float updateOrderQuan,
-			final int type) {
+	
+	private void delDish() {
 		new Thread() {
 			public void run() {
 				try {
-					int ret = mMyOrder.submitDelDish(position, type);
+					int ret = mMyOrder.submitDelDish(UPDATE_ORDER);
 					if (ret < 0) {
 						delDishHandler.sendEmptyMessage(ret);
 						return;
 					}
-					mMyOrder.minus(position, updateOrderQuan);
 					delDishHandler.sendEmptyMessage(ret);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-			}
+			} 
 		}.start();
 
 	}
 
 	private void delDishAlert(final int position) {
 		String messages;
-
 		if (position == CLEANALL) {
 			messages = "确认退掉所有菜品";
+			delDishDialog(position, messages);
 		} else {
 			if ("斤".equals(mMyOrder.getOrderedDish(position).getUnit())) {
 				new AlertDialog.Builder(DelOrderActivity.this)
@@ -130,9 +132,12 @@ public class DelOrderActivity extends OrderBaseActivity {
 						.show();
 				return;
 			}
-			messages = "确认退菜：" + mMyOrder.getOrderedDish(position).getName();
+			mMyOrder.addDelOrder(position); 
+			mMyOrder.minus(position, 1);
+			fillDelData();
+			mMyOrderAdapter.notifyDataSetChanged();
 		}
-		delDishDialog(position, messages);
+		
 	}
 
 	protected void delDishDialog(final int position, String messages) {
@@ -142,20 +147,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 				if (position == CLEANALL) {
 					showProgressDlg("正在退掉所有菜品");
 					cleanAllThread();
-				} else {
-					showProgressDlg("正在退掉菜品");
-					if (converFloat(position)) {
-						delDish(position, UPDATE_ORDER_QUAN, UPDATE_ORDER);
-					} else {
-						delDish(position, mMyOrder.getQuantity(position),
-								DEL_ITEM_ORDER);
-					}
-				}
-			}
-
-			private boolean converFloat(final int position) {
-				return MyOrder.convertFloat(mMyOrder.getQuantity(position))
-						.indexOf(".") == -1;
+				} 
 			}
 		};
 
@@ -248,7 +240,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 						cleanAllHandler.sendEmptyMessage(-2);
 						return;
 					}
-					int result = mMyOrder.submitDelDish(CLEANALL, CLEANALL);
+					int result = mMyOrder.submitDelDish(CLEANALL);
 					if (result < 0) {
 						cleanAllHandler.sendEmptyMessage(result);
 						return;
@@ -291,7 +283,25 @@ public class DelOrderActivity extends OrderBaseActivity {
 			mMyOrderAdapter.notifyDataSetChanged();
 		}
 	};
+	
+	private OnClickListener delSubmitBtnClicked = new OnClickListener() {
 
+		@Override
+		public void onClick(View v) {
+			showProgressDlg("正在退掉菜品");
+				delDish();
+		}
+	};
+	
+	private OnClickListener delRefreshClicked = new OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+			showProgressDlg("正在获取菜品。。。");
+			getOrderThread();
+		}
+	};
+	
 	private OnClickListener delClicked = new OnClickListener() {
 
 		public void onClick(View v) {

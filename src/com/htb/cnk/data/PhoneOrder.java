@@ -61,7 +61,7 @@ public class PhoneOrder extends MyOrder {
 				String unit = cur.getString(UNIT_NAME);
 				String pic = cur.getString(PIC_COLUMN);
 				Dish mDish = new Dish(dishId, name, dishPrice, pic, unit, printer);
-				addOrder(mDish, quantity, tableId, 0, MODE_PHONE);
+				addOrder(mDish, quantity, tableId, 0, MODE_PHONE,mOrder);
 			}
 			return 0;
 		} catch (Exception e) {
@@ -110,7 +110,7 @@ public class PhoneOrder extends MyOrder {
 
 	public int minus(Dish dish, int quantity) {
 		for (OrderedDish item : mOrder) {
-			if (item.dish.getId() == dish.getId()) {
+			if (item.dish.getDishId() == dish.getDishId()) {
 				return minus(item, quantity);
 			}
 		}
