@@ -23,6 +23,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 	private final int CLEANALL = -1;
 	private final int UPDATE_ORDER = 1;
 	private final int DEL_ITEM_ORDER = 2;
+	private final int DEL_ORDER =  0;
 	private int NETWORK_ARERTDIALOG = 0;
 	private MyOrderAdapter mMyOrderAdapter;
 	private AlertDialog mNetWrorkcancel;
@@ -240,7 +241,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 						cleanAllHandler.sendEmptyMessage(-2);
 						return;
 					}
-					int result = mMyOrder.submitDelDish(CLEANALL);
+					int result = mMyOrder.submitDelDish(DEL_ORDER);
 					if (result < 0) {
 						cleanAllHandler.sendEmptyMessage(result);
 						return;

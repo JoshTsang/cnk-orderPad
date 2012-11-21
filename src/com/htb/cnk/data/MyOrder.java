@@ -33,7 +33,7 @@ public class MyOrder {
 	public final static int ERR_DB = -10;
 
 	/* Del order mode */
-	public final static int DEL_ALL_ORDER = -1;
+	public final static int DEL_ALL_ORDER = 0;
 	public final static int DEL_ITEM_ORDER = 2;
 	
 	/* current order mode */
@@ -308,17 +308,17 @@ public class MyOrder {
 
 	}
 
-	public static int submitPendedOrder(String order, int tableStatus) {
-		String response;
+	public static int submitPendedOrder(String order, int tableStatus, String MD5) {
+		String response = null;
 
 		int ret = Http.getPrinterStatus(Server.PRINTER_CONTENT_TYPE_ORDER);
 		if (ret < 0) {
 			return ret;
 		}
 		if (tableStatus == Table.OPEN_TABLE_STATUS) {
-			response = Http.post(Server.SUBMIT_ORDER + "?action=add", order);
+			response = Http.post(Server.SUBMIT_ORDER + "?action=add&MD5=" + MD5, order);
 		} else {
-			response = Http.post(Server.SUBMIT_ORDER, order);
+			response = Http.post(Server.SUBMIT_ORDER + "?MD5=" + MD5, order);
 		}
 		if (!ErrorPHP.isSucc(response, TAG)) {
 			return -1;
@@ -511,9 +511,6 @@ public class MyOrder {
 		Date date = new Date();
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String time = df.format(date);
-		if (mDelOrder.size() <= 0) {
-			return -1;
-		}
 		int ret = Http.getPrinterStatus(Server.PRINTER_CONTENT_TYPE_ORDER);
 		if (ret < 0) {
 			return ret;
@@ -547,6 +544,9 @@ public class MyOrder {
 					return NOTHING_TO_DEL;
 				}
 			} else {
+				if (mDelOrder.size() <= 0) {
+					return -1;
+				}
 				for(int i=0;i<mDelOrder.size();i++){
 					JSONObject dish = new JSONObject();
 					dish.put("dishId", mDelOrder.get(i).dish.getDishId());
