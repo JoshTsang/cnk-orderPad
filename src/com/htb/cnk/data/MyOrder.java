@@ -24,7 +24,7 @@ import com.htb.constant.Table;
 
 public class MyOrder {
 	public final static String TAG = "MyOrder";
-	
+
 	/* Error Code */
 	public final static int ERR_GET_PHONE_ORDER_FAILED = -10;
 	public final static int RET_NULL_PHONE_ORDER = 1;
@@ -35,7 +35,7 @@ public class MyOrder {
 	/* Del order mode */
 	public final static int DEL_ALL_ORDER = 0;
 	public final static int DEL_ITEM_ORDER = 2;
-	
+
 	/* current order mode */
 	public final static int MODE_PAD = 0;
 	public final static int MODE_PHONE = 1;
@@ -64,11 +64,11 @@ public class MyOrder {
 		mDb = mCnkDbHelper.getReadableDatabase();
 		mContext = context;
 	}
-	
+
 	public void setOrderType(int type) {
 		mOrderType = type;
 	}
-	
+
 	public void setPersons(int persons) {
 		this.mPersons = persons;
 	}
@@ -78,7 +78,7 @@ public class MyOrder {
 	}
 
 	protected int addOrder(Dish dish, float quantity, int tableId, int status,
-			int type,List<OrderedDish> order) {
+			int type, List<OrderedDish> order) {
 		for (OrderedDish item : order) {
 			if (item.dish.getDishId() == dish.getDishId()) {
 				if (type == MODE_PAD) {
@@ -94,13 +94,17 @@ public class MyOrder {
 		return 0;
 	}
 
-	public void addDelOrder(int position){
+	public void addDelOrder(int position,float quantity) {
 		Dish dish = getDish(position);
 		int tableId = getDishId(position);
 		int status = getStatus(position);
-		addOrder(dish, 1, tableId, status, MODE_PAD, mDelOrder);
+		addOrder(dish, quantity, tableId, status, MODE_PAD, mDelOrder);
 	}
-	
+
+	public List<OrderedDish> getDelOrder() {
+		return mDelOrder;
+	}
+
 	public int add(Dish dish, float quantity, int tableId, int type) {
 		for (OrderedDish item : mOrder) {
 			if (item.dish.getDishId() == dish.getDishId()) {
@@ -125,22 +129,22 @@ public class MyOrder {
 	public int getTotalQuantity() {
 		return count();
 	}
-	
-	public int getStatus(int position){
+
+	public int getStatus(int position) {
 		if (position < mOrder.size()) {
 			return mOrder.get(position).status;
 		}
 		return -1;
 	}
-	
-	public Dish getDish(int position){
+
+	public Dish getDish(int position) {
 		if (position < mOrder.size()) {
-			Log.d(TAG, "postion:"+position+"mOrder.size："+mOrder.size());
+			Log.d(TAG, "postion:" + position + "mOrder.size：" + mOrder.size());
 			return mOrder.get(position).dish;
 		}
 		return null;
 	}
-	
+
 	public int getDishId(int position) {
 		if (position < mOrder.size()) {
 			return mOrder.get(position).dish.getDishId();
@@ -187,18 +191,18 @@ public class MyOrder {
 		return mOrder.get(index).getTableId();
 	}
 
-	public int getIndex(int dishId){
-		for(int i=0;i<mOrder.size();i++){
-			 if(dishId == mOrder.get(i).getDishId())
-				 return i;
+	public int getIndex(int dishId) {
+		for (int i = 0; i < mOrder.size(); i++) {
+			if (dishId == mOrder.get(i).getDishId())
+				return i;
 		}
 		return -1;
 	}
-	
+
 	public static String[] getFlavor() {
 		return mFlavorName;
 	}
-	
+
 	public void setComment(String str) {
 		mComment = str;
 	}
@@ -308,7 +312,8 @@ public class MyOrder {
 
 	}
 
-	public static int submitPendedOrder(String order, int tableStatus, String MD5) {
+	public static int submitPendedOrder(String order, int tableStatus,
+			String MD5) {
 		String response = null;
 
 		int ret = Http.getPrinterStatus(Server.PRINTER_CONTENT_TYPE_ORDER);
@@ -316,7 +321,8 @@ public class MyOrder {
 			return ret;
 		}
 		if (tableStatus == Table.OPEN_TABLE_STATUS) {
-			response = Http.post(Server.SUBMIT_ORDER + "?action=add&MD5=" + MD5, order);
+			response = Http.post(
+					Server.SUBMIT_ORDER + "?action=add&MD5=" + MD5, order);
 		} else {
 			response = Http.post(Server.SUBMIT_ORDER + "?MD5=" + MD5, order);
 		}
@@ -338,7 +344,7 @@ public class MyOrder {
 			order.put("tableId", Info.getTableId());
 			order.put("persons", mPersons);
 			order.put("tableName", Info.getTableName());
-			order.put("type", mOrderType==MODE_PAD?"pad":"phone");
+			order.put("type", mOrderType == MODE_PAD ? "pad" : "phone");
 			if (!"".equals(mComment.trim())) {
 				order.put("comment", mComment);
 			}
@@ -447,6 +453,7 @@ public class MyOrder {
 		String response = Http.get(Server.GET_MYORDER, "TID=" + tableId);
 		if ("null".equals(response)) {
 			Log.w(TAG, "getOrderFromServer.null");
+			mOrder.clear();
 			return -2;
 		} else if (response == null) {
 			Log.e(TAG, "getOrderFromServer.timeOut");
@@ -463,7 +470,7 @@ public class MyOrder {
 				int status = item.getInt("status");
 				Float dishPrice = (float) item.getDouble("price");
 				Cursor cur = getDishInfoFromDB(dishId);
-				if(cur == null){
+				if (cur == null) {
 					return ERR_DB;
 				}
 				String name = cur.getString(NAME_COLUMN);
@@ -472,7 +479,7 @@ public class MyOrder {
 				String unit = cur.getString(UNIT_NAME);
 				Dish mDish = new Dish(dishId, name, dishPrice, pic, unit,
 						printer);
-				addOrder(mDish, quantity, tableId, status, MODE_PAD,mOrder);
+				addOrder(mDish, quantity, tableId, status, MODE_PAD, mOrder);
 			}
 			return 0;
 		} catch (Exception e) {
@@ -504,7 +511,7 @@ public class MyOrder {
 		}
 		return name;
 	}
-	
+
 	public int submitDelDish(int type) {
 		String response;
 		JSONObject order = new JSONObject();
@@ -528,14 +535,15 @@ public class MyOrder {
 		try {
 			if (type == DEL_ALL_ORDER) {
 				for (int i = 0; i < mOrder.size(); i++) {
-					if ("斤".equals(mOrder.get(i).dish.getUnit())) {
-						continue;
-					}
+//					if ("斤".equals(mOrder.get(i).dish.getUnit())) {
+//						continue;
+//					}
 					JSONObject dish = new JSONObject();
 					dish.put("dishId", mOrder.get(i).dish.getDishId());
 					dish.put("name", mOrder.get(i).dish.getName());
 					dish.put("price", mOrder.get(i).dish.getPrice());
-					dish.put("quan",
+					dish.put(
+							"quan",
 							(mOrder.get(i).padQuantity + mOrder.get(i).phoneQuantity));
 					dish.put("printer", mOrder.get(i).getPrinter());
 					dishes.put(dish);
@@ -547,13 +555,14 @@ public class MyOrder {
 				if (mDelOrder.size() <= 0) {
 					return -1;
 				}
-				for(int i=0;i<mDelOrder.size();i++){
+				for (int i = 0; i < mDelOrder.size(); i++) {
 					JSONObject dish = new JSONObject();
 					dish.put("dishId", mDelOrder.get(i).dish.getDishId());
 					dish.put("name", mDelOrder.get(i).dish.getName());
 					dish.put("price", mDelOrder.get(i).dish.getPrice());
 					dish.put("quan", mDelOrder.get(i).getQuantity());
 					dish.put("printer", mDelOrder.get(i).dish.getPrinter());
+					dish.put("unit", mDelOrder.get(i).dish.getUnit());
 					dishes.put(dish);
 				}
 			}
@@ -562,15 +571,16 @@ public class MyOrder {
 			e.printStackTrace();
 		}
 		Log.d(TAG, order.toString());
-		response = Http.post(Server.DEL_ORDER+ "?TYPE=" + type, order.toString());
+		response = Http.post(Server.DEL_ORDER + "?TYPE=" + type,
+				order.toString());
+		mDelOrder.clear();
 		if (!ErrorPHP.isSucc(response, TAG)) {
 			return -2;
 		}
 		return 0;
 
 	}
-	
-	
+
 	public void showServerDelProgress() {
 		Method showDelProcessDlg;
 		try {
@@ -610,7 +620,7 @@ public class MyOrder {
 						CnkDbHelper.UNIT_ID, CnkDbHelper.TABLE_DISH_INFO,
 						CnkDbHelper.DISH_ID, id);
 		Cursor cur = mDb.rawQuery(sql, null);
-	
+
 		if (cur.moveToNext()) {
 			return cur;
 		}
@@ -655,7 +665,7 @@ public class MyOrder {
 		Cursor cur = mDb.query(CnkDbHelper.TABLE_DISH_INFO,
 				new String[] { CnkDbHelper.DISH_NAME }, CnkDbHelper.DISH_ID
 						+ "=" + id, null, null, null, null);
-	
+
 		if (cur.moveToNext()) {
 			return cur.getString(0);
 		}

@@ -18,13 +18,14 @@ import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.OrderedDish;
 import com.htb.cnk.ui.base.OrderBaseActivity;
+import com.umeng.common.Log;
 
 public class DelOrderActivity extends OrderBaseActivity {
 	static final String TAG = "DelOrderActivity";
-	private final int CLEANALL = 0;
+	private final int CLEANALL = -10;
 	private final int UPDATE_ORDER = 1;
 	private final int DEL_ITEM_ORDER = 2;
-	private final int DEL_ORDER = 0;
+	private final int DEL_ALL_ORDER = 0;
 	private int NETWORK_ARERTDIALOG = 0;
 	private MyOrderAdapter mMyOrderAdapter;
 	private AlertDialog mNetWrorkcancel;
@@ -125,17 +126,27 @@ public class DelOrderActivity extends OrderBaseActivity {
 		String messages;
 		if (position == CLEANALL) {
 			messages = "确认退掉所有菜品";
-			delDishDialog(position, messages);
-		} else {
-			if ("斤".equals(mMyOrder.getOrderedDish(position).getUnit())) {
-				new AlertDialog.Builder(DelOrderActivity.this)
-						.setCancelable(false).setTitle("提示")
-						.setMessage("该菜品无法退回！").setPositiveButton("确定", null)
-						.show();
-				return;
+			if(mMyOrder.getDelOrder().size() > 0){
+				Log.d(TAG, "size:"+mMyOrder.getDelOrder().size());
+				toastText("请先提交已经删除产品，再退掉所有菜品！");
+			}else{
+				delDishDialog(position, messages);		
 			}
-			mMyOrder.addDelOrder(position);
-			mMyOrder.minus(position, 1);
+		} else {
+//			if ("斤".equals(mMyOrder.getOrderedDish(position).getUnit())) {
+//				new AlertDialog.Builder(DelOrderActivity.this)
+//						.setCancelable(false).setTitle("提示")
+//						.setMessage("该菜品无法退回！").setPositiveButton("确定", null)
+//						.show();
+//				return;
+//			}
+			if ("斤".equals(mMyOrder.getOrderedDish(position).getUnit())) {
+				mMyOrder.addDelOrder(position,mMyOrder.getOrderedDish(position).getQuantity());
+				mMyOrder.minus(position, mMyOrder.getOrderedDish(position).getQuantity());
+			}else{
+				mMyOrder.addDelOrder(position,1);
+				mMyOrder.minus(position, 1);
+			}
 			fillDelData();
 			mMyOrderAdapter.notifyDataSetChanged();
 		}
@@ -262,7 +273,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 						cleanAllHandler.sendEmptyMessage(-2);
 						return;
 					}
-					int result = mMyOrder.submitDelDish(DEL_ORDER);
+					int result = mMyOrder.submitDelDish(DEL_ALL_ORDER);
 					if (result < 0) {
 						cleanAllHandler.sendEmptyMessage(result);
 						return;
