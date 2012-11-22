@@ -6,11 +6,14 @@ import java.util.List;
 
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -36,6 +39,12 @@ public class TableActivity extends TableGridActivity {
 	private AlertDialog.Builder mNetWrorkAlertDialog;
 
 	@Override
+	protected void onResume() {
+		super.onResume();
+		checkAndUpdateMenu();
+	}
+
+	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.table_activity);
@@ -43,6 +52,28 @@ public class TableActivity extends TableGridActivity {
 		setClickListeners();
 	}
 
+	
+	private void checkAndUpdateMenu() {
+		new Thread() {
+			public void run() {
+				int menuVer = getCurrentMenuVer();
+				if (UpdateMenuActivity.isUpdateNeed(menuVer)) {
+					Log.d(TAG, "update Menu needed");
+					handlerMenuUpdate.sendEmptyMessage(1);
+				} else {
+					Log.d(TAG, "no new menu founded, currentMenuVer:" + menuVer);
+					handlerMenuUpdate.sendEmptyMessage(0);
+				}
+			}
+		}.start();
+	}
+	
+	private int getCurrentMenuVer() {
+		SharedPreferences sharedPre = getSharedPreferences("menuDB",
+				Context.MODE_PRIVATE);
+		return sharedPre.getInt("ver", -1);
+	}
+	
 	private void findViews() {
 		mBackBtn = (Button) findViewById(R.id.back);
 		mUpdateBtn = (Button) findViewById(R.id.checkOutTable);
@@ -60,6 +91,17 @@ public class TableActivity extends TableGridActivity {
 		layoutViewPager.addView(getPageView());
 	}
 
+	private Handler handlerMenuUpdate = new Handler() {
+		public void handleMessage(Message msg) {
+			if (msg.what > 0) {
+				Intent intent = new Intent();
+				intent.setClass(TableActivity.this,
+						UpdateMenuActivity.class);
+				startActivity(intent);
+			}
+		}
+	};
+	
 	private Handler totalPriceTableHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
