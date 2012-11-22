@@ -52,6 +52,7 @@ public class LoginDlg {
 			
 			if (!Setting.enabledPWDCheck()) {
 				UserData.debugMode();
+				shown = false;
 				login();
 				return ;
 			}

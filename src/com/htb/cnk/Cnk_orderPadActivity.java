@@ -381,8 +381,11 @@ public class Cnk_orderPadActivity extends BaseActivity {
 		@Override
 		public void onClick(View arg0) {
 			Intent intent = new Intent();
-			intent.setClass(Cnk_orderPadActivity.this, MenuActivity.class);
-			Info.setMode(Info.WORK_MODE_CUSTOMER);
+			if (Info.getMode() == Info.WORK_MODE_CUSTOMER) {
+				intent.setClass(Cnk_orderPadActivity.this, MenuActivity.class);
+			} else {
+				intent.setClass(Cnk_orderPadActivity.this, TableActivity.class);
+			}
 			startActivity(intent);
 		}
 
