@@ -56,7 +56,7 @@ public abstract class TableGridActivity extends BaseActivity {
 	private ViewPager mPageView;
 	private View layout;
 	private TextView imgCur;
-	private AlertDialog.Builder mNetWrorkAlertDialog;
+	private AlertDialog.Builder mNetWrorkAlertDialog ;
 	private NotificationTypes mNotificationType = new NotificationTypes();
 	
 	@Override
@@ -228,6 +228,7 @@ public abstract class TableGridActivity extends BaseActivity {
 		guidePageAdapter = new GuidePageAdapter(TableGridActivity.this,
 				mTableInfo);
 		mReceiver = new MyReceiver(TableGridActivity.this);
+		mNetWrorkAlertDialog = new  AlertDialog.Builder(TableGridActivity.this);
 		registerReceiver(mReceiver);
 	}
 
