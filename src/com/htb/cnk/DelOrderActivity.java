@@ -2,6 +2,7 @@ package com.htb.cnk;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -23,13 +24,13 @@ public class DelOrderActivity extends OrderBaseActivity {
 	private final int CLEANALL = 0;
 	private final int UPDATE_ORDER = 1;
 	private final int DEL_ITEM_ORDER = 2;
-	private final int DEL_ORDER =  0;
+	private final int DEL_ORDER = 0;
 	private int NETWORK_ARERTDIALOG = 0;
 	private MyOrderAdapter mMyOrderAdapter;
 	private AlertDialog mNetWrorkcancel;
 	private AlertDialog.Builder mNetWrorkAlertDialog;
 	private final int UPDATE_ORDER_QUAN = 1;
-//	private List<String> delOrder = new ArrayList<String>();
+
 	@Override
 	protected void onResume() {
 		if (NETWORK_ARERTDIALOG == 1) {
@@ -50,10 +51,10 @@ public class DelOrderActivity extends OrderBaseActivity {
 	}
 
 	private void setDelViews() {
-//		mSubmitBtn.setVisibility(View.GONE);
+		// mSubmitBtn.setVisibility(View.GONE);
 		mSubmitBtn.setText("提交刪除");
 		mLeftBtn.setText(R.string.cleanAll);
-//		mRefreshBtn.setVisibility(View.GONE);
+		// mRefreshBtn.setVisibility(View.GONE);
 		mComment.setVisibility(View.GONE);
 	}
 
@@ -101,7 +102,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 		mSubmitBtn.setOnClickListener(delSubmitBtnClicked);
 		mRefreshBtn.setOnClickListener(delRefreshClicked);
 	}
-	
+
 	private void delDish() {
 		new Thread() {
 			public void run() {
@@ -115,7 +116,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-			} 
+			}
 		}.start();
 
 	}
@@ -133,12 +134,12 @@ public class DelOrderActivity extends OrderBaseActivity {
 						.show();
 				return;
 			}
-			mMyOrder.addDelOrder(position); 
+			mMyOrder.addDelOrder(position);
 			mMyOrder.minus(position, 1);
 			fillDelData();
 			mMyOrderAdapter.notifyDataSetChanged();
 		}
-		
+
 	}
 
 	protected void delDishDialog(final int position, String messages) {
@@ -148,7 +149,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 				if (position == CLEANALL) {
 					showProgressDlg("正在退掉所有菜品");
 					cleanAllThread();
-				} 
+				}
 			}
 		};
 
@@ -163,7 +164,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 			mpDialog.cancel();
 			switch (msg.what) {
 			case -10:
-				toastText("本地数据库出错，请从网络重新更新数据库");
+				errDbDialog();
 				break;
 			case -2:
 				toastText(R.string.delWarning);
@@ -181,6 +182,26 @@ public class DelOrderActivity extends OrderBaseActivity {
 				mMyOrderAdapter.notifyDataSetChanged();
 				break;
 			}
+		}
+
+		private void errDbDialog() {
+			DialogInterface.OnClickListener refreshListener = new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					Intent intent = new Intent();
+					intent.setClass(DelOrderActivity.this,
+							UpdateMenuActivity.class);
+					startActivity(intent);
+				}
+			};
+			DialogInterface.OnClickListener negativeListener = new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					finish();
+				}
+			};
+			mTitleAndMessageDialog.messageDialog(false, "菜谱不是最新，请更新", "更新",
+					refreshListener, "取消", negativeListener).show();
 		}
 	};
 
@@ -284,16 +305,16 @@ public class DelOrderActivity extends OrderBaseActivity {
 			mMyOrderAdapter.notifyDataSetChanged();
 		}
 	};
-	
+
 	private OnClickListener delSubmitBtnClicked = new OnClickListener() {
 
 		@Override
 		public void onClick(View v) {
 			showProgressDlg("正在退掉菜品");
-				delDish();
+			delDish();
 		}
 	};
-	
+
 	private OnClickListener delRefreshClicked = new OnClickListener() {
 
 		@Override
@@ -302,7 +323,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 			getOrderThread();
 		}
 	};
-	
+
 	private OnClickListener delClicked = new OnClickListener() {
 
 		public void onClick(View v) {

@@ -418,5 +418,5 @@ public class OrderBaseActivity extends BaseActivity {
 			OrderBaseActivity.this.finish();
 		}
 	};
-
+	
 }

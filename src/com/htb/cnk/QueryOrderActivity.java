@@ -110,10 +110,12 @@ public class QueryOrderActivity extends OrderBaseActivity {
 				Toast.makeText(getApplicationContext(),
 						getResources().getString(R.string.delWarning),
 						Toast.LENGTH_SHORT).show();
-			} else if (msg.what == -1) {
+			} else if (msg.what == MyOrder.TIME_OUT) {
 				ARERTDIALOG = 1;
 				mNetWrorkAlertDialog.setMessage("查询菜品失败，请检查连接网络重试");
 				mNetWrorkcancel = mNetWrorkAlertDialog.show();
+			} else if (msg.what == MyOrder.ERR_DB) {
+				errDbDialog();
 			} else {
 				setAdapter();
 				mMyOrderAdapter.notifyDataSetChanged();
@@ -124,6 +126,29 @@ public class QueryOrderActivity extends OrderBaseActivity {
 				mTableNumTxt.setText(Info.getTableName() + "/" + mPersons);
 			}
 
+		}
+
+		/**
+		 * 
+		 */
+		private void errDbDialog() {
+			DialogInterface.OnClickListener refreshListener = new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					Intent intent = new Intent();
+					intent.setClass(QueryOrderActivity.this,
+							UpdateMenuActivity.class);
+					startActivity(intent);
+				}
+			};
+			DialogInterface.OnClickListener negativeListener = new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					finish();
+				}
+			};
+			mTitleAndMessageDialog.messageDialog(false, "菜谱不是最新，请更新", "更新",
+					refreshListener, "取消", negativeListener).show();
 		}
 	};
 
@@ -141,9 +166,10 @@ public class QueryOrderActivity extends OrderBaseActivity {
 	}
 
 	private AlertDialog.Builder networkDialog() {
-		return mNetworkDialog.networkDialog(
-				networkPositiveListener,networkNegativeListener);
+		return mNetworkDialog.networkDialog(networkPositiveListener,
+				networkNegativeListener);
 	}
+
 	DialogInterface.OnClickListener networkPositiveListener = new DialogInterface.OnClickListener() {
 		@Override
 		public void onClick(DialogInterface dialog, int i) {
@@ -159,6 +185,7 @@ public class QueryOrderActivity extends OrderBaseActivity {
 			ARERTDIALOG = 0;
 		}
 	};
+
 	@Override
 	public void finish() {
 		mMyOrder.clear();
