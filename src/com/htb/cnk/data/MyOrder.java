@@ -562,7 +562,11 @@ public class MyOrder {
 					dish.put("price", mDelOrder.get(i).dish.getPrice());
 					dish.put("quan", mDelOrder.get(i).getQuantity());
 					dish.put("printer", mDelOrder.get(i).dish.getPrinter());
-					dish.put("unit", mDelOrder.get(i).dish.getUnit());
+					if ("斤".equals(mDelOrder.get(i).dish.getUnit())) {
+						dish.put("unit", true);
+					}else{
+						dish.put("unit", false);
+					}
 					dishes.put(dish);
 				}
 			}
