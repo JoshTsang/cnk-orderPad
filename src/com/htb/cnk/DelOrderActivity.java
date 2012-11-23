@@ -102,7 +102,6 @@ public class DelOrderActivity extends OrderBaseActivity {
 		mLeftBtn.setOnClickListener(cleanBtnClicked);
 		mSubmitBtn.setOnClickListener(delSubmitBtnClicked);
 		mRefreshBtn.setOnClickListener(delRefreshClicked);
-		mBackBtn.setOnClickListener(delBackClicked);
 	}
 
 	private void delDish() {
@@ -127,27 +126,25 @@ public class DelOrderActivity extends OrderBaseActivity {
 		String messages;
 		if (position == CLEANALL) {
 			messages = "确认退掉所有菜品";
-			if (mMyOrder.getDelOrder().size() > 0) {
-				Log.d(TAG, "size:" + mMyOrder.getDelOrder().size());
+			if(mMyOrder.getDelOrder().size() > 0){
+				Log.d(TAG, "size:"+mMyOrder.getDelOrder().size());
 				toastText("请先提交已经删除产品，再退掉所有菜品！");
-			} else {
-				delDishDialog(position, messages);
+			}else{
+				delDishDialog(position, messages);		
 			}
 		} else {
-			// if ("斤".equals(mMyOrder.getOrderedDish(position).getUnit())) {
-			// new AlertDialog.Builder(DelOrderActivity.this)
-			// .setCancelable(false).setTitle("提示")
-			// .setMessage("该菜品无法退回！").setPositiveButton("确定", null)
-			// .show();
-			// return;
-			// }
+//			if ("斤".equals(mMyOrder.getOrderedDish(position).getUnit())) {
+//				new AlertDialog.Builder(DelOrderActivity.this)
+//						.setCancelable(false).setTitle("提示")
+//						.setMessage("该菜品无法退回！").setPositiveButton("确定", null)
+//						.show();
+//				return;
+//			}
 			if ("斤".equals(mMyOrder.getOrderedDish(position).getUnit())) {
-				mMyOrder.addDelOrder(position, mMyOrder
-						.getOrderedDish(position).getQuantity());
-				mMyOrder.minus(position, mMyOrder.getOrderedDish(position)
-						.getQuantity());
-			} else {
-				mMyOrder.addDelOrder(position, 1);
+				mMyOrder.addDelOrder(position,mMyOrder.getOrderedDish(position).getQuantity());
+				mMyOrder.minus(position, mMyOrder.getOrderedDish(position).getQuantity());
+			}else{
+				mMyOrder.addDelOrder(position,1);
 				mMyOrder.minus(position, 1);
 			}
 			fillDelData();
@@ -324,12 +321,8 @@ public class DelOrderActivity extends OrderBaseActivity {
 
 		@Override
 		public void onClick(View v) {
-			if (mMyOrder.getDelOrder().size() > 0) {
-				showProgressDlg("正在退掉菜品");
-				delDish();
-			}else{
-				toastText("请选择你所需要删除的菜！");
-			}
+			showProgressDlg("正在退掉菜品");
+			delDish();
 		}
 	};
 
@@ -341,19 +334,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 			getOrderThread();
 		}
 	};
-	
-	private OnClickListener delBackClicked = new OnClickListener() {
 
-		@Override
-		public void onClick(View v) {
-			if(mMyOrder.getDelOrder().size() > 0){
-				toastText("请提交删除的菜品或者刷新菜品，再退出！");
-			}else{
-				DelOrderActivity.this.finish();
-			}
-		}
-	};
-	
 	private OnClickListener delClicked = new OnClickListener() {
 
 		public void onClick(View v) {
