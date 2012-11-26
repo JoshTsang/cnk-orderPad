@@ -47,10 +47,11 @@ public class QueryOrderActivity extends OrderBaseActivity {
 
 	private void setQueryViews() {
 		mSubmitBtn.setText("上菜");
-		mLeftBtn.setVisibility(View.GONE);
+		mLeftBtn.setText("打印");
 		mRefreshBtn.setVisibility(View.GONE);
 		mComment.setVisibility(View.GONE);
 		mSubmitBtn.setOnClickListener(submitClicked);
+		mLeftBtn.setOnClickListener(printClicked);
 	}
 
 	private void setAdapter() {

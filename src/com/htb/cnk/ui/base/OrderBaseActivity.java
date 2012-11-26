@@ -9,7 +9,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.text.InputFilter;
 import android.text.method.DigitsKeyListener;
 import android.util.Log;
@@ -21,6 +23,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.htb.cnk.R;
 import com.htb.cnk.TableActivity;
@@ -262,6 +265,31 @@ public class OrderBaseActivity extends BaseActivity {
 				flavorDialog(position);
 		}
 	};
+	
+	protected OnClickListener orderTimeTypeClicked = new OnClickListener() {
+		
+		@Override
+		public void onClick(View v) {
+			int type = mMyOrder.getOrderTimeType();
+			mMyOrder.setOrderTimeType(type==MyOrder.ORDER_INSTANT?MyOrder.ORDER_PEND:MyOrder.ORDER_INSTANT);
+			mLeftBtn.setText(mMyOrder.getOrderTimeType()==MyOrder.ORDER_INSTANT?"即单":"叫单");
+		}
+	};
+	
+	protected OnClickListener printClicked = new OnClickListener() {
+		
+		@Override
+		public void onClick(View v) {
+			mpDialog.setMessage("正在打印...");
+			mpDialog.show();
+			new Thread() {
+				public void run() {
+					int ret = mMyOrder.print();
+					printHandler.sendEmptyMessage(ret);
+				}
+			}.start();
+		}
+	};
 
 	@Override
 	protected void onDestroy() {
@@ -416,6 +444,15 @@ public class OrderBaseActivity extends BaseActivity {
 		@Override
 		public void onClick(View v) {
 			OrderBaseActivity.this.finish();
+		}
+	};
+	
+	protected Handler printHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			mpDialog.cancel();
+			if (msg.what < 0) {
+				Toast.makeText(getApplicationContext(), "打印时发生错误！", Toast.LENGTH_LONG);
+			}
 		}
 	};
 	
