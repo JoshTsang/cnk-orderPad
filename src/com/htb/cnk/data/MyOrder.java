@@ -46,8 +46,13 @@ public class MyOrder {
 	public static int PIC_COLUMN = 2;
 	public static int PRINTER_COLUMN = 3;
 	public final static int UNIT_NAME = 4;
+	
+	public final static int ORDER_INSTANT = 0;
+	public final static int ORDER_PEND = 1;
+	public final static int ORDER_REPRINT = 2;
 
 	protected int mOrderType;
+	protected int mOrderTimeType = ORDER_INSTANT;
 
 	protected CnkDbHelper mCnkDbHelper;
 	protected SQLiteDatabase mDb;
@@ -67,6 +72,14 @@ public class MyOrder {
 
 	public void setOrderType(int type) {
 		mOrderType = type;
+	}
+	
+	public void setOrderTimeType(int type) {
+		mOrderTimeType = type;
+	}
+	
+	public int getOrderTimeType() {
+		return mOrderTimeType;
 	}
 
 	public void setPersons(int persons) {
@@ -345,6 +358,7 @@ public class MyOrder {
 			order.put("persons", mPersons);
 			order.put("tableName", Info.getTableName());
 			order.put("type", mOrderType == MODE_PAD ? "pad" : "phone");
+			order.put("timeType", orderTimeTypeToString(mOrderTimeType));
 			if (!"".equals(mComment.trim())) {
 				order.put("comment", mComment);
 			}
@@ -419,6 +433,27 @@ public class MyOrder {
 			flavor.put(mFlavorName[i].toString());
 		}
 		Setting.saveFlavor(flavor.toString());
+		return 0;
+	}
+	
+	public int print() {
+		if (mOrder.size() <= 0) {
+			return -1;
+		}
+
+		mOrderTimeType = ORDER_REPRINT;
+		String orderJson = getOrderJson();
+		if (orderJson == null) {
+			return -1;
+		}
+
+		String response;
+		
+		response = Http.post(Server.PRINT + "?action=order", orderJson);
+		
+		if (!ErrorPHP.isSucc(response, TAG)) {
+			return -1;
+		}
 		return 0;
 	}
 
@@ -674,6 +709,19 @@ public class MyOrder {
 			return cur.getString(0);
 		}
 		return null;
+	}
+	
+	private String orderTimeTypeToString(int type) {
+		switch (type) {
+		case ORDER_INSTANT:
+			return "即单";
+		case ORDER_PEND:
+			return "叫单";
+		case ORDER_REPRINT:
+			return "重打";
+		default:
+			return "即单";
+		}
 	}
 
 }
