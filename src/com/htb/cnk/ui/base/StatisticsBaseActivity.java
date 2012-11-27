@@ -1,5 +1,6 @@
 package com.htb.cnk.ui.base;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -11,13 +12,16 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.htb.cnk.R;
 import com.htb.cnk.adapter.StatisticsAdapter;
@@ -66,6 +70,7 @@ public class StatisticsBaseActivity extends BaseActivity {
 		findViews();
 		setClickListener();
 		downloadDB();
+		setAdapter();
 	}
 
 	protected void updateData(Calendar start, Calendar end) {
@@ -185,6 +190,53 @@ public class StatisticsBaseActivity extends BaseActivity {
 		mEndTimeBtn.setOnClickListener(endTimeClicked);
 	}
 
+	private void setAdapter() {
+		mStatisticsAdapter = new StatisticsAdapter(getApplicationContext(),
+				mStatistics) {
+			@Override
+			public View getView(int position, View convertView, ViewGroup parent) {
+				ViewHolder viewHolder;
+
+				if (convertView == null) {
+					viewHolder = new ViewHolder();
+					convertView = LayoutInflater.from(
+							StatisticsBaseActivity.this).inflate(
+							R.layout.item_statistics, null);
+					viewHolder.dishName = (TextView) convertView
+							.findViewById(R.id.dishName);
+					viewHolder.salesCount = (TextView) convertView
+							.findViewById(R.id.salesCount);
+					viewHolder.totalAmount = (TextView) convertView
+							.findViewById(R.id.totalAmount);
+					viewHolder.percentage = (TextView) convertView
+							.findViewById(R.id.percentage);
+					convertView.setTag(viewHolder);
+				} else {
+					viewHolder = (ViewHolder) convertView.getTag();
+				}
+
+				viewHolder.dishName.setText(mStatistics.getName(position));
+				viewHolder.salesCount.setText(MyOrder.convertFloat(mStatistics
+						.getQuantity(position)));
+				viewHolder.totalAmount.setText(MyOrder.convertFloat(mStatistics
+						.getAmount(position)));
+				DecimalFormat df = new DecimalFormat("0.00");
+				double percent = (mStatistics.getAmount(position) * 100)
+						/ mStatistics.getTotalAmount();
+				viewHolder.percentage.setText(df.format(percent) + "%");
+				return convertView;
+			}
+
+			class ViewHolder {
+				TextView dishName;
+				TextView salesCount;
+				TextView totalAmount;
+				TextView percentage;
+			}
+		};
+		mSalesData.setAdapter(mStatisticsAdapter);
+	}
+	
 	private void downloadDB() {
 		showProgressDlg("正在加载销售数据...");
 		new Thread() {
@@ -319,6 +371,29 @@ public class StatisticsBaseActivity extends BaseActivity {
 			mEndSet.set(Calendar.MINUTE, minute);
 			SimpleDateFormat df = new SimpleDateFormat("HH:mm");
 			mEndTimeBtn.setText(df.format(mEndSet.getTime()));
+		}
+	};
+	
+	protected OnClickListener printClicked = new OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+			if (mStatistics.count() <= 0) {
+				Toast.makeText(getApplicationContext(), "没有可打印信息",
+						Toast.LENGTH_LONG).show();
+				return;
+			}
+			showProgressDlg("正在上传打印信息...");
+			new Thread() {
+				public void run() {
+					int ret = mStatistics.print(mStart, mEnd);
+					handlerPrint.sendEmptyMessage(ret);
+				}
+			}.start();
+
+//			if (mQueryMode == QUERY_TODAY) {
+//				updateLatestStatistics();
+//			}
 		}
 	};
 	

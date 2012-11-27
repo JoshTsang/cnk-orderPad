@@ -451,8 +451,11 @@ public class OrderBaseActivity extends BaseActivity {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
 			if (msg.what < 0) {
-				Toast.makeText(getApplicationContext(), "打印时发生错误！", Toast.LENGTH_LONG);
+				Toast.makeText(getApplicationContext(), "打印时发生错误！", Toast.LENGTH_LONG).show();
+			} else {
+				Toast.makeText(getApplicationContext(), "打印任务已提交！", Toast.LENGTH_LONG).show();
 			}
+			
 		}
 	};
 	

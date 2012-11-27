@@ -61,6 +61,7 @@ public class Statistics {
 	private float mTotalAmount = 0;
 	private int tableUsage;
 	private int servedPersons;
+	private String mPrinterConfig;
 	
 	
 	public Statistics(Context context) {
@@ -192,8 +193,80 @@ public class Statistics {
 				String waiterName = getWaiterName(salesRow.did);
 				salesRow.dName = waiterName;
 				mSalesData.add(salesRow);
-				
+
 				mTotalAmount += resultSet.getFloat(TOTAL_AMOUNT);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return -1;
+		}
+
+		return perpareSummary(startDT, endDT);
+	}
+
+	public int perpareStatisticsByCategory(Calendar start, Calendar end) {
+		SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat time = new SimpleDateFormat("HH:mm");
+		String startDT = date.format(start.getTime()) + " " + time.format(start.getTime());
+		Date endDate = end.getTime();
+		endDate.setMinutes(endDate.getMinutes() + 1);
+		String endDT = date.format(end.getTime()) + " " + time.format(endDate);
+
+		conectDB();
+		mSalesData.clear();
+		mTotalAmount = 0;
+		try {
+			Cursor categories = mDbMenu.query(CnkDbHelper.TABLE_CATEGORIES, 
+					new String[] {CnkDbHelper.CATEGORY_ID, CnkDbHelper.CATEGORY_NAME},
+					null, null, null, null, null, null);
+			List<CategoryStatistic> categoryList = new ArrayList<Statistics.CategoryStatistic>();
+			CategoryStatistic cs;
+			StringBuffer ids = new StringBuffer();
+			while (categories.moveToNext()) {
+				ids.setLength(0);
+				cs = new CategoryStatistic();
+				cs.id = categories.getInt(0);
+				cs.name = categories.getString(1);
+				Log.d(TAG, "category:" + cs.name);
+				Cursor dishIds = mDbMenu.query(CnkDbHelper.TABLE_DISH_CATEGORY, 
+						new String[] {"dishID"},
+						"categoryID="+cs.id, null, null, null, null, null);
+				while (dishIds.moveToNext()) {
+					Log.d(TAG, "dishName:" + getDishName(dishIds.getInt(0)) + "/" + dishIds.getInt(0));
+					ids.append(dishIds.getInt(0) + ",");
+				}
+				
+				Cursor resultSet = mDbSales.query(CnkDbHelper.SALES_DATA, new String[] {
+						  "sum(price*quantity)",
+						  "sum(quantity)"},
+						  "dish_id IN (" + ids.substring(0, ids.length() -1) +
+						  ") AND DATETIME(timestamp)>='"+startDT +
+						  "' and DATETIME(timestamp)<='" + endDT+"'",
+						  null, null, null, null, null);
+				Log.d(TAG, "time start:" + startDT + " time end:" + endDT);
+				if (resultSet.moveToNext()) {
+					cs.total = resultSet.getFloat(0);
+					cs.count = resultSet.getFloat(1);
+					Log.d(TAG, "category:" + cs.name + " belonged ids:" + ids.substring(0, ids.length() -1));
+					Log.d(TAG, "total:" + cs.total + " count:" + cs.count);
+				} else {
+					Log.e(TAG, "no result for category:" + cs.name);
+				}
+				
+				categoryList.add(cs);
+			}
+			
+			Cursor resultSet = mDbSales.query(CnkDbHelper.SALES_DATA, new String[] {"sum(price*quantity)"},
+					  "DATETIME(timestamp)>='"+startDT +"' and DATETIME(timestamp)<='" + endDT+"'",
+					  null, null, null, null, null);
+			if (resultSet.moveToNext()) {
+				mTotalAmount = resultSet.getFloat(0);
+			}
+			for (CategoryStatistic item:categoryList) {
+				SalesRow salesRow = new SalesRow(item.id,
+						item.total, item.count);
+				salesRow.dName = item.name;
+				mSalesData.add(salesRow);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -202,7 +275,80 @@ public class Statistics {
 		
 		return perpareSummary(startDT, endDT);
 	}
+	
+	public int perpareStatisticsByPrinter(Calendar start, Calendar end) {
+		SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat time = new SimpleDateFormat("HH:mm");
+		String startDT = date.format(start.getTime()) + " " + time.format(start.getTime());
+		Date endDate = end.getTime();
+		endDate.setMinutes(endDate.getMinutes() + 1);
+		String endDT = date.format(end.getTime()) + " " + time.format(endDate);
 
+		conectDB();
+		mSalesData.clear();
+		mTotalAmount = 0;
+		try {
+			List<CategoryStatistic> printers = new ArrayList<CategoryStatistic>();
+			CategoryStatistic ps;
+			StringBuffer ids = new StringBuffer();
+			JSONArray printerLst = new JSONArray(mPrinterConfig);
+			JSONObject printer;
+			for (int i = printerLst.length()-1; i >= 0; i--) {
+				printer = printerLst.getJSONObject(i);
+				if (printer.getInt("id") > 0) {
+					ps = new CategoryStatistic();
+					ps.id = printer.getInt("id");
+					ps.name = printer.getString("name");
+					printers.add(ps);
+				}
+			}
+			for (CategoryStatistic item:printers) {
+				ids.setLength(0);
+				Log.d(TAG, "printer:" + item.name);
+				Cursor dishIds = mDbMenu.query(CnkDbHelper.TABLE_DISH_INFO, 
+						new String[] {"id"},
+						"sortPrintID="+item.id, null, null, null, null, null);
+				while (dishIds.moveToNext()) {
+					Log.d(TAG, "dishName:" + getDishName(dishIds.getInt(0)) + "/" + dishIds.getInt(0));
+					ids.append(dishIds.getInt(0) + ",");
+				}
+				
+				Cursor resultSet = mDbSales.query(CnkDbHelper.SALES_DATA, new String[] {
+						  "sum(price*quantity)",
+						  "sum(quantity)"},
+						  "dish_id IN (" + ids.substring(0, ids.length() -1) +
+						  ") AND DATETIME(timestamp)>='"+startDT +
+						  "' and DATETIME(timestamp)<='" + endDT+"'",
+						  null, null, null, null, null);
+				Log.d(TAG, "time start:" + startDT + " time end:" + endDT);
+				if (resultSet.moveToNext()) {
+					item.total = resultSet.getFloat(0);
+					item.count = resultSet.getFloat(1);
+					Log.d(TAG, "category:" + item.name + " belonged ids:" + ids.substring(0, ids.length() -1));
+					Log.d(TAG, "total:" + item.total + " count:" + item.count);
+				} else {
+					Log.e(TAG, "no result for category:" + item.name);
+				}
+				SalesRow salesRow = new SalesRow(item.id,
+						item.total, item.count);
+				salesRow.dName = item.name;
+				mSalesData.add(salesRow);
+			}
+			
+			Cursor resultSet = mDbSales.query(CnkDbHelper.SALES_DATA, new String[] {"sum(price*quantity)"},
+					  "DATETIME(timestamp)>='"+startDT +"' and DATETIME(timestamp)<='" + endDT+"'",
+					  null, null, null, null, null);
+			if (resultSet.moveToNext()) {
+				mTotalAmount = resultSet.getFloat(0);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return -1;
+		}
+		
+		return perpareSummary(startDT, endDT);
+	}
+	
 	public int perpareSummary(String startDT, String endDT) {
 		int ret = getTableUsage(startDT, endDT);
 		if (ret < 0) {
@@ -219,6 +365,11 @@ public class Statistics {
 		}
 		return 0;
 	}
+	
+	public void setPrinterInfo(String json) {
+		mPrinterConfig = json;
+	}
+	
 	public int getTableUsage() {
 		return tableUsage;
 	}
@@ -390,5 +541,12 @@ public class Statistics {
 		}
 		
 		return ret;
+	}
+	
+	class CategoryStatistic {
+		String name;
+		int id;
+		float count;
+		float total;
 	}
 }

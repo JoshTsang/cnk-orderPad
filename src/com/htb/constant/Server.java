@@ -46,6 +46,7 @@ public class Server {
 	public final static String PAD_VALIDATE = PHP_DIR + "validatePad.php";
 	public final static String GET_AREA = PHP_DIR +"getArea.php";
 	public final static String PRINT = PHP_DIR + "print.php";
+	public final static String PRINTER_SETTING = PHP_DIR + "setting/getPrinterSetting.php";
 	
 	/* Database */
 	public final static String DB_DIR = "db/";
