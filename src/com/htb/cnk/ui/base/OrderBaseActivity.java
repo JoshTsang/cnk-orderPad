@@ -280,6 +280,10 @@ public class OrderBaseActivity extends BaseActivity {
 		
 		@Override
 		public void onClick(View v) {
+			if (mMyOrder.count() == 0) {
+				Toast.makeText(getApplicationContext(), "没有菜品信息！", Toast.LENGTH_SHORT).show();
+				return ;
+			}
 			mpDialog.setMessage("正在打印...");
 			mpDialog.show();
 			new Thread() {
