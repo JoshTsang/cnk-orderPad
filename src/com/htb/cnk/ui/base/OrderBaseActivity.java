@@ -280,6 +280,10 @@ public class OrderBaseActivity extends BaseActivity {
 		
 		@Override
 		public void onClick(View v) {
+			if (mMyOrder.count() == 0) {
+				Toast.makeText(getApplicationContext(), "没有菜品信息！", Toast.LENGTH_SHORT).show();
+				return ;
+			}
 			mpDialog.setMessage("正在打印...");
 			mpDialog.show();
 			new Thread() {
@@ -451,8 +455,11 @@ public class OrderBaseActivity extends BaseActivity {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
 			if (msg.what < 0) {
-				Toast.makeText(getApplicationContext(), "打印时发生错误！", Toast.LENGTH_LONG);
+				Toast.makeText(getApplicationContext(), "打印时发生错误！", Toast.LENGTH_LONG).show();
+			} else {
+				Toast.makeText(getApplicationContext(), "打印任务已提交！", Toast.LENGTH_LONG).show();
 			}
+			
 		}
 	};
 	

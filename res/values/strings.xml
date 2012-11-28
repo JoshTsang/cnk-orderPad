@@ -50,7 +50,7 @@
     <string name="startTime">开始:</string>
     <string name="endTime">结束:</string>
     <string name="queryByTime">按时间查询</string>
-    <string name="queryToday">查询历史</string>
+    <string name="queryToday">查询今天</string>
     <string name="print">打印</string>
     <string name="peroid">时间段:</string>
     <string name="dash">~</string>

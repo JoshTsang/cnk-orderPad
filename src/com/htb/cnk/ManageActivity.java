@@ -32,7 +32,7 @@ public class ManageActivity extends BaseActivity {
 	private TextView mPicBackupTime;
 	private BackupAndRestoreDlg backupAndRestoreDlg;
 	
-	private final static CharSequence[] statisticsItems = {"销售统计", "员工绩效", };
+	private final static CharSequence[] statisticsItems = {"销售统计", "员工绩效", "分类统计", "分单统计"};
 	private final static CharSequence[] backupAndRestoreItems = {"备份数据", "恢复数据", };
 	
 	@Override
@@ -87,15 +87,9 @@ public class ManageActivity extends BaseActivity {
 		.show();
 	}
 
-	private void luanchPerformanceActivity() { 
+	private void luanchStatisticsActivity(Class<?> cls) {
 		Intent intent = new Intent();
-		intent.setClass(ManageActivity.this, StuffPerformanceActivity.class);
-		ManageActivity.this.startActivity(intent);
-	}
-
-	private void luanchSaleStatisticsActivity() {
-		Intent intent = new Intent();
-		intent.setClass(ManageActivity.this, StatisticsActivity.class);
+		intent.setClass(ManageActivity.this, cls);
 		ManageActivity.this.startActivity(intent);
 	}
 
@@ -218,10 +212,16 @@ public class ManageActivity extends BaseActivity {
 					public void onClick(DialogInterface dialog, int which) {
 						switch(which) {
 						case 0:
-							luanchSaleStatisticsActivity();
+							luanchStatisticsActivity(StatisticsActivity.class);
 							break;
 						case 1:
-							luanchPerformanceActivity();
+							luanchStatisticsActivity(StuffPerformanceActivity.class);
+							break;
+						case 2:
+							luanchStatisticsActivity(StatisticsByCategoryActivity.class);
+							break;
+						case 3:
+							luanchStatisticsActivity(StatisticsByPrinterActivity.class);
 							break;
 						default:
 							Log.e(TAG, "backupAndRestoreClicked unsupported which:" + which);
