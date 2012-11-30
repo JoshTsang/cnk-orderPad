@@ -31,12 +31,12 @@ public class StatisticsByPrinterActivity extends StatisticsActivity {
 
 		@Override
 		public void onClick(View v) {
-			mStart.setTimeInMillis(System.currentTimeMillis());
-			mStart.set(Calendar.HOUR_OF_DAY, 0);
-			mStart.set(Calendar.MINUTE, 0);
-			mEnd.setTimeInMillis(System.currentTimeMillis());
+			mStartSet.setTimeInMillis(System.currentTimeMillis());
+			mStartSet.set(Calendar.HOUR_OF_DAY, 0);
+			mStartSet.set(Calendar.MINUTE, 0);
+			mEndSet.setTimeInMillis(System.currentTimeMillis());
 			
-			getResult();
+			getResult(QUERY_TODAY);
 		}
 	};
 
@@ -45,19 +45,19 @@ public class StatisticsByPrinterActivity extends StatisticsActivity {
 		@Override
 		public void onClick(View v) {
 			if (isDateTimeSet()) {
-				getResult();
+				getResult(QUERY_BY_TIME);
 			}
 		}
 	};
 
-	private void getResult() {
-		int ret = mStatistics.perpareStatisticsByPrinter(mStart, mEnd);
+	private void getResult(int queryMode) {
+		int ret = mStatistics.perpareStatisticsByPrinter(mStartSet, mEndSet);
 		if (ret < 0) {
 			popUpDlg("错误", "销售数据出错,需从新下载!", true);
 			return;
 		}
-		updateData(mStart, mEnd);
-		mQueryMode = QUERY_TODAY;
+		updateData(mStartSet, mEndSet);
+		mQueryMode = queryMode;
 	}
 	
 	private void loadPrinterSetting() {
