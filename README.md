@@ -1,11 +1,16 @@
 cnk-orderPad
 ============
-V1.1.13
-Fixed Issues:
-
-Improvements:
-
-New Features:
+V1.1.17
+1.[FIXED]启动时，菜脑壳停止运行
+2.[FIXED]网络连接异常时，主界面弹出多个提示框
+3.[IMPROVED]添加结账小票时间戳
+4.[IMPROVED]增加订单MD5，防止订单重复提交
+5.[IMPROVED]添加同时删除多个菜
+6.[IMPROVED]在桌面管理页面增加菜谱更新检查
+7.[IMPROVED]可以删除以斤为单位的菜
+8.[IMPROVED]增加订单类型（即单/叫单）
+9.[NEW FEATRUE]按分类统计
+10.[NEW FEATRUE]按分单统计
 
 ============
 V1.1.11

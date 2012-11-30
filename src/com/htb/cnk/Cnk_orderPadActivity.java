@@ -382,7 +382,12 @@ public class Cnk_orderPadActivity extends BaseActivity {
 		public void onClick(View arg0) {
 			Intent intent = new Intent();
 			if (Info.getMode() == Info.WORK_MODE_CUSTOMER) {
-				intent.setClass(Cnk_orderPadActivity.this, MenuActivity.class);
+				if (Info.getTableId() < 0) {
+					Toast.makeText(getBaseContext(), "没有选择桌号", Toast.LENGTH_LONG).show();
+					return;
+				} else {
+					intent.setClass(Cnk_orderPadActivity.this, MenuActivity.class);
+				}
 			} else {
 				intent.setClass(Cnk_orderPadActivity.this, TableActivity.class);
 			}

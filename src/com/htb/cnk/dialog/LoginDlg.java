@@ -18,6 +18,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.htb.cnk.R;
+import com.htb.cnk.data.Info;
 import com.htb.cnk.data.Setting;
 import com.htb.cnk.data.UserData;
 
@@ -104,6 +105,7 @@ public class LoginDlg {
 	}
 	
 	private void login() {
+		Info.setMode(Info.WORK_MODE_WAITER);
 		if (mDestActivity != null) {
 			Intent intent = new Intent();
 			intent.setClass(mActivity, mDestActivity);
