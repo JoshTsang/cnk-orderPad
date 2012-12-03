@@ -14,6 +14,7 @@ import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.method.ScrollingMovementMethod;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -99,7 +100,11 @@ public class CheckOutActivity extends BaseActivity {
 	}
 
 	private void updateTabelInfos() {
-		mCheckOutPrinte.setText(mSettings.checkOutJson());
+		DisplayMetrics metrics = new DisplayMetrics();
+
+		getWindowManager().getDefaultDisplay().getMetrics(metrics);
+		
+		mCheckOutPrinte.setText(mSettings.checkOutJson(metrics.widthPixels));
 		mReceivableText.setText(String.valueOf(MyOrder.convertFloat((float)mTotalPrice)));
 	}
 

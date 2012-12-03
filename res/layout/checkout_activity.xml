@@ -14,8 +14,9 @@
         <LinearLayout
             android:id="@+id/titleBar"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal" >
+            android:layout_height="45dp"
+            android:orientation="horizontal"
+            android:background="@drawable/left_top" >
 
             <Button
                 android:id="@+id/back_btn"
@@ -50,6 +51,8 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_below="@id/titleBar"
+            android:layout_above="@id/submit"
+            android:layout_alignParentBottom="true"
             android:layout_marginBottom="5dip"
             android:layout_marginTop="5dip"
             android:orientation="vertical" >
@@ -109,14 +112,13 @@
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/right"
-        android:paddingLeft="10dp"
+        android:background="@drawable/right1"
         android:orientation="vertical" >
 
         <RelativeLayout
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content" >
-
+            android:layout_height="45dp"
+            android:background="@drawable/right_top" >
             <TextView
                 android:layout_width="fill_parent"
                 android:layout_height="43dip"
@@ -153,6 +155,7 @@
                 android:layout_height="fill_parent"
                 android:textColor="#652A25"
                 android:scrollbars="vertical"  
+                android:paddingLeft="10dp"
    				android:singleLine="false"    
                 android:textSize="30dip"/>
     </LinearLayout>

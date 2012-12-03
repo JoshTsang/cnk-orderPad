@@ -30,6 +30,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -87,7 +88,10 @@ public class Cnk_orderPadActivity extends BaseActivity {
 		version = new Version(Cnk_orderPadActivity.this);
 		mAppSetting = new Setting(Cnk_orderPadActivity.this);
 		mWifiAdmin = new WifiAdmin(Cnk_orderPadActivity.this);
-		
+		DisplayMetrics metrics = new DisplayMetrics();
+
+		getWindowManager().getDefaultDisplay().getMetrics(metrics);
+		Log.i(TAG, metrics.toString());
 		findViews();
 		initSyncProgressBar();
 		setClickListeners();

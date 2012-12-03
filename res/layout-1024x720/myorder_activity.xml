@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal" >
+    
+    <!-- 统计信息  -->
+	<RelativeLayout
+	    android:layout_width="180dip"
+	    android:layout_height="match_parent"
+	    android:orientation="vertical"
+	    android:background="@drawable/left" >
+	    <LinearLayout android:id="@+id/titleBar"
+	        android:layout_width="fill_parent"
+		    android:layout_height="55dp"
+		    android:orientation="horizontal"
+	    	android:background="@drawable/left_top">
+	        <Button android:id="@+id/back_btn"
+	            android:text="@string/back"
+ 	            android:textColor="#F9E8BB"
+	        	android:textSize="35dip"
+	            android:layout_width="90dip"
+		    	android:layout_height="55dip"
+		    	android:gravity="center"
+	        	android:background="#00000000"/>
+	        <Button android:id="@+id/left_btn"
+ 	            android:textColor="#F9E8BB"
+	        	android:textSize="35dip"
+	            android:layout_width="90dip"
+		    	android:layout_height="55dip"
+		    	android:gravity="center"
+	        	android:background="#00000000"/>
+	    </LinearLayout>
+	    <Button android:id="@+id/submit"
+	        android:layout_width="fill_parent"
+    		android:layout_height="60dip"
+	        android:text="@string/submit"
+	        android:textColor="#F9E8BB"
+	        android:textSize="45dip"
+	        android:background="@drawable/left_bottom"
+    		android:layout_alignParentBottom="true"/>
+	    <LinearLayout
+	         android:layout_width="fill_parent"
+    		 android:layout_height="fill_parent"
+    		 android:orientation="vertical"
+    		 android:layout_marginTop="5dip"
+    		 android:layout_marginBottom="5dip"
+    		 android:paddingLeft="5dp"
+    		 android:layout_below="@id/titleBar"
+    		 android:layout_above="@id/myOrder">
+	        <!-- 桌号 -->
+	        <TextView android:id="@+id/tableName"
+	            android:layout_width="wrap_content"
+	    		android:layout_height="wrap_content"
+	    		android:layout_marginTop="5dip"
+	    		android:textSize="35dip"
+	    		android:text="@string/tableNum"/>
+	        <TextView android:id="@+id/tableNum"
+	            android:layout_width="wrap_content"
+	    		android:layout_height="wrap_content"
+	    		android:textSize="40dip"/>
+	        
+	        <!-- 菜份数  -->
+	        <TextView android:layout_width="wrap_content"
+	    		android:layout_height="wrap_content"
+	    		android:layout_marginTop="7dip"
+	    		android:textSize="35dip"
+	    		android:text="@string/dishCount"/>
+	        <TextView android:id="@+id/dishCount"
+	            android:layout_width="wrap_content"
+	    		android:layout_height="wrap_content"
+	    		android:textSize="40dip"/>
+	        
+	        <!-- 总价  -->
+	        <TextView android:layout_width="wrap_content"
+	    		android:layout_height="wrap_content"
+	    		android:layout_marginTop="7dip"
+	    		android:textSize="35dip"
+	    		android:text="@string/totalPrice"/>
+	        <TextView android:id="@+id/totalPrice"
+	            android:layout_width="wrap_content"
+	    		android:layout_height="wrap_content"
+	    		android:textSize="35dip"/>
+	    </LinearLayout>
+    </RelativeLayout>
+    
+    <!-- 我点的菜  -->
+    <LinearLayout 
+	    android:layout_width="fill_parent"
+	    android:layout_height="match_parent"
+	    android:orientation="vertical"
+	    android:background="@drawable/right1" >
+	    <RelativeLayout 
+	    android:layout_width="fill_parent"
+	    android:layout_height="45dp"
+	    android:background="@drawable/right_top" >
+		    <TextView
+		    	android:layout_width="fill_parent"
+		    	android:layout_height="43dip"
+		    	android:gravity="center"
+		    	android:textSize="30dip"
+		    	android:textColor="#652A25"
+		    	android:text="@string/myOrder"/>
+		    <Button android:id="@+id/refresh"
+		        android:layout_height="40dp"
+		        android:layout_width="wrap_content"
+		        android:layout_marginLeft="15dp"
+		        android:layout_alignParentLeft="true"
+		        android:textSize="22sp"
+		        android:textColor="#652A25"
+		        android:text="@string/refresh"
+		        android:background="@drawable/refresh"
+		     />
+		    <Button android:id="@+id/comment"
+		        android:layout_height="40dp"
+		        android:layout_width="wrap_content"
+		        android:layout_marginLeft="15dp"
+		        android:layout_alignParentRight="true"
+		        android:textSize="22sp"
+		        android:textColor="#652A25"
+		        android:text="@string/comment"
+		        android:background="@drawable/refresh"
+		     />
+	    </RelativeLayout>
+	    <ListView android:id="@+id/myOrderList"
+	        android:layout_width="fill_parent"
+	    	android:layout_height="match_parent"
+	    	android:layout_marginLeft="10dip"
+	    	android:divider="#DECFBB"
+	    	android:dividerHeight="1dip">
+	    </ListView>
+    </LinearLayout>
+</LinearLayout>

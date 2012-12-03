@@ -652,9 +652,21 @@ public class TableSetting implements Serializable {
 		return totalPrice;
 	}
 
-	public String checkOutJson() {
+	public String checkOutJson(int width) {
+		Log.d(TAG, "width:" + width);
+		int space = 24;
 		String checkOutJson = new String();
-		checkOutJson = String.format("\b%s%24s%9s%8s%10s", "品名", "", "单价",
+		switch(width) {
+		case 800:
+			space = 24;
+			break;
+		case 1024:
+			space = 56;
+			break;
+		default:
+			
+		}
+		checkOutJson = String.format("\b%s%" + space +"s%9s%8s%10s", "品名", "", "单价",
 				"数量", "小计");
 		int k = 0;
 		List<String> tableName = new ArrayList<String>();
@@ -683,7 +695,7 @@ public class TableSetting implements Serializable {
 					int zhLen = (strByteLen - strlen) / 2;
 					int enLen = strlen - zhLen;
 					int spaceLen = zhLen * 2 + enLen;
-					spaceLen = 19 - spaceLen;
+					spaceLen = (space/2+7) - spaceLen;
 					spaceLen *= 2;
 					if (enLen > 0) {
 						spaceLen += 1;
@@ -725,20 +737,33 @@ public class TableSetting implements Serializable {
 				e.printStackTrace();
 			}
 		}
-		checkOutJson = String.format("%s\n\r%s", checkOutJson,
-				"------------------------------------------");
+		
 		float tableAllPrice = 0;
+		switch(width) {
+		case 800:
+			checkOutJson = String.format("%s\n\r%s", checkOutJson,
+					"------------------------------------------");
+			space = 38;
+			break;
+		case 1024:
+			checkOutJson = String.format("%s\n\r%s", checkOutJson,
+					"----------------------------------------------------------");
+			space = 54;
+			break;
+		default:
+			
+		}
 		for (int i = 0; i < k; i++) {
 			String tName = tableName.get(i).toString();
 			String totalPriceStr = nf.format(totalPrice.get(i));
-			int len = 38 - tName.length() - totalPriceStr.length();
+			int len = space - tName.length() - totalPriceStr.length();
 			checkOutJson += String.format("\r\n %s%" + len * 2 + "s%s", tName
 					+ "桌", "", totalPriceStr);
 			tableAllPrice = tableAllPrice + totalPrice.get(i);
 		}
 		String endPriceStr = nf.format(tableAllPrice);
 		checkOutJson = String.format("%s\n\r %s%"
-				+ ((36 - endPriceStr.length()) * 2 - 1) + "s%s", checkOutJson,
+				+ ((space - 2 - endPriceStr.length()) * 2) + "s%s", checkOutJson,
 				"合计", "", endPriceStr);
 		return checkOutJson;
 	}

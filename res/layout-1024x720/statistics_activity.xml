@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F8E9C1" >
+    
+    <LinearLayout android:id="@+id/titlebar"
+    android:layout_width="match_parent"
+    android:layout_height="50dip"
+    android:background="@drawable/statistics_titlebar"
+    android:orientation="horizontal" >
+	    <Button android:id="@+id/back"
+	        android:layout_width="0dip"
+	    	android:layout_height="50dip"
+            android:layout_weight="1"
+	    	android:textColor="#F9E8BB"
+	    	android:textSize="35dip"
+	    	android:text="@string/back"
+	    	android:background="#00000000"/>
+	    <Button android:id="@+id/queryToday"
+	        android:layout_width="0dip"
+	    	android:layout_height="50dip"
+            android:layout_weight="1"
+	    	android:textColor="#F9E8BB"
+	    	android:textSize="35dip"
+	    	android:text="@string/queryToday"
+	    	android:background="#00000000"/>
+	    <Button android:id="@+id/queryByTime"
+	        android:layout_width="0dip"
+	    	android:layout_height="50dip"
+            android:layout_weight="1"
+	    	android:textColor="#F9E8BB"
+	    	android:textSize="35dip"
+	    	android:text="@string/queryByTime"
+	    	android:background="#00000000"/>
+	    <Button android:id="@+id/print"
+	        android:layout_width="0dip"
+	    	android:layout_height="50dip"
+            android:layout_weight="1"
+	    	android:textColor="#F9E8BB"
+	    	android:textSize="35dip"
+	    	android:text="@string/print"
+	    	android:background="#00000000"/>
+    </LinearLayout>
+    
+    <LinearLayout android:id="@+id/footer"
+	    android:layout_width="match_parent"
+	    android:layout_height="50dip"
+	    android:layout_alignParentBottom="true"
+	    android:gravity="center_vertical"
+	    android:background="@drawable/statistics_footer"
+	    android:orientation="horizontal" >
+	    <LinearLayout 
+		    android:layout_width="0dp"
+		    android:layout_height="match_parent"
+	        android:layout_weight="1"
+		    android:orientation="horizontal" >
+		    <TextView 
+		        android:layout_width="wrap_content"
+		    	android:layout_height="wrap_content"
+		    	android:layout_marginLeft="10dip"
+		    	android:layout_marginRight="5dip"
+		    	android:textSize="30dip"
+		    	android:textColor="#FFFFFF"
+		    	android:text="@string/startTime"/>
+		    <Button android:id="@+id/setStartDate"
+		        android:layout_width="170dip"
+		    	android:layout_height="wrap_content"
+		    	android:textSize="30dip"
+		    	android:textColor="#F9E8BB"
+		    	android:text="@string/setDate"
+		    	android:layout_marginRight="10dip"
+		    	android:background="#00000000"/>
+		        
+		    <Button android:id="@+id/setStartTime"
+		        android:layout_width="135dip"
+		    	android:layout_height="wrap_content"
+		    	android:textSize="30dip"
+		    	android:textColor="#F9E8BB"
+		    	android:text="@string/setTime"
+		    	android:background="#00000000"/>
+		</LinearLayout>
+	    <LinearLayout 
+		    android:layout_width="0dp"
+		    android:layout_height="match_parent"
+	        android:layout_weight="1"
+		    android:orientation="horizontal" >
+		    <TextView 
+		        android:layout_width="wrap_content"
+		    	android:layout_height="wrap_content"
+		    	android:textSize="30dip"
+		    	android:textColor="#FFFFFF"
+		    	android:layout_marginLeft="15dip"
+		    	android:layout_marginRight="5dip"
+		    	android:text="@string/endTime"/>
+		    <Button android:id="@+id/setEndDate"
+		        android:layout_width="170dip"
+		    	android:layout_height="wrap_content"
+		    	android:layout_marginRight="10dip"
+		    	android:textSize="30dip"
+		    	android:textColor="#F9E8BB"
+		    	android:text="@string/setDate"
+		    	android:background="#00000000"/>
+		        
+		    <Button android:id="@+id/setEndTime"
+		        android:layout_width="135dip"
+		    	android:layout_height="wrap_content"
+		    	android:textSize="30dip"
+		    	android:textColor="#F9E8BB"
+		    	android:text="@string/setTime"
+		    	android:background="#00000000"/>
+	    </LinearLayout>
+	</LinearLayout>
+
+    <LinearLayout 
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:layout_above="@id/footer"
+        android:layout_below="@id/titlebar"
+        android:orientation="horizontal">
+	    <LinearLayout 
+        	android:layout_height="match_parent"
+        	android:layout_width="220dip"
+        	android:paddingLeft="10dip"
+        	android:background="#FFFFFF"
+        	android:orientation="vertical">
+	        <TextView android:layout_width="wrap_content"
+	    		android:layout_height="wrap_content"
+	    		android:layout_marginTop="5dip"
+				style="@style/statisticInfos_1024x720"
+	    		android:text="@string/peroid"/>
+         	<TextView android:id="@+id/startDate"
+        	    android:layout_width="wrap_content"
+	    		android:layout_height="wrap_content"
+				style="@style/statisticInfos_1024x720"/>
+        	<TextView android:id="@+id/startTime"
+        	    android:layout_width="wrap_content"
+	    		android:layout_height="wrap_content"
+				style="@style/statisticInfos_1024x720"/>
+        	
+        	<TextView android:layout_width="match_parent"
+	    		android:layout_height="wrap_content"
+	    		android:gravity="center_vertical"
+	    		android:textSize="15dip"
+    			android:textColor="#4D2412"
+	    		android:text="@string/dash" />
+        	
+	        <TextView android:id="@+id/endDate"
+        	    android:layout_width="wrap_content"
+	    		android:layout_height="wrap_content"
+				style="@style/statisticInfos_1024x720"/>
+        	<TextView android:id="@+id/endTime"
+        	    android:layout_width="wrap_content"
+	    		android:layout_height="wrap_content"
+				style="@style/statisticInfos_1024x720"/>
+	        <TextView android:layout_width="wrap_content"
+	    		android:layout_height="wrap_content"
+				style="@style/statisticInfos_1024x720"
+	    		android:text="@string/tableUsage"/>
+	        <TextView android:id="@+id/tableUsage"
+	            android:layout_width="wrap_content"
+	    		android:layout_height="wrap_content"
+				style="@style/statisticInfos_1024x720"/>
+	        <TextView android:layout_width="wrap_content"
+	    		android:layout_height="wrap_content"
+				style="@style/statisticInfos_1024x720"
+	    		android:text="@string/servedPersons"/>
+	        <TextView android:id="@+id/persons"
+	            android:layout_width="wrap_content"
+	    		android:layout_height="wrap_content"
+				style="@style/statisticInfos_1024x720"/>
+	        <TextView android:layout_width="wrap_content"
+	    		android:layout_height="wrap_content"
+				style="@style/statisticInfos_1024x720"
+	    		android:text="@string/totalAmount"/>
+	        <TextView android:id="@+id/totalAmount"
+	            android:layout_width="wrap_content"
+	    		android:layout_height="wrap_content"
+				style="@style/statisticInfos_1024x720"/>
+        </LinearLayout>
+        <LinearLayout android:layout_width="match_parent"
+			    android:layout_height="match_parent"
+			    android:orientation="vertical">
+	        <LinearLayout 
+			    android:layout_width="match_parent"
+			    android:layout_height="wrap_content"
+			    android:orientation="horizontal" >
+	    
+				<TextView
+			    	android:layout_width="250dip"
+			   		android:layout_height="wrap_content"
+			   		android:textSize="30dip"
+			   		android:singleLine="true"
+			   		android:layout_marginLeft="15dip"
+			   		android:textColor="#4D2412"
+			   		android:text="@string/dishName"/>
+				<TextView
+			    	android:layout_width="150dip"
+			   		android:layout_height="wrap_content"
+			   		android:textSize="30dip"
+			   		android:singleLine="true"
+			   		android:textColor="#4D2412"
+			   		android:gravity="right"
+			   		android:text="@string/salesCount"/>
+				<TextView
+			    	android:layout_width="180dip"
+			   		android:layout_height="wrap_content"
+			   		android:textSize="30dip"
+			   		android:singleLine="true"
+			   		android:textColor="#4D2412"
+			   		android:gravity="right"
+			   		android:text="@string/salesAmount"/>
+				<TextView
+			    	android:layout_width="180dip"
+			   		android:layout_height="wrap_content"
+			   		android:textSize="30dip"
+			   		android:singleLine="true"
+			   		android:textColor="#4D2412"
+			   		android:gravity="right"
+			   		android:text="@string/percentage"/>
+			</LinearLayout>
+	        <ListView android:id="@+id/salesData"
+		        android:layout_height="match_parent"
+		        android:layout_width="match_parent">
+	    	</ListView>
+    	</LinearLayout>
+    </LinearLayout>
+    
+
+</RelativeLayout>
