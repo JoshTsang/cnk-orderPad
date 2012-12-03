@@ -268,11 +268,9 @@ public abstract class TableGridActivity extends BaseActivity {
 		imgCur = (TextView) layout.findViewById(R.id.text);
 	}
 
-	@SuppressWarnings("deprecation")
 	private void initPagerView() {
 		setCurPage(0);
-		mPageView.getLayoutParams().height = this.getWindowManager()
-				.getDefaultDisplay().getHeight() * 4 / 5;
+		
 		mPageView.setAdapter(guidePageAdapter);
 		mPageView.setOnPageChangeListener(new GuidePageChangeListener(
 				TableGridActivity.this, mTableInfo));

@@ -11,29 +11,33 @@
     android:background="@drawable/statistics_titlebar"
     android:orientation="horizontal" >
 	    <Button android:id="@+id/back"
-	        android:layout_width="200dip"
+	        android:layout_width="0dip"
 	    	android:layout_height="50dip"
+            android:layout_weight="1"
 	    	android:textColor="#F9E8BB"
 	    	android:textSize="35dip"
 	    	android:text="@string/back"
 	    	android:background="#00000000"/>
 	    <Button android:id="@+id/queryToday"
-	        android:layout_width="200dip"
+	        android:layout_width="0dip"
 	    	android:layout_height="50dip"
+            android:layout_weight="1"
 	    	android:textColor="#F9E8BB"
 	    	android:textSize="35dip"
 	    	android:text="@string/queryToday"
 	    	android:background="#00000000"/>
 	    <Button android:id="@+id/queryByTime"
-	        android:layout_width="200dip"
+	        android:layout_width="0dip"
 	    	android:layout_height="50dip"
+            android:layout_weight="1"
 	    	android:textColor="#F9E8BB"
 	    	android:textSize="35dip"
 	    	android:text="@string/queryByTime"
 	    	android:background="#00000000"/>
 	    <Button android:id="@+id/print"
-	        android:layout_width="200dip"
+	        android:layout_width="0dip"
 	    	android:layout_height="50dip"
+            android:layout_weight="1"
 	    	android:textColor="#F9E8BB"
 	    	android:textSize="35dip"
 	    	android:text="@string/print"
@@ -47,55 +51,66 @@
 	    android:gravity="center_vertical"
 	    android:background="@drawable/statistics_footer"
 	    android:orientation="horizontal" >
-	    <TextView 
-	        android:layout_width="wrap_content"
-	    	android:layout_height="wrap_content"
-	    	android:layout_marginLeft="10dip"
-	    	android:layout_marginRight="5dip"
-	    	android:textSize="30dip"
-	    	android:textColor="#FFFFFF"
-	    	android:text="@string/startTime"/>
-	    <Button android:id="@+id/setStartDate"
-	        android:layout_width="170dip"
-	    	android:layout_height="wrap_content"
-	    	android:textSize="30dip"
-	    	android:textColor="#F9E8BB"
-	    	android:text="@string/setDate"
-	    	android:layout_marginRight="10dip"
-	    	android:background="#00000000"/>
-	        
-	    <Button android:id="@+id/setStartTime"
-	        android:layout_width="135dip"
-	    	android:layout_height="wrap_content"
-	    	android:textSize="30dip"
-	    	android:textColor="#F9E8BB"
-	    	android:text="@string/setTime"
-	    	android:background="#00000000"/>
-	    
-	    <TextView 
-	        android:layout_width="wrap_content"
-	    	android:layout_height="wrap_content"
-	    	android:textSize="30dip"
-	    	android:textColor="#FFFFFF"
-	    	android:layout_marginLeft="15dip"
-	    	android:layout_marginRight="5dip"
-	    	android:text="@string/endTime"/>
-	    <Button android:id="@+id/setEndDate"
-	        android:layout_width="170dip"
-	    	android:layout_height="wrap_content"
-	    	android:layout_marginRight="10dip"
-	    	android:textSize="30dip"
-	    	android:textColor="#F9E8BB"
-	    	android:text="@string/setDate"
-	    	android:background="#00000000"/>
-	        
-	    <Button android:id="@+id/setEndTime"
-	        android:layout_width="135dip"
-	    	android:layout_height="wrap_content"
-	    	android:textSize="30dip"
-	    	android:textColor="#F9E8BB"
-	    	android:text="@string/setTime"
-	    	android:background="#00000000"/>
+	    <LinearLayout 
+		    android:layout_width="0dp"
+		    android:layout_height="match_parent"
+	        android:layout_weight="1"
+		    android:orientation="horizontal" >
+		    <TextView 
+		        android:layout_width="wrap_content"
+		    	android:layout_height="wrap_content"
+		    	android:layout_marginLeft="10dip"
+		    	android:layout_marginRight="5dip"
+		    	android:textSize="30dip"
+		    	android:textColor="#FFFFFF"
+		    	android:text="@string/startTime"/>
+		    <Button android:id="@+id/setStartDate"
+		        android:layout_width="170dip"
+		    	android:layout_height="wrap_content"
+		    	android:textSize="30dip"
+		    	android:textColor="#F9E8BB"
+		    	android:text="@string/setDate"
+		    	android:layout_marginRight="10dip"
+		    	android:background="#00000000"/>
+		        
+		    <Button android:id="@+id/setStartTime"
+		        android:layout_width="135dip"
+		    	android:layout_height="wrap_content"
+		    	android:textSize="30dip"
+		    	android:textColor="#F9E8BB"
+		    	android:text="@string/setTime"
+		    	android:background="#00000000"/>
+		</LinearLayout>
+	    <LinearLayout 
+		    android:layout_width="0dp"
+		    android:layout_height="match_parent"
+	        android:layout_weight="1"
+		    android:orientation="horizontal" >
+		    <TextView 
+		        android:layout_width="wrap_content"
+		    	android:layout_height="wrap_content"
+		    	android:textSize="30dip"
+		    	android:textColor="#FFFFFF"
+		    	android:layout_marginLeft="15dip"
+		    	android:layout_marginRight="5dip"
+		    	android:text="@string/endTime"/>
+		    <Button android:id="@+id/setEndDate"
+		        android:layout_width="170dip"
+		    	android:layout_height="wrap_content"
+		    	android:layout_marginRight="10dip"
+		    	android:textSize="30dip"
+		    	android:textColor="#F9E8BB"
+		    	android:text="@string/setDate"
+		    	android:background="#00000000"/>
+		        
+		    <Button android:id="@+id/setEndTime"
+		        android:layout_width="135dip"
+		    	android:layout_height="wrap_content"
+		    	android:textSize="30dip"
+		    	android:textColor="#F9E8BB"
+		    	android:text="@string/setTime"
+		    	android:background="#00000000"/>
+	    </LinearLayout>
 	</LinearLayout>
 
     <LinearLayout 

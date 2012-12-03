@@ -12,8 +12,9 @@
 	    android:background="@drawable/left" >
 	    <LinearLayout android:id="@+id/titleBar"
 	        android:layout_width="fill_parent"
-		    android:layout_height="wrap_content"
-		    android:orientation="horizontal">
+		    android:layout_height="45dp"
+		    android:orientation="horizontal"
+	    	android:background="@drawable/left_top">
 	        <Button android:id="@+id/back_btn"
 	            android:text="@string/back"
  	            android:textColor="#F9E8BB"
@@ -35,7 +36,7 @@
     		android:layout_height="60dip"
 	        android:text="@string/submit"
 	        android:textColor="#F9E8BB"
-	        android:textSize="35dip"
+	        android:textSize="45dip"
 	        android:background="@drawable/left_bottom"
     		android:layout_alignParentBottom="true"/>
 	    <LinearLayout
@@ -44,6 +45,7 @@
     		 android:orientation="vertical"
     		 android:layout_marginTop="5dip"
     		 android:layout_marginBottom="5dip"
+    		 android:paddingLeft="5dp"
     		 android:layout_below="@id/titleBar"
     		 android:layout_above="@id/myOrder">
 	        <!-- 桌号 -->
@@ -87,10 +89,11 @@
 	    android:layout_width="fill_parent"
 	    android:layout_height="match_parent"
 	    android:orientation="vertical"
-	    android:background="@drawable/right" >
+	    android:background="@drawable/right1" >
 	    <RelativeLayout 
 	    android:layout_width="fill_parent"
-	    android:layout_height="wrap_content" >
+	    android:layout_height="45dp"
+	    android:background="@drawable/right_top" >
 		    <TextView
 		    	android:layout_width="fill_parent"
 		    	android:layout_height="43dip"
