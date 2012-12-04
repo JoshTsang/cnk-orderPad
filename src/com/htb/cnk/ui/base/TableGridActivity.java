@@ -50,6 +50,7 @@ public abstract class TableGridActivity extends BaseActivity {
 	private TextView mStatusBar;
 	private int currentPage;
 	private boolean isPrinterErrShown = false;
+	private boolean isActivityActive;
 	private TableAdapter mTableInfo;
 	private GuidePageAdapter guidePageAdapter;
 	private boolean flag = false;
@@ -62,6 +63,7 @@ public abstract class TableGridActivity extends BaseActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+		isActivityActive = true;
 		if (guidePageAdapter.getImageItem() != null) {
 			mTableInfo.clearLstImageItem();
 			updateGridViewAdapter(currentPage);
@@ -74,6 +76,13 @@ public abstract class TableGridActivity extends BaseActivity {
 		unbindService(conn);
 		unregisterReceiver(mReceiver);
 		super.onDestroy();
+	}
+
+	
+	@Override
+	protected void onPause() {
+		isActivityActive = false;
+		super.onPause();
 	}
 
 	@Override
@@ -314,23 +323,24 @@ public abstract class TableGridActivity extends BaseActivity {
 				int err = binder.getErr();
 				if (err < 0) {
 					if (!isPrinterErrShown) {
-						new AlertDialog.Builder(TableGridActivity.this)
-								.setTitle("错误")
-								.setMessage("无法连接打印机或打印机缺纸，请检查打印机")
-								.setPositiveButton("确定",
-										new DialogInterface.OnClickListener() {
-
-											@Override
-											public void onClick(
-													DialogInterface dialog,
-													int which) {
-												isPrinterErrShown = false;
-												binder.cleanErr();
-											}
-										}).show();
-						isPrinterErrShown = true;
+						if (isActivityActive) {
+							new AlertDialog.Builder(TableGridActivity.this)
+									.setTitle("错误")
+									.setMessage("无法连接打印机或打印机缺纸，请检查打印机")
+									.setPositiveButton("确定",
+											new DialogInterface.OnClickListener() {
+	
+												@Override
+												public void onClick(
+														DialogInterface dialog,
+														int which) {
+													isPrinterErrShown = false;
+													binder.cleanErr();
+												}
+											}).show();
+							isPrinterErrShown = true;
+						}
 					}
-					binder.cleanErr();
 					Log.e(TAG, "submit order failed more than 10 times");
 				}
 			} else {

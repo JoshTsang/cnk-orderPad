@@ -45,6 +45,7 @@ public class NotificationTableService extends Service {
 		
 		public int getErr() {
 			if (count > 10) {
+				count = 10;
 				return -1;
 			}
 			return 0;
