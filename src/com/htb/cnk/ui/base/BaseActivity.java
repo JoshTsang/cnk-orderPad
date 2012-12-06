@@ -19,7 +19,7 @@ import com.umeng.analytics.MobclickAgent;
 
 public abstract class BaseActivity extends Activity {
 
-	private final static boolean enableUmeng = true;
+	private final static boolean enableUmeng = false;
 	protected TitleAndMessageDlg mTitleAndMessageDialog;
 	protected ItemDlg mItemDialog;
 	protected ViewDlg mViewDialog;

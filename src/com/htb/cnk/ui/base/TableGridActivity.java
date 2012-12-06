@@ -320,31 +320,31 @@ public abstract class TableGridActivity extends BaseActivity {
 				Log.d(TAG, "has order Pending");
 				mOrderNotification.setVisibility(View.VISIBLE);
 				mOrderNotification.setText("有" + ret + "个订单挂起，系统会自动提交");
-				int err = binder.getErr();
-				if (err < 0) {
-					if (!isPrinterErrShown) {
-						if (isActivityActive) {
-							new AlertDialog.Builder(TableGridActivity.this)
-									.setTitle("错误")
-									.setMessage("无法连接打印机或打印机缺纸，请检查打印机")
-									.setPositiveButton("确定",
-											new DialogInterface.OnClickListener() {
-	
-												@Override
-												public void onClick(
-														DialogInterface dialog,
-														int which) {
-													isPrinterErrShown = false;
-													binder.cleanErr();
-												}
-											}).show();
-							isPrinterErrShown = true;
-						}
-					}
-					Log.e(TAG, "submit order failed more than 10 times");
-				}
 			} else {
 				mOrderNotification.setVisibility(View.INVISIBLE);
+			}
+			int err = binder.getErr();
+			if (err < 0) {
+				if (!isPrinterErrShown) {
+					if (isActivityActive) {
+						new AlertDialog.Builder(TableGridActivity.this)
+								.setTitle("错误")
+								.setMessage("无法连接打印机或打印机缺纸，请检查打印机")
+								.setPositiveButton("确定",
+										new DialogInterface.OnClickListener() {
+
+											@Override
+											public void onClick(
+													DialogInterface dialog,
+													int which) {
+												isPrinterErrShown = false;
+												binder.cleanErr();
+											}
+										}).show();
+						isPrinterErrShown = true;
+					}
+				}
+				Log.e(TAG, "submit order failed more than 10 times");
 			}
 		}
 	};

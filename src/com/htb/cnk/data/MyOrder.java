@@ -329,10 +329,6 @@ public class MyOrder {
 			String MD5) {
 		String response = null;
 
-		int ret = Http.getPrinterStatus(Server.PRINTER_CONTENT_TYPE_ORDER);
-		if (ret < 0) {
-			return ret;
-		}
 		if (tableStatus == Table.OPEN_TABLE_STATUS) {
 			response = Http.post(
 					Server.SUBMIT_ORDER + "?action=add&MD5=" + MD5, order);

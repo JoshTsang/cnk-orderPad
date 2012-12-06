@@ -21,7 +21,7 @@ public class NotificationTableService extends Service {
 	public final static String SER_KEY = "cainaoke.ser";
 	private MyBinder myBinder = new MyBinder();
 	private PendedOrder pendedOrder = new PendedOrder();
-	private int count;
+	private boolean printErr;
 	private int updateTableStatusCount = 0;
 	private boolean networkStatus = false;
 
@@ -44,15 +44,11 @@ public class NotificationTableService extends Service {
 		}
 		
 		public int getErr() {
-			if (count > 10) {
-				count = 10;
-				return -1;
-			}
-			return 0;
+			return printErr?-1:0;
 		}
 		
 		public void cleanErr() {
-			count = 0;
+			printErr = true;
 		}
 		
 		public boolean getNetworkStatus() {
@@ -79,11 +75,7 @@ public class NotificationTableService extends Service {
 
 	class submitThread implements Runnable {
 		public void run() {
-			if (pendedOrder.submit() < 0) {
-				count++;
-			} else {
-				count = 0;
-			}
+			pendedOrder.submit();
 		}
 	}
 	
@@ -98,8 +90,10 @@ public class NotificationTableService extends Service {
 					updateTableStatusCount = 0;
 				}
 				
-				if (notification < 0) {
-					count--;
+				if (notification == -2) {
+					printErr = true;
+				} else {
+					printErr = false;
 				}
 				
 				networkStatus = notification==-1?false:true;

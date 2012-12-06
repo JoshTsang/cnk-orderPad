@@ -41,7 +41,7 @@ public class QuickOrder extends MyOrder {
 		String retName = "";
 		mMatchedDishes.clear();
 		for (int i = 0; i < tempName.length; i++) {
-				retName += tempName[i] + "[\\s\\S]*";
+				retName += "[\\s\\S]*" + tempName[i] + "[\\s\\S]*";
 		}
 		ret = matchPinYin(retName);
 		if (ret < 0) {

@@ -98,7 +98,7 @@ public class Notifications {
 			Log.e("getNotification.php", notificationPkg);
 		}
 
-		return -1;
+		return -2;
 	}
 
 	public List<String> getNotifiycationsType(int index) {
