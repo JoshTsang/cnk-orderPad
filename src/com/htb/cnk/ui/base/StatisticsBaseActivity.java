@@ -11,7 +11,6 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -25,11 +24,9 @@ import android.widget.Toast;
 
 import com.htb.cnk.R;
 import com.htb.cnk.adapter.StatisticsAdapter;
-import com.htb.cnk.data.CnkDbHelper;
 import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.Statistics;
 import com.htb.cnk.lib.Http;
-import com.htb.constant.ErrorNum;
 import com.htb.constant.Server;
 
 public class StatisticsBaseActivity extends BaseActivity {
@@ -69,7 +66,6 @@ public class StatisticsBaseActivity extends BaseActivity {
 		mStatistics = new Statistics(StatisticsBaseActivity.this);
 		findViews();
 		setClickListener();
-		downloadDB();
 		setAdapter();
 	}
 
@@ -237,40 +233,6 @@ public class StatisticsBaseActivity extends BaseActivity {
 		mSalesData.setAdapter(mStatisticsAdapter);
 	}
 	
-	private void downloadDB() {
-		showProgressDlg("正在加载销售数据...");
-		new Thread() {
-			public void run() {
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				int ret = mStatistics.downloadDB(Server.SERVER_DB_SALES, CnkDbHelper.DB_SALES);
-				if (ret < 0) {
-					handler.sendEmptyMessage(ret);
-					Log.e(TAG, "Download sales db failed:" + ret);
-					return;
-				}
-
-				String respond = Http.get(Server.LATEST_STATISTICS, "do=get");
-				if (respond == null) {
-					handler.sendEmptyMessage(ErrorNum.GET_LATEST_STATISTICS_FAILED);
-					Log.e(TAG, "get latest statistics time failed");
-					return;
-				}
-				int start = respond.indexOf("[") + 1;
-				if (start != 1) {
-					handler.sendEmptyMessage(ErrorNum.GET_LATEST_STATISTICS_FAILED);
-					return;
-				}
-				int end = respond.indexOf("]");
-				mLatestStatistics = respond.substring(start, end);
-				handler.sendEmptyMessage(0);
-			}
-		}.start();
-	}
-
 	private void DateTimeNotSetAlert(String err) {
 		popUpDlg("请注意", err, false);
 	}
@@ -397,25 +359,6 @@ public class StatisticsBaseActivity extends BaseActivity {
 		}
 	};
 	
-	protected Handler handler = new Handler() {
-		public void handleMessage(Message msg) {
-			mpDialog.cancel();
-			if (msg.what < 0) {
-				switch (msg.what) {
-				case ErrorNum.DOWNLOAD_DB_FAILED:
-					popUpDlg("错误", "下载销售数据失败,错误码:" + msg.what, true);
-					break;
-				case ErrorNum.GET_LATEST_STATISTICS_FAILED:
-					popUpDlg("错误", "获取上次统计时间失败！", true);
-					break;
-				default:
-					popUpDlg("错误", "下载销售数据失败,错误码:" + msg.what, true);
-					Log.e(TAG, "unknow error num");
-				}
-			}
-		}
-	};
-	
 	protected Handler handlerPrint = new Handler() {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();
@@ -424,6 +367,35 @@ public class StatisticsBaseActivity extends BaseActivity {
 			} else {
 				popUpDlg("完成", "打印完成", false);
 			}
+		}
+	};
+	
+	protected Handler handleDataLoad = new Handler() {
+		public void handleMessage(Message msg) {
+			mpDialog.cancel();
+			int ret = -1;
+			switch (msg.what) {
+			case Statistics.BY_DISH:
+				ret = mStatistics.perpareResult((String)msg.obj);
+				break;
+			case Statistics.BY_CATEGORY:
+				ret = mStatistics.perpareStatisticsByCategory((String)msg.obj);
+				break;
+			case Statistics.BY_PRINTER:
+				ret = mStatistics.perpareStatisticsByPrinter((String)msg.obj);
+				break;
+			case Statistics.BY_STUFF:
+				ret = mStatistics.perparePerformanceResult((String)msg.obj);
+				break;
+			default:
+				ret = -1;
+				break;
+			}
+			if (ret < 0) {
+				popUpDlg("错误", "销售数据出错,需从新下载!", true);
+				return;
+			}
+			updateData(mStart, mEnd);
 		}
 	};
 

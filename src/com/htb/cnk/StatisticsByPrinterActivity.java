@@ -3,13 +3,11 @@ package com.htb.cnk;
 import java.util.Calendar;
 
 import android.os.Bundle;
-import android.util.Log;
+import android.os.Message;
 import android.view.View;
 import android.view.View.OnClickListener;
 
-import com.htb.cnk.lib.Http;
-import com.htb.constant.ErrorNum;
-import com.htb.constant.Server;
+import com.htb.cnk.data.Statistics;
 
 public class StatisticsByPrinterActivity extends StatisticsActivity {
 	final static String TAG = "StatisticsByCategoryActivity";
@@ -17,7 +15,6 @@ public class StatisticsByPrinterActivity extends StatisticsActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		loadPrinterSetting();
 		setClickListener();
 	}
 	
@@ -50,33 +47,17 @@ public class StatisticsByPrinterActivity extends StatisticsActivity {
 		}
 	};
 
-	private void getResult(int queryMode) {
-		int ret = mStatistics.perpareStatisticsByPrinter(mStartSet, mEndSet);
-		if (ret < 0) {
-			popUpDlg("错误", "销售数据出错,需从新下载!", true);
-			return;
-		}
-		updateData(mStartSet, mEndSet);
-		mQueryMode = queryMode;
-	}
-	
-	private void loadPrinterSetting() {
+	private void getResult(final int queryMode) {
+		showProgressDlg("正在查询销售信息...");
 		new Thread() {
-			public void run() {
-				String respond = Http.get(Server.PRINTER_SETTING, "");
-				if (respond == null) {
-					handler.sendEmptyMessage(ErrorNum.GET_LATEST_STATISTICS_FAILED);
-					Log.e(TAG, "get latest statistics time failed");
-					return;
-				}
-				int start = respond.indexOf("[") + 1;
-				if (start != 1) {
-					handler.sendEmptyMessage(ErrorNum.GET_LATEST_STATISTICS_FAILED);
-					return;
-				}
-				mStatistics.setPrinterInfo(respond);
+			public void run(){
+				String ret = mStatistics.loadStatisticsResultJson(mStartSet, mEndSet, Statistics.BY_PRINTER);
+				Message msg = new Message();
+				msg.what = Statistics.BY_PRINTER;
+				msg.obj = ret;
+				handleDataLoad.sendMessage(msg);
+				mQueryMode = queryMode;
 			}
 		}.start();
 	}
-	
 }

@@ -24,6 +24,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
 import android.util.Log;
+import android.util.SparseArray;
 
 import com.htb.cnk.lib.DBFile;
 import com.htb.cnk.lib.Http;
@@ -49,19 +50,20 @@ public class Statistics {
 		}
 	}
 	
+	public final static int BY_DISH = 0;
+	public final static int BY_STUFF = 1;
+	public final static int BY_CATEGORY = 2;
+	public final static int BY_PRINTER = 3;
+	
 	private Context mContext;
 
 	private List<SalesRow> mSalesData = new ArrayList<SalesRow>(); 
 	private CnkDbHelper mCnkDbMenu;
-	private CnkDbHelper mCnkDbSales;
-	private CnkDbHelper mCnkDbUser;
-	private SQLiteDatabase mDbSales;
 	private SQLiteDatabase mDbMenu;
-	private SQLiteDatabase mDbUser;
+	private SparseArray<String> stuffs;
 	private float mTotalAmount = 0;
 	private int tableUsage;
 	private int servedPersons;
-	private String mPrinterConfig;
 	
 	
 	public Statistics(Context context) {
@@ -129,253 +131,168 @@ public class Statistics {
         }
 	}
 	
-	public int perpareResult(Calendar start, Calendar end) {
-		SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
-		SimpleDateFormat time = new SimpleDateFormat("HH:mm");
-		String startDT = date.format(start.getTime()) + " " + time.format(start.getTime());
-		Date endDate = end.getTime();
-		endDate.setMinutes(endDate.getMinutes() + 1);
-		String endDT = date.format(end.getTime()) + " " + time.format(endDate);
-		final int DID = 0;
-		final int TOTAL_AMOUNT = 1;
-		final int COUNT = 2;
-
-		conectDB();
+	public int perpareResult(String json) { 
 		mSalesData.clear();
-		mTotalAmount = 0;
+		JSONObject obj;
 		try {
-			Cursor resultSet = mDbSales.query(CnkDbHelper.SALES_DATA, new String[] {"dish_id",
-					  "sum(price*quantity)",
-					  "sum(quantity)"},
-					  "DATETIME(timestamp)>='"+startDT +"' and DATETIME(timestamp)<='" + endDT+"'",
-					  null, "dish_id", null, null, null);
-			while (resultSet.moveToNext()) {
-				SalesRow salesRow = new SalesRow(resultSet.getInt(DID),
-						resultSet.getFloat(TOTAL_AMOUNT), resultSet.getFloat(COUNT));
+			obj = new JSONObject(json);
+		
+			JSONArray data = obj.getJSONArray("data");
+			mTotalAmount = obj.getInt("total");
+			servedPersons = obj.getInt("personCount");
+			tableUsage = obj.getInt("tableCount");
+			int len = data.length();
+			JSONObject item;
+			for (int i=0; i<len; i++) {
+				item = data.getJSONObject(i);
+				SalesRow salesRow = new SalesRow(item.getInt("id"),
+						item.getLong("total"), item.getLong("quantity"));
 				String dishName = getDishName(salesRow.did);
 				salesRow.dName = dishName;
 				mSalesData.add(salesRow);
-				
-				mTotalAmount += resultSet.getFloat(TOTAL_AMOUNT);
 			}
-		} catch (Exception e) {
+		} catch (JSONException e) {
 			e.printStackTrace();
 			return -1;
 		}
 		
-		return perpareSummary(startDT, endDT);
+		return 0;
 	}
 	
-	public int perparePerformanceResult(Calendar start, Calendar end) {
-		SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
-		SimpleDateFormat time = new SimpleDateFormat("HH:mm");
-		String startDT = date.format(start.getTime()) + " " + time.format(start.getTime());
-		Date endDate = end.getTime();
-		endDate.setMinutes(endDate.getMinutes() + 1);
-		String endDT = date.format(end.getTime()) + " " + time.format(endDate);
-		final int DID = 0;
-		final int TOTAL_AMOUNT = 1;
-		final int COUNT = 2;
-
-		conectDB();
+	public int perparePerformanceResult(String json) {
 		mSalesData.clear();
-		mTotalAmount = 0;
+		JSONObject obj;
 		try {
-			//Log.d("statictics timestamp", "start:" + startDT + " end:" + endDT);
-			Cursor resultSet = mDbSales.query(CnkDbHelper.SALES_DATA, new String[] {"waiter_id",
-					  "sum(price*quantity)",
-					  "sum(quantity)"},
-					  "DATETIME(timestamp)>='"+startDT +"' and DATETIME(timestamp)<='" + endDT+"'",
-					  null, "waiter_id", null, null, null);
-			while (resultSet.moveToNext()) {
-				SalesRow salesRow = new SalesRow(resultSet.getInt(DID),
-						resultSet.getFloat(TOTAL_AMOUNT), resultSet.getFloat(COUNT));
-				String waiterName = getWaiterName(salesRow.did);
-				salesRow.dName = waiterName;
-				mSalesData.add(salesRow);
-
-				mTotalAmount += resultSet.getFloat(TOTAL_AMOUNT);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return -1;
-		}
-
-		return perpareSummary(startDT, endDT);
-	}
-
-	public int perpareStatisticsByCategory(Calendar start, Calendar end) {
-		SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
-		SimpleDateFormat time = new SimpleDateFormat("HH:mm");
-		String startDT = date.format(start.getTime()) + " " + time.format(start.getTime());
-		Date endDate = end.getTime();
-		endDate.setMinutes(endDate.getMinutes() + 1);
-		String endDT = date.format(end.getTime()) + " " + time.format(endDate);
-
-		conectDB();
-		mSalesData.clear();
-		mTotalAmount = 0;
-		try {
-			Cursor categories = mDbMenu.query(CnkDbHelper.TABLE_CATEGORIES, 
-					new String[] {CnkDbHelper.CATEGORY_ID, CnkDbHelper.CATEGORY_NAME},
-					null, null, null, null, null, null);
-			List<CategoryStatistic> categoryList = new ArrayList<Statistics.CategoryStatistic>();
-			CategoryStatistic cs;
-			StringBuffer ids = new StringBuffer();
-			while (categories.moveToNext()) {
-				ids.setLength(0);
-				cs = new CategoryStatistic();
-				cs.id = categories.getInt(0);
-				cs.name = categories.getString(1);
-				Log.d(TAG, "category:" + cs.name);
-				Cursor dishIds = mDbMenu.query(CnkDbHelper.TABLE_DISH_CATEGORY, 
-						new String[] {"dishID"},
-						"categoryID="+cs.id, null, null, null, null, null);
-				while (dishIds.moveToNext()) {
-					Log.d(TAG, "dishName:" + getDishName(dishIds.getInt(0)) + "/" + dishIds.getInt(0));
-					ids.append(dishIds.getInt(0) + ",");
-				}
-				
-				Cursor resultSet = mDbSales.query(CnkDbHelper.SALES_DATA, new String[] {
-						  "sum(price*quantity)",
-						  "sum(quantity)"},
-						  "dish_id IN (" + ids.substring(0, ids.length() -1) +
-						  ") AND DATETIME(timestamp)>='"+startDT +
-						  "' and DATETIME(timestamp)<='" + endDT+"'",
-						  null, null, null, null, null);
-				Log.d(TAG, "time start:" + startDT + " time end:" + endDT);
-				if (resultSet.moveToNext()) {
-					cs.total = resultSet.getFloat(0);
-					cs.count = resultSet.getFloat(1);
-					Log.d(TAG, "category:" + cs.name + " belonged ids:" + ids.substring(0, ids.length() -1));
-					Log.d(TAG, "total:" + cs.total + " count:" + cs.count);
-				} else {
-					Log.e(TAG, "no result for category:" + cs.name);
-				}
-				
-				categoryList.add(cs);
-			}
-			
-			Cursor resultSet = mDbSales.query(CnkDbHelper.SALES_DATA, new String[] {"sum(price*quantity)"},
-					  "DATETIME(timestamp)>='"+startDT +"' and DATETIME(timestamp)<='" + endDT+"'",
-					  null, null, null, null, null);
-			if (resultSet.moveToNext()) {
-				mTotalAmount = resultSet.getFloat(0);
-			}
-			for (CategoryStatistic item:categoryList) {
-				SalesRow salesRow = new SalesRow(item.id,
-						item.total, item.count);
-				salesRow.dName = item.name;
+			obj = new JSONObject(json);
+		
+			JSONArray data = obj.getJSONArray("data");
+			mTotalAmount = obj.getInt("total");
+			servedPersons = obj.getInt("personCount");
+			tableUsage = obj.getInt("tableCount");
+			int len = data.length();
+			JSONObject item;
+			for (int i=0; i<len; i++) {
+				item = data.getJSONObject(i);
+				SalesRow salesRow = new SalesRow(item.getInt("id"),
+						item.getLong("total"), item.getLong("quantity"));
+				String dishName = getWaiterName(salesRow.did);
+				salesRow.dName = dishName;
 				mSalesData.add(salesRow);
 			}
-		} catch (Exception e) {
+		} catch (JSONException e) {
 			e.printStackTrace();
 			return -1;
 		}
 		
-		return perpareSummary(startDT, endDT);
+		return 0;
 	}
-	
-	public int perpareStatisticsByPrinter(Calendar start, Calendar end) {
-		SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
-		SimpleDateFormat time = new SimpleDateFormat("HH:mm");
-		String startDT = date.format(start.getTime()) + " " + time.format(start.getTime());
-		Date endDate = end.getTime();
-		endDate.setMinutes(endDate.getMinutes() + 1);
-		String endDT = date.format(end.getTime()) + " " + time.format(endDate);
 
-		conectDB();
+	public int perpareStatisticsByCategory(String json) {
+
 		mSalesData.clear();
-		mTotalAmount = 0;
+		JSONObject obj;
 		try {
-			List<CategoryStatistic> printers = new ArrayList<CategoryStatistic>();
-			CategoryStatistic ps;
-			StringBuffer ids = new StringBuffer();
-			JSONArray printerLst = new JSONArray(mPrinterConfig);
-			JSONObject printer;
-			for (int i = printerLst.length()-1; i >= 0; i--) {
-				printer = printerLst.getJSONObject(i);
-				if (printer.getInt("id") > 0) {
-					ps = new CategoryStatistic();
-					ps.id = printer.getInt("id");
-					ps.name = printer.getString("name");
-					printers.add(ps);
-				}
-			}
-			for (CategoryStatistic item:printers) {
-				ids.setLength(0);
-				Log.d(TAG, "printer:" + item.name);
-				Cursor dishIds = mDbMenu.query(CnkDbHelper.TABLE_DISH_INFO, 
-						new String[] {"id"},
-						"sortPrintID="+item.id, null, null, null, null, null);
-				while (dishIds.moveToNext()) {
-					Log.d(TAG, "dishName:" + getDishName(dishIds.getInt(0)) + "/" + dishIds.getInt(0));
-					ids.append(dishIds.getInt(0) + ",");
-				}
-				
-				Cursor resultSet = mDbSales.query(CnkDbHelper.SALES_DATA, new String[] {
-						  "sum(price*quantity)",
-						  "sum(quantity)"},
-						  "dish_id IN (" + ids.substring(0, ids.length() -1) +
-						  ") AND DATETIME(timestamp)>='"+startDT +
-						  "' and DATETIME(timestamp)<='" + endDT+"'",
-						  null, null, null, null, null);
-				Log.d(TAG, "time start:" + startDT + " time end:" + endDT);
-				if (resultSet.moveToNext()) {
-					item.total = resultSet.getFloat(0);
-					item.count = resultSet.getFloat(1);
-					Log.d(TAG, "category:" + item.name + " belonged ids:" + ids.substring(0, ids.length() -1));
-					Log.d(TAG, "total:" + item.total + " count:" + item.count);
-				} else {
-					Log.e(TAG, "no result for category:" + item.name);
-				}
-				SalesRow salesRow = new SalesRow(item.id,
-						item.total, item.count);
-				salesRow.dName = item.name;
+			obj = new JSONObject(json);
+		
+			JSONArray data = obj.getJSONArray("data");
+			mTotalAmount = obj.getInt("total");
+			servedPersons = obj.getInt("personCount");
+			tableUsage = obj.getInt("tableCount");
+			int len = data.length();
+			JSONObject item;
+			for (int i=0; i<len; i++) {
+				item = data.getJSONObject(i);
+				SalesRow salesRow = new SalesRow(0,
+						item.getLong("total"), item.getLong("quantity"));
+				String dishName = item.getString("name");
+				salesRow.dName = dishName;
 				mSalesData.add(salesRow);
 			}
-			
-			Cursor resultSet = mDbSales.query(CnkDbHelper.SALES_DATA, new String[] {"sum(price*quantity)"},
-					  "DATETIME(timestamp)>='"+startDT +"' and DATETIME(timestamp)<='" + endDT+"'",
-					  null, null, null, null, null);
-			if (resultSet.moveToNext()) {
-				mTotalAmount = resultSet.getFloat(0);
-			}
-		} catch (Exception e) {
+		} catch (JSONException e) {
 			e.printStackTrace();
 			return -1;
-		}
-		
-		return perpareSummary(startDT, endDT);
-	}
-	
-	public int perpareSummary(String startDT, String endDT) {
-		int ret = getTableUsage(startDT, endDT);
-		if (ret < 0) {
-			return -1;
-		} else {
-			tableUsage = ret;
-		}
-		
-		ret = getPersons(startDT, endDT);
-		if (ret < 0) {
-			return -1;
-		} else {
-			servedPersons = ret;
 		}
 		return 0;
 	}
 	
-	public void setPrinterInfo(String json) {
-		mPrinterConfig = json;
+	public String loadStatisticsResultJson(Calendar start, Calendar end, int action) {
+		JSONObject msg = new JSONObject();
+		SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat time = new SimpleDateFormat("HH:mm");
+		String startDT = date.format(start.getTime()) + " " + time.format(start.getTime());
+		Date endDate = end.getTime();
+		endDate.setMinutes(endDate.getMinutes() + 1);
+		String endDT = date.format(end.getTime()) + " " + time.format(endDate);
+		
+		try {
+			msg.put("start", startDT);
+			msg.put("end", endDT);
+			msg.put("type", action);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		
+		String respond;
+		if (action == BY_STUFF) {
+			if (this.stuffs == null) {
+				this.stuffs = new SparseArray<String>();
+			}
+			respond = Http.get(Server.STUFF, "");
+			if (respond == null) {
+				Log.e(TAG, "get stuff failed");
+				return null;
+			}
+			try {
+				JSONArray stuffs = new JSONArray(respond);
+				JSONObject stuff;
+				int stuffNum = stuffs.length();
+				this.stuffs.clear();
+				for (int i=0; i<stuffNum; i++) {
+					stuff = stuffs.getJSONObject(i);
+					this.stuffs.put(stuff.getInt("id"), stuff.getString("name"));
+				}
+			} catch (JSONException e) {
+				e.printStackTrace();
+				return null;
+			}
+			
+		}
+		
+		respond = Http.post(Server.STATISTIC, msg.toString());
+		if (respond == null) {
+			Log.e(TAG, "get statistics failed");
+			return null;
+		}
+		
+		
+		return respond;
 	}
 	
-	public int getTableUsage() {
-		return tableUsage;
-	}
-	
-	public int getServedPersons() {
-		return servedPersons;
+	public int perpareStatisticsByPrinter(String json) {
+		mSalesData.clear();
+		JSONObject obj;
+		try {
+			obj = new JSONObject(json);
+		
+			JSONArray data = obj.getJSONArray("data");
+			mTotalAmount = obj.getInt("total");
+			servedPersons = obj.getInt("personCount");
+			tableUsage = obj.getInt("tableCount");
+			int len = data.length();
+			JSONObject item;
+			for (int i=0; i<len; i++) {
+				item = data.getJSONObject(i);
+				SalesRow salesRow = new SalesRow(0,
+						item.getLong("total"), item.getLong("quantity"));
+				String dishName = item.getString("name");
+				salesRow.dName = dishName;
+				mSalesData.add(salesRow);
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+			return -1;
+		}
+		return 0;
 	}
 	
 	public int print(Calendar start, Calendar end) {
@@ -427,6 +344,14 @@ public class Statistics {
 		}
 		return 0;
 	}
+
+	public int getTableUsage() {
+		return tableUsage;
+	}
+	
+	public int getServedPersons() {
+			return servedPersons;
+	}
 	
 	public String getName(int index) {
 		return mSalesData.get(index).dName;
@@ -457,7 +382,7 @@ public class Statistics {
 	}
 	
 	public String getWaiterName(int uid) {
-		String name = getWaiterNameFromDB(uid);
+		String name = stuffs.get(uid, null);
 		if (name == null) {
 			return "服务员名称错误";
 		}
@@ -467,22 +392,8 @@ public class Statistics {
 	@Override
 	protected void finalize() throws Throwable {
 		mDbMenu.close();
-		if (mCnkDbSales != null) {
-			mDbSales.close();
-		}
 		
-		if (mCnkDbUser != null) {
-			mDbUser.close();
-		}
 		super.finalize();
-	}
-
-	private void conectDB() {
-		if (mCnkDbSales == null) {
-			mCnkDbSales = new CnkDbHelper(mContext, CnkDbHelper.DB_SALES,
-					null, 1);
-			mDbSales = mCnkDbSales.getReadableDatabase();
-		}
 	}
 
 	private String getDishNameFromDB(int id) {
@@ -493,54 +404,6 @@ public class Statistics {
 			return cur.getString(0);
 		}
 		return null;
-	}
-	
-	private String getWaiterNameFromDB(int id) {
-		if (mCnkDbUser == null) {
-			mCnkDbUser = new CnkDbHelper(mContext, CnkDbHelper.DB_USER,
-					null, 1);
-			mDbUser = mCnkDbUser.getReadableDatabase();
-		}
-		
-		Cursor cur = mDbUser.query(CnkDbHelper.USER_TABLE, new String[] {CnkDbHelper.USER_NAME},
-			  	CnkDbHelper.USER_ID + "=" + id, null, null, null, null);
-	
-		if (cur.moveToNext()) {
-			return cur.getString(0);
-		}
-		return null;
-	}
-	
-	private int getTableUsage(String startDT, String endDT) {
-		int ret = -1;
-		try {
-			Cursor resultSet = mDbSales.query(CnkDbHelper.TABLE_INFO, new String[] {"count()"},
-					  "DATETIME(timestamp)>='"+startDT +"' and DATETIME(timestamp)<='" + endDT+"'",
-					  null, null, null, null, null);
-			if (resultSet.moveToNext()) {
-				return resultSet.getInt(0);
-			}
-		} catch (Exception e) {
-			return -1;
-		}
-		
-		return ret;
-	}
-	
-	private int getPersons(String startDT, String endDT) {
-		int ret = -1;
-		try {
-			Cursor resultSet = mDbSales.query(CnkDbHelper.TABLE_INFO, new String[] {"sum(persons)"},
-					  "DATETIME(timestamp)>='"+startDT +"' and DATETIME(timestamp)<='" + endDT+"'",
-					  null, null, null, null, null);
-			if (resultSet.moveToNext()) {
-				return resultSet.getInt(0);
-			}
-		} catch (Exception e) {
-			return -1;
-		}
-		
-		return ret;
 	}
 	
 	class CategoryStatistic {

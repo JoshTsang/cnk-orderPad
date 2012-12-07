@@ -3,13 +3,12 @@ package com.htb.cnk;
 import java.util.Calendar;
 
 import android.os.Bundle;
-import android.util.Log;
+import android.os.Message;
 import android.view.View;
 import android.view.View.OnClickListener;
 
-import com.htb.cnk.data.CnkDbHelper;
+import com.htb.cnk.data.Statistics;
 import com.htb.cnk.ui.base.StatisticsBaseActivity;
-import com.htb.constant.Server;
 
 public class StuffPerformanceActivity extends StatisticsBaseActivity {
 	final static String TAG = "StuffPerformanceActivity";
@@ -18,28 +17,9 @@ public class StuffPerformanceActivity extends StatisticsBaseActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		downloadUserInfo();
 		setPerClickListener();
 	}
 
-	private void downloadUserInfo() {
-		showProgressDlg("正在加载销售数据...");
-		new Thread() {
-			public void run() {
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				int ret = mStatistics.downloadDB(Server.SERVER_DB_USER, CnkDbHelper.DB_USER);
-				if (ret < 0) {
-					handler.sendEmptyMessage(ret);
-					Log.e(TAG, "Download sales db failed:" + ret);
-					return;
-				}
-			}
-		}.start();
-	}
 	
 	private void setPerClickListener() {
 		mQueryByTimeBtn.setOnClickListener(queryByTimeClicked);
@@ -51,18 +31,12 @@ public class StuffPerformanceActivity extends StatisticsBaseActivity {
 
 		@Override
 		public void onClick(View v) {
-			mStart.setTimeInMillis(System.currentTimeMillis());
-			mStart.set(Calendar.HOUR_OF_DAY, 0);
-			mStart.set(Calendar.MINUTE, 0);
-			mEnd.setTimeInMillis(System.currentTimeMillis());
+			mStartSet.setTimeInMillis(System.currentTimeMillis());
+			mStartSet.set(Calendar.HOUR_OF_DAY, 0);
+			mStartSet.set(Calendar.MINUTE, 0);
+			mEndSet.setTimeInMillis(System.currentTimeMillis());
 			
-			int ret = mStatistics.perparePerformanceResult(mStart, mEnd);
-			if (ret < 0) {
-				popUpDlg("错误", "销售数据出错,需从新下载!", true);
-				return;
-			}
-			updateData(mStart, mEnd);
-			mQueryMode = QUERY_TODAY;
+			getResult(QUERY_TODAY);
 		}
 	};
 
@@ -71,15 +45,24 @@ public class StuffPerformanceActivity extends StatisticsBaseActivity {
 		@Override
 		public void onClick(View v) {
 			if (isDateTimeSet()) {
-				int ret = mStatistics.perparePerformanceResult(mStartSet, mEndSet);
-				if (ret < 0) {
-					popUpDlg("错误", "销售数据出错,需从新下载!", true);
-					return;
-				}
-				updateData(mStartSet, mEndSet);
-				mQueryMode = QUERY_BY_TIME;
+				
+				getResult(QUERY_BY_TIME);
 			}
 		}
 	};
+	
+	private void getResult(final int queryMode) {
+		showProgressDlg("正在查询销售信息...");
+		new Thread() {
+			public void run(){
+				String ret = mStatistics.loadStatisticsResultJson(mStartSet, mEndSet, Statistics.BY_STUFF);
+				Message msg = new Message();
+				msg.what = Statistics.BY_STUFF;
+				msg.obj = ret;
+				handleDataLoad.sendMessage(msg);
+				mQueryMode = queryMode;
+			}
+		}.start();
+	}
 		
 }
