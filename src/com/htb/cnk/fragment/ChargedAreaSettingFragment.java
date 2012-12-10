@@ -29,6 +29,7 @@ import com.htb.cnk.dialog.TitleAndMessageDlg;
 
 public class ChargedAreaSettingFragment extends Fragment {
 	private final static String TAG = "ChargedAreaSettingFragment";
+	
 	private TableSetting mTableSetting;
 	private Button areaButton;
 	private Switch areaSwitch;

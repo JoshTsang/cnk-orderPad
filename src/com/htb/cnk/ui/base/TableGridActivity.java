@@ -225,7 +225,7 @@ public abstract class TableGridActivity extends BaseActivity {
 		mNetWrorkAlertDialog.setMessage(msg).show();
 	}
 
-	protected void setClassToActivity(Class<?> setClass) {
+	protected void luanchActivity(Class<?> setClass) {
 		intent.setClass(TableGridActivity.this, setClass);
 		TableGridActivity.this.startActivity(intent);
 	}

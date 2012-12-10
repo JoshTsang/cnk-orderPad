@@ -1,6 +1,8 @@
 package com.htb.cnk.ui.base;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 import android.app.AlertDialog;
 import android.content.ComponentName;
@@ -45,7 +47,9 @@ import com.htb.constant.Table;
  */
 public class OrderBaseActivity extends BaseActivity {
 	private final static String TAG = "OrderBaseActivity";
-	
+
+    protected final int SELECT_TABLES_DIALOG = 1;
+    
 	protected Button mBackBtn;
 	protected Button mSubmitBtn;
 	protected Button mLeftBtn;
@@ -62,6 +66,9 @@ public class OrderBaseActivity extends BaseActivity {
 	protected TitleAndMessageDlg mNetworkDialog;
 	protected NotificationTableService.MyBinder mPendOrderBinder;
 	protected boolean mBinded;
+	protected boolean[] mTableSelected;
+	protected List<Integer> multiOrderIds;
+	protected StringBuffer multiOrderNames;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -79,24 +86,75 @@ public class OrderBaseActivity extends BaseActivity {
 //        startService(intent); 
         bindService(intent, conn, Context.BIND_AUTO_CREATE);  
 	}
+	
+    protected void showTableSelectDialog() {
+        List<String> tableNames = mSettings.getTableNames();
+        if (mTableSelected == null) {
+        	mTableSelected = new boolean[tableNames.size()];
+        }
+        int tableNum = mSettings.tableSeetingsSize();
+        for (int i=0; i<tableNum; i++) {
+        	mTableSelected[i] = false;
+        }
+    	AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("请选择");
+            DialogInterface.OnMultiChoiceClickListener mutiListener = 
+                    new DialogInterface.OnMultiChoiceClickListener() {
+                                
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, 
+                                                int which, boolean isChecked) {
+                                	mTableSelected[which] = isChecked;
+                                }
+                        };
+            builder.setMultiChoiceItems((CharSequence[])tableNames.toArray(new String[0]), 
+            		mTableSelected, mutiListener);
+            DialogInterface.OnClickListener btnListener = 
+                    new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int which) {
+                            		boolean flag = true;
+                            		if (multiOrderIds == null) {
+                            			multiOrderIds = new ArrayList<Integer>();
+                            		} else {
+                            			multiOrderIds.clear();
+                            		}
+                            		if (multiOrderNames == null) {
+                            			multiOrderNames = new StringBuffer();
+                            		} else {
+                            			multiOrderNames.setLength(0);
+                            		}
+                                    for(int i=0; i<mTableSelected.length; i++) {
+                                        if(mTableSelected[i] == true) {
+                                        	flag = false;
+                                            multiOrderIds.add(mSettings.getIdByAllIndex(i));
+                                            multiOrderNames.append(mSettings.getNameByAllIndex(i) + ",");
+                                        }
+                                    }
+                                    if(multiOrderIds.size() > 0) {
+                                    	multiOrderNames.deleteCharAt(multiOrderNames.length() - 1);
+                                    }
+                                    showMultiOrderConfimDlg(flag);
+                                }
+                        };
+            builder.setPositiveButton("确定", btnListener);
+            builder.setNegativeButton("取消", null);
+            builder.create().show();
+	}
 
 	public void submitOrder() {
-			new Thread() {
-				public void run() {
-					submitToService();
-					mMyOrder.clear();
-					if (Info.getMode() == Info.WORK_MODE_CUSTOMER) {
-						Info.setMode(Info.WORK_MODE_WAITER);
-						Intent intent = new Intent();
-						intent.setClass(OrderBaseActivity.this,
-								TableActivity.class);
-						startActivity(intent);
-					}
-	
-					finish();
-				}
-			}.start();
+		submitToService();
+		mMyOrder.clear();
+		if (Info.getMode() == Info.WORK_MODE_CUSTOMER) {
+			Info.setMode(Info.WORK_MODE_WAITER);
+			Intent intent = new Intent();
+			intent.setClass(OrderBaseActivity.this,
+					TableActivity.class);
+			startActivity(intent);
 		}
+
+		finish();
+	}
 
 	protected void getPersons() {
 		new Thread() {
@@ -210,11 +268,7 @@ public class OrderBaseActivity extends BaseActivity {
 						int personCount = Integer.parseInt(persons);
 						if (personCount > 0) {
 							mMyOrder.setPersons(personCount);
-							if (Info.getMode() == Info.WORK_MODE_CUSTOMER) {
-								customerSubmitOrderDlg();
-							} else {
-								submitOrder();
-							}
+							prepareSubmitOrder();
 						} else {
 							new AlertDialog.Builder(OrderBaseActivity.this)
 									.setCancelable(false).setTitle("注意")
@@ -303,16 +357,33 @@ public class OrderBaseActivity extends BaseActivity {
 		super.onDestroy();
 	}
 
-	protected void submitToService() {
+	protected int submitToService() {
 		String order = mMyOrder.getOrderJson();
 		if (order == null) {
 			Log.e(TAG, "order==null");
+			return -1;
 		}
 		mPendOrderBinder.add(Info.getTableId(), Info.getTableName(), mSettings.getStatusById(Info.getTableId()), order);
 		int tableStatus = TableSetting.getLocalTableStatusById(Info.getTableId());
 		if (tableStatus%10 == 0) {
 			TableSetting.setLocalTableStatusById(Info.getTableId(), tableStatus + Table.OPEN_TABLE_STATUS);
 		}
+		return 0;
+	}
+	
+	protected int submitMultiOrderToService() {
+		String order = mMyOrder.getMultiOrderJson(multiOrderIds, multiOrderNames.toString());
+		if (order == null) {
+			Log.e(TAG, "order==null");
+			return -1;
+		}
+		
+		mPendOrderBinder.add(multiOrderIds.get(0), multiOrderNames.toString(), mSettings.getStatusById(multiOrderIds.get(0)), order);
+		int tableStatus = TableSetting.getLocalTableStatusById(multiOrderIds.get(0));
+		if (tableStatus%10 == 0) {
+			TableSetting.setLocalTableStatusById(multiOrderIds.get(0), tableStatus + Table.OPEN_TABLE_STATUS);
+		}
+		return 0;
 	}
 	
 	protected void flavorDialog(final int position) {
@@ -350,6 +421,28 @@ public class OrderBaseActivity extends BaseActivity {
 
 	};
 	
+	private void showMultiOrderConfimDlg(boolean noTableSelected) {
+		if (noTableSelected) {
+			new AlertDialog.Builder(OrderBaseActivity.this)
+			.setMessage("没有选中任何桌号")
+			.setPositiveButton("确定", null).show();
+		} else {
+			new AlertDialog.Builder(OrderBaseActivity.this)
+			.setMessage("请确认桌号：" + multiOrderNames)
+			.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialogInterface,
+						int which) {
+					if (submitMultiOrderToService() >= 0) {
+						finish();
+					} else {
+						Toast.makeText(getBaseContext(), "提交订单失败", Toast.LENGTH_LONG).show();
+					}
+				}
+			}).setNegativeButton("取消", null).show();
+		}
+	}
+	
 	private void findViews() {
 		mBackBtn = (Button) findViewById(R.id.back_btn);
 		mSubmitBtn = (Button) findViewById(R.id.submit);
@@ -364,7 +457,7 @@ public class OrderBaseActivity extends BaseActivity {
 
 	private void fillData() {
 		mTableNumTxt.setText(Info.getTableName());
-		if (Info.getTableId() < 0) {
+		if (Info.getTableId() < 0 && Info.getTableId() != MyOrder.MULTI_ORDER) {
 			mSubmitBtn.setText("清除菜单");
 		}
 		updateTabelInfos();
@@ -374,6 +467,21 @@ public class OrderBaseActivity extends BaseActivity {
 		mBackBtn.setOnClickListener(backBtnClicked);
 		mSubmitBtn.setOnClickListener(submitBtnClicked);
 		mComment.setOnClickListener(commentClicked);
+	}
+
+	private void prepareSubmitOrder() {
+		if (Info.getTableId() < 0 && Info.getTableId() != MyOrder.MULTI_ORDER) {
+			mMyOrder.clear();
+			mMyOrderAdapter.notifyDataSetChanged();
+			updateTabelInfos();
+			return;
+		} else if (Info.getMode() == Info.WORK_MODE_CUSTOMER) {
+			customerSubmitOrderDlg();
+		} else if(Info.getTableId() == MyOrder.MULTI_ORDER) {
+			showTableSelectDialog();
+		} else {
+			submitOrder();
+		}
 	}
 
 	private void customerSubmitOrderDlg() {
@@ -410,12 +518,7 @@ public class OrderBaseActivity extends BaseActivity {
 
 		@Override
 		public void onClick(View v) {
-			if (Info.getTableId() < 0) {
-				mMyOrder.clear();
-				mMyOrderAdapter.notifyDataSetChanged();
-				updateTabelInfos();
-				return;
-			}
+			
 			if (mMyOrder.count() <= 0) {
 				new AlertDialog.Builder(OrderBaseActivity.this).setTitle("请注意")
 						.setMessage("您还没有点任何东西").setPositiveButton("确定", null)
@@ -426,11 +529,7 @@ public class OrderBaseActivity extends BaseActivity {
 				showSetPersonsDlg();
 			} else {
 				mMyOrder.setPersons(0);
-				if (Info.getMode() == Info.WORK_MODE_CUSTOMER) {
-					customerSubmitOrderDlg();
-				} else {
-					submitOrder();
-				}
+				prepareSubmitOrder();
 			}
 		}
 	};

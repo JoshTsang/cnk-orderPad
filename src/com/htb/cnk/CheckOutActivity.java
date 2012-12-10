@@ -210,7 +210,7 @@ public class CheckOutActivity extends BaseActivity {
 			
 			if (msg.what == -2) {
 				toastText(R.string.checkOutWarning);
-			} else if (msg.what == -1) {
+			} else if (msg.what < 0) {
 				mNetWrorkAlertDialog.setMessage("收银出错，请检查连接网络重试").show();
 			} else if (isPrinterError(msg)) {
 				toastText("无法连接打印机或打印机缺纸");

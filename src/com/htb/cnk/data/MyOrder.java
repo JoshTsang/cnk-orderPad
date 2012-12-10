@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,6 +36,7 @@ public class MyOrder {
 	/* Del order mode */
 	public final static int DEL_ALL_ORDER = 0;
 	public final static int DEL_ITEM_ORDER = 2;
+	public final static int MULTI_ORDER = -100;
 
 	/* current order mode */
 	public final static int MODE_PAD = 0;
@@ -325,6 +327,57 @@ public class MyOrder {
 
 	}
 
+	public String getMultiOrderJson(List<Integer> ids, String names) {
+		JSONObject order = new JSONObject();
+		Date date = new Date();
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String time = df.format(date);
+
+		try {
+			order.put("waiter", UserData.getUserName());
+			order.put("waiterId", UserData.getUID());
+			//TODO
+			JSONArray tableIds = new JSONArray();
+			for (Integer id:ids) {
+				tableIds.put(id);
+			}
+			order.put("tableId", tableIds);
+			order.put("persons", mPersons);
+			order.put("tableName", names);
+			order.put("multi", 1);
+			order.put("type", mOrderType == MODE_PAD ? "pad":"phone");
+			order.put("timeType", orderTimeTypeToString(mOrderTimeType));
+			if (!"".equals(mComment.trim())) {
+				order.put("comment", mComment);
+			}
+			order.put("timestamp", time);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+
+		JSONArray dishes = new JSONArray();
+		try {
+			for (int i = 0; i < mOrder.size(); i++) {
+				String flavorStr = null;
+				flavorStr = getFlavorNameToSubmit(i, flavorStr);
+				JSONObject dish = new JSONObject();
+				dish.put("dishId", mOrder.get(i).dish.getDishId());
+				dish.put("name", mOrder.get(i).dish.getName());
+				dish.put("price", mOrder.get(i).dish.getPrice());
+				dish.put("quan", mOrder.get(i).getQuantity());
+				dish.put("printer", mOrder.get(i).getPrinter());
+				dish.put("flavor", flavorStr);
+				dishes.put(dish);
+			}
+			order.put("order", dishes);
+		} catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+
+		return order.toString();
+	}
+	
 	public static int submitPendedOrder(String order, int tableStatus,
 			String MD5) {
 		String response = null;
@@ -645,8 +698,7 @@ public class MyOrder {
 	}
 
 	protected Cursor getDishInfoFromDB(int id) {
-		String sql = String
-				.format("SELECT %s, %s, %s, %s, %s FROM %s,%s,%s Where %s.%s=%s and %s.%s=%d",
+		String sql = String.format(Locale.CHINESE, "SELECT %s, %s, %s, %s, %s FROM %s,%s,%s Where %s.%s=%s and %s.%s=%d",
 						CnkDbHelper.DISH_NAME, CnkDbHelper.DISH_PRICE,
 						CnkDbHelper.DISH_PIC, CnkDbHelper.DISH_PRINTER,
 						CnkDbHelper.UNIT_NAME, CnkDbHelper.TABLE_DISH_INFO,

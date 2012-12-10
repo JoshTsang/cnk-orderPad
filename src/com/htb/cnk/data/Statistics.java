@@ -152,6 +152,7 @@ public class Statistics {
 				mSalesData.add(salesRow);
 			}
 		} catch (JSONException e) {
+			Log.d(TAG, json);
 			e.printStackTrace();
 			return -1;
 		}

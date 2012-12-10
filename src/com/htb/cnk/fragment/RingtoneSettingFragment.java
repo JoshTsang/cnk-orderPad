@@ -189,7 +189,7 @@ public class RingtoneSettingFragment extends Fragment {
 		if (fileOutputStream != null) {
 			fileOutputStream.close();
 		}
-		
+		is.close();
 		return 0;
 	}
 	

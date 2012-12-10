@@ -163,6 +163,15 @@ public class TableSetting implements Serializable {
 		return item == null ? null : item.getName();
 	}
 
+	public List<String> getTableNames() {
+		List<String> names = new ArrayList<String>();
+		for (TableSettingItem item:mTableSettings) {
+			names.add(item.getName());
+		}
+		
+		return names;
+	}
+	
 	public int getStatusById(int tableId) {
 		TableSettingItem item = mTableIndexForId.get(tableId);
 
@@ -544,7 +553,7 @@ public class TableSetting implements Serializable {
 		int i = 0;
 		for (Integer item : srcTId) {
 			ret = getOrderFromServer(item.intValue());
-			if (ret == -1) {
+			if (ret < 0) {
 				Log.e(TAG, "mOrder.getOrderFromServer.timeout:checkOut");
 				return TIME_OUT;
 			}

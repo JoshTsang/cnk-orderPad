@@ -14,12 +14,15 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.PopupMenu;
 
 import com.htb.cnk.data.Info;
+import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.ui.base.TableGridActivity;
 
 public class TableActivity extends TableGridActivity {
@@ -85,7 +88,7 @@ public class TableActivity extends TableGridActivity {
 	private void setClickListeners() {
 		mBackBtn.setOnClickListener(backClicked);
 		mUpdateBtn.setOnClickListener(checkOutClicked);
-		mStatisticsBtn.setOnClickListener(logoutClicked);
+		mStatisticsBtn.setOnClickListener(multiOrderClicked);
 		mManageBtn.setOnClickListener(manageClicked);
 		mNetWrorkAlertDialog = networkDialog();
 		layoutViewPager.addView(getPageView());
@@ -236,11 +239,26 @@ public class TableActivity extends TableGridActivity {
 		}
 	};
 
+	private OnClickListener multiOrderClicked = new OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+			Info.setTableId(MyOrder.MULTI_ORDER);
+			Info.setTableName("合点");
+			luanchActivity(MenuActivity.class);
+		}
+	};
+	
 	private OnClickListener manageClicked = new OnClickListener() {
 
 		@Override
 		public void onClick(View v) {
-			setClassToActivity(ManageActivity.class);
+			PopupMenu popup = new PopupMenu(getBaseContext(), v);
+	        popup.getMenuInflater().inflate(R.menu.table_activity_more, popup.getMenu());
+
+	        popup.setOnMenuItemClickListener(popupMenuClicked);
+
+	        popup.show();
 		}
 	};
 
@@ -252,18 +270,30 @@ public class TableActivity extends TableGridActivity {
 		}
 	};
 
-	private OnClickListener logoutClicked = new OnClickListener() {
-		@Override
-		public void onClick(View v) {
-			mTitleAndMessageDialog.titleAndMessageDialog(false,
-					getResources().getString(R.string.notice),
-					getResources().getString(R.string.islogOut),
-					getResources().getString(R.string.ok),
-					logoutPositiveListener,
-					getResources().getString(R.string.cancel), null).show();
-		}
+	private void logoutClicked() {
+		mTitleAndMessageDialog.titleAndMessageDialog(false,
+				getResources().getString(R.string.notice),
+				getResources().getString(R.string.islogOut),
+				getResources().getString(R.string.ok),
+				logoutPositiveListener,
+				getResources().getString(R.string.cancel), null).show();
 	};
-
+	
+	private PopupMenu.OnMenuItemClickListener popupMenuClicked = new PopupMenu.OnMenuItemClickListener() {
+        public boolean onMenuItemClick(MenuItem item) {
+            switch (item.getItemId()) {
+			case R.id.manage:
+				luanchActivity(ManageActivity.class);
+				break;
+			case R.id.logout:
+				logoutClicked();
+			default:
+				break;
+            }
+            return true;
+        }
+    };
+    
 	private DialogInterface.OnClickListener logoutPositiveListener = new DialogInterface.OnClickListener() {
 		@Override
 		public void onClick(DialogInterface dialogInterface, int which) {

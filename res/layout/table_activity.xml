@@ -44,7 +44,7 @@
                 android:layout_height="40dip"
                 android:layout_weight="1"
                 android:background="#00000000"
-                android:text="@string/logout"
+                android:text="合点"
                 android:textColor="#F9E8BB"
                 android:textSize="35dip" />
 
@@ -54,7 +54,7 @@
                 android:layout_height="40dip"
                 android:layout_weight="1"
                 android:background="#00000000"
-                android:text="@string/mangement"
+                android:text="更多"
                 android:textColor="#F9E8BB"
                 android:textSize="35dip" />
         </LinearLayout>
