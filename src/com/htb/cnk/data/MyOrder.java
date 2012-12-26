@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -37,6 +38,7 @@ public class MyOrder {
 	public final static int DEL_ALL_ORDER = 0;
 	public final static int DEL_ITEM_ORDER = 2;
 	public final static int MULTI_ORDER = -100;
+	public final static int PERSERVE_ORDER = -200;
 
 	/* current order mode */
 	public final static int MODE_PAD = 0;
@@ -336,7 +338,6 @@ public class MyOrder {
 		try {
 			order.put("waiter", UserData.getUserName());
 			order.put("waiterId", UserData.getUID());
-			//TODO
 			JSONArray tableIds = new JSONArray();
 			for (Integer id:ids) {
 				tableIds.put(id);
@@ -355,6 +356,7 @@ public class MyOrder {
 			e.printStackTrace();
 		}
 
+		Collections.sort(mOrder, mOrder.get(0));
 		JSONArray dishes = new JSONArray();
 		try {
 			for (int i = 0; i < mOrder.size(); i++) {
@@ -416,6 +418,7 @@ public class MyOrder {
 			e.printStackTrace();
 		}
 
+		Collections.sort(mOrder, mOrder.get(0));
 		JSONArray dishes = new JSONArray();
 		try {
 			for (int i = 0; i < mOrder.size(); i++) {

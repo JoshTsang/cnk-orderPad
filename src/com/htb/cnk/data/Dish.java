@@ -1,5 +1,6 @@
 package com.htb.cnk.data;
 
+
 /**
  * @author josh
  *
@@ -68,4 +69,5 @@ public class Dish {
 	public int getPrinter() {
 		return mPrinter;
 	}
+	
 }

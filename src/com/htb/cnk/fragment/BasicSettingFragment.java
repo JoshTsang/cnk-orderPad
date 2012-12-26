@@ -1,15 +1,19 @@
 package com.htb.cnk.fragment;
 
+import android.app.AlertDialog;
 import android.app.Fragment;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.TableRow;
+import android.widget.TextView;
 
 import com.htb.cnk.R;
 import com.htb.cnk.data.Setting;
@@ -20,6 +24,9 @@ public class BasicSettingFragment extends Fragment {
 	CheckBox persons;
 	CheckBox pwdCheck;
 	CheckBox cleanTableAfterCheckout;
+	TableRow checkoutRoundRow;
+	TextView checkoutRoundMode;
+	int roundMode;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -40,6 +47,9 @@ public class BasicSettingFragment extends Fragment {
 		
 		persons = (CheckBox) v.findViewById(R.id.persons);
 		pwdCheck = (CheckBox) v.findViewById(R.id.pwdCheck);
+		checkoutRoundRow = (TableRow) v.findViewById(R.id.checkoutRoundRow);
+		checkoutRoundMode = (TextView) v.findViewById(R.id.checkoutRound);
+		
 		if (!Setting.enabledDebug()) {
 			TableRow pwdSetting = (TableRow) v.findViewById(R.id.pwdSetting);
 			pwdSetting.setVisibility(View.GONE);
@@ -54,7 +64,10 @@ public class BasicSettingFragment extends Fragment {
 		pwdCheck.setOnCheckedChangeListener(pwdCheckedChange);
 		cleanTableAfterCheckout
 				.setOnCheckedChangeListener(cleanTableAfterCheckoutChange);
-
+		
+		roundMode = Setting.getCheckoutRoundMode();
+		checkoutRoundRow.setOnClickListener(checkoutRoundModeClicked);
+		checkoutRoundMode.setText(Setting.CHECKOUT_ROUND[roundMode]);
 		return v;
 	}
 	
@@ -88,6 +101,31 @@ public class BasicSettingFragment extends Fragment {
 			if (isChecked) {
 				UserData.debugMode();
 			}
+		}
+	};
+	
+	OnClickListener checkoutRoundModeClicked = new OnClickListener() {
+		
+		@Override
+		public void onClick(View v) {
+			roundMode = Setting.getCheckoutRoundMode();
+			new AlertDialog.Builder(getActivity())
+			.setNegativeButton("取消", null)
+			.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					Setting.setCheckoutRoundMode(roundMode);
+					checkoutRoundMode.setText(Setting.CHECKOUT_ROUND[roundMode]);
+				}
+			})
+			.setSingleChoiceItems(Setting.CHECKOUT_ROUND, roundMode, new DialogInterface.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					roundMode = which;
+				}})
+			.show();
 		}
 	};
 }

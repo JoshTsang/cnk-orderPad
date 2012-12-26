@@ -1,12 +1,15 @@
 package com.htb.cnk.data;
 
-public class OrderedDish {
+import java.util.Comparator;
+
+public class OrderedDish implements Comparator<OrderedDish>{
 	protected Dish dish;
 	protected float padQuantity;
 	protected float phoneQuantity;
 	protected int status;
 	protected int tableId;
 	protected boolean[] flavor;
+	
 	public OrderedDish(MyOrder myOrder, Dish dish, float quantity, int tableId, int status,
 			int type) {
 		//OrderedDish = myOrder;
@@ -69,5 +72,12 @@ public class OrderedDish {
 
 	public void setFlavor(boolean[] flavor) {
 		this.flavor = flavor;
+	}
+	
+	public int compare(OrderedDish lhs, OrderedDish rhs) {
+		OrderedDish l = (OrderedDish) lhs;
+		OrderedDish r = (OrderedDish) rhs;
+		
+		return l.getPrinter()-r.getPrinter();
 	}
 }

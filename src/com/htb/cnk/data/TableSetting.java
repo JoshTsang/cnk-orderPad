@@ -567,10 +567,26 @@ public class TableSetting implements Serializable {
 		String flavorStr = nameStrBuf.toString().substring(0,
 				nameStrBuf.length() - 1);
 		String time = getCurrentTime();
+		Double total = receivable;
+		switch(Setting.getCheckoutRoundMode()) {
+		case Setting.ROUND_DISABLE:
+			break;
+		case Setting.ROUND_DOWN:
+			total = Math.floor(receivable);
+			break;
+		case Setting.ROUND_HALF_DOWN:
+			total = (double) Math.round(receivable);
+			break;
+		case Setting.ROUND_UP:
+			total = Math.ceil(receivable);
+			break;
+		default:
+			break;
+	}
 		try {
 			orderAll.put("waiter", UserData.getUserName());
 			orderAll.put("orderAll", orderArrary.toString());
-			orderAll.put("receivable", receivable.toString());
+			orderAll.put("receivable", total.toString());
 			orderAll.put("income", income.toString());
 			orderAll.put("change", change.toString());
 			orderAll.put("tableName", flavorStr.toString());
@@ -770,6 +786,22 @@ public class TableSetting implements Serializable {
 					+ "桌", "", totalPriceStr);
 			tableAllPrice = tableAllPrice + totalPrice.get(i);
 		}
+		switch(Setting.getCheckoutRoundMode()) {
+			case Setting.ROUND_DISABLE:
+				break;
+			case Setting.ROUND_DOWN:
+				tableAllPrice = (float) Math.floor(tableAllPrice);
+				break;
+			case Setting.ROUND_HALF_DOWN:
+				tableAllPrice = (float) Math.round(tableAllPrice);
+				break;
+			case Setting.ROUND_UP:
+				tableAllPrice = (float) Math.ceil(tableAllPrice);
+				break;
+			default:
+				break;
+		}
+		
 		String endPriceStr = nf.format(tableAllPrice);
 		checkOutJson = String.format("%s\n\r %s%"
 				+ ((space - 2 - endPriceStr.length()) * 2) + "s%s", checkOutJson,

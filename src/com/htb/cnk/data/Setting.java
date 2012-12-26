@@ -8,9 +8,15 @@ public class Setting {
 	private static final String SettingPerferenceName = "setting";
 	private static boolean debug = false;
 	private static SharedPreferences Perference;
+	
+	public static final int ROUND_DISABLE = 0;
+	public static final int ROUND_HALF_DOWN = 1;
+	public static final int ROUND_UP = 2;
+	public static final int ROUND_DOWN = 3;
 
 	public static final String[] TITLES = { "基本设置", "铃声设置", "区域设置", };
-
+	public static final String[] CHECKOUT_ROUND = {"不舍入", "四舍五入", "进一", "抹去小数点"};
+	
 	public Setting(Context context) {
 		Perference = context.getSharedPreferences(SettingPerferenceName,
 				Context.MODE_PRIVATE);
@@ -89,6 +95,14 @@ public class Setting {
 		return Perference.getString("flavor", "");
 	}
 	
+	public static void setCheckoutRoundMode(int mode) {
+		commitPerferenceInt("checkoutRoundMode", mode);
+	}
+	
+	public static int getCheckoutRoundMode() {
+		return Perference.getInt("checkoutRoundMode", 0);
+	}
+	
 	private static void commitPerferenceBoolean(String key, boolean value) {
 		Editor editor = Perference.edit();
 		editor.putBoolean(key, value);
@@ -98,6 +112,12 @@ public class Setting {
 	private static void commitPerferenceString(String key, String value){
 		Editor editor = Perference.edit();
 		editor.putString(key, value);
+		editor.commit();
+	}
+	
+	private static void commitPerferenceInt(String key, int value){
+		Editor editor = Perference.edit();
+		editor.putInt(key, value);
 		editor.commit();
 	}
 
