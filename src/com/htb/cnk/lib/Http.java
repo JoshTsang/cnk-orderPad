@@ -32,6 +32,7 @@ import org.apache.http.util.EntityUtils;
 
 import android.util.Log;
 
+import com.htb.cnk.data.Reservation;
 import com.htb.constant.ErrorNum;
 import com.htb.constant.Limit;
 import com.htb.constant.Server;
@@ -68,6 +69,121 @@ public class Http {
 		}
 		
 		return null;
+	}
+	
+	public static String submitReservation(Reservation reservation, String json) {
+		HttpParams httpParameters1 = new BasicHttpParams();
+
+		// 超时设置
+		HttpConnectionParams.setConnectionTimeout(httpParameters1, 15 * 1000);
+		HttpConnectionParams.setSoTimeout(httpParameters1, 60 * 1000);
+
+		Map<String, String> params = new HashMap<String, String>();
+		String param = "";
+		
+		try {
+			param = new String(json.getBytes(), "UTF-8");
+			params.put("reservationJson", param);
+			param = new String(reservation.getName().getBytes(), "UTF-8");
+			params.put("customerName", param);
+			param = new String(reservation.getTel().getBytes(), "UTF-8");
+			params.put("phoneNum", param);
+			param = new String(reservation.getDatetime().getBytes(), "UTF-8");
+			params.put("reservationTime", param);
+			param = new String("true".getBytes(), "UTF-8");
+			params.put("cashPledgeYN", param);
+			param = new String(Integer.toString(reservation.getDeposit()).getBytes(), "UTF-8");
+			params.put("cashPledge", param);
+			String tableNames = reservation.getTableNames();
+			
+			int tableCount;
+			if (tableNames ==null || tableNames.length() <= 0) {
+				tableCount = 0;
+			} else {
+				tableCount = tableNames.split(",").length;
+			};
+			param = new String(Integer.toString(tableCount).getBytes(), "UTF-8");
+			params.put("tableNum", param);
+			param = new String(Integer.toString(reservation.getPersons()).getBytes(), "UTF-8");
+			params.put("personNum", param);
+			param = new String((tableCount>0?"true":"false").getBytes(), "UTF-8");
+			params.put("submitTableYN", param);
+			String tableIds = reservation.getTableIds();
+			if (tableIds != null) {
+				String tableId[] = tableIds.split(",");
+				for (int i=0; i<tableId.length; i++) {
+					param = new String(tableId[i].getBytes(), "UTF-8");
+					params.put("arrID[]", param);
+				}
+			} else {
+				param = new String("null".getBytes(), "UTF-8");
+				params.put("arrID", param);
+			}
+
+			param = new String(reservation.getTableNames(" ").getBytes(), "UTF-8");
+			params.put("arrName", param);
+			param = new String(reservation.getComment().getBytes(), "UTF-8");
+			params.put("remark", param);
+			param = new String(reservation.getAddr().getBytes(), "UTF-8");
+			params.put("Addr", param);
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+
+		List<NameValuePair> ls = new ArrayList<NameValuePair>();
+		Set<String> keys = params.keySet();
+		for (String key : keys) {
+			ls.add(new BasicNameValuePair(key, params.get(key).toString()));
+		}
+
+		String url = Server.SERVER_DOMIN + "/" + "managePC/client/addReservationDB.php";
+
+		DefaultHttpClient client;
+		client = new DefaultHttpClient(httpParameters1);
+		
+		if ("".equals(url)) {
+			mErrno = ErrorNum.HTTP_NO_CONECTION;
+			return null;
+		}
+
+		HttpPost post = new HttpPost(url);
+		post.setHeader("User-Agent", "Mozilla/4.5");
+		post.setHeader("connection", "Keep-Alive");
+		post.setHeader("Accept-Language", "zh-cn,zh;q=0.5");
+
+		try {
+			post.setEntity(new UrlEncodedFormEntity(ls, HTTP.UTF_8));
+		} catch (UnsupportedEncodingException e1) {
+			e1.printStackTrace();
+			mErrno = ErrorNum.UTF8_NOT_SUPPORTED;
+			return null;
+		}
+
+		HttpResponse httpResponse = null;
+		try {
+			httpResponse = client.execute(post);
+		} catch (IOException e) {
+			e.printStackTrace();
+			mErrno = ErrorNum.HTTP_NO_CONECTION;
+			return null;
+		}
+
+		int statusCode = httpResponse.getStatusLine().getStatusCode();
+		if (statusCode == 200) {
+			try {
+				return EntityUtils.toString(httpResponse.getEntity());
+			} catch (ParseException e) {
+				e.printStackTrace();
+				return null;
+			} catch (IOException e) {
+				e.printStackTrace();
+				return null;
+			}
+		} else {
+	    	mErrno = -statusCode;
+	    	Log.e(TAG, Integer.toString(mErrno) + ",url:" + url);
+			return null;
+		}
 	}
 	
 	public static int getPrinterStatus(int contentType) {

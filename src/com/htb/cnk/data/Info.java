@@ -31,8 +31,13 @@ public class Info {
 	}
 
 	public static String getTableName() {
-		if (mTableName == null) {
+		switch (mTableId) {
+		case -1:
 			return "菜谱模式";
+		case MyOrder.MULTI_ORDER:
+			return "合点";
+		case MyOrder.PERSERVE_ORDER:
+			return "预订";
 		}
 		return mTableName;
 	}

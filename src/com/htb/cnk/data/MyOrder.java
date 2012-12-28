@@ -416,6 +416,7 @@ public class MyOrder {
 			order.put("timestamp", time);
 		} catch (JSONException e) {
 			e.printStackTrace();
+			return null;
 		}
 
 		Collections.sort(mOrder, mOrder.get(0));
@@ -442,6 +443,87 @@ public class MyOrder {
 		return order.toString();
 	}
 
+	public String getReservationJson(Reservation reservation) {
+		JSONObject order = new JSONObject();
+		Date date = new Date();
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String time = df.format(date);
+
+		try {
+			order.put("waiter", UserData.getUserName());
+			order.put("waiterId", UserData.getUID());
+			order.put("persons", reservation.getPersons());
+			if (!"".equals(reservation.getTableNames()) && reservation.getTableNames() != null) {
+				order.put("tableName", reservation.getTableNames());
+				order.put("tableId", reservation.getTableIds());
+			} 
+			order.put("type", "pad");
+			if (!"".equals(reservation.getComment()) && reservation.getComment() != null) {
+				order.put("comment", getComment());
+			}
+			order.put("reservation", reservation.getDatetime());
+			order.put("timestamp", time);
+			order.put("tel", reservation.getTel());
+			order.put("name", reservation.getName());
+			order.put("deposit", reservation.getDeposit());
+			if (!"".equals(reservation.getAddr()) && reservation.getAddr() != null) {
+				order.put("addr", reservation.getAddr());
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+
+		Collections.sort(mOrder, mOrder.get(0));
+		JSONArray dishes = new JSONArray();
+		try {
+			for (int i = 0; i < mOrder.size(); i++) {
+				String flavorStr = null;
+				flavorStr = getFlavorNameToSubmit(i, flavorStr);
+				JSONObject dish = new JSONObject();
+				dish.put("dishId", mOrder.get(i).dish.getDishId());
+				dish.put("name", mOrder.get(i).dish.getName());
+				dish.put("price", mOrder.get(i).dish.getPrice());
+				dish.put("quan", mOrder.get(i).getQuantity());
+				dish.put("printer", mOrder.get(i).getPrinter());
+				dish.put("flavor", flavorStr);
+				dishes.put(dish);
+			}
+			order.put("order", dishes);
+		} catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+
+		return order.toString();
+	}
+	
+	public int submitReservation(Reservation reservation) {
+		String json = getReservationJson(reservation);
+		if (json == null) {
+			return -1;
+		}
+		
+		String ret = Http.submitReservation(reservation, json);
+		if (ret == null) {
+			return -1;
+		} else if (!"".equals(ret)) {
+			return -1;
+		}
+		
+		ret = Http.post(Server.PRINT + "?action=reservation", json);
+		if (ret == null) {
+			Log.d(TAG, "print return null");
+			return -1;
+		} else {
+			if (ErrorPHP.isSucc(ret, TAG)) {
+				return 0;
+			} else {
+				return -1;
+			}
+		}
+	}
+	
 	public static int loodPersons(int tableId) {
 		String response = Http.get(Server.GET_PERSONS, "TID=" + tableId);
 		if ("null".equals(response)) {

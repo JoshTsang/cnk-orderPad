@@ -28,6 +28,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.htb.cnk.R;
+import com.htb.cnk.ReservationInfoActivity;
 import com.htb.cnk.TableActivity;
 import com.htb.cnk.adapter.MyOrderAdapter;
 import com.htb.cnk.data.Info;
@@ -457,7 +458,7 @@ public class OrderBaseActivity extends BaseActivity {
 
 	private void fillData() {
 		mTableNumTxt.setText(Info.getTableName());
-		if (Info.getTableId() < 0 && Info.getTableId() != MyOrder.MULTI_ORDER) {
+		if (Info.getTableId() == -1) {
 			mSubmitBtn.setText("清除菜单");
 		}
 		updateTabelInfos();
@@ -470,7 +471,7 @@ public class OrderBaseActivity extends BaseActivity {
 	}
 
 	private void prepareSubmitOrder() {
-		if (Info.getTableId() < 0 && Info.getTableId() != MyOrder.MULTI_ORDER) {
+		if (Info.getTableId() == -1) {
 			mMyOrder.clear();
 			mMyOrderAdapter.notifyDataSetChanged();
 			updateTabelInfos();
@@ -479,6 +480,11 @@ public class OrderBaseActivity extends BaseActivity {
 			customerSubmitOrderDlg();
 		} else if(Info.getTableId() == MyOrder.MULTI_ORDER) {
 			showTableSelectDialog();
+		} else if(Info.getTableId() == MyOrder.PERSERVE_ORDER) {
+			Intent intent = new Intent();
+			intent.setClass(getApplicationContext(), ReservationInfoActivity.class);
+			startActivity(intent);
+			finish();
 		} else {
 			submitOrder();
 		}
@@ -525,7 +531,7 @@ public class OrderBaseActivity extends BaseActivity {
 						.show();
 				return;
 			}
-			if (Setting.enabledPersons()) {
+			if (setPersonsNeed()) {
 				showSetPersonsDlg();
 			} else {
 				mMyOrder.setPersons(0);
@@ -534,6 +540,10 @@ public class OrderBaseActivity extends BaseActivity {
 		}
 	};
 
+	private boolean setPersonsNeed() {
+		return Setting.enabledPersons() && Info.getTableId() != MyOrder.PERSERVE_ORDER;
+	}
+	
 	private OnClickListener commentClicked = new OnClickListener() {
 
 		@Override

@@ -255,7 +255,6 @@ public class TableActivity extends TableGridActivity {
 		public void onClick(View v) {
 			PopupMenu popup = new PopupMenu(getBaseContext(), v);
 	        popup.getMenuInflater().inflate(R.menu.table_activity_more, popup.getMenu());
-
 	        popup.setOnMenuItemClickListener(popupMenuClicked);
 
 	        popup.show();
@@ -279,6 +278,11 @@ public class TableActivity extends TableGridActivity {
 				getResources().getString(R.string.cancel), null).show();
 	};
 	
+	private void reservation() {
+		Info.setTableId(MyOrder.PERSERVE_ORDER);
+		luanchActivity(MenuActivity.class);
+	}
+	
 	private PopupMenu.OnMenuItemClickListener popupMenuClicked = new PopupMenu.OnMenuItemClickListener() {
         public boolean onMenuItemClick(MenuItem item) {
             switch (item.getItemId()) {
@@ -287,6 +291,10 @@ public class TableActivity extends TableGridActivity {
 				break;
 			case R.id.logout:
 				logoutClicked();
+				break;
+			case R.id.reservation:
+				reservation();
+				break;
 			default:
 				break;
             }
