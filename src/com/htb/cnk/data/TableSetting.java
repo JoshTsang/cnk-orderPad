@@ -34,6 +34,7 @@ public class TableSetting implements Serializable {
 	private int floorNum;
 	// private int FLOOR_NUM_CURRENT = 10;
 	private Context mContext;
+	private boolean showDetail;
 
 	public class TableSettingItem {
 		protected int mStatus;
@@ -551,18 +552,37 @@ public class TableSetting implements Serializable {
 		JSONObject orderAll = new JSONObject();
 		JSONArray orderArrary = new JSONArray();
 		int i = 0;
-		for (Integer item : srcTId) {
-			ret = getOrderFromServer(item.intValue());
-			if (ret < 0) {
-				Log.e(TAG, "mOrder.getOrderFromServer.timeout:checkOut");
-				return TIME_OUT;
+		if (showDetail) {
+			for (Integer item : srcTId) {
+				ret = getOrderFromServer(item.intValue());
+				if (ret < 0) {
+					Log.e(TAG, "mOrder.getOrderFromServer.timeout:checkOut");
+					return TIME_OUT;
+				}
+				JSONObject orderObject = new JSONObject();
+	//			String time = getCurrentTime();
+				orderJson(item, orderObject, tableName.get(i), null, 0);
+				nameStrBuf.append(tableName.get(i).toString() + ",");
+				orderArrary.put(orderObject.toString());
+				i++;
 			}
+		} else {
+			if (mOrder != null) {
+				mOrder.clear();
+			}
+			for (Integer item : srcTId) {
+				ret = getOrderFromServerWithoutClear(item.intValue());
+				if (ret < 0) {
+					Log.e(TAG, "mOrder.getOrderFromServerWithoutClear.timeout:checkOut");
+					return TIME_OUT;
+				}
+				nameStrBuf.append(tableName.get(i).toString() + ",");
+				i++;
+			}
+
 			JSONObject orderObject = new JSONObject();
-//			String time = getCurrentTime();
-			orderJson(item, orderObject, tableName.get(i), null, 0);
-			nameStrBuf.append(tableName.get(i).toString() + ",");
+			orderJson(0, orderObject, nameStrBuf.substring(0, nameStrBuf.length()-1), null, 0);
 			orderArrary.put(orderObject.toString());
-			i++;
 		}
 		String flavorStr = nameStrBuf.toString().substring(0,
 				nameStrBuf.length() - 1);
@@ -604,6 +624,14 @@ public class TableSetting implements Serializable {
 		return 0;
 	}
 
+	public void setCheckoutShowDetail(boolean show) {
+		showDetail = show;
+	}
+	
+	public boolean getCheckoutShowDetail() {
+		return showDetail;
+	}
+	
 	public int combineTable(int srcTId, int destTId, String srcName,
 			String destName, int persons) {
 		int ret = getOrderFromServer(srcTId);
@@ -853,6 +881,7 @@ public class TableSetting implements Serializable {
 	public int getOrderFromServer(int srcTId) {
 		if (mOrder == null) {
 			mOrder = new MyOrder(mContext);
+			mOrder.clear();
 		} else {
 			mOrder.clear();
 		}
@@ -860,6 +889,14 @@ public class TableSetting implements Serializable {
 		return ret;
 	}
 
+	public int getOrderFromServerWithoutClear(int srcTId) {
+		if (mOrder == null) {
+			mOrder = new MyOrder(mContext);
+			mOrder.clear();
+		}
+		int ret = mOrder.getOrderFromServerWithoutClear(srcTId);
+		return ret;
+	}
 	public static int getLocalTableStatusById(int tid) {
 		return mTableIndexForId.get(tid).getStatus();
 	}

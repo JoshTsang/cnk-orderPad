@@ -1,6 +1,7 @@
 package com.htb.cnk.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -20,6 +21,7 @@ public class StatisticsAdapter extends BaseAdapter {
 	
 	@Override
 	public int getCount() {
+		Log.d("statisticAdapter", "count:" + mStatistics.count());
 		return mStatistics.count();
 	}
 

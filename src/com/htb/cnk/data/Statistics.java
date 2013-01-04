@@ -54,6 +54,7 @@ public class Statistics {
 	public final static int BY_STUFF = 1;
 	public final static int BY_CATEGORY = 2;
 	public final static int BY_PRINTER = 3;
+	public final static int CATEGORY_DETAIL = 0;
 	
 	private Context mContext;
 
@@ -203,7 +204,7 @@ public class Statistics {
 			JSONObject item;
 			for (int i=0; i<len; i++) {
 				item = data.getJSONObject(i);
-				SalesRow salesRow = new SalesRow(0,
+				SalesRow salesRow = new SalesRow(item.getInt("id"),
 						item.getLong("total"), item.getLong("quantity"));
 				String dishName = item.getString("name");
 				salesRow.dName = dishName;
@@ -217,6 +218,59 @@ public class Statistics {
 	}
 	
 	public String loadStatisticsResultJson(Calendar start, Calendar end, int action) {
+		JSONObject msg = new JSONObject();
+		SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat time = new SimpleDateFormat("HH:mm");
+		String startDT = date.format(start.getTime()) + " " + time.format(start.getTime());
+		Date endDate = end.getTime();
+		endDate.setMinutes(endDate.getMinutes() + 1);
+		String endDT = date.format(end.getTime()) + " " + time.format(endDate);
+		
+		try {
+			msg.put("start", startDT);
+			msg.put("end", endDT);
+			msg.put("type", action);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		
+		String respond;
+		if (action == BY_STUFF) {
+			if (this.stuffs == null) {
+				this.stuffs = new SparseArray<String>();
+			}
+			respond = Http.get(Server.STUFF, "");
+			if (respond == null) {
+				Log.e(TAG, "get stuff failed");
+				return null;
+			}
+			try {
+				JSONArray stuffs = new JSONArray(respond);
+				JSONObject stuff;
+				int stuffNum = stuffs.length();
+				this.stuffs.clear();
+				for (int i=0; i<stuffNum; i++) {
+					stuff = stuffs.getJSONObject(i);
+					this.stuffs.put(stuff.getInt("id"), stuff.getString("name"));
+				}
+			} catch (JSONException e) {
+				e.printStackTrace();
+				return null;
+			}
+			
+		}
+		
+		respond = Http.post(Server.STATISTIC, msg.toString());
+		if (respond == null) {
+			Log.e(TAG, "get statistics failed");
+			return null;
+		}
+		
+		
+		return respond;
+	}
+	
+	public String loadStatisticsResultJson(Calendar start, Calendar end, int action, int id) {
 		JSONObject msg = new JSONObject();
 		SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
 		SimpleDateFormat time = new SimpleDateFormat("HH:mm");
@@ -352,6 +406,10 @@ public class Statistics {
 	
 	public int getServedPersons() {
 			return servedPersons;
+	}
+	
+	public int getId(int index) {
+		return mSalesData.get(index).did;
 	}
 	
 	public String getName(int index) {

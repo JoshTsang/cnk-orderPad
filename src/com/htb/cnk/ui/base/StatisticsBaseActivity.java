@@ -11,12 +11,16 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.LinearLayout;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -57,6 +61,7 @@ public class StatisticsBaseActivity extends BaseActivity {
 	protected int mQueryMode;
 	protected Statistics mStatistics;
 	protected StatisticsAdapter mStatisticsAdapter;
+	protected boolean[] expanded;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -79,7 +84,12 @@ public class StatisticsBaseActivity extends BaseActivity {
 		mTableUsage.setText(Integer.toString(mStatistics.getTableUsage()));
 		mPersons.setText(Integer.toString(mStatistics.getServedPersons()));
 		mTotalAmount.setText(MyOrder.convertFloat(mStatistics.getTotalAmount()));
+		expanded = new boolean[mStatistics.count()];
 		mStatisticsAdapter.notifyDataSetChanged();
+		mStartDateBtn.setText("设置日期");
+		mStartTimeBtn.setText("设置时间");
+		mEndDateBtn.setText("设置日期");
+		mEndTimeBtn.setText("设置时间");
 	}
 
 	protected void updateLatestStatistics() {
@@ -206,11 +216,24 @@ public class StatisticsBaseActivity extends BaseActivity {
 							.findViewById(R.id.totalAmount);
 					viewHolder.percentage = (TextView) convertView
 							.findViewById(R.id.percentage);
+					viewHolder.detail = (LinearLayout) convertView.findViewById(R.id.details);
+					viewHolder.detailList = (ListView) convertView.findViewById(R.id.detailList);
+
+					View emptyView = getLayoutInflater().inflate(R.layout.empty_list, null);
+
+					((ViewGroup) viewHolder.detailList.getParent()).addView(emptyView,
+							new LayoutParams(LayoutParams.WRAP_CONTENT,
+									LayoutParams.WRAP_CONTENT));
+					viewHolder.detailList.setEmptyView(emptyView);
 					convertView.setTag(viewHolder);
 				} else {
 					viewHolder = (ViewHolder) convertView.getTag();
 				}
-
+				if (mStatistics.getQuantity(position) > 0) {
+					viewHolder.detail.setVisibility(expanded[position]?View.VISIBLE:View.GONE);
+				} else {
+					viewHolder.detail.setVisibility(View.GONE);
+				}
 				viewHolder.dishName.setText(mStatistics.getName(position));
 				viewHolder.salesCount.setText(MyOrder.convertFloat(mStatistics
 						.getQuantity(position)));
@@ -222,17 +245,31 @@ public class StatisticsBaseActivity extends BaseActivity {
 				viewHolder.percentage.setText(df.format(percent) + "%");
 				return convertView;
 			}
-
-			class ViewHolder {
-				TextView dishName;
-				TextView salesCount;
-				TextView totalAmount;
-				TextView percentage;
-			}
 		};
 		mSalesData.setAdapter(mStatisticsAdapter);
 	}
-	
+
+    public void setListViewHeight(ListView listView) {   
+
+        ListAdapter listAdapter = listView.getAdapter();    
+
+        if (listAdapter == null) {   
+            return;   
+        }   
+
+        int totalHeight = 0;   
+
+        for (int i = 0; i < listAdapter.getCount(); i++) {   
+            View listItem = listAdapter.getView(i, null, listView);   
+            listItem.measure(0, 0);   
+            totalHeight += listItem.getMeasuredHeight();   
+        }   
+
+        ViewGroup.LayoutParams params = listView.getLayoutParams();   
+        params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));   
+        listView.setLayoutParams(params);  
+    }  
+    
 	private void DateTimeNotSetAlert(String err) {
 		popUpDlg("请注意", err, false);
 	}
@@ -348,7 +385,7 @@ public class StatisticsBaseActivity extends BaseActivity {
 			showProgressDlg("正在上传打印信息...");
 			new Thread() {
 				public void run() {
-					int ret = mStatistics.print(mStart, mEnd);
+					int ret = mStatistics.print(mStartSet, mEndSet);
 					handlerPrint.sendEmptyMessage(ret);
 				}
 			}.start();
@@ -395,8 +432,122 @@ public class StatisticsBaseActivity extends BaseActivity {
 				popUpDlg("错误", "销售数据出错,需从新下载!", true);
 				return;
 			}
-			updateData(mStart, mEnd);
+			updateData(mStartSet, mEndSet);
 		}
 	};
+	
+	
+	protected class ViewHolder {
+		TextView dishName;
+		TextView salesCount;
+		TextView totalAmount;
+		TextView percentage;
+		LinearLayout detail;
+		ListView detailList;
+		StatisticsAdapter detailAdapter;
+		Statistics statisticsDetails;
+		
+		private void showDetails(int index) {
+			if (mStatistics.getQuantity(index) == 0) {
+				Toast.makeText(StatisticsBaseActivity.this, "没有相关数据", Toast.LENGTH_SHORT).show();
+			}
+			if (detailAdapter == null) {
+				statisticsDetails = new Statistics(StatisticsBaseActivity.this);
+				
+				detailAdapter = new StatisticsAdapter(getApplicationContext(),
+						statisticsDetails) {
+						@Override
+						public View getView(int position, View convertView, ViewGroup parent) {
+							DetailViewHolder viewHolder;
+				
+							if (convertView == null) {
+								viewHolder = new DetailViewHolder();
+								convertView = LayoutInflater.from(
+										StatisticsBaseActivity.this).inflate(
+										R.layout.item_statistics, null);
+								viewHolder.dishName = (TextView) convertView
+										.findViewById(R.id.dishName);
+								viewHolder.salesCount = (TextView) convertView
+										.findViewById(R.id.salesCount);
+								viewHolder.totalAmount = (TextView) convertView
+										.findViewById(R.id.totalAmount);
+								viewHolder.percentage = (TextView) convertView
+										.findViewById(R.id.percentage);
+								convertView.setTag(viewHolder);
+							} else {
+								viewHolder = (DetailViewHolder) convertView.getTag();
+							}
+				
+							Log.d(TAG, "name:" + statisticsDetails.getName(position));
+							Log.d(TAG, "viewHolder:" + (viewHolder==null?"null":"not"));
+
+							Log.d(TAG, "dishName:" + (viewHolder.dishName==null?"null":"not"));
+							viewHolder.dishName.setText("  " + statisticsDetails.getName(position));
+							viewHolder.salesCount.setText(MyOrder.convertFloat(statisticsDetails
+									.getQuantity(position)));
+							viewHolder.totalAmount.setText(MyOrder.convertFloat(statisticsDetails
+									.getAmount(position)));
+							DecimalFormat df = new DecimalFormat("0.00");
+							double percent = (statisticsDetails.getAmount(position) * 100)
+									/ statisticsDetails.getTotalAmount();
+							viewHolder.percentage.setText(df.format(percent) + "%");
+							return convertView;
+						}
+				};
+				detailList.setAdapter(detailAdapter);
+				loadData(mStatistics.getId(index));
+			}
+		}
+		
+		protected Handler handler = new Handler() {
+			public void handleMessage(Message msg) {
+				int ret = -1;
+				if (msg.what >= 0) {
+					ret = statisticsDetails.perpareResult((String)msg.obj);
+				}
+				
+				if (ret < 0) {
+					popUpDlg("错误", "销售数据出错,需从新下载!", true);
+				} else {
+					detailAdapter.notifyDataSetChanged();
+					setListViewHeight(detailList);
+					//mStatisticsAdapter.notifyDataSetChanged();
+				}
+			}
+		};
+		
+		private void loadData(final int cid) {
+			new Thread() {
+				public void run() {
+					String ret = mStatistics.loadStatisticsResultJson(mStartSet, mEndSet, Statistics.CATEGORY_DETAIL, cid);
+					Message msg = new Message();
+					if (ret != null && !"".equals(ret)) {
+						Log.d(TAG, ret);
+						msg.what = 0;
+					} else {
+						msg.what = -1;
+					}
+					msg.obj = ret;
+					handler.sendMessage(msg);
+				}
+			}.start();
+		}
+		
+		public void toggleDetail(int index) {
+			expanded[index] = !expanded[index];
+			if (expanded[index]) {
+				Log.d(TAG, "show");
+				showDetails(index);
+			} 
+			mStatisticsAdapter.notifyDataSetChanged();
+		}
+	}
+	
+	protected class DetailViewHolder {
+		TextView dishName;
+		TextView salesCount;
+		TextView totalAmount;
+		TextView percentage;
+	}
 
 }

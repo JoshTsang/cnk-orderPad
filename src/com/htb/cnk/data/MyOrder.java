@@ -347,7 +347,7 @@ public class MyOrder {
 			order.put("tableName", names);
 			order.put("multi", 1);
 			order.put("type", mOrderType == MODE_PAD ? "pad":"phone");
-			order.put("timeType", orderTimeTypeToString(mOrderTimeType));
+			order.put("timeType", orderTimeTypeToString(mOrderTimeType, date.getHours()));
 			if (!"".equals(mComment.trim())) {
 				order.put("comment", mComment);
 			}
@@ -409,7 +409,7 @@ public class MyOrder {
 			order.put("persons", mPersons);
 			order.put("tableName", Info.getTableName());
 			order.put("type", mOrderType == MODE_PAD ? "pad" : "phone");
-			order.put("timeType", orderTimeTypeToString(mOrderTimeType));
+			order.put("timeType", orderTimeTypeToString(mOrderTimeType, date.getHours()));
 			if (!"".equals(mComment.trim())) {
 				order.put("comment", mComment);
 			}
@@ -657,6 +657,45 @@ public class MyOrder {
 		}
 		return -1;
 	}
+	
+	public int getOrderFromServerWithoutClear(int tableId) {
+		String response = Http.get(Server.GET_MYORDER, "TID=" + tableId);
+		if ("null".equals(response)) {
+			Log.w(TAG, "getOrderFromServer.null");
+			mOrder.clear();
+			return -2;
+		} else if (response == null) {
+			Log.e(TAG, "getOrderFromServer.timeOut");
+			return TIME_OUT;
+		}
+		try {
+			JSONArray tableList = new JSONArray(response);
+			int length = tableList.length();
+			for (int i = 0; i < length; i++) {
+				JSONObject item = tableList.getJSONObject(i);
+				float quantity = (float) item.getDouble("quantity");
+				int dishId = item.getInt("dish_id");
+				int status = item.getInt("status");
+				Float dishPrice = (float) item.getDouble("price");
+				Cursor cur = getDishInfoFromDB(dishId);
+				if (cur == null) {
+					return ERR_DB;
+				}
+				String name = cur.getString(NAME_COLUMN);
+				String pic = cur.getString(PIC_COLUMN);
+				int printer = cur.getInt(PRINTER_COLUMN);
+				String unit = cur.getString(UNIT_NAME);
+				Dish mDish = new Dish(dishId, name, dishPrice, pic, unit,
+						printer);
+				addOrder(mDish, quantity, tableId, status, MODE_PAD, mOrder);
+			}
+			return 0;
+		} catch (Exception e) {
+			Log.e(TAG, response);
+			e.printStackTrace();
+		}
+		return -1;
+	}
 
 	public void updateQuantity(int index, float quantity) {
 		mOrder.get(index).phoneQuantity = 0;
@@ -844,17 +883,29 @@ public class MyOrder {
 		return null;
 	}
 	
-	private String orderTimeTypeToString(int type) {
+	private String orderTimeTypeToString(int type, int hourOfDay) {
+		String time = "午";
+		if (hourOfDay > 15) {
+			time = "晚";
+		}
 		switch (type) {
 		case ORDER_INSTANT:
-			return "即单";
+			return "即" + time;
 		case ORDER_PEND:
-			return "叫单";
+			return "叫" + time;
 		case ORDER_REPRINT:
 			return "重打";
 		default:
 			return "即单";
 		}
+	}
+	
+	public String toString() {
+		StringBuffer myOrder = new StringBuffer();
+		for (int i = 0; i < mOrder.size(); i++) {
+			myOrder.append("|" + mOrder.get(i).getName() + "*" + mOrder.get(i).getQuantity());
+		}
+		return myOrder.toString();
 	}
 
 }

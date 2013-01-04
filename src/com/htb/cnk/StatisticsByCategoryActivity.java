@@ -4,8 +4,11 @@ import java.util.Calendar;
 
 import android.os.Bundle;
 import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 
 import com.htb.cnk.data.Statistics;
 
@@ -23,8 +26,20 @@ public class StatisticsByCategoryActivity extends StatisticsActivity {
 		mQueryByTimeBtn.setOnClickListener(queryByTimeClicked);
 		mQueryTodayBtn.setOnClickListener(queryTodayClicked);
 		mPrintBtn.setOnClickListener(printClicked);
+		mSalesData.setOnItemClickListener(showDetail);
 	}
-	
+
+	private OnItemClickListener showDetail = new OnItemClickListener() {
+
+		@Override
+		public void onItemClick(AdapterView<?> arg0, View v, int position,
+				long id) {
+			Log.d(TAG, "item clicked");
+			ViewHolder vh = (ViewHolder) v.getTag();
+			vh.toggleDetail(position);
+		}
+		
+	};
 	OnClickListener queryTodayClicked = new OnClickListener() {
 
 		@Override

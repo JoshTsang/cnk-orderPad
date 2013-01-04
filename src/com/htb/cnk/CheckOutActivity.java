@@ -3,7 +3,6 @@ package com.htb.cnk;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -54,7 +53,6 @@ public class CheckOutActivity extends BaseActivity {
 	protected List<String> tableName = new ArrayList<String>();
 	protected List<Integer> selectedTable = new ArrayList<Integer>();
 	protected TableSetting mSettings;
-	protected AlertDialog.Builder mNetWrorkAlertDialog;
 	
 	private final String TAG = "CheckOutActivity";
 
@@ -87,11 +85,12 @@ public class CheckOutActivity extends BaseActivity {
 
 	private void setCheckOutView() {
 		mSubmitBtn.setText("结账");
-		mLeftBtn.setVisibility(View.GONE);
+		mLeftBtn.setText("明细");
 		mRefreshBtn.setVisibility(View.GONE);
 		mComment.setVisibility(View.GONE);
 		mBackBtn.setOnClickListener(backBtnClicked);
 		mSubmitBtn.setOnClickListener(submitClicked);
+		mLeftBtn.setOnClickListener(showDetailToggleClicked);
 		mIncomeEdit.addTextChangedListener(watcher);
 		mCheckOutPrinte
 				.setMovementMethod(ScrollingMovementMethod.getInstance());
@@ -157,6 +156,20 @@ public class CheckOutActivity extends BaseActivity {
 		}
 
 	};
+	
+	private OnClickListener showDetailToggleClicked = new OnClickListener() {
+
+		@Override
+		public void onClick(View arg0) {
+			mSettings.setCheckoutShowDetail(!mSettings.getCheckoutShowDetail());
+			if (mSettings.getCheckoutShowDetail()) {
+				mLeftBtn.setText("明细");
+			} else {
+				mLeftBtn.setText("合并");
+			}
+		}
+
+	};
 
 	TextWatcher watcher = new TextWatcher() {
 
@@ -210,10 +223,10 @@ public class CheckOutActivity extends BaseActivity {
 			
 			if (msg.what == -2) {
 				toastText(R.string.checkOutWarning);
-			} else if (msg.what < 0) {
-				mNetWrorkAlertDialog.setMessage("收银出错，请检查连接网络重试").show();
 			} else if (isPrinterError(msg)) {
 				toastText("无法连接打印机或打印机缺纸");
+			} else if (msg.what < 0) {
+				toastText("收银出错，请检查连接网络重试");
 			} else {
 				if (Setting.enabledCleanTableAfterCheckout()) {
 					cleanTableThread(selectedTable);
