@@ -35,7 +35,7 @@ public class MyOrderActivity extends OrderBaseActivity {
 
 	private void setOrderViews() {
 		mLeftBtn.setText(mMyOrder.getOrderTimeType()==MyOrder.ORDER_INSTANT?"即单":"叫单");
-		mRefreshBtn.setVisibility(View.GONE);
+		mRefreshBtn.setText("预付款");
 	}
 
 	private void fillOrderData() {
@@ -68,6 +68,7 @@ public class MyOrderActivity extends OrderBaseActivity {
 	private void setOrderClickListener() {
 		mBackBtn.setOnClickListener(backClicked);
 		mLeftBtn.setOnClickListener(orderTimeTypeClicked);
+		mRefreshBtn.setOnClickListener(advPaymentClicked);
 	}
 
 	private void updateDishQuantity(int position, int quantity) {

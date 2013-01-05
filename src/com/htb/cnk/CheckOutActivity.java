@@ -105,6 +105,10 @@ public class CheckOutActivity extends BaseActivity {
 		
 		mCheckOutPrinte.setText(mSettings.checkOutJson(metrics.widthPixels));
 		mReceivableText.setText(String.valueOf(MyOrder.convertFloat((float)mTotalPrice)));
+		if (mSettings.getAdvPayment() > 0) {
+			mRefreshBtn.setText("预付:" + mSettings.getAdvPayment());
+			mRefreshBtn.setVisibility(View.VISIBLE);
+		}
 	}
 
 	private void getTableValue() {
@@ -185,7 +189,7 @@ public class CheckOutActivity extends BaseActivity {
 			}
 			if (tempStr.length() > 0) {
 				mIncome = Double.valueOf(tempStr).doubleValue();
-				mChange = mIncome - mTotalPrice;
+				mChange = mIncome + mSettings.getAdvPayment() - mTotalPrice;
 				mChangeText.setText(String.valueOf(MyOrder.convertFloat((float)mChange)));
 			}
 		}

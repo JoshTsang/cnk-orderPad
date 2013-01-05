@@ -64,6 +64,7 @@ public class MyOrder {
 	protected static List<OrderedDish> mOrder = new ArrayList<OrderedDish>();
 	protected static List<OrderedDish> mDelOrder = new ArrayList<OrderedDish>();
 	protected int mPersons;
+	protected float mAdvPayment;
 	protected static String[] mFlavorName;
 	protected static String mComment = "";
 
@@ -346,6 +347,9 @@ public class MyOrder {
 			order.put("persons", mPersons);
 			order.put("tableName", names);
 			order.put("multi", 1);
+			if (mAdvPayment > 0) {
+				order.put("advPayment", mAdvPayment);
+			}
 			order.put("type", mOrderType == MODE_PAD ? "pad":"phone");
 			order.put("timeType", orderTimeTypeToString(mOrderTimeType, date.getHours()));
 			if (!"".equals(mComment.trim())) {
@@ -410,6 +414,9 @@ public class MyOrder {
 			order.put("tableName", Info.getTableName());
 			order.put("type", mOrderType == MODE_PAD ? "pad" : "phone");
 			order.put("timeType", orderTimeTypeToString(mOrderTimeType, date.getHours()));
+			if (mAdvPayment > 0) {
+				order.put("advPayment", mAdvPayment);
+			}
 			if (!"".equals(mComment.trim())) {
 				order.put("comment", mComment);
 			}
@@ -819,6 +826,14 @@ public class MyOrder {
 				i--;
 			}
 		}
+	}
+	
+	public void setAdvPayment(float pay) {
+		mAdvPayment = pay;
+	}
+	
+	public float getAdvPayment() {
+		return mAdvPayment;
 	}
 
 	protected Cursor getDishInfoFromDB(int id) {

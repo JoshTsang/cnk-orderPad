@@ -282,6 +282,58 @@ public class OrderBaseActivity extends BaseActivity {
 		personSettingDlg.setNegativeButton("取消", null);
 		personSettingDlg.show();
 	}
+	
+	protected void showSetAdvPaymentDlg() {
+		final EditText changeTableText = new EditText(OrderBaseActivity.this);
+		changeTableText.setKeyListener(new DigitsKeyListener(false, true));
+		changeTableText
+				.setFilters(new InputFilter[] { new InputFilter.LengthFilter(3) });
+		if (mMyOrder.getAdvPayment() > 0) {
+			changeTableText.setText(Float.toString(mMyOrder.getAdvPayment()));
+		}
+		final AlertDialog.Builder personSettingDlg = new AlertDialog.Builder(
+				OrderBaseActivity.this);
+		personSettingDlg.setTitle("请输入预付款");
+		personSettingDlg.setIcon(R.drawable.ic_launcher);
+		personSettingDlg.setCancelable(false);
+		personSettingDlg.setView(changeTableText);
+		personSettingDlg.setPositiveButton("确定",
+				new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int i) {
+						String payment;
+						payment = changeTableText.getEditableText().toString();
+						if (payment.equals("")) {
+							new AlertDialog.Builder(OrderBaseActivity.this)
+									.setCancelable(false).setTitle("注意")
+									.setMessage("预付款不能为空")
+									.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+										
+										@Override
+										public void onClick(DialogInterface dialog, int which) {
+											showSetAdvPaymentDlg();
+										}
+									}).show();
+							return;
+						}
+
+						float advPayment = Float.parseFloat(payment);
+						if (advPayment > 0) {
+							mMyOrder.setAdvPayment(advPayment);
+							mRefreshBtn.setText("预付:" + payment);
+						} else {
+							new AlertDialog.Builder(OrderBaseActivity.this)
+									.setCancelable(false).setTitle("注意")
+									.setMessage("预付款不合法")
+									.setPositiveButton("确定", null).show();
+							mRefreshBtn.setText("预付款");
+						}
+					}
+				});
+		personSettingDlg.setNegativeButton("取消", null);
+		personSettingDlg.show();
+	}
 
 	protected void showComment() {
 		LayoutInflater factory = LayoutInflater.from(OrderBaseActivity.this);
@@ -328,6 +380,14 @@ public class OrderBaseActivity extends BaseActivity {
 			int type = mMyOrder.getOrderTimeType();
 			mMyOrder.setOrderTimeType(type==MyOrder.ORDER_INSTANT?MyOrder.ORDER_PEND:MyOrder.ORDER_INSTANT);
 			mLeftBtn.setText(mMyOrder.getOrderTimeType()==MyOrder.ORDER_INSTANT?"即单":"叫单");
+		}
+	};
+	
+	protected OnClickListener advPaymentClicked= new OnClickListener() {
+		
+		@Override
+		public void onClick(View v) {
+			showSetAdvPaymentDlg();
 		}
 	};
 	

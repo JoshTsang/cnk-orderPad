@@ -35,6 +35,7 @@ public class TableSetting implements Serializable {
 	// private int FLOOR_NUM_CURRENT = 10;
 	private Context mContext;
 	private boolean showDetail;
+	private static float advPayment;
 
 	public class TableSettingItem {
 		protected int mStatus;
@@ -611,6 +612,9 @@ public class TableSetting implements Serializable {
 			orderAll.put("change", change.toString());
 			orderAll.put("tableName", flavorStr.toString());
 			orderAll.put("timestamp", time);
+			if (advPayment > 0) {
+				orderAll.put("advPayment", advPayment);
+			}
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
@@ -688,21 +692,38 @@ public class TableSetting implements Serializable {
 		String time = getCurrentTime();
 		int i = 0;
 		checkOutPrinter.clear();
+		advPayment = 0;
+		int ret;
+		float paymentRet;
 		for (Integer item : srcTId) {
-			int ret = getOrderFromServer(item.intValue());
+			ret = getOrderFromServer(item.intValue());
 			if (ret == -1) {
 				Log.e(TAG,
 						"mOrder.getOrderFromServer.timeout:getTotalPriceTable");
 				return TIME_OUT;
 			}
+			paymentRet = fetchAdvPayment(item.intValue());
+			if (paymentRet < 0) {
+				Log.e(TAG,
+						"mOrder.getOrderFromServer.timeout:fetchAdvPayment");
+				return TIME_OUT;
+			} else {
+				advPayment += paymentRet;
+				Log.d(TAG, "tid:" + item.intValue() + "tn:" + tableName.get(i) + "p:" + paymentRet);
+			} 
 			JSONObject order = new JSONObject();
 			orderJson(item.intValue(), order, tableName.get(i), time, 0);
 			checkOutPrinter.add(order.toString());
 			i++;
 			totalPrice = totalPrice + mOrder.getTotalPrice();
+			Log.d(TAG, "advPayment:" + advPayment);
 		}
 
 		return totalPrice;
+	}
+	
+	public float getAdvPayment() {
+		return advPayment;
 	}
 
 	public String checkOutJson(int width) {
@@ -887,6 +908,14 @@ public class TableSetting implements Serializable {
 		}
 		int ret = mOrder.getOrderFromServer(srcTId);
 		return ret;
+	}
+	
+	private float fetchAdvPayment(int srcTId) {
+		String ret = Http.get(Server.GET_ADVPAYMENT, "TID=" + srcTId);
+		if (ret == null ||  "".equals(ret)) {
+			return TIME_OUT;
+		}
+		return Float.valueOf(ret);
 	}
 
 	public int getOrderFromServerWithoutClear(int srcTId) {
