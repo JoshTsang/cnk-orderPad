@@ -413,7 +413,7 @@ public class StatisticsBaseActivity extends BaseActivity {
 			int ret = -1;
 			switch (msg.what) {
 			case Statistics.BY_DISH:
-				ret = mStatistics.perpareResult((String)msg.obj);
+				ret = mStatistics.perpareResult((String)msg.obj, Statistics.BY_DISH);
 				break;
 			case Statistics.BY_CATEGORY:
 				ret = mStatistics.perpareStatisticsByCategory((String)msg.obj);
@@ -489,7 +489,7 @@ public class StatisticsBaseActivity extends BaseActivity {
 									.getAmount(position)));
 							DecimalFormat df = new DecimalFormat("0.00");
 							double percent = (statisticsDetails.getAmount(position) * 100)
-									/ statisticsDetails.getTotalAmount();
+									/ mStatistics.getTotalAmount();
 							viewHolder.percentage.setText(df.format(percent) + "%");
 							return convertView;
 						}
@@ -503,7 +503,7 @@ public class StatisticsBaseActivity extends BaseActivity {
 			public void handleMessage(Message msg) {
 				int ret = -1;
 				if (msg.what >= 0) {
-					ret = statisticsDetails.perpareResult((String)msg.obj);
+					ret = statisticsDetails.perpareResult((String)msg.obj, Statistics.BY_CATEGORY);
 				}
 				
 				if (ret < 0) {

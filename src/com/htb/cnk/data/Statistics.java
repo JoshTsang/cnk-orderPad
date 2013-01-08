@@ -54,7 +54,7 @@ public class Statistics {
 	public final static int BY_STUFF = 1;
 	public final static int BY_CATEGORY = 2;
 	public final static int BY_PRINTER = 3;
-	public final static int CATEGORY_DETAIL = 0;
+	public final static int CATEGORY_DETAIL = 4;
 	
 	private Context mContext;
 
@@ -132,16 +132,25 @@ public class Statistics {
         }
 	}
 	
-	public int perpareResult(String json) { 
+	public int perpareResult(String json, int type) { 
+
+		if (json == null) {
+			Log.d(TAG, "json == null");
+			return -1;
+		}
 		mSalesData.clear();
 		JSONObject obj;
 		try {
 			obj = new JSONObject(json);
 		
 			JSONArray data = obj.getJSONArray("data");
-			mTotalAmount = obj.getInt("total");
-			servedPersons = obj.getInt("personCount");
-			tableUsage = obj.getInt("tableCount");
+			if (type == CATEGORY_DETAIL) {
+				
+			} else {
+				mTotalAmount = obj.getInt("total");
+				servedPersons = obj.getInt("personCount");
+				tableUsage = obj.getInt("tableCount");
+			}
 			int len = data.length();
 			JSONObject item;
 			for (int i=0; i<len; i++) {
@@ -162,6 +171,11 @@ public class Statistics {
 	}
 	
 	public int perparePerformanceResult(String json) {
+
+		if (json == null) {
+			Log.d(TAG, "json == null");
+			return -1;
+		}
 		mSalesData.clear();
 		JSONObject obj;
 		try {
@@ -190,7 +204,10 @@ public class Statistics {
 	}
 
 	public int perpareStatisticsByCategory(String json) {
-
+		if (json == null) {
+			Log.d(TAG, "json == null");
+			return -1;
+		}
 		mSalesData.clear();
 		JSONObject obj;
 		try {
@@ -283,6 +300,7 @@ public class Statistics {
 			msg.put("start", startDT);
 			msg.put("end", endDT);
 			msg.put("type", action);
+			msg.put("id", id);
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
