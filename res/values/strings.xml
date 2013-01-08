@@ -126,4 +126,7 @@
 	<string name="functionDisableCauseNetworkUnavalialbe">网络不可用时，无法使用该功能</string>
 	<string name="rebate">打折</string>
 	<string name="cashType">计算方式</string>
+	<string name="advPaymentIllegal">预付值不正确</string>
+	<string name="updateAdvPaymentFailed">提交预付失败</string>
+	<string name="getAdvPaymentFailed">获取预付款失败</string>
 </resources>

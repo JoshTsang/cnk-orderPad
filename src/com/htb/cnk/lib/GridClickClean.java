@@ -8,6 +8,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Handler;
 import android.os.Message;
+import android.text.InputType;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
@@ -17,9 +19,11 @@ import com.htb.cnk.R;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.Setting;
 import com.htb.cnk.ui.base.TableGridActivity;
+import com.htb.constant.Server;
 import com.htb.constant.Table;
 
 public class GridClickClean extends GridClick {
+	public final static String TAG = "GridClickClean";
 	private EditText tableIdEdit;
 	private EditText personsEdit;
 
@@ -70,12 +74,19 @@ public class GridClickClean extends GridClick {
 			}
 			break;
 		case 3:
-			setClassToActivity(DelOrderActivity.class);
+			if (TableGridActivity.networkStatus) {
+				showAdvPaymentDialog();
+			} else {
+				networkErrDlg();
+			}         
 			break;
 		case 4:
-			chooseTypeToMenu();
+			setClassToActivity(DelOrderActivity.class);
 			break;
 		case 5:
+			chooseTypeToMenu();
+			break;
+		case 6:
 			setClassToActivity(QueryOrderActivity.class);
 			break;
 		default:
@@ -140,6 +151,60 @@ public class GridClickClean extends GridClick {
 		return changeTableAlertDialog;
 	}
 
+	private void showAdvPaymentDialog() {
+		new Thread() {
+			public void run() {
+				String response = Http.get(Server.ADVPAYMENT, "TID=" + Info.getTableId());
+				Message msg = new Message();
+				int ret = -1;
+				if (null != response && !"".equals(response)) {
+					try {
+						Float.valueOf(response);
+						ret = 0;
+						msg.obj = response;
+					} catch (NumberFormatException e) {
+						e.printStackTrace();
+					}
+				} else {
+					Log.d(TAG, "response==null");
+				}
+				
+				msg.what = ret;
+				getAdvPaymentHandler.sendMessage(msg);
+			}
+		}.start();
+	}
+	
+	private Builder advPaymentDialog(String payment) {
+		final AlertDialog.Builder changeTableAlertDialog;
+		tableIdEdit = editTextListener();
+		changeTableAlertDialog = mViewDialog.viewDialog(false, tableIdEdit);
+		tableIdEdit.setText(payment);
+		tableIdEdit.setInputType(InputType.TYPE_CLASS_NUMBER);
+		changeTableAlertDialog.setTitle(mContext.getResources().getString(
+				R.string.pleaseInput)
+				+ "预付金额");
+
+		DialogInterface.OnClickListener advPaymentPositiveListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				String payment = tableIdEdit.getText().toString();
+				try {
+					updateAdvPayment(Float.valueOf(payment));
+				} catch (NumberFormatException e) {
+					e.printStackTrace();
+					toastText(R.string.advPaymentIllegal);
+				}
+			}
+		};
+
+		changeTableAlertDialog.setPositiveButton(mContext.getResources()
+				.getString(R.string.ok), advPaymentPositiveListener);
+		changeTableAlertDialog.setNegativeButton(mContext.getResources()
+				.getString(R.string.cancel), null);
+		return changeTableAlertDialog;
+	}
+	
 	private DialogInterface.OnClickListener cleanTableListener = new DialogInterface.OnClickListener() {
 		@Override
 		public void onClick(DialogInterface dialog, int i) {
@@ -221,6 +286,21 @@ public class GridClickClean extends GridClick {
 		}.start();
 	}
 
+	private void updateAdvPayment(final float payment) {
+		mpDialog.setMessage("正在提交预付信息");
+		mpDialog.show();
+		new Thread() {
+			public void run() {
+				try {
+					int ret = getSettings().updateAdvPayment(Info.getTableId(),
+							payment);
+					updateAdvPaymentHandler.sendEmptyMessage(ret);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}.start();
+	}
 	private void combineTable(final int destTId, final int persons) {
 		mpDialog.setMessage("正在并台");
 		mpDialog.show();
@@ -263,6 +343,26 @@ public class GridClickClean extends GridClick {
 		}
 	};
 
+	private Handler updateAdvPaymentHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			mpDialog.cancel();
+			if (msg.what < 0) {
+				toastText(R.string.updateAdvPaymentFailed);
+			}
+		}
+	};
+	
+	private Handler getAdvPaymentHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			mpDialog.cancel();
+			if (msg.what < 0) {
+				toastText(R.string.getAdvPaymentFailed);
+			} else {
+				advPaymentDialog((String)msg.obj).show();
+			}
+		}
+	};
+	
 	private Handler combineTIdHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			mpDialog.cancel();

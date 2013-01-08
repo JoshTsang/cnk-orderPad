@@ -49,7 +49,7 @@ public class Server {
 	public final static String PRINTER_SETTING = PHP_DIR + "setting/getPrinterSetting.php";
 	public final static String STATISTIC = PHP_DIR + "statistics.php";
 	public final static String STUFF = PHP_DIR + "getStuff.php";
-	public final static String GET_ADVPAYMENT = PHP_DIR + "getAdvPayment.php";
+	public final static String ADVPAYMENT = PHP_DIR + "advPayment.php";
 	
 	/* Database */
 	public final static String DB_DIR = "db/";

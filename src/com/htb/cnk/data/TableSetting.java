@@ -543,6 +543,22 @@ public class TableSetting implements Serializable {
 		return 0;
 	}
 
+	public int updateAdvPayment(int tid, float payment) {
+		String response = Http.get(Server.ADVPAYMENT, "TID=" + tid
+				+ "&do=set&payment=" + payment);
+		try {
+			if (response == null) {
+				return -2;
+			} else if (Float.valueOf(response) == payment) {
+				return 0;
+			} else {
+				return -1;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return -1;
+		}
+	}
 	public int checkOut(List<Integer> srcTId, List<String> tableName,
 			Double receivable, Double income, Double change) {
 		int ret = Http.getPrinterStatus(Server.PRINTER_CONTENT_TYPE_ORDER);
@@ -911,7 +927,7 @@ public class TableSetting implements Serializable {
 	}
 	
 	private float fetchAdvPayment(int srcTId) {
-		String ret = Http.get(Server.GET_ADVPAYMENT, "TID=" + srcTId);
+		String ret = Http.get(Server.ADVPAYMENT, "TID=" + srcTId);
 		if (ret == null ||  "".equals(ret)) {
 			return TIME_OUT;
 		}
