@@ -471,13 +471,23 @@ public class OrderBaseActivity extends BaseActivity {
 				}).setNegativeButton("取消", null).show();
 	}
 	
-	protected OnLongClickListener quantityClicked = new OnLongClickListener() {
+	protected OnLongClickListener quantityLongClicked = new OnLongClickListener() {
 
 		@Override
 		public boolean onLongClick(View v) {
 			final int position = Integer.parseInt(v.getTag().toString());
 			showUpdateQuantityDlg(position);
 			return false;
+		}
+
+	};
+	
+	protected OnClickListener quantityClicked = new OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+			final int position = Integer.parseInt(v.getTag().toString());
+			showUpdateQuantityDlg(position);
 		}
 
 	};

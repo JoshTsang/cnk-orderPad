@@ -89,7 +89,7 @@ public class PhoneActivity extends OrderBaseActivity {
 						.getQuantity()));
 				
 				holder1.dishQuantity.setTag(position);
-				holder1.dishQuantity.setOnLongClickListener(quantityClicked);
+				holder1.dishQuantity.setOnClickListener(quantityClicked);
 				
 				holder1.plusBtn.setTag(position);
 				holder1.plusBtn.setOnClickListener(plusClicked);

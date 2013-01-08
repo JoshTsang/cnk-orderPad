@@ -167,7 +167,8 @@ public class MyOrderActivity extends OrderBaseActivity {
 			minusBtn.setOnClickListener(minusClicked);
 
 			flavorBtn.setOnClickListener(flavorClicked);
-			dishQuantity.setOnLongClickListener(quantityClicked);
+			//dishQuantity.setOnLongClickListener(quantityClicked);
+			dishQuantity.setOnClickListener(quantityClicked);
 		}
 
 		public void setTag(int position) {
