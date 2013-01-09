@@ -113,7 +113,7 @@ public class Http {
 				String tableId[] = tableIds.split(",");
 				for (int i=0; i<tableId.length; i++) {
 					param = new String(tableId[i].getBytes(), "UTF-8");
-					params.put("arrID[]", param);
+					params.put("arrID["+i+"]", param);
 				}
 			} else {
 				param = new String("null".getBytes(), "UTF-8");

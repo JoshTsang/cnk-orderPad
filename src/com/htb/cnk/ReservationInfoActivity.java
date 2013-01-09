@@ -137,8 +137,16 @@ public class ReservationInfoActivity extends BaseActivity {
 		if (multiOrderNames != null) {
 			reservation.setTableNames(multiOrderNames.toString());
 		}
-		//TODO tableIds
-		reservation.setTableIds("1");
+		
+		StringBuffer ids = new StringBuffer();
+		for (Integer item:multiOrderIds) {
+			ids.append(item.toString() + ",");
+		}
+		if (multiOrderIds.size() > 0) {
+			reservation.setTableIds(ids.toString().substring(0, ids.length()-1));
+		} else {
+			reservation.setTableIds(null);
+		}
 		return ret;
 	}
 	
