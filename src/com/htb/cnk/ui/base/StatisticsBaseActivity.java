@@ -219,8 +219,8 @@ public class StatisticsBaseActivity extends BaseActivity {
 					viewHolder.detail = (LinearLayout) convertView.findViewById(R.id.details);
 					viewHolder.detailList = (ListView) convertView.findViewById(R.id.detailList);
 
+					
 					View emptyView = getLayoutInflater().inflate(R.layout.empty_list, null);
-
 					((ViewGroup) viewHolder.detailList.getParent()).addView(emptyView,
 							new LayoutParams(LayoutParams.WRAP_CONTENT,
 									LayoutParams.WRAP_CONTENT));
@@ -240,8 +240,14 @@ public class StatisticsBaseActivity extends BaseActivity {
 				viewHolder.totalAmount.setText(MyOrder.convertFloat(mStatistics
 						.getAmount(position)));
 				DecimalFormat df = new DecimalFormat("0.00");
-				double percent = (mStatistics.getAmount(position) * 100)
-						/ mStatistics.getTotalAmount();
+				
+				double percent;
+				if (mStatistics.getTotalAmount() <= 0) {
+					percent = 0;
+				} else {
+					percent = (mStatistics.getAmount(position) * 100)
+							/ mStatistics.getTotalAmount();
+				}
 				viewHolder.percentage.setText(df.format(percent) + "%");
 				return convertView;
 			}
