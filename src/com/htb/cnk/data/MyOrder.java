@@ -900,7 +900,7 @@ public class MyOrder {
 	
 	private String orderTimeTypeToString(int type, int hourOfDay) {
 		String time = "午";
-		if (hourOfDay > 15) {
+		if (hourOfDay >= 14) {
 			time = "晚";
 		}
 		switch (type) {

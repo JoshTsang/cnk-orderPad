@@ -266,15 +266,22 @@ public class OrderBaseActivity extends BaseActivity {
 							return;
 						}
 
-						int personCount = Integer.parseInt(persons);
-						if (personCount > 0) {
-							mMyOrder.setPersons(personCount);
-							prepareSubmitOrder();
-						} else {
+						try {
+							int personCount = Integer.parseInt(persons);
+							if (personCount > 0) {
+								mMyOrder.setPersons(personCount);
+								prepareSubmitOrder();
+							} else {
+								new AlertDialog.Builder(OrderBaseActivity.this)
+										.setCancelable(false).setTitle("注意")
+										.setMessage("人数不合法")
+										.setPositiveButton("确定", null).show();
+							}
+						} catch(NumberFormatException e) {
 							new AlertDialog.Builder(OrderBaseActivity.this)
-									.setCancelable(false).setTitle("注意")
-									.setMessage("人数不合法")
-									.setPositiveButton("确定", null).show();
+							.setCancelable(false).setTitle("注意")
+							.setMessage("人数不合法")
+							.setPositiveButton("确定", null).show();
 						}
 
 					}
