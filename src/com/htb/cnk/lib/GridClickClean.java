@@ -12,6 +12,7 @@ import android.text.InputType;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.htb.cnk.DelOrderActivity;
 import com.htb.cnk.QueryOrderActivity;
@@ -54,7 +55,9 @@ public class GridClickClean extends GridClick {
 		switch (which) {
 		case 0:
 			if (TableGridActivity.networkStatus) {
-				cleanTableDialog().show();
+				//TODO
+				//cleanTableDialog().show();
+				Toast.makeText(mContext, "权限不足！", Toast.LENGTH_LONG);
 			} else {
 				networkErrDlg();
 			}

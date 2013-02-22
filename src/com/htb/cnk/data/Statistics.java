@@ -363,6 +363,7 @@ public class Statistics {
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();
+			Log.e(TAG, json);
 			return -1;
 		}
 		return 0;

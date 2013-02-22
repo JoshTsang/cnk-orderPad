@@ -67,6 +67,12 @@ public class CheckOutActivity extends BaseActivity {
 		setCheckOutView();
 	}
 
+	@Override
+	protected void onStop() {
+		mMyOrder.clear();
+		super.onStop();
+	}
+
 	private void checkfindViews() {
 		mBackBtn = (Button) findViewById(R.id.back_btn);
 		mSubmitBtn = (Button) findViewById(R.id.submit);
