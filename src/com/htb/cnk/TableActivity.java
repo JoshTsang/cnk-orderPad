@@ -13,7 +13,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -24,6 +23,7 @@ import android.widget.PopupMenu;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.ui.base.TableGridActivity;
+import com.htb.cnk.utils.MyLog;
 
 public class TableActivity extends TableGridActivity {
 
@@ -61,10 +61,10 @@ public class TableActivity extends TableGridActivity {
 			public void run() {
 				int menuVer = getCurrentMenuVer();
 				if (UpdateMenuActivity.isUpdateNeed(menuVer)) {
-					Log.d(TAG, "update Menu needed");
+					MyLog.d(TAG, "update Menu needed");
 					handlerMenuUpdate.sendEmptyMessage(1);
 				} else {
-					Log.d(TAG, "no new menu founded, currentMenuVer:" + menuVer);
+					MyLog.d(TAG, "no new menu founded, currentMenuVer:" + menuVer);
 					handlerMenuUpdate.sendEmptyMessage(0);
 				}
 			}

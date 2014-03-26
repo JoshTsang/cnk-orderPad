@@ -5,11 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.htb.cnk.R;
 import com.htb.cnk.data.Notifications;
 import com.htb.cnk.data.TableSetting;
+import com.htb.cnk.utils.MyLog;
 import com.htb.constant.Table;
 
 public class TableAdapter {
@@ -165,7 +165,7 @@ public class TableAdapter {
 			break;
 		default:
 			map.put(IMAGE_ITEM, TABLE_NOTUSE);
-			Log.e(TAG,
+			MyLog.e(TAG,
 					"unknown status:"
 							+ status
 							+ ";"

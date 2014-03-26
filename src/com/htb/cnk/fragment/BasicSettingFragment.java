@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -18,6 +17,7 @@ import android.widget.TextView;
 import com.htb.cnk.R;
 import com.htb.cnk.data.Setting;
 import com.htb.cnk.data.UserData;
+import com.htb.cnk.utils.MyLog;
 
 public class BasicSettingFragment extends Fragment {
 
@@ -86,7 +86,7 @@ public class BasicSettingFragment extends Fragment {
 		@Override
 		public void onCheckedChanged(CompoundButton buttonView,
 				boolean isChecked) {
-			Log.d("clean", "cleanchange");
+			MyLog.d("clean", "cleanchange");
 			Setting.enableCleanTableAfterCheckout(isChecked);
 		}
 

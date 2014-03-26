@@ -9,7 +9,6 @@ import android.content.DialogInterface;
 import android.os.Handler;
 import android.os.Message;
 import android.text.InputType;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -20,6 +19,7 @@ import com.htb.cnk.R;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.Setting;
 import com.htb.cnk.ui.base.TableGridActivity;
+import com.htb.cnk.utils.MyLog;
 import com.htb.constant.Server;
 import com.htb.constant.Table;
 
@@ -169,7 +169,7 @@ public class GridClickClean extends GridClick {
 						e.printStackTrace();
 					}
 				} else {
-					Log.d(TAG, "response==null");
+					MyLog.d(TAG, "response==null");
 				}
 				
 				msg.what = ret;

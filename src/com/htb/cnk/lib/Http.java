@@ -30,9 +30,8 @@ import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 
-import android.util.Log;
-
 import com.htb.cnk.data.Reservation;
+import com.htb.cnk.utils.MyLog;
 import com.htb.constant.ErrorNum;
 import com.htb.constant.Limit;
 import com.htb.constant.Server;
@@ -181,7 +180,7 @@ public class Http {
 			}
 		} else {
 	    	mErrno = -statusCode;
-	    	Log.e(TAG, Integer.toString(mErrno) + ",url:" + url);
+	    	MyLog.e(TAG, Integer.toString(mErrno) + ",url:" + url);
 			return null;
 		}
 	}
@@ -191,7 +190,7 @@ public class Http {
 		String printers[] = getPrinterList(contentType);
 
 		if (printers == null) {
-			Log.e(TAG, "getPrinterListFailed");
+			MyLog.e(TAG, "getPrinterListFailed");
 			return ErrorNum.PRINTER_ERR_CONNECT_TIMEOUT;
 		}
 		if (printers.length == 0) {
@@ -247,7 +246,7 @@ public class Http {
             if (buffer[0] == 18) {
             	return 0;
             } else {
-            	Log.e(TAG, "PRINTER_NO_PAPER:" + printerIp);
+            	MyLog.e(TAG, "PRINTER_NO_PAPER:" + printerIp);
             	return ErrorNum.PRINTER_ERR_NO_PAPER;
             }
         } catch (UnknownHostException e) {
@@ -313,7 +312,7 @@ public class Http {
 			}
 		} else {
 	    	mErrno = -statusCode;
-	    	Log.e(TAG, Integer.toString(mErrno) + ",url:" + url);
+	    	MyLog.e(TAG, Integer.toString(mErrno) + ",url:" + url);
 			return null;
 		}
 	}

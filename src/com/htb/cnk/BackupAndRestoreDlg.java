@@ -25,9 +25,9 @@ import android.content.SharedPreferences.Editor;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 
 import com.htb.cnk.lib.DBFile;
+import com.htb.cnk.utils.MyLog;
 import com.htb.constant.ErrorNum;
 import com.htb.constant.Server;
 
@@ -54,7 +54,7 @@ public class BackupAndRestoreDlg {
 		} else if (action == ACTION_RESTORE){
 			pdialog.setMessage("正在将数据恢复到服务器...");
 		} else {
-			Log.e(TAG, "unknown action:" + mAction);
+			MyLog.e(TAG, "unknown action:" + mAction);
 		}
 		pdialog.show();
 		restoreAndBackup();
@@ -75,7 +75,7 @@ public class BackupAndRestoreDlg {
 				} else if (mAction == ACTION_RESTORE) {
 					ret = restore();
 				} else {
-					Log.e(TAG, "unknown action:" + mAction);
+					MyLog.e(TAG, "unknown action:" + mAction);
 				}
 				handler.sendEmptyMessage(ret);
 			}
@@ -89,21 +89,21 @@ public class BackupAndRestoreDlg {
 		/* restore menu */
 		ret = uploadDB(Server.SERVER_DB_MENU);
 		if (ret < 0) {
-			Log.e(TAG, "upload menu db failed");
+			MyLog.e(TAG, "upload menu db failed");
 			return ret;
 		}
 		
 		/* restore sales data */
 		ret = uploadDB(Server.SERVER_DB_SALES);
 		if (ret < 0) {
-			Log.e(TAG, "upload sales db failed");
+			MyLog.e(TAG, "upload sales db failed");
 			return ret;
 		}
 		
 		/* upload pic */
 		ret = uploadPic();
 		if (ret < 0) {
-			Log.e(TAG, "upload pic failed");
+			MyLog.e(TAG, "upload pic failed");
 			return ret;
 		}
 		
@@ -159,16 +159,16 @@ public class BackupAndRestoreDlg {
         	        File dir = mActivity.getFilesDir();
         	        String filelist[] = dir.list();
         	        FileInputStream inStream;
-        	        Log.d(TAG, "filelist size:" + filelist.length);
+        	        MyLog.d(TAG, "filelist size:" + filelist.length);
         	        for (String fileName:filelist) {
         	        	if (fileName.matches(".+\\.(jpg|png)")) {
-        	        		Log.d(TAG, "pic file:" + fileName);   
+        	        		MyLog.d(TAG, "pic file:" + fileName);   
         	        		inStream = mActivity.openFileInput(fileName);
 		        	        buffIn = new BufferedInputStream(inStream);
 		        	        ret = ftpClient.storeFile(fileName, buffIn);
 		        	        buffIn.close();
         	        	} else {
-        	        		Log.d(TAG, "not pic file:" + fileName);
+        	        		MyLog.d(TAG, "not pic file:" + fileName);
         	        	}
         	        }
         	        ftpClient.logout();
@@ -178,7 +178,7 @@ public class BackupAndRestoreDlg {
         	        }
         	        
         	    } else {
-        	    	Log.w("ftp reply", ftpClient.getReplyString());
+        	    	MyLog.w("ftp reply", ftpClient.getReplyString());
         	    	return ErrorNum.DOWNLOAD_DB_FAILED;
         	    }
         	} catch (SocketException e) {
@@ -234,7 +234,7 @@ public class BackupAndRestoreDlg {
         	        }
         	        
         	    } else {
-        	    	Log.w("ftp reply", ftpClient.getReplyString());
+        	    	MyLog.w("ftp reply", ftpClient.getReplyString());
         	    	return ErrorNum.DOWNLOAD_DB_FAILED;
         	    }
         	} catch (SocketException e) {
@@ -291,7 +291,7 @@ public class BackupAndRestoreDlg {
         	        }
         	        
         	    } else {
-        	    	Log.w("ftp reply", ftpClient.getReplyString());
+        	    	MyLog.w("ftp reply", ftpClient.getReplyString());
         	    	return ErrorNum.DOWNLOAD_DB_FAILED;
         	    }
         	} catch (SocketException e) {
@@ -331,7 +331,7 @@ public class BackupAndRestoreDlg {
 				} else if(mAction == ACTION_RESTORE) {
 					errDlg("恢复数据失败！");
 				} else {
-					Log.e(TAG, "unknown action:" + mAction);
+					MyLog.e(TAG, "unknown action:" + mAction);
 				}
 			} else {
 				Method refreshBackupTime;

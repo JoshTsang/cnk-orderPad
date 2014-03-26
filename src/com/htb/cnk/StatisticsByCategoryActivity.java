@@ -4,13 +4,13 @@ import java.util.Calendar;
 
 import android.os.Bundle;
 import android.os.Message;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 
 import com.htb.cnk.data.Statistics;
+import com.htb.cnk.utils.MyLog;
 
 public class StatisticsByCategoryActivity extends StatisticsActivity {
 	final static String TAG = "StatisticsByCategoryActivity";
@@ -34,7 +34,7 @@ public class StatisticsByCategoryActivity extends StatisticsActivity {
 		@Override
 		public void onItemClick(AdapterView<?> arg0, View v, int position,
 				long id) {
-			Log.d(TAG, "item clicked");
+			MyLog.d(TAG, "item clicked");
 			ViewHolder vh = (ViewHolder) v.getTag();
 			vh.toggleDetail(position);
 		}

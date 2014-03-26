@@ -17,10 +17,10 @@ import org.json.JSONObject;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import com.htb.cnk.lib.ErrorPHP;
 import com.htb.cnk.lib.Http;
+import com.htb.cnk.utils.MyLog;
 import com.htb.constant.Server;
 import com.htb.constant.Table;
 
@@ -157,7 +157,7 @@ public class MyOrder {
 
 	public Dish getDish(int position) {
 		if (position < mOrder.size()) {
-			Log.d(TAG, "postion:" + position + "mOrder.size：" + mOrder.size());
+			MyLog.d(TAG, "postion:" + position + "mOrder.size：" + mOrder.size());
 			return mOrder.get(position).dish;
 		}
 		return null;
@@ -520,7 +520,7 @@ public class MyOrder {
 		
 		ret = Http.post(Server.PRINT + "?action=reservation", json);
 		if (ret == null) {
-			Log.d(TAG, "print return null");
+			MyLog.d(TAG, "print return null");
 			return -1;
 		} else {
 			if (ErrorPHP.isSucc(ret, TAG)) {
@@ -534,17 +534,17 @@ public class MyOrder {
 	public static int loodPersons(int tableId) {
 		String response = Http.get(Server.GET_PERSONS, "TID=" + tableId);
 		if ("null".equals(response)) {
-			Log.w(TAG, "getPersonsFromServer.null");
+			MyLog.w(TAG, "getPersonsFromServer.null");
 			return -2;
 		} else if (response == null) {
-			Log.e(TAG, "getPersonsFromServer.timeOut");
+			MyLog.e(TAG, "getPersonsFromServer.timeOut");
 			return TIME_OUT;
 		}
 		try {
 			int start = response.indexOf('[');
 			int end = response.indexOf(']');
 			if (start < 0 || end < 0 || (end - start) > 4) {
-				Log.e(TAG, "getPersons failed:" + response);
+				MyLog.e(TAG, "getPersons failed:" + response);
 				return -1;
 			} else {
 				String persons = response.substring(start + 1, end);
@@ -552,7 +552,7 @@ public class MyOrder {
 			}
 
 		} catch (Exception e) {
-			Log.e(TAG, response);
+			MyLog.e(TAG, response);
 			e.printStackTrace();
 		}
 		return -1;
@@ -603,10 +603,10 @@ public class MyOrder {
 	 */
 	private static int getFlavorName(String response) {
 		if ("null".equals(response)) {
-			Log.w(TAG, "getFLavorFromServer.null");
+			MyLog.w(TAG, "getFLavorFromServer.null");
 			return -2;
 		} else if (response == null) {
-			Log.e(TAG, "getFLavorFromServer.timeOut");
+			MyLog.e(TAG, "getFLavorFromServer.timeOut");
 			return TIME_OUT;
 		}
 		try {
@@ -618,7 +618,7 @@ public class MyOrder {
 			}
 			return 0;
 		} catch (Exception e) {
-			Log.e(TAG, response);
+			MyLog.e(TAG, response);
 			e.printStackTrace();
 		}
 		return -1;
@@ -628,11 +628,11 @@ public class MyOrder {
 		mDelOrder.clear();
 		String response = Http.get(Server.GET_MYORDER, "TID=" + tableId);
 		if ("null".equals(response)) {
-			Log.w(TAG, "getOrderFromServer.null");
+			MyLog.w(TAG, "getOrderFromServer.null");
 			mOrder.clear();
 			return -2;
 		} else if (response == null) {
-			Log.e(TAG, "getOrderFromServer.timeOut");
+			MyLog.e(TAG, "getOrderFromServer.timeOut");
 			return TIME_OUT;
 		}
 		try {
@@ -659,7 +659,7 @@ public class MyOrder {
 			}
 			return 0;
 		} catch (Exception e) {
-			Log.e(TAG, response);
+			MyLog.e(TAG, response);
 			e.printStackTrace();
 		}
 		return -1;
@@ -668,11 +668,11 @@ public class MyOrder {
 	public int getOrderFromServerWithoutClear(int tableId) {
 		String response = Http.get(Server.GET_MYORDER, "TID=" + tableId);
 		if ("null".equals(response)) {
-			Log.w(TAG, "getOrderFromServer.null");
+			MyLog.w(TAG, "getOrderFromServer.null");
 			mOrder.clear();
 			return -2;
 		} else if (response == null) {
-			Log.e(TAG, "getOrderFromServer.timeOut");
+			MyLog.e(TAG, "getOrderFromServer.timeOut");
 			return TIME_OUT;
 		}
 		try {
@@ -698,7 +698,7 @@ public class MyOrder {
 			}
 			return 0;
 		} catch (Exception e) {
-			Log.e(TAG, response);
+			MyLog.e(TAG, response);
 			e.printStackTrace();
 		}
 		return -1;
@@ -789,7 +789,7 @@ public class MyOrder {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		Log.d(TAG, order.toString());
+		MyLog.d(TAG, order.toString());
 		response = Http.post(Server.DEL_ORDER + "?TYPE=" + type,
 				order.toString());
 		mDelOrder.clear();

@@ -18,7 +18,7 @@ import com.htb.cnk.data.Info;
 import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.OrderedDish;
 import com.htb.cnk.ui.base.OrderBaseActivity;
-import com.umeng.common.Log;
+import com.htb.cnk.utils.MyLog;
 
 public class DelOrderActivity extends OrderBaseActivity {
 	static final String TAG = "DelOrderActivity";
@@ -128,7 +128,7 @@ public class DelOrderActivity extends OrderBaseActivity {
 		if (position == CLEANALL) {
 			messages = "确认退掉所有菜品";
 			if (mMyOrder.getDelOrder().size() > 0) {
-				Log.d(TAG, "size:" + mMyOrder.getDelOrder().size());
+				MyLog.d(TAG, "size:" + mMyOrder.getDelOrder().size());
 				toastText("请先提交已经删除产品，再退掉所有菜品！");
 			} else {
 				delDishDialog(position, messages);

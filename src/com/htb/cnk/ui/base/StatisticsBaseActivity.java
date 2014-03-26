@@ -11,7 +11,6 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -31,6 +30,7 @@ import com.htb.cnk.adapter.StatisticsAdapter;
 import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.Statistics;
 import com.htb.cnk.lib.Http;
+import com.htb.cnk.utils.MyLog;
 import com.htb.constant.Server;
 
 public class StatisticsBaseActivity extends BaseActivity {
@@ -484,10 +484,10 @@ public class StatisticsBaseActivity extends BaseActivity {
 								viewHolder = (DetailViewHolder) convertView.getTag();
 							}
 				
-							Log.d(TAG, "name:" + statisticsDetails.getName(position));
-							Log.d(TAG, "viewHolder:" + (viewHolder==null?"null":"not"));
+							MyLog.d(TAG, "name:" + statisticsDetails.getName(position));
+							MyLog.d(TAG, "viewHolder:" + (viewHolder==null?"null":"not"));
 
-							Log.d(TAG, "dishName:" + (viewHolder.dishName==null?"null":"not"));
+							MyLog.d(TAG, "dishName:" + (viewHolder.dishName==null?"null":"not"));
 							viewHolder.dishName.setText("  " + statisticsDetails.getName(position));
 							viewHolder.salesCount.setText(MyOrder.convertFloat(statisticsDetails
 									.getQuantity(position)));
@@ -528,7 +528,7 @@ public class StatisticsBaseActivity extends BaseActivity {
 					String ret = mStatistics.loadStatisticsResultJson(mStartSet, mEndSet, Statistics.CATEGORY_DETAIL, cid);
 					Message msg = new Message();
 					if (ret != null && !"".equals(ret)) {
-						Log.d(TAG, ret);
+						MyLog.d(TAG, ret);
 						msg.what = 0;
 					} else {
 						msg.what = -1;
@@ -542,7 +542,7 @@ public class StatisticsBaseActivity extends BaseActivity {
 		public void toggleDetail(int index) {
 			expanded[index] = !expanded[index];
 			if (expanded[index]) {
-				Log.d(TAG, "show");
+				MyLog.d(TAG, "show");
 				showDetails(index);
 			} 
 			mStatisticsAdapter.notifyDataSetChanged();

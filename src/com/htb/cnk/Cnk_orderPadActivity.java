@@ -31,7 +31,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -50,6 +49,7 @@ import com.htb.cnk.dialog.LoginDlg;
 import com.htb.cnk.lib.Http;
 import com.htb.cnk.service.NotificationTableService;
 import com.htb.cnk.ui.base.BaseActivity;
+import com.htb.cnk.utils.MyLog;
 import com.htb.constant.Permission;
 import com.htb.constant.Server;
 
@@ -91,7 +91,7 @@ public class Cnk_orderPadActivity extends BaseActivity {
 		DisplayMetrics metrics = new DisplayMetrics();
 
 		getWindowManager().getDefaultDisplay().getMetrics(metrics);
-		Log.i(TAG, metrics.toString());
+		MyLog.i(TAG, metrics.toString());
 		findViews();
 		initSyncProgressBar();
 		setClickListeners();
@@ -163,7 +163,7 @@ public class Cnk_orderPadActivity extends BaseActivity {
 		new Thread() {
 			public void run() {
 				int ret = Lisence.validateDevice(getBaseContext());
-				Log.d(TAG, "lisence" + ret);
+				MyLog.d(TAG, "lisence" + ret);
 				LisenceHandle.sendEmptyMessage(ret);
 			}
 		}.start();
@@ -186,13 +186,13 @@ public class Cnk_orderPadActivity extends BaseActivity {
 	private boolean getServerVerCode() {
 		String response = Http.get(Server.APK_VERSION, null);
 		if (response == null || "".equals(response)) {
-			Log.e(TAG, "server not response for version request");
+			MyLog.e(TAG, "server not response for version request");
 			return false;
 		} else {
 			try {
 				JSONObject versionInfo = new JSONObject(response);
 				String versionString = versionInfo.getString("ver");
-				Log.i(TAG, "ver:" + versionString);
+				MyLog.i(TAG, "ver:" + versionString);
 				String[] ver = versionString.split("\\.");
 				int major = Integer.parseInt(ver[0]);
 				int minor = Integer.parseInt(ver[1]);
@@ -205,7 +205,7 @@ public class Cnk_orderPadActivity extends BaseActivity {
 					return false;
 				}
 			} catch (Exception e) {
-				Log.e(TAG, "APK ver response:" + response);
+				MyLog.e(TAG, "APK ver response:" + response);
 				e.printStackTrace();
 			}
 		}
@@ -237,7 +237,7 @@ public class Cnk_orderPadActivity extends BaseActivity {
 	private void downFile(final String url) {
 		new Thread() {
 			public void run() {
-				Log.i(TAG, "download new version apk:" + url);
+				MyLog.i(TAG, "download new version apk:" + url);
 				HttpParams httpParameters1 = new BasicHttpParams();
 	
 				HttpConnectionParams.setConnectionTimeout(httpParameters1,
@@ -251,7 +251,7 @@ public class Cnk_orderPadActivity extends BaseActivity {
 					response = client.execute(get);
 					HttpEntity entity = response.getEntity();
 					long length = entity.getContentLength();
-					Log.i(TAG, "update apk, size: " + length);
+					MyLog.i(TAG, "update apk, size: " + length);
 					InputStream is = entity.getContent();
 					FileOutputStream fileOutputStream = null;
 					if (is != null) {
@@ -270,7 +270,7 @@ public class Cnk_orderPadActivity extends BaseActivity {
 					if (fileOutputStream != null) {
 						fileOutputStream.close();
 					}
-					Log.i(TAG, "download apk done");
+					MyLog.i(TAG, "download apk done");
 					down();
 				} catch (ClientProtocolException e) {
 					e.printStackTrace();
@@ -372,7 +372,7 @@ public class Cnk_orderPadActivity extends BaseActivity {
 		@Override
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			if (service == null)
-				Log.d("TAG", "service==null");
+				MyLog.d("TAG", "service==null");
 			pendOrderBinder = (NotificationTableService.MyBinder)service;
 			binded = true;
 			pendOrderBinder.start();
@@ -524,7 +524,7 @@ public class Cnk_orderPadActivity extends BaseActivity {
 		public void handleMessage(Message msg) {
 			if (msg.what < 0) {
 				mpDialog.cancel();
-				Log.e("fetch Data failed", "errno: " + msg.what);
+				MyLog.e("fetch Data failed", "errno: " + msg.what);
 				popErrorDlg(msg.what);
 			}
 		}
@@ -557,10 +557,10 @@ public class Cnk_orderPadActivity extends BaseActivity {
 						handlerSync.sendEmptyMessage(LATEST_MENU);
 						int menuVer = getCurrentMenuVer();
 						if (UpdateMenuActivity.isUpdateNeed(menuVer)) {
-							Log.d(TAG, "update Menu needed");
+							MyLog.d(TAG, "update Menu needed");
 							handlerSync.sendEmptyMessage(UPDATE_MENU);
 						} else {
-							Log.d(TAG, "no new menu founded, currentMenuVer:" + menuVer);
+							MyLog.d(TAG, "no new menu founded, currentMenuVer:" + menuVer);
 							handlerSync.sendEmptyMessage(LATEST_MENU);
 						}
 					}

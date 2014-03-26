@@ -12,7 +12,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -26,6 +25,7 @@ import com.htb.cnk.data.MyOrder;
 import com.htb.cnk.data.Reservation;
 import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.ui.base.BaseActivity;
+import com.htb.cnk.utils.MyLog;
 
 public class ReservationInfoActivity extends BaseActivity {
 
@@ -191,7 +191,7 @@ public class ReservationInfoActivity extends BaseActivity {
 				new Thread() {
 					public void run() {
 						int ret = myOrder.submitReservation(reservation);
-						Log.d(TAG, "ret:"+ret);
+						MyLog.d(TAG, "ret:"+ret);
 						handler.sendEmptyMessage(ret);
 					}
 				}.start();

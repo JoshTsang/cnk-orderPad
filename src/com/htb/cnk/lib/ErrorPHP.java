@@ -3,8 +3,7 @@ package com.htb.cnk.lib;
 import java.io.Serializable;
 
 import org.json.JSONObject;
-
-import android.util.Log;
+import com.htb.cnk.utils.MyLog;
 
 public class ErrorPHP implements Serializable{
 	private static final long serialVersionUID = 2L;
@@ -13,7 +12,7 @@ public class ErrorPHP implements Serializable{
 	
 	public static boolean isSucc(String responsePkg,String errorTAG) {
 		if(responsePkg == null){
-			Log.e(errorTAG, errorTAG+".timeOut");
+			MyLog.e(errorTAG, errorTAG+".timeOut");
 			return false;
 		}
 		try {
@@ -29,7 +28,7 @@ public class ErrorPHP implements Serializable{
 		} catch (Exception e) {
 			
 		}
-		Log.e(errorTAG, responsePkg);
+		MyLog.e(errorTAG, responsePkg);
 		return false;
 	}
 
