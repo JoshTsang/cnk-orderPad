@@ -29,7 +29,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.TextView;
 
@@ -37,6 +36,7 @@ import com.htb.cnk.data.CnkDbHelper;
 import com.htb.cnk.lib.DBFile;
 import com.htb.cnk.lib.Http;
 import com.htb.cnk.ui.base.BaseActivity;
+import com.htb.cnk.utils.MyLog;
 import com.htb.constant.ErrorNum;
 import com.htb.constant.Server;
 
@@ -125,13 +125,13 @@ public class UpdateMenuActivity extends BaseActivity {
 	public static boolean isUpdateNeed(int currentMenuVer) {
 		String serverRespond = Http.get(Server.MENU_VERSION, "");
 		if (serverRespond == null || "".equals(serverRespond)) {
-			Log.e(TAG, "no respond when request menu version, currentMVer:" + currentMenuVer);
+			MyLog.e(TAG, "no respond when request menu version, currentMVer:" + currentMenuVer);
 			return false;
 		} else {
 			int start = serverRespond.indexOf("[") + 1;
 			int end = serverRespond.indexOf("]");
 			if (start < 0 || end < 0) {
-				Log.e(TAG, "illegal package, action:getMenuVersion, pkg:" + serverRespond);
+				MyLog.e(TAG, "illegal package, action:getMenuVersion, pkg:" + serverRespond);
 				return false;
 			} else {
 				String ver = serverRespond.substring(start, end);
@@ -139,10 +139,10 @@ public class UpdateMenuActivity extends BaseActivity {
 			}
 		}
 		if (mMenuVer == currentMenuVer) {
-			Log.i(TAG, "serverMenuVer:" + mMenuVer);
+			MyLog.i(TAG, "serverMenuVer:" + mMenuVer);
 			return false;
 		} else {
-			Log.d(TAG, "MenuVer =" + mMenuVer + "current:" + currentMenuVer);
+			MyLog.d(TAG, "MenuVer =" + mMenuVer + "current:" + currentMenuVer);
 			return true;
 		}
 	}
@@ -181,7 +181,7 @@ public class UpdateMenuActivity extends BaseActivity {
         	        }
         	        
         	    } else {
-        	    	Log.d("ftp reply", ftpClient.getReplyString());
+        	    	MyLog.d("ftp reply", ftpClient.getReplyString());
         	    	return ErrorNum.DOWNLOAD_DB_FAILED;
         	    }
         	} catch (SocketException e) {
@@ -225,7 +225,7 @@ public class UpdateMenuActivity extends BaseActivity {
 				String picName = dishes.getString(0);
 				if (picName != null && !"".equals(picName) && !"null".equals(picName)) {
 					ret = downloadPic(Server.IMG_PATH+ picName, picName);
-					Log.i(TAG, "downloading pic " + picName + " for " + dishes.getString(1));
+					MyLog.i(TAG, "downloading pic " + picName + " for " + dishes.getString(1));
 					if (ret < 0) {
 						count++;
 						if (count >= 10) {
@@ -233,7 +233,7 @@ public class UpdateMenuActivity extends BaseActivity {
 						}
 					}
 				} else {
-					Log.i(TAG, "no pic for " + dishes.getString(1));
+					MyLog.i(TAG, "no pic for " + dishes.getString(1));
 				}
 			}
 			
@@ -362,7 +362,7 @@ public class UpdateMenuActivity extends BaseActivity {
 				if (msg.what == ErrorNum.DB_BROKEN) {
 					if (retry < 5) {
 						retry++;
-						Log.d("update menu failed", "retry:" + retry);
+						MyLog.d("update menu failed", "retry:" + retry);
 						updateMenu();
 						return;
 					}

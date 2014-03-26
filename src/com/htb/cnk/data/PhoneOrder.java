@@ -5,10 +5,10 @@ import org.json.JSONObject;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.util.Log;
 
 import com.htb.cnk.lib.ErrorPHP;
 import com.htb.cnk.lib.Http;
+import com.htb.cnk.utils.MyLog;
 import com.htb.constant.Server;
 
 public class PhoneOrder extends MyOrder {
@@ -37,7 +37,7 @@ public class PhoneOrder extends MyOrder {
 		talbeClear();
 		String response = Http.get(Server.GET_GETPHONEORDER, "TID=" + tableId);
 		if (response == null) {
-			Log.e(TAG, "getPhoneOrderFromServer.timeOut");
+			MyLog.e(TAG, "getPhoneOrderFromServer.timeOut");
 			return TIME_OUT;
 		} else if ("null".equals(response)) {
 			return RET_NULL_PHONE_ORDER;
@@ -65,7 +65,7 @@ public class PhoneOrder extends MyOrder {
 			}
 			return 0;
 		} catch (Exception e) {
-			Log.e(TAG, response);
+			MyLog.e(TAG, response);
 			e.printStackTrace();
 		}
 		return -1;

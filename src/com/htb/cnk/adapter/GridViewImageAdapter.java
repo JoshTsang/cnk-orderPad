@@ -20,7 +20,7 @@ import android.widget.TextView;
 
 import com.htb.cnk.R;
 import com.htb.cnk.data.TableSetting;
-import com.umeng.common.Log;
+import com.htb.cnk.utils.MyLog;
 
 public class GridViewImageAdapter extends BaseAdapter {
 	private Context mContext;
@@ -52,7 +52,7 @@ public class GridViewImageAdapter extends BaseAdapter {
 		String waiterScopeString = sharedPre.getString("waiterScope", "");
 		String stringTemp[] = null;
 		stringTemp = waiterScopeString.split(",");
-		Log.d("", waiterScopeString);
+		MyLog.d("", waiterScopeString);
 		if (!waiterScopeString.equals("")) {
 			for (int i = 0; i < stringTemp.length; i++) {
 				if (mTableSetting.getIndexByAllId(Integer

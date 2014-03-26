@@ -1,8 +1,7 @@
 package com.htb.cnk.data;
 
-import android.util.Log;
-
 import com.htb.cnk.lib.Http;
+import com.htb.cnk.utils.MyLog;
 import com.htb.constant.Server;
 
 public class UserData {
@@ -47,7 +46,7 @@ public class UserData {
 			return PWD_NETWORK_ERR;
 		}
 		
-		Log.d("pwd", "userPwd:" + userPwd);
+		MyLog.d("pwd", "userPwd:" + userPwd);
 		String userPerminssion = Http.get(Server.GET_PERMINSSION, "UNAME="
 				+ UserData.mName);
 		if (userPerminssion == null) {
@@ -57,14 +56,14 @@ public class UserData {
 		int end = userPerminssion.indexOf("]");
 
 		if ((start < 0) || (end < 0)) {
-			Log.e("userPerminssion", "userPerminssion is " + userPerminssion);
+			MyLog.e("userPerminssion", "userPerminssion is " + userPerminssion);
 			return PWD_INCORRECT;
 		}
 
 		String userPerminssionRet = userPerminssion.subSequence(start + 1, end)
 				.toString();
 		if (userPerminssionRet.length() <= 0) {
-			Log.e("userPermission", "userPermission length < 0");
+			MyLog.e("userPermission", "userPermission length < 0");
 			return PWD_INCORRECT;
 		}
 
@@ -75,14 +74,14 @@ public class UserData {
 		if (pwd[1].equals(UserData.mPwd)) {
 			
 		} else {
-			Log.e("compare", "userPwd.error:" + userPwd + " userPermission:"
+			MyLog.e("compare", "userPwd.error:" + userPwd + " userPermission:"
 					+ userPerminssionRet);
 			return PWD_INCORRECT;
 		}
 
 		mPermission = Integer.valueOf(userPerminssionRet);
 		if (mPermission > permissionRequire) {
-			Log.e(TAG, "no permission:" + mPermission + " require:" + permissionRequire);
+			MyLog.e(TAG, "no permission:" + mPermission + " require:" + permissionRequire);
 			return NO_PERMISSION;
 		}
 		

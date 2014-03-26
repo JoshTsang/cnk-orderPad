@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -15,8 +14,8 @@ import android.widget.TextView;
 
 import com.htb.cnk.data.UserData;
 import com.htb.cnk.ui.base.BaseActivity;
+import com.htb.cnk.utils.MyLog;
 import com.htb.constant.Permission;
-
 
 public class ManageActivity extends BaseActivity {
 	public final static String TAG = "ManageActivity";
@@ -166,7 +165,7 @@ public class ManageActivity extends BaseActivity {
 							restoreConfirmDlg();
 							break;
 						default:
-							Log.e(TAG, "backupAndRestoreClicked unsupported which:" + which);
+							MyLog.e(TAG, "backupAndRestoreClicked unsupported which:" + which);
 						}
 					}
 				}).show();
@@ -224,7 +223,7 @@ public class ManageActivity extends BaseActivity {
 							luanchStatisticsActivity(StatisticsByPrinterActivity.class);
 							break;
 						default:
-							Log.e(TAG, "backupAndRestoreClicked unsupported which:" + which);
+							MyLog.e(TAG, "backupAndRestoreClicked unsupported which:" + which);
 						}
 					}
 				}).show();

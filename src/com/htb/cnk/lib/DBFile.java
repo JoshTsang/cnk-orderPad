@@ -9,9 +9,9 @@ import java.nio.channels.FileChannel;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
-import android.util.Log;
 
 import com.htb.cnk.data.CnkDbHelper;
+import com.htb.cnk.utils.MyLog;
 
 /**
  * @author josh
@@ -51,11 +51,11 @@ public class DBFile {
         File backup = new File(exportDir, dbFile.getName());
         try {
             fileCopy(backup, dbFile);
-            Log.i(TAG, "copy db to db dir:success,src:"+exportDir+dbFile.getName()+" dest"+dbFile.getPath());
+            MyLog.i(TAG, "copy db to db dir:success,src:"+exportDir+dbFile.getName()+" dest"+dbFile.getPath());
             return 0;
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e(TAG, "copy db to db dir:fail,src:"+exportDir+dbFile.getName()+" dest"+dbFile.getPath());
+            MyLog.e(TAG, "copy db to db dir:fail,src:"+exportDir+dbFile.getName()+" dest"+dbFile.getPath());
             return -1;
         }
         
@@ -74,11 +74,11 @@ public class DBFile {
         File backup = new File(exportDir, name);
         try {
             fileCopy(dbFile, backup);
-            Log.i(TAG, "backup:success");
+            MyLog.i(TAG, "backup:success");
             return 0;
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e(TAG, "backup:fail");
+            MyLog.e(TAG, "backup:fail");
             return -1;
         }
 	}

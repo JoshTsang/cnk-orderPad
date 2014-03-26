@@ -3,7 +3,6 @@ package com.htb.cnk;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -17,6 +16,7 @@ import com.htb.cnk.adapter.CategoryListAdapter;
 import com.htb.cnk.adapter.DishListAdapter;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.ui.base.MenuBaseActivity;
+import com.htb.cnk.utils.MyLog;
 
 /**
  * @author josh
@@ -79,7 +79,7 @@ public class MenuActivity extends MenuBaseActivity {
 	private void setListData() {
 		if (mCategories.count() <= 0) {
 			errorAccurDlg("菜谱数据损坏,请更新菜谱!", FINISH_ACTIVITY);
-			Log.e(TAG, "menu data base is broken, categories.count <= 0");
+			MyLog.e(TAG, "menu data base is broken, categories.count <= 0");
 			return;
 		}
 		setCategories();

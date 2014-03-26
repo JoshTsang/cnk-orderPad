@@ -11,7 +11,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -26,6 +25,7 @@ import android.widget.Toast;
 import com.htb.cnk.R;
 import com.htb.cnk.data.Setting;
 import com.htb.cnk.lib.Ringtone;
+import com.htb.cnk.utils.MyLog;
 
 public class RingtoneSettingFragment extends Fragment {
 
@@ -168,7 +168,7 @@ public class RingtoneSettingFragment extends Fragment {
 					e.printStackTrace();
 				}
 			  }
-			  Log.d(TAG, uri.getPath() + " ext:" + extension);
+			  MyLog.d(TAG, uri.getPath() + " ext:" + extension);
 		  }
 	};
 	

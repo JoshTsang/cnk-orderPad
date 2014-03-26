@@ -6,9 +6,8 @@ import java.util.HashMap;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import android.util.Log;
-
 import com.htb.cnk.lib.Http;
+import com.htb.cnk.utils.MyLog;
 import com.htb.constant.Server;
 
 public class NotificationTypes {
@@ -37,7 +36,7 @@ public class NotificationTypes {
 			notificationTypes.add(map);
 			return 0;
 		} catch (Exception e) {
-			Log.e("getNotificationTypes.php", notificationTypePkg);
+			MyLog.e("getNotificationTypes.php", notificationTypePkg);
 			e.printStackTrace();
 		}
 

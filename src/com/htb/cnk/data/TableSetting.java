@@ -14,11 +14,11 @@ import org.json.JSONObject;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 import android.util.SparseArray;
 
 import com.htb.cnk.lib.ErrorPHP;
 import com.htb.cnk.lib.Http;
+import com.htb.cnk.utils.MyLog;
 import com.htb.constant.Server;
 import com.htb.constant.Table;
 
@@ -207,7 +207,7 @@ public class TableSetting implements Serializable {
 	public int getTableStatusFromServerActivity() {
 		String tableStatusPkg = Http.get(Server.GET_TABLE_STATUS, null);
 		if (tableStatusPkg == null) {
-			Log.e(TAG, "getTableStatusFromServer.timeout");
+			MyLog.e(TAG, "getTableStatusFromServer.timeout");
 			return TIME_OUT;
 		}
 		return parseTableSetting(tableStatusPkg);
@@ -217,7 +217,7 @@ public class TableSetting implements Serializable {
 		String tableStatusPkg = Http.get(Server.GET_TABLE_STATUS, "UUID="
 				+ Lisence.getDeviceId());
 		if (tableStatusPkg == null) {
-			Log.e(TAG, "getTableStatusFromServer.timeout");
+			MyLog.e(TAG, "getTableStatusFromServer.timeout");
 			return null;
 		}
 		return tableStatusPkg;
@@ -230,7 +230,7 @@ public class TableSetting implements Serializable {
 	public int parseTableSetting(String tableStatusPkg) {
 		if (tableStatusPkg == null || tableStatusPkg == "")
 			return -1;
-		// Log.d(TAG, tableStatusPkg);
+		// MyLog.d(TAG, tableStatusPkg);
 		try {
 			JSONArray tableList = new JSONArray(tableStatusPkg);
 			// TODO find good solution for table status update
@@ -238,7 +238,7 @@ public class TableSetting implements Serializable {
 			// /////////////////////////////////////
 			return 0;
 		} catch (Exception e) {
-			Log.e(TAG, "tableStatusResponse:" + tableStatusPkg);
+			MyLog.e(TAG, "tableStatusResponse:" + tableStatusPkg);
 			e.printStackTrace();
 		}
 		return -1;
@@ -310,12 +310,12 @@ public class TableSetting implements Serializable {
 	public String[] getchargedAreaName() {
 		String[] areaString = null;
 		String response = Http.get(Server.GET_AREA, "");
-		Log.d(TAG, response);
+		MyLog.d(TAG, response);
 		if ("null".equals(response)) {
-			Log.w(TAG, "getOrderFromServer.null");
+			MyLog.w(TAG, "getOrderFromServer.null");
 			return null;
 		} else if (response == null) {
-			Log.e(TAG, "getOrderFromServer.timeOut");
+			MyLog.e(TAG, "getOrderFromServer.timeOut");
 			return null;
 		}
 		try {
@@ -328,7 +328,7 @@ public class TableSetting implements Serializable {
 				areaString[i] = String.valueOf(area);
 			}
 		} catch (Exception e) {
-			Log.e(TAG, response);
+			MyLog.e(TAG, response);
 			e.printStackTrace();
 		}
 		return areaString;
@@ -425,7 +425,7 @@ public class TableSetting implements Serializable {
 		String tableStatusPkg = Http.get(Server.GET_ITEM_TABLE_STATUS, "TSI="
 				+ tableId);
 		if (tableStatusPkg == null) {
-			Log.e(TAG, "getItemTableStatus:tableStatusPkg is null");
+			MyLog.e(TAG, "getItemTableStatus:tableStatusPkg is null");
 			return TIME_OUT;
 		}
 
@@ -433,14 +433,14 @@ public class TableSetting implements Serializable {
 		int end = tableStatusPkg.indexOf("]");
 
 		if ((start < 0) || (end < 0)) {
-			Log.e(TAG, "getItemTableStatus:tableStatusPkg is " + tableStatusPkg);
+			MyLog.e(TAG, "getItemTableStatus:tableStatusPkg is " + tableStatusPkg);
 			return -1;
 		}
 
 		String tableStatus = tableStatusPkg.subSequence(start + 1, end)
 				.toString();
 		if (tableStatus.length() <= 0) {
-			Log.e(TAG, "getItemTableStatus:tableStatusPkg length  < 0");
+			MyLog.e(TAG, "getItemTableStatus:tableStatusPkg length  < 0");
 			return -1;
 		}
 		return Integer.parseInt(tableStatus);
@@ -491,7 +491,7 @@ public class TableSetting implements Serializable {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		Log.d(TAG, orderALL.toString());
+		MyLog.d(TAG, orderALL.toString());
 		String tableCleanPkg = Http.post(Server.CLEAN_TABLE,
 				orderALL.toString());
 		if (!ErrorPHP.isSucc(tableCleanPkg, TAG)) {
@@ -504,7 +504,7 @@ public class TableSetting implements Serializable {
 			String destName, int persons) {
 		int ret = getOrderFromServer(srcTId);
 		if (ret == -1) {
-			Log.e(TAG, "mOrder.getOrderFromServer.timeout:changeTable");
+			MyLog.e(TAG, "mOrder.getOrderFromServer.timeout:changeTable");
 			return TIME_OUT;
 		}
 
@@ -528,7 +528,7 @@ public class TableSetting implements Serializable {
 	public int copyTable(int srcTId, int destTId, int persons) {
 		int ret = getOrderFromServer(srcTId);
 		if (ret == -1) {
-			Log.e(TAG, "mOrder.getOrderFromServer.timeout:copyTable");
+			MyLog.e(TAG, "mOrder.getOrderFromServer.timeout:copyTable");
 			return TIME_OUT;
 		}
 		JSONObject order = new JSONObject();
@@ -573,7 +573,7 @@ public class TableSetting implements Serializable {
 			for (Integer item : srcTId) {
 				ret = getOrderFromServer(item.intValue());
 				if (ret < 0) {
-					Log.e(TAG, "mOrder.getOrderFromServer.timeout:checkOut");
+					MyLog.e(TAG, "mOrder.getOrderFromServer.timeout:checkOut");
 					return TIME_OUT;
 				}
 				JSONObject orderObject = new JSONObject();
@@ -590,7 +590,7 @@ public class TableSetting implements Serializable {
 			for (Integer item : srcTId) {
 				ret = getOrderFromServerWithoutClear(item.intValue());
 				if (ret < 0) {
-					Log.e(TAG, "mOrder.getOrderFromServerWithoutClear.timeout:checkOut");
+					MyLog.e(TAG, "mOrder.getOrderFromServerWithoutClear.timeout:checkOut");
 					return TIME_OUT;
 				}
 				nameStrBuf.append(tableName.get(i).toString() + ",");
@@ -634,7 +634,7 @@ public class TableSetting implements Serializable {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		Log.d(TAG, orderAll.toString());
+		MyLog.d(TAG, orderAll.toString());
 		String tablecheckOutPkg = Http.post(Server.CHECK_OUT,
 				orderAll.toString());
 		if (!ErrorPHP.isSucc(tablecheckOutPkg, TAG)) {
@@ -656,7 +656,7 @@ public class TableSetting implements Serializable {
 			String destName, int persons) {
 		int ret = getOrderFromServer(srcTId);
 		if (ret == -1) {
-			Log.e(TAG, "mOrder.getOrderFromServer.timeout:combineTable");
+			MyLog.e(TAG, "mOrder.getOrderFromServer.timeout:combineTable");
 			return TIME_OUT;
 		}
 
@@ -668,7 +668,7 @@ public class TableSetting implements Serializable {
 		String time = getCurrentTime();
 		int destPersons = MyOrder.loodPersons(destTId);
 		if (destPersons < 0) {
-			Log.e(TAG, "mOrder.getPersonsFromServer");
+			MyLog.e(TAG, "mOrder.getPersonsFromServer");
 			return destPersons;
 		}
 		persons = destPersons + persons;
@@ -714,25 +714,25 @@ public class TableSetting implements Serializable {
 		for (Integer item : srcTId) {
 			ret = getOrderFromServer(item.intValue());
 			if (ret == -1) {
-				Log.e(TAG,
+				MyLog.e(TAG,
 						"mOrder.getOrderFromServer.timeout:getTotalPriceTable");
 				return TIME_OUT;
 			}
 			paymentRet = fetchAdvPayment(item.intValue());
 			if (paymentRet < 0) {
-				Log.e(TAG,
+				MyLog.e(TAG,
 						"mOrder.getOrderFromServer.timeout:fetchAdvPayment");
 				return TIME_OUT;
 			} else {
 				advPayment += paymentRet;
-				Log.d(TAG, "tid:" + item.intValue() + "tn:" + tableName.get(i) + "p:" + paymentRet);
+				MyLog.d(TAG, "tid:" + item.intValue() + "tn:" + tableName.get(i) + "p:" + paymentRet);
 			} 
 			JSONObject order = new JSONObject();
 			orderJson(item.intValue(), order, tableName.get(i), time, 0);
 			checkOutPrinter.add(order.toString());
 			i++;
 			totalPrice = totalPrice + mOrder.getTotalPrice();
-			Log.d(TAG, "advPayment:" + advPayment);
+			MyLog.d(TAG, "advPayment:" + advPayment);
 		}
 
 		return totalPrice;
@@ -743,7 +743,7 @@ public class TableSetting implements Serializable {
 	}
 
 	public String checkOutJson(int width) {
-		Log.d(TAG, "width:" + width);
+		MyLog.d(TAG, "width:" + width);
 		int space = 24;
 		String checkOutJson = new String();
 		switch(width) {
@@ -791,9 +791,9 @@ public class TableSetting implements Serializable {
 						spaceLen += 1;
 					}
 
-					// Log.d(TAG, "dishName:" + name + " zhLen:" + zhLen
+					// MyLog.d(TAG, "dishName:" + name + " zhLen:" + zhLen
 					// + " enLen:" + enLen + " spaceLen:" + spaceLen);
-					// Log.d(TAG, "dishName:" + name + " strLen:" + strlen
+					// MyLog.d(TAG, "dishName:" + name + " strLen:" + strlen
 					// + " strByteLen:" + strByteLen);
 
 					String priceStr = nf.format(price);
@@ -809,7 +809,7 @@ public class TableSetting implements Serializable {
 								+ totalPriceSpaceLen + "s%s", name, "",
 								priceStr, "", quanStr, "", "", itemTotalPrice);
 					} else {
-						// Log.d(TAG, "%s\r\n%36s%s%" + priceSpaceLen + "s%s%"
+						// MyLog.d(TAG, "%s\r\n%36s%s%" + priceSpaceLen + "s%s%"
 						// + quanSpaceLen + "s%" + totalPriceSpaceLen
 						// + "s%s");
 						dish = String.format("%s\r\n%42s%s%" + priceSpaceLen
@@ -823,7 +823,7 @@ public class TableSetting implements Serializable {
 				totalPrice.add(tatolPrice);
 				k++;
 			} catch (JSONException e) {
-				Log.e(TAG, "checkOutJson.error");
+				MyLog.e(TAG, "checkOutJson.error");
 				e.printStackTrace();
 			}
 		}

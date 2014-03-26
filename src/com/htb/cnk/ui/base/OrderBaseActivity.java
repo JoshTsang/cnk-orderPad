@@ -16,7 +16,6 @@ import android.os.IBinder;
 import android.os.Message;
 import android.text.InputFilter;
 import android.text.method.DigitsKeyListener;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -39,6 +38,7 @@ import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.dialog.LoginDlg;
 import com.htb.cnk.dialog.TitleAndMessageDlg;
 import com.htb.cnk.service.NotificationTableService;
+import com.htb.cnk.utils.MyLog;
 import com.htb.constant.Permission;
 import com.htb.constant.Table;
 
@@ -428,7 +428,7 @@ public class OrderBaseActivity extends BaseActivity {
 	protected int submitToService() {
 		String order = mMyOrder.getOrderJson();
 		if (order == null) {
-			Log.e(TAG, "order==null");
+			MyLog.e(TAG, "order==null");
 			return -1;
 		}
 		mPendOrderBinder.add(Info.getTableId(), Info.getTableName(), mSettings.getStatusById(Info.getTableId()), order);
@@ -442,7 +442,7 @@ public class OrderBaseActivity extends BaseActivity {
 	protected int submitMultiOrderToService() {
 		String order = mMyOrder.getMultiOrderJson(multiOrderIds, multiOrderNames.toString());
 		if (order == null) {
-			Log.e(TAG, "order==null");
+			MyLog.e(TAG, "order==null");
 			return -1;
 		}
 		
@@ -590,7 +590,7 @@ public class OrderBaseActivity extends BaseActivity {
 		@Override
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			if (service == null) {
-				Log.d("TAG", "service==null");
+				MyLog.d("TAG", "service==null");
 			}
 			mPendOrderBinder = (NotificationTableService.MyBinder)service;
 			mBinded = true;

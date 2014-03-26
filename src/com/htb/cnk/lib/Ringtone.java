@@ -6,12 +6,12 @@ import android.content.Context;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
-import android.util.Log;
 
 import com.htb.cnk.R;
 import com.htb.cnk.data.Notifications;
 import com.htb.cnk.data.Setting;
 import com.htb.cnk.data.TableSetting;
+import com.htb.cnk.utils.MyLog;
 
 public class Ringtone implements OnPreparedListener, OnCompletionListener{
 	public final static String TAG = "Ringtone";
@@ -47,7 +47,7 @@ public class Ringtone implements OnPreparedListener, OnCompletionListener{
 		} else if (mediaPlayer.isPlaying()) {
 			return;
 		} else {
-			Log.e(TAG, "something is wrong");
+			MyLog.e(TAG, "something is wrong");
 			update();
 		}
 		

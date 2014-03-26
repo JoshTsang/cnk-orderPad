@@ -23,11 +23,11 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
-import android.util.Log;
 import android.util.SparseArray;
 
 import com.htb.cnk.lib.DBFile;
 import com.htb.cnk.lib.Http;
+import com.htb.cnk.utils.MyLog;
 import com.htb.constant.ErrorNum;
 import com.htb.constant.Server;
 
@@ -97,7 +97,7 @@ public class Statistics {
         	        ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
         	        buffIn = new BufferedOutputStream(new FileOutputStream(filePath+localDBName));
         	        ftpClient.enterLocalPassiveMode();
-        	        Log.i(TAG, "downloading db, src:"+serverDBName+" dest:"+filePath+localDBName);
+        	        MyLog.i(TAG, "downloading db, src:"+serverDBName+" dest:"+filePath+localDBName);
         	        boolean ret = ftpClient.retrieveFile(serverDBName, buffIn);
         	        buffIn.close();
         	        ftpClient.logout();
@@ -106,19 +106,19 @@ public class Statistics {
         	        	return ErrorNum.DOWNLOAD_DB_FAILED;
         	        }
         	    } else {
-        	    	Log.e(TAG, "ftp reply" + ftpClient.getReplyString());
+        	    	MyLog.e(TAG, "ftp reply" + ftpClient.getReplyString());
         	    	return ErrorNum.DOWNLOAD_DB_FAILED;
         	    }
         	} catch (SocketException e) {
-        	    //Log.e(SorensonApplication.TAG, e.getStackTrace().toString());
+        	    //MyLog.e(SorensonApplication.TAG, e.getStackTrace().toString());
         		e.printStackTrace();
         		return ErrorNum.DOWNLOAD_DB_FAILED;
         	} catch (UnknownHostException e) {
-        	    //Log.e(SorensonApplication.TAG, e.getStackTrace().toString());
+        	    //MyLog.e(SorensonApplication.TAG, e.getStackTrace().toString());
         		e.printStackTrace();
         		return ErrorNum.DOWNLOAD_DB_FAILED;
         	} catch (IOException e) {
-        	    //Log.e(SorensonApplication.TAG, e.getStackTrace().toString());
+        	    //MyLog.e(SorensonApplication.TAG, e.getStackTrace().toString());
         		e.printStackTrace();
         		return ErrorNum.DOWNLOAD_DB_FAILED;
         	}
@@ -135,7 +135,7 @@ public class Statistics {
 	public int perpareResult(String json, int type) { 
 
 		if (json == null) {
-			Log.d(TAG, "json == null");
+			MyLog.d(TAG, "json == null");
 			return -1;
 		}
 		mSalesData.clear();
@@ -162,7 +162,7 @@ public class Statistics {
 				mSalesData.add(salesRow);
 			}
 		} catch (JSONException e) {
-			Log.d(TAG, json);
+			MyLog.d(TAG, json);
 			e.printStackTrace();
 			return -1;
 		}
@@ -173,7 +173,7 @@ public class Statistics {
 	public int perparePerformanceResult(String json) {
 
 		if (json == null) {
-			Log.d(TAG, "json == null");
+			MyLog.d(TAG, "json == null");
 			return -1;
 		}
 		mSalesData.clear();
@@ -205,7 +205,7 @@ public class Statistics {
 
 	public int perpareStatisticsByCategory(String json) {
 		if (json == null) {
-			Log.d(TAG, "json == null");
+			MyLog.d(TAG, "json == null");
 			return -1;
 		}
 		mSalesData.clear();
@@ -258,7 +258,7 @@ public class Statistics {
 			}
 			respond = Http.get(Server.STUFF, "");
 			if (respond == null) {
-				Log.e(TAG, "get stuff failed");
+				MyLog.e(TAG, "get stuff failed");
 				return null;
 			}
 			try {
@@ -279,7 +279,7 @@ public class Statistics {
 		
 		respond = Http.post(Server.STATISTIC, msg.toString());
 		if (respond == null) {
-			Log.e(TAG, "get statistics failed");
+			MyLog.e(TAG, "get statistics failed");
 			return null;
 		}
 		
@@ -312,7 +312,7 @@ public class Statistics {
 			}
 			respond = Http.get(Server.STUFF, "");
 			if (respond == null) {
-				Log.e(TAG, "get stuff failed");
+				MyLog.e(TAG, "get stuff failed");
 				return null;
 			}
 			try {
@@ -333,7 +333,7 @@ public class Statistics {
 		
 		respond = Http.post(Server.STATISTIC, msg.toString());
 		if (respond == null) {
-			Log.e(TAG, "get statistics failed");
+			MyLog.e(TAG, "get statistics failed");
 			return null;
 		}
 		
@@ -363,7 +363,7 @@ public class Statistics {
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();
-			Log.e(TAG, json);
+			MyLog.e(TAG, json);
 			return -1;
 		}
 		return 0;
@@ -379,7 +379,7 @@ public class Statistics {
 		
 		ret = Http.getPrinterStatus(Server.PRINTER_CONTENT_TYPE_STATISTICS);
 		if (ret < 0) {
-			Log.e(TAG, "get PrinterStatus failed:" + ret);
+			MyLog.e(TAG, "get PrinterStatus failed:" + ret);
 			return -1;
 		}
 		try {
@@ -408,12 +408,12 @@ public class Statistics {
  
 		String response = Http.post(Server.STATISTICS_PRINT, salesData.toString());
 		if (response == null) {
-			Log.e(TAG, "Respond:die/ok");
+			MyLog.e(TAG, "Respond:die/ok");
 			return -1;
 		} else if ("".equals(response)) {
-			//Log.e("Respond",response);
+			//MyLog.e("Respond",response);
 		} else { 
-			Log.e(TAG, "Respond:" + response);
+			MyLog.e(TAG, "Respond:" + response);
 			return -1;
 		}
 		return 0;

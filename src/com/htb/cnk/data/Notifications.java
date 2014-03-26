@@ -6,9 +6,8 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import android.util.Log;
-
 import com.htb.cnk.lib.Http;
+import com.htb.cnk.utils.MyLog;
 import com.htb.constant.Server;
 
 public class Notifications {
@@ -95,7 +94,7 @@ public class Notifications {
 			return 1;
 		} catch (Exception e) {
 			e.printStackTrace();
-			Log.e("getNotification.php", notificationPkg);
+			MyLog.e("getNotification.php", notificationPkg);
 		}
 
 		return -2;

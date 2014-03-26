@@ -2,7 +2,6 @@ package com.htb.cnk.lib;
 
 import android.app.Activity;
 import android.content.Context;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -10,6 +9,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import com.htb.cnk.adapter.TableAdapter;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.ui.base.TableGridActivity;
+import com.htb.cnk.utils.MyLog;
 
 public class TableItemClickListener extends Activity implements OnItemClickListener{ 
 	private final static String TAG = "TableItemClickListener";
@@ -26,7 +26,7 @@ public class TableItemClickListener extends Activity implements OnItemClickListe
 			int arg2,// The position of the view in the adapter
 			long arg3// The row id of the item that was clicked
 	) {
-		Log.d(TAG,
+		MyLog.d(TAG,
 				"arg2:" + arg2 + " name: " + mTableInfo.getName(arg2)
 						+ "id: " + mTableInfo.getId(arg2) + " status:"
 						+ mTableInfo.getStatus(arg2));

@@ -13,7 +13,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -30,6 +29,7 @@ import com.htb.cnk.lib.Ringtone;
 import com.htb.cnk.service.MyReceiver;
 import com.htb.cnk.service.NotificationTableService;
 import com.htb.cnk.service.NotificationTableService.MyBinder;
+import com.htb.cnk.utils.MyLog;
 
 public abstract class TableGridActivity extends BaseActivity {
 	public static boolean networkStatus = true;
@@ -317,7 +317,7 @@ public abstract class TableGridActivity extends BaseActivity {
 		public void handleMessage(Message msg) {
 			int ret = binder.count();
 			if (ret > 0) {
-				Log.d(TAG, "has order Pending");
+				MyLog.d(TAG, "has order Pending");
 				mOrderNotification.setVisibility(View.VISIBLE);
 				mOrderNotification.setText("有" + ret + "个订单挂起，系统会自动提交");
 			} else {
@@ -344,7 +344,7 @@ public abstract class TableGridActivity extends BaseActivity {
 						isPrinterErrShown = true;
 					}
 				}
-				Log.e(TAG, "submit order failed more than 10 times");
+				MyLog.e(TAG, "submit order failed more than 10 times");
 			}
 		}
 	};
@@ -389,7 +389,7 @@ public abstract class TableGridActivity extends BaseActivity {
 					}
 					break;
 				default:
-					Log.e(TAG,
+					MyLog.e(TAG,
 							"unhandled case:"
 									+ msg.what
 									+ (new Exception()).getStackTrace()[2]

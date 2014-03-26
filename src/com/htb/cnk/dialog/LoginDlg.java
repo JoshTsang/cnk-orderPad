@@ -11,7 +11,6 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -21,6 +20,7 @@ import com.htb.cnk.R;
 import com.htb.cnk.data.Info;
 import com.htb.cnk.data.Setting;
 import com.htb.cnk.data.UserData;
+import com.htb.cnk.utils.MyLog;
 
 public class LoginDlg {
 	private final String TAG = "LoginDlg";
@@ -176,7 +176,7 @@ public class LoginDlg {
 							Toast.LENGTH_LONG).show();
 					break;
 				default:
-					Log.e(TAG, "unknown err msg");
+					MyLog.e(TAG, "unknown err msg");
 				}
 				
 			} else {

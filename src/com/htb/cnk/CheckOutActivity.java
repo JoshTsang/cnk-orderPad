@@ -14,7 +14,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.method.ScrollingMovementMethod;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -29,6 +28,7 @@ import com.htb.cnk.data.TableSetting;
 import com.htb.cnk.dialog.CashContext;
 import com.htb.cnk.dialog.CashDialog;
 import com.htb.cnk.ui.base.BaseActivity;
+import com.htb.cnk.utils.MyLog;
 
 public class CheckOutActivity extends BaseActivity {
 	protected Button mBackBtn;
@@ -132,7 +132,7 @@ public class CheckOutActivity extends BaseActivity {
 				Context.MODE_PRIVATE);
 		String cashType = sharedPre.getString("cashType", "");
 		String cashRebate = sharedPre.getString("cashRebate", "");
-		Log.d(TAG, cashType);
+		MyLog.d(TAG, cashType);
 		CashContext cashContext = new CashContext(cashType, cashRebate);
 		mTotalPrice = cashContext.getResult(mTotalPrice);
 	}
